@@ -8,18 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('pembinas', function (Blueprint $table) {
+        Schema::create('kelas', function (Blueprint $table) {
             $table->id();
-            $table->string('nip')->unique();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('nama');
-            $table->enum('jenis_kelamin', ['laki-laki', 'perempuan']);
+            $table->enum('tingkat', ['x', 'xi', 'xii']);
+            $table->foreignId('tahun_ajaran_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('pembinas');
+        Schema::dropIfExists('kelas');
     }
 };

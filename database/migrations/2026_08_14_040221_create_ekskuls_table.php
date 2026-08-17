@@ -6,15 +6,12 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('ekskuls', function (Blueprint $table) {
-            $table->id_ekskul();
-            $table->foreignId('nip')->constrained('pembinas')->onDelete('cascade'); // Foreign Key
-            $table->foreignId('id_pelatih')->constrained('pelatihs')->onDelete('cascade'); // Foreign Key
+            $table->id();
+            $table->foreignId('pembina_id')->constrained('pembinas')->onDelete('cascade');
+            $table->foreignId('pelatih_id')->constrained()->onDelete('cascade');
             $table->string('nama_ekskul');
             $table->text('deskripsi')->nullable();
             $table->text('jadwal')->nullable();
@@ -23,9 +20,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('ekskuls');

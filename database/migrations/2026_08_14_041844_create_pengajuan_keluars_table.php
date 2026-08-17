@@ -6,24 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('pengajuan_keluars', function (Blueprint $table) {
-            $table->id_pengajuan_keluar();
-            $table->foreignId('nis')->constrained('siswas')->onDelete('cascade'); // Foreign Key
-            $table->foreignId('id_ekskul')->constrained('ekskuls')->onDelete('cascade'); // Foreign Key
+            $table->id();
+            $table->foreignId('siswa_id')->constrained()->onDelete('cascade');
+            $table->foreignId('ekskul_id')->constrained()->onDelete('cascade');
             $table->text('alasan');
             $table->enum('status', ['pending', 'diterima', 'ditolak'])->default('pending');
-            $table->timestamps('tanggal_pengajuan');
+            $table->date('tanggal_pengajuan');
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('pengajuan_keluars');
