@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('nama');
             $table->foreignId('kelas_id')->constrained()->onDelete('cascade');
             $table->enum('jenis_kelamin', ['laki-laki', 'perempuan']);
-            $table->enum('jabatan', ['siswa', 'anggota', 'ketua_ekskul'])->default('siswa');
+            $table->enum('jabatan', ['siswa', 'anggota', 'ketua'])->default('siswa');
             $table->timestamps();
         });
     }
