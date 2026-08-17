@@ -31,37 +31,32 @@ class PresensiController extends Controller
     public function store(Request $request, Kegiatan $kegiatan)
     {
         $validated = $request->validate([
-            'presensi'   => 'required|array',
-            'presensi.*.pendaftaran_id' => 'required|exists:pendaftarans,id',
-            'presensi.*.status'         => 'required|in:hadir,sakit,izin,alpha',
-            'dokumentasi'  => 'nullable|array',
+            'presensi'                      => 'required|array',
+            'presensi.*.pendaftaran_id'     => 'required|exists:pendaftarans,id',
+            'presensi.*.status'             => 'required|in:hadir,sakit,izin,alpha',
+            'dokumentasi'                   => 'nullable|array',
         ]);
 
         foreach ($validated['presensi'] as $item) {
             Presensi::updateOrCreate(
                 [
-                    'kegiatan_id'      => $kegiatan->id,
-                    'pendaftaran_id'   => $item['pendaftaran_id'],
+                    'kegiatan_id'    => $kegiatan->id,
+                    'pendaftaran_id' => $item['pendaftaran_id'],
                 ],
                 [
-                    'status'       => $item['status'],
-                    'dokumentasi'  => $validated['dokumentasi'] ?? null,
+                    'status'      => $item['status'],
+                    'dokumentasi' => $validated['dokumentasi'] ?? null,
                 ]
             );
         }
 
-        return redirect()->route('kegiatan.show', $kegiatan)->with('success', 'Presensi berhasil disimpan.');
+        return redirect()->route('ketua.kegiatan.show', $kegiatan)->with('success', 'Presensi berhasil disimpan.');
     }
 
     public function show(Presensi $presensi)
     {
         $presensi->load(['kegiatan', 'pendaftaran.siswa']);
         return view('ketua.presensi.show', compact('presensi'));
-    }
-
-    public function edit(Presensi $presensi)
-    {
-        return view('ketua.presensi.edit', compact('presensi'));
     }
 
     public function update(Request $request, Presensi $presensi)
@@ -73,13 +68,13 @@ class PresensiController extends Controller
 
         $presensi->update($validated);
 
-        return redirect()->route('kegiatan.show', $presensi->kegiatan)->with('success', 'Presensi berhasil diupdate.');
+        return redirect()->route('ketua.kegiatan.show', $presensi->kegiatan)->with('success', 'Presensi berhasil diupdate.');
     }
 
     public function destroy(Presensi $presensi)
     {
         $presensi->delete();
 
-        return redirect()->route('kegiatan.show', $presensi->kegiatan)->with('success', 'Presensi berhasil dihapus.');
+        return redirect()->route('ketua.kegiatan.show', $presensi->kegiatan)->with('success', 'Presensi berhasil dihapus.');
     }
 }
