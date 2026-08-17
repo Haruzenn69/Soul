@@ -3,76 +3,67 @@
 namespace App\Http\Controllers;
 
 use App\Models\LaporanBulanan;
-use App\Models\Ekskul;
 use Illuminate\Http\Request;
 
 class LaporanBulananController extends Controller
 {
+    private function getEkskul()
+    {
+        return auth()->user()->siswa->pendaftarans()->where('status', 'diterima')->first()->ekskul;
+    }
+
     public function index()
     {
-        $laporans = LaporanBulanan::with('ekskul')->get();
-        return view('pembina.laporan-bulanan.index', compact('laporans'));
+        $ekskul = $this->getEkskul();
+        $laporans = LaporanBulanan::where('ekskul_id', $ekskul->id)->get();
+        return view('ketua.laporan-bulanan.index', compact('laporans'));
     }
 
     public function create()
     {
-        $ekskul = auth()->user()->pembina->ekskuls->first();
+        $ekskul = $this->getEkskul();
         return view('ketua.laporan-bulanan.create', compact('ekskul'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'bulan'            => 'required|string|max:7',
-            'materi_kegiatan'  => 'nullable|string|max:255',
-            'ringkasan'        => 'nullable|string',
-            'dokumentasi'      => 'nullable|string',
+            'bulan'           => 'required|string|max:7',
+            'materi_kegiatan' => 'nullable|string|max:255',
+            'ringkasan'       => 'nullable|string',
+            'dokumentasi'     => 'nullable|string',
         ]);
 
-        $ekskul = auth()->user()->siswa->pendaftarans()->where('status', 'diterima')->first()->ekskul;
+        $ekskul = $this->getEkskul();
 
         LaporanBulanan::create([
-            'ekskul_id'        => $ekskul->id,
-            'bulan'            => $validated['bulan'],
-            'materi_kegiatan'  => $validated['materi_kegiatan'] ?? null,
-            'ringkasan'        => $validated['ringkasan'] ?? null,
-            'dokumentasi'      => $validated['dokumentasi'] ?? null,
-            'status'           => 'draft',
+            'ekskul_id'       => $ekskul->id,
+            'bulan'           => $validated['bulan'],
+            'materi_kegiatan' => $validated['materi_kegiatan'] ?? null,
+            'ringkasan'       => $validated['ringkasan'] ?? null,
+            'dokumentasi'     => $validated['dokumentasi'] ?? null,
+            'status'          => 'draft',
         ]);
 
-        return redirect()->route('laporan-bulanan.index')->with('success', 'Laporan bulanan berhasil dibuat.');
+        return redirect()->route('ketua.laporan-bulanan.index')->with('success', 'Laporan bulanan berhasil dibuat.');
     }
 
     public function show(LaporanBulanan $laporanBulanan)
     {
         $laporanBulanan->load('ekskul');
-        return view('pembina.laporan-bulanan.show', compact('laporanBulanan'));
-    }
-
-    public function edit(LaporanBulanan $laporanBulanan)
-    {
-        return view('ketua.laporan-bulanan.edit', compact('laporanBulanan'));
+        return view('ketua.laporan-bulanan.show', compact('laporanBulanan'));
     }
 
     public function update(Request $request, LaporanBulanan $laporanBulanan)
     {
         $validated = $request->validate([
-            'materi_kegiatan'  => 'nullable|string|max:255',
-            'ringkasan'        => 'nullable|string',
-            'dokumentasi'      => 'nullable|string',
-            'status'           => 'nullable|in:draft,disetujui,ditolak',
-            'catatan_pembina'  => 'nullable|string',
+            'materi_kegiatan' => 'nullable|string|max:255',
+            'ringkasan'       => 'nullable|string',
+            'dokumentasi'     => 'nullable|string',
         ]);
 
         $laporanBulanan->update($validated);
 
-        return redirect()->route('laporan-bulanan.index')->with('success', 'Laporan bulanan berhasil diupdate.');
-    }
-
-    public function destroy(LaporanBulanan $laporanBulanan)
-    {
-        $laporanBulanan->delete();
-
-        return redirect()->route('laporan-bulanan.index')->with('success', 'Laporan bulanan berhasil dihapus.');
+        return redirect()->route('ketua.laporan-bulanan.index')->with('success', 'Laporan bulanan berhasil diupdate.');
     }
 }
