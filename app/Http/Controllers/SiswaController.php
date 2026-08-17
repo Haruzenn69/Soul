@@ -7,11 +7,15 @@ use App\Models\Kelas;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class SiswaController extends Controller
 {
     public function index()
+    {
+        return view('siswa.landing');
+    }
+
+    public function manage()
     {
         $siswas = Siswa::with('kelas')->get();
         return view('kesiswaan.siswa.index', compact('siswas'));
@@ -47,7 +51,7 @@ class SiswaController extends Controller
             'jenis_kelamin'   => $validated['jenis_kelamin'],
         ]);
 
-        return redirect()->route('siswa.index')->with('success', 'Siswa berhasil ditambahkan.');
+        return redirect()->route('kesiswaan.siswa.manage')->with('success', 'Siswa berhasil ditambahkan.');
     }
 
     public function show(Siswa $siswa)
@@ -73,7 +77,7 @@ class SiswaController extends Controller
 
         $siswa->update($validated);
 
-        return redirect()->route('siswa.index')->with('success', 'Siswa berhasil diupdate.');
+        return redirect()->route('kesiswaan.siswa.manage')->with('success', 'Siswa berhasil diupdate.');
     }
 
     public function destroy(Siswa $siswa)
@@ -81,6 +85,6 @@ class SiswaController extends Controller
         $siswa->user->delete();
         $siswa->delete();
 
-        return redirect()->route('siswa.index')->with('success', 'Siswa berhasil dihapus.');
+        return redirect()->route('kesiswaan.siswa.manage')->with('success', 'Siswa berhasil dihapus.');
     }
 }

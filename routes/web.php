@@ -6,12 +6,13 @@ use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\PengajuanKeluarController;
 use App\Http\Controllers\LaporanBulananController;
+use App\Http\Controllers\SiswaController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// ============ LANDING PAGE ============
+Route::get('/', [SiswaController::class, 'index'])->name('siswa.landing');
 
+// ============ DASHBOARD ============
 Route::get('/dashboard', function () {
     $user = auth()->user();
 
