@@ -9,10 +9,16 @@ use App\Http\Controllers\LaporanBulananController;
 use App\Http\Controllers\SiswaController;
 use Illuminate\Support\Facades\Route;
 
-// ============ LANDING PAGE ============
 Route::get('/', [SiswaController::class, 'index'])->name('siswa.landing');
 
-// ============ DASHBOARD ============
+Route::get('/siswa/dashboard', function () {
+    return view('siswa.dashboard');
+})->name('siswa.dashboard');
+
+Route::get('/pembina/dashboard', function () {
+    return view('pembina.dashboard');
+})->name('pembina.dashboard');
+
 Route::get('/dashboard', function () {
     $user = auth()->user();
 
@@ -29,7 +35,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// ============ KETUA EKSKUL ============
 Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name('ketua.')->group(function () {
 
     Route::get('/dashboard', function () {
