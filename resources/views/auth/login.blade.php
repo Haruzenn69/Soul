@@ -72,7 +72,7 @@
                 
                 <!-- Input Email / Username -->
                 <div>
-                    <input type="text" name="login" placeholder="Email / Username" required class="w-full px-5 py-3.5 rounded-full bg-gray-100/80 border border-transparent text-xs text-gray-800 placeholder-gray-400 focus:bg-white focus:border-theme-blue focus:outline-none transition shadow-inner">
+                    <input type="text" name="email" placeholder="Email / Username" required class="w-full px-5 py-3.5 rounded-full bg-gray-100/80 border border-transparent text-xs text-gray-800 placeholder-gray-400 focus:bg-white focus:border-theme-blue focus:outline-none transition shadow-inner">
                 </div>
 
                 <!-- Input Password -->

@@ -6,10 +6,12 @@ use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\PengajuanKeluarController;
 use App\Http\Controllers\LaporanBulananController;
-use App\Http\Controllers\SiswaController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [SiswaController::class, 'index'])->name('siswa.landing');
+Route::get('/', function () {
+    $ekskuls = \App\Models\Ekskul::with(['pembina', 'pelatih'])->get();
+    return view('welcome', compact('ekskuls'));
+})->name('siswa.landing');
 
 Route::get('/siswa/dashboard', function () {
     return view('siswa.dashboard');
