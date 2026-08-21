@@ -110,7 +110,6 @@
                     <div class="bg-theme-light rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition p-6 flex flex-col">
                         <h3 class="font-bold text-lg text-theme-dark mb-2">{{ $ekskul->nama_ekskul }}</h3>
                         <p class="text-xs text-gray-500 mb-1">Pembina: {{ $ekskul->pembina->nama ?? '-' }}</p>
-                        <p class="text-xs text-gray-500 mb-1">Pelatih: {{ $ekskul->pelatih->nama ?? '-' }}</p>
                         <p class="text-xs text-gray-500 mb-3">Jadwal: {{ $ekskul->jadwal ?? '-' }}</p>
                         <p class="text-sm text-gray-600 flex-1 mb-4">{{ $ekskul->deskripsi ?? 'Tidak ada deskripsi.' }}</p>
                         <div class="mt-auto">

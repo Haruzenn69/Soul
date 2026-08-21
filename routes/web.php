@@ -4,7 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    $ekskuls = \App\Models\Ekskul::with(['pembina', 'pelatih'])->get();
+    $ekskuls = \App\Models\Ekskul::with('pembina')->get();
     return view('welcome', compact('ekskuls'));
 })->name('siswa.landing');
 
