@@ -29,4 +29,23 @@ class Siswa extends Model
     {
         return $this->hasMany(PengajuanKeluar::class);
     }
+
+    // === TAMBAHKAN DUA METHOD DI BAWAH INI ===
+
+    public function presensis(): HasMany
+    {
+        return $this->hasMany(Presensi::class);
+    }
+
+    public function ekskulAktif()
+    {
+        return $this->hasOneThrough(
+            Ekskul::class,
+            Pendaftaran::class,
+            'siswa_id',    // Foreign key di tabel pendaftarans
+            'id',          // Foreign key di tabel ekskuls
+            'id',          // Local key di tabel siswas
+            'ekskul_id'    // Local key di tabel pendaftarans
+        )->where('pendaftarans.status', 'diterima');
+    }
 }

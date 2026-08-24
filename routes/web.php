@@ -8,35 +8,70 @@ use App\Http\Controllers\PengajuanKeluarController;
 use App\Http\Controllers\LaporanBulananController;
 use Illuminate\Support\Facades\Route;
 
+// 1. LANDING PAGE
 Route::get('/', function () {
     $ekskuls = \App\Models\Ekskul::with(['pembina', 'pelatih'])->get();
     return view('welcome', compact('ekskuls'));
 })->name('siswa.landing');
 
-Route::get('/siswa/dashboard', function () {
-    return view('siswa.dashboard');
-})->name('siswa.dashboard');
-
-Route::get('/pembina/dashboard', function () {
-    return view('pembina.dashboard');
-})->name('pembina.dashboard');
-
+// 2. REDIRECTOR DASHBOARD UTAMA
+// Meneruskan user ke dashboard yang sesuai berdasarkan role/jabatan saat mengakses /dashboard
 Route::get('/dashboard', function () {
     $user = auth()->user();
 
-    if ($user->role === 'siswa' && $user->siswa && $user->siswa->jabatan === 'ketua') {
-        return redirect()->route('ketua.dashboard');
+    if ($user->role === 'siswa') {
+        if ($user->siswa && $user->siswa->jabatan === 'ketua') {
+            return redirect()->route('ketua.dashboard');
+        }
+        return redirect()->route('siswa.dashboard');
+    }
+
+    if ($user->role === 'pembina') {
+        return redirect()->route('pembina.dashboard');
     }
 
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// 3. PROFILE USER
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// 4. ROUTE ROLE: SISWA (ANGGOTA REGULER)
+Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
+    Route::get('/dashboard', function () {
+        $user  = auth()->user();
+        $siswa = $user->siswa;
+
+        // 1. Ambil pendaftaran ekskul yang statusnya diterima
+        $pendaftaran = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->with('ekskul')->first() : null;
+        $ekskul      = $pendaftaran ? $pendaftaran->ekskul : null;
+
+        // 2. Ambil kegiatan mendatang khusus ekskul siswa ini
+        $kegiatanMendatang = $ekskul 
+            ? $ekskul->kegiatans()->where('tanggal', '>=', now())->orderBy('tanggal', 'asc')->get() 
+            : collect();
+
+        // 3. Ambil total kehadiran siswa
+        $totalHadir = $siswa ? $siswa->presensis()->where('status', 'hadir')->count() : 0;
+
+        return view('siswa.dashboard', compact('siswa', 'ekskul', 'kegiatanMendatang', 'totalHadir'));
+    })->name('dashboard');
+});
+
+// 5. ROUTE ROLE: PEMBINA
+Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')->group(function () {
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+        $pembina = $user->pembina;
+        return view('pembina.dashboard', compact('pembina'));
+    })->name('dashboard');
+});
+
+// 6. ROUTE ROLE: KETUA EKSKUL (SISWA DENGAN JABATAN KETUA)
 Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name('ketua.')->group(function () {
 
     Route::get('/dashboard', function () {
