@@ -24,7 +24,7 @@
         <div>
             <div class="flex items-center gap-3 mb-10">
                 <div class="w-10 h-10 rounded-2xl bg-theme-dark text-theme-yellow flex items-center justify-center font-bold text-lg shadow-md">
-                    👑
+                    
                 </div>
                 <div>
                     <h1 class="font-extrabold text-base tracking-wide leading-none">SOUL</h1>
@@ -35,19 +35,19 @@
             <div class="text-[11px] font-bold text-gray-400 tracking-wider uppercase mb-3 px-3">Menu Pembina</div>
             <nav class="space-y-1">
                 <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-theme-blue rounded-2xl font-bold text-xs transition">
-                    <span class="text-base">📂</span> Dashboard
+                    <span class="text-base"></span> Dashboard
                 </a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium text-xs transition">
-                    <span class="text-base">📝</span> Input Presensi
+                    <span class="text-base"></span> Input Presensi
                 </a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium text-xs transition">
-                    <span class="text-base">📸</span> Foto Dokumentasi
+                    <span class="text-base"></span> Foto Dokumentasi
                 </a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium text-xs transition">
-                    <span class="text-base">📊</span> Verifikasi Laporan
+                    <span class="text-base"></span> Verifikasi Laporan
                 </a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium text-xs transition">
-                    <span class="text-base">🖨️</span> Cetak Rekap
+                    <span class="text-base"></span> Cetak Rekap
                 </a>
             </nav>
         </div>
@@ -72,7 +72,7 @@
         <header class="px-8 py-5 bg-white border-b border-gray-100 flex items-center justify-between gap-4">
             <div class="relative w-full max-w-md">
                 <input type="text" placeholder="Cari data siswa, presensi, laporan..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs text-theme-dark placeholder-gray-400 focus:outline-none focus:bg-white focus:border-theme-blue transition">
-                <span class="absolute left-3.5 top-2.5 text-gray-400 text-sm">🔍</span>
+                <span class="absolute left-3.5 top-2.5 text-gray-400 text-sm"></span>
             </div>
 
             <div class="flex items-center gap-3">
@@ -87,7 +87,7 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 class="text-2xl font-extrabold text-theme-dark">
-                        Selamat datang, Bu Nita! 👋
+                        Selamat datang, Bu Nita! 
                     </h1>
                     <p class="text-xs text-gray-400 mt-1">Kelola presensi, dokumentasi, dan verifikasi laporan bulanan eskul.</p>
                 </div>
@@ -104,7 +104,7 @@
                         <h3 class="text-3xl font-extrabold text-theme-dark mt-2">1 <span class="text-xs font-normal text-gray-400">Ekskul</span></h3>
                         <p class="text-[11px] font-medium text-theme-blue mt-2">Software Engineering</p>
                     </div>
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-theme-blue flex items-center justify-center text-xl">💻</div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-theme-blue flex items-center justify-center text-xl"></div>
                 </div>
 
                 <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
@@ -113,7 +113,7 @@
                         <h3 class="text-3xl font-extrabold text-theme-dark mt-2">32 <span class="text-xs font-normal text-gray-400">Siswa</span></h3>
                         <p class="text-[11px] font-medium text-emerald-500 mt-2">95% Kehadiran Rata-rata</p>
                     </div>
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl">👥</div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl"></div>
                 </div>
 
                 <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
@@ -122,7 +122,6 @@
                         <h3 class="text-3xl font-extrabold text-theme-dark mt-2">1 <span class="text-xs font-normal text-amber-500">Perlu Verifikasi</span></h3>
                         <p class="text-[11px] font-medium text-gray-400 mt-2">Bulan Agustus 2026</p>
                     </div>
-                    <div class="w-12 h-12 rounded-2xl bg-amber-50 text-theme-yellow flex items-center justify-center text-xl">📑</div>
                 </div>
             </div>
 

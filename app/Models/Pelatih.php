@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pelatih extends Model
 {
@@ -11,4 +12,9 @@ class Pelatih extends Model
     protected $casts = [
         'status' => 'string',
     ];
+
+    public function ekskuls(): HasMany
+    {
+        return $this->hasMany(Ekskul::class);
+    }
 }

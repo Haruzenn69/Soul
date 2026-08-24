@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Kelas;
+use App\Models\Pelatih;
+use App\Models\TahunAjaran;
 use App\Models\User;
 use App\Models\Kelas;
 use App\Models\TahunAjaran;
@@ -20,12 +23,13 @@ class KetuaSeeder extends Seeder
     {
         // Tahun Ajaran + Kelas
         $tahunAjaran = TahunAjaran::firstOrCreate(
-            ['nama' => '2025/2026'],
+            ['nama' => '2026/2027'],
             ['is_active' => true]
         );
 
         $kelas = Kelas::firstOrCreate(
-            ['nama' => 'X RPL 1', 'tingkat' => 'x', 'tahun_ajaran_id' => $tahunAjaran->id],
+            ['nama' => 'XI RPL 1', 'tahun_ajaran_id' => $tahunAjaran->id],
+            ['tingkat' => 'xi']
         );
 
         // User + Siswa (Ketua)
@@ -108,9 +112,10 @@ class KetuaSeeder extends Seeder
 
         // Pelatih
         $pelatih = Pelatih::create([
-            'nama'            => 'Pelatih Test',
-            'jenis_kelamin'   => 'laki-laki',
-            'no_hp'           => '081234567890',
+            'nama'          => 'Pelatih Karate',
+            'jenis_kelamin' => 'laki-laki',
+            'no_hp'         => '081298765432',
+            'status'        => 'aktif',
         ]);
 
         // Ekskul

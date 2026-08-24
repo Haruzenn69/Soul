@@ -25,7 +25,7 @@
             <!-- Logo SOUL -->
             <div class="flex items-center gap-3 mb-10">
                 <div class="w-10 h-10 rounded-2xl bg-theme-blue text-white flex items-center justify-center font-bold text-lg shadow-md shadow-blue-500/20">
-                    ✨
+                    
                 </div>
                 <div>
                     <h1 class="font-extrabold text-base tracking-wide leading-none">SOUL</h1>
@@ -37,22 +37,22 @@
             <div class="text-[11px] font-bold text-gray-400 tracking-wider uppercase mb-3 px-3">Menu Utama</div>
             <nav class="space-y-1">
                 <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-theme-blue rounded-2xl font-bold text-xs transition">
-                    <span class="text-base">📂</span> Dashboard
+                    <span class="text-base"></span> Dashboard
                 </a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium text-xs transition">
-                    <span class="text-base">📖</span> Katalog Ekskul
+                    <span class="text-base"></span> Katalog Ekskul
                 </a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium text-xs transition">
-                    <span class="text-base">📋</span> Presensi & Kegiatan
+                    <span class="text-base"></span> Presensi & Kegiatan
                 </a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium text-xs transition">
-                    <span class="text-base">🚪</span> Pengajuan Keluar
+                    <span class="text-base"></span> Pengajuan Keluar
                 </a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium text-xs transition">
-                    <span class="text-base">📄</span> Laporan Bulanan
+                    <span class="text-base"></span> Laporan Bulanan
                 </a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium text-xs transition">
-                    <span class="text-base">👤</span> Profile
+                    <span class="text-base"></span> Profile
                 </a>
             </nav>
         </div>
@@ -80,7 +80,7 @@
             <!-- Search Bar -->
             <div class="relative w-full max-w-md">
                 <input type="text" placeholder="Cari ekskul, siswa, kegiatan..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs text-theme-dark placeholder-gray-400 focus:outline-none focus:bg-white focus:border-theme-blue transition">
-                <span class="absolute left-3.5 top-2.5 text-gray-400 text-sm">🔍</span>
+                <span class="absolute left-3.5 top-2.5 text-gray-400 text-sm"></span>
             </div>
 
             <!-- Top Right Profile / Role Badge -->
@@ -89,7 +89,7 @@
                     <span class="w-2 h-2 rounded-full bg-theme-blue"></span> Siswa ▾
                 </div>
                 <button class="w-9 h-9 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-xs relative text-gray-500">
-                    🔔
+                    
                     <span class="w-2 h-2 rounded-full bg-theme-yellow absolute top-2 right-2 border-2 border-white"></span>
                 </button>
             </div>
@@ -102,7 +102,7 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 class="text-2xl font-extrabold text-theme-dark flex items-center gap-2">
-                        Selamat datang, Nazwa! 👋
+                        Selamat datang, Nazwa! 
                     </h1>
                     <p class="text-xs text-gray-400 mt-1">Rabu, 19 Agustus 2026 · Semester Ganjil 2026/2027</p>
                 </div>
@@ -121,7 +121,7 @@
                         <h3 class="text-3xl font-extrabold text-theme-dark mt-2">1 <span class="text-xs font-normal text-gray-400">Ekskul (Max)</span></h3>
                         <p class="text-[11px] font-medium text-emerald-500 mt-2">✓ Terdaftar Aktif</p>
                     </div>
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-theme-blue flex items-center justify-center text-xl">📖</div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-theme-blue flex items-center justify-center text-xl"></div>
                 </div>
 
                 <!-- Stat 2 -->
@@ -131,7 +131,7 @@
                         <h3 class="text-3xl font-extrabold text-theme-dark mt-2">92%</h3>
                         <p class="text-[11px] font-medium text-emerald-500 mt-2">↗ +5% dari bulan lalu</p>
                     </div>
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl">📈</div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl"></div>
                 </div>
 
                 <!-- Stat 3 -->
@@ -141,14 +141,12 @@
                         <h3 class="text-3xl font-extrabold text-theme-dark mt-2">2</h3>
                         <p class="text-[11px] font-medium text-theme-blue mt-2">Minggu ini</p>
                     </div>
-                    <div class="w-12 h-12 rounded-2xl bg-amber-50 text-theme-yellow flex items-center justify-center text-xl">📅</div>
+                    <div class="w-12 h-12 rounded-2xl bg-amber-50 text-theme-yellow flex items-center justify-center text-xl"></div>
                 </div>
             </div>
 
-            <!-- MAIN GRID CONTENT (Eskul Saya vs Schedule & Activity) -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
-                <!-- LEFT COLUMN: Eskul Saya (Hanya 1 Ekskul) -->
                 <div class="lg:col-span-2 space-y-6">
                     <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
                         <div class="flex justify-between items-center mb-6">

@@ -19,14 +19,4 @@ class Siswa extends Model
     {
         return $this->belongsTo(Kelas::class);
     }
-
-    public function pendaftarans(): HasMany
-    {
-        return $this->hasMany(Pendaftaran::class);
-    }
-
-    public function pengajuanKeluars(): HasMany
-    {
-        return $this->hasMany(PengajuanKeluar::class);
-    }
 }
