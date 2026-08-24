@@ -1,55 +1,44 @@
-@extends('layouts.sidebar-ketua')
-@section('title', 'Pengajuan Keluar')
+@extends('ketua.layout')
+@section('title', 'Daftar Pengajuan Keluar')
 
 @section('content')
-    <h1 class="text-2xl font-bold mb-4">Pengajuan Keluar Ekskul</h1>
+    <p class="text-xs text-gray-400 mb-4">Total: {{ $pengajuanKeluars->count() }} pengajuan</p>
 
-    <div class="bg-white rounded shadow overflow-hidden">
-        <table class="w-full text-sm">
-            <thead class="bg-gray-50">
+    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+        <table class="w-full text-left text-xs">
+            <thead class="bg-gray-50 text-gray-400 font-bold uppercase tracking-wider">
                 <tr>
-                    <th class="px-4 py-2 text-left">Tanggal</th>
-                    <th class="px-4 py-2 text-left">NIS</th>
-                    <th class="px-4 py-2 text-left">Nama</th>
-                    <th class="px-4 py-2 text-left">Alasan</th>
-                    <th class="px-4 py-2 text-left">Status</th>
-                    <th class="px-4 py-2 text-left">Aksi</th>
+                    <th class="px-6 py-3">No</th>
+                    <th class="px-6 py-3">Nama</th>
+                    <th class="px-6 py-3">Tanggal</th>
+                    <th class="px-6 py-3">Alasan</th>
+                    <th class="px-6 py-3">Status</th>
+                    <th class="px-6 py-3">Aksi</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-gray-50">
                 @forelse($pengajuanKeluars as $pengajuan)
-                    <tr class="border-t">
-                        <td class="px-4 py-2">{{ $pengajuan->tanggal_pengajuan->format('d/m/Y') }}</td>
-                        <td class="px-4 py-2">{{ $pengajuan->siswa->nis }}</td>
-                        <td class="px-4 py-2">{{ $pengajuan->siswa->nama }}</td>
-                        <td class="px-4 py-2">{{ $pengajuan->alasan }}</td>
-                        <td class="px-4 py-2">
+                    <tr class="hover:bg-gray-50/50">
+                        <td class="px-6 py-4">{{ $loop->iteration }}</td>
+                        <td class="px-6 py-4">{{ $pengajuan->siswa->nama }}</td>
+                        <td class="px-6 py-4">{{ $pengajuan->tanggal_pengajuan->format('d/m/Y') }}</td>
+                        <td class="px-6 py-4">{{ Str::limit($pengajuan->alasan, 30) }}</td>
+                        <td class="px-6 py-4">
                             @if($pengajuan->status === 'pending')
-                                <span class="text-yellow-600">Pending</span>
+                                <span class="text-yellow-600 font-medium">Pending</span>
                             @elseif($pengajuan->status === 'diterima')
-                                <span class="text-green-600">Diterima</span>
+                                <span class="text-green-600 font-medium">Diterima</span>
                             @else
-                                <span class="text-red-600">Ditolak</span>
+                                <span class="text-red-600 font-medium">Ditolak</span>
                             @endif
                         </td>
-                        <td class="px-4 py-2">
-                            @if($pengajuan->status === 'pending')
-                                <form action="{{ route('ketua.pengajuan-keluar.update', $pengajuan) }}" method="POST" class="inline">
-                                    @csrf @method('PATCH')
-                                    <input type="hidden" name="status" value="diterima">
-                                    <button class="text-green-600 hover:underline">Setuju</button>
-                                </form>
-                                <form action="{{ route('ketua.pengajuan-keluar.update', $pengajuan) }}" method="POST" class="inline ml-2">
-                                    @csrf @method('PATCH')
-                                    <input type="hidden" name="status" value="ditolak">
-                                    <button class="text-red-600 hover:underline">Tolak</button>
-                                </form>
-                            @endif
+                        <td class="px-6 py-4">
+                            <a href="{{ route('ketua.pengajuan-keluar.show', $pengajuan) }}" class="text-theme-blue hover:underline font-medium">Detail</a>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-4 py-4 text-center text-gray-400">Tidak ada pengajuan</td>
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-400">Belum ada pengajuan keluar.</td>
                     </tr>
                 @endforelse
             </tbody>

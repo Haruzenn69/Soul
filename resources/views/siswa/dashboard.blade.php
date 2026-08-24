@@ -26,6 +26,9 @@
             <div class="flex items-center gap-3 mb-8 px-2">
                 <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-base shadow-sm">
                     ✨
+            <div class="flex items-center gap-3 mb-10">
+                <div class="w-10 h-10 rounded-2xl bg-theme-blue text-white flex items-center justify-center font-bold text-lg shadow-md shadow-blue-500/20">
+                    
                 </div>
                 <div>
                     <h1 class="font-bold text-sm tracking-tight text-slate-900 leading-none">SOUL</h1>
@@ -75,6 +78,23 @@
                         <img src="{{ asset('images/profile.png') }}" alt="Profile Icon" class="w-full h-full object-contain">
                     </span> 
                     Profile
+                <a href="#" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-theme-blue rounded-2xl font-bold text-xs transition">
+                    <span class="text-base"></span> Dashboard
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium text-xs transition">
+                    <span class="text-base"></span> Katalog Ekskul
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium text-xs transition">
+                    <span class="text-base"></span> Presensi & Kegiatan
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium text-xs transition">
+                    <span class="text-base"></span> Pengajuan Keluar
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium text-xs transition">
+                    <span class="text-base"></span> Laporan Bulanan
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium text-xs transition">
+                    <span class="text-base"></span> Profile
                 </a>
             </nav>
         </div>
@@ -108,6 +128,8 @@
                     <img src="{{ asset('images/search.png') }}" alt="Search" class="w-full h-full object-contain">
                 </span>
                 <input type="text" placeholder="Cari ekskul, siswa, kegiatan..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 transition-all">
+                <input type="text" placeholder="Cari ekskul, siswa, kegiatan..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs text-theme-dark placeholder-gray-400 focus:outline-none focus:bg-white focus:border-theme-blue transition">
+                <span class="absolute left-3.5 top-2.5 text-gray-400 text-sm"></span>
             </div>
 
             <!-- Top Right Profile / Role Badge -->
@@ -120,6 +142,9 @@
                         <img src="{{ asset('images/notification.png') }}" alt="Icon" class="w-full h-full object-contain">
                     </div>
                     <span class="w-2 h-2 rounded-full bg-amber-400 absolute top-2 right-2 border-2 border-white"></span>
+                <button class="w-9 h-9 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-xs relative text-gray-500">
+                    
+                    <span class="w-2 h-2 rounded-full bg-theme-yellow absolute top-2 right-2 border-2 border-white"></span>
                 </button>
             </div>
         </header>
@@ -132,6 +157,8 @@
                 <div>
                     <h1 class="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
                         Selamat datang, {{ $siswa->nama ?? auth()->user()->username }}! 
+                    <h1 class="text-2xl font-extrabold text-theme-dark flex items-center gap-2">
+                        Selamat datang, Nazwa! 
                     </h1>
                     <p class="text-xs text-slate-400 mt-0.5">{{ \Carbon\Carbon::now()->isoFormat('D MMMM Y') }} · Semester Ganjil 2026/2027</p>
                 </div>
@@ -156,6 +183,7 @@
                     <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center overflow-hidden shrink-0">
                         <img src="{{ asset('images/status.png') }}" alt="Icon" class="w-5 h-5 object-contain">
                     </div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-theme-blue flex items-center justify-center text-xl"></div>
                 </div>
 
                 <!-- Stat 2: Total Kehadiran -->
@@ -168,6 +196,7 @@
                     <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center overflow-hidden shrink-0">
                         <img src="{{ asset('images/statistik.png') }}" alt="Icon" class="w-5 h-5 object-contain">
                     </div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl"></div>
                 </div>
 
                 <!-- Stat 3: Kegiatan Mendatang -->
@@ -187,6 +216,12 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 <!-- LEFT COLUMN: Ekskul Saya -->
+                    <div class="w-12 h-12 rounded-2xl bg-amber-50 text-theme-yellow flex items-center justify-center text-xl"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
                 <div class="lg:col-span-2 space-y-6">
                     <div class="bg-white p-6 rounded-2xl border border-slate-200/70 shadow-sm/50">
                         <div class="flex justify-between items-center mb-5">

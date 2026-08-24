@@ -9,6 +9,10 @@ class Pelatih extends Model
 {
     protected $fillable = ['nama', 'jenis_kelamin', 'no_hp', 'status'];
 
+    protected $casts = [
+        'status' => 'string',
+    ];
+
     public function ekskuls(): HasMany
     {
         return $this->hasMany(Ekskul::class);

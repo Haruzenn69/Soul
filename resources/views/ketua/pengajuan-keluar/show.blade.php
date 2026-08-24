@@ -1,28 +1,22 @@
-@extends('layouts.sidebar-ketua')
+@extends('ketua.layout')
 @section('title', 'Detail Pengajuan Keluar')
 
 @section('content')
-    <h1 class="text-2xl font-bold mb-4">Detail Pengajuan Keluar</h1>
-
-    <div class="bg-white p-6 rounded shadow max-w-lg">
+    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm max-w-lg">
         <div class="mb-3">
-            <p class="text-sm text-gray-500">Tanggal Pengajuan</p>
-            <p class="font-medium">{{ $pengajuanKeluar->tanggal_pengajuan->format('d/m/Y') }}</p>
+            <p class="text-[11px] text-gray-400 font-bold uppercase">Tanggal Pengajuan</p>
+            <p class="font-medium text-sm">{{ $pengajuanKeluar->tanggal_pengajuan->format('d/m/Y') }}</p>
         </div>
         <div class="mb-3">
-            <p class="text-sm text-gray-500">NIS</p>
-            <p class="font-medium">{{ $pengajuanKeluar->siswa->nis }}</p>
+            <p class="text-[11px] text-gray-400 font-bold uppercase">Nama</p>
+            <p class="font-medium text-sm">{{ $pengajuanKeluar->siswa->nama }}</p>
         </div>
         <div class="mb-3">
-            <p class="text-sm text-gray-500">Nama</p>
-            <p class="font-medium">{{ $pengajuanKeluar->siswa->nama }}</p>
+            <p class="text-[11px] text-gray-400 font-bold uppercase">Alasan</p>
+            <p class="font-medium text-sm">{{ $pengajuanKeluar->alasan }}</p>
         </div>
         <div class="mb-3">
-            <p class="text-sm text-gray-500">Alasan</p>
-            <p class="font-medium">{{ $pengajuanKeluar->alasan }}</p>
-        </div>
-        <div class="mb-3">
-            <p class="text-sm text-gray-500">Status</p>
+            <p class="text-[11px] text-gray-400 font-bold uppercase">Status</p>
             @if($pengajuanKeluar->status === 'pending')
                 <span class="text-yellow-600 font-medium">Pending</span>
             @elseif($pengajuanKeluar->status === 'diterima')
@@ -37,18 +31,18 @@
                 <form action="{{ route('ketua.pengajuan-keluar.update', $pengajuanKeluar) }}" method="POST" class="inline">
                     @csrf @method('PATCH')
                     <input type="hidden" name="status" value="diterima">
-                    <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Setuju</button>
+                    <button class="px-5 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-full transition">Setuju</button>
                 </form>
                 <form action="{{ route('ketua.pengajuan-keluar.update', $pengajuanKeluar) }}" method="POST" class="inline">
                     @csrf @method('PATCH')
                     <input type="hidden" name="status" value="ditolak">
-                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Tolak</button>
+                    <button class="px-5 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-full transition">Tolak</button>
                 </form>
             </div>
         @endif
 
         <div class="mt-4">
-            <a href="{{ route('ketua.pengajuan-keluar.index') }}" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Kembali</a>
+            <a href="{{ route('ketua.pengajuan-keluar.index') }}" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-full transition">Kembali</a>
         </div>
     </div>
 @endsection

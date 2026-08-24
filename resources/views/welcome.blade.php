@@ -41,7 +41,7 @@
                     Dashboard
                 </a>
                 <form method="POST" action="{{ route('logout') }}">
-                    @csrf
+                    @csrf   
                     <button class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-theme-dark text-xs font-semibold rounded-full transition">
                         Logout
                     </button>
@@ -110,7 +110,6 @@
                     <div class="bg-theme-light rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition p-6 flex flex-col">
                         <h3 class="font-bold text-lg text-theme-dark mb-2">{{ $ekskul->nama_ekskul }}</h3>
                         <p class="text-xs text-gray-500 mb-1">Pembina: {{ $ekskul->pembina->nama ?? '-' }}</p>
-                        <p class="text-xs text-gray-500 mb-1">Pelatih: {{ $ekskul->pelatih->nama ?? '-' }}</p>
                         <p class="text-xs text-gray-500 mb-3">Jadwal: {{ $ekskul->jadwal ?? '-' }}</p>
                         <p class="text-sm text-gray-600 flex-1 mb-4">{{ $ekskul->deskripsi ?? 'Tidak ada deskripsi.' }}</p>
                         <div class="mt-auto">

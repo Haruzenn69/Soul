@@ -1,34 +1,35 @@
-@extends('layouts.sidebar-ketua')
+@extends('ketua.layout')
 @section('title', 'Buat Laporan Bulanan')
 
 @section('content')
-    <h1 class="text-2xl font-bold mb-4">Buat Laporan Bulanan</h1>
-
-    <form action="{{ route('ketua.laporan-bulanan.store') }}" method="POST" class="bg-white p-6 rounded shadow max-w-lg">
-        @csrf
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">Bulan (YYYY-MM)</label>
-            <input type="month" name="bulan" value="{{ old('bulan') }}" class="w-full border rounded px-3 py-2" required>
-            @error('bulan') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-        </div>
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">Materi Kegiatan</label>
-            <input type="text" name="materi_kegiatan" value="{{ old('materi_kegiatan') }}" class="w-full border rounded px-3 py-2">
-            @error('materi_kegiatan') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-        </div>
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">Ringkasan</label>
-            <textarea name="ringkasan" rows="4" class="w-full border rounded px-3 py-2">{{ old('ringkasan') }}</textarea>
-            @error('ringkasan') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-        </div>
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">Dokumentasi (URL foto)</label>
-            <input type="text" name="dokumentasi" value="{{ old('dokumentasi') }}" class="w-full border rounded px-3 py-2">
-            @error('dokumentasi') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-        </div>
-        <div class="flex gap-2">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Simpan</button>
-            <a href="{{ route('ketua.laporan-bulanan.index') }}" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Batal</a>
-        </div>
-    </form>
+    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm max-w-lg">
+        <form action="{{ route('ketua.laporan-bulanan.store') }}" method="POST">
+            @csrf
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-gray-500 mb-1">Bulan (YYYY-MM)</label>
+                <input type="month" name="bulan" value="{{ old('bulan') }}" required
+                    class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition">
+                @error('bulan') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-gray-500 mb-1">Materi Kegiatan</label>
+                <input type="text" name="materi_kegiatan" value="{{ old('materi_kegiatan') }}"
+                    class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition">
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-gray-500 mb-1">Ringkasan</label>
+                <textarea name="ringkasan" rows="4"
+                    class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition">{{ old('ringkasan') }}</textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-gray-500 mb-1">Dokumentasi (URL/Link)</label>
+                <input type="text" name="dokumentasi" value="{{ old('dokumentasi') }}"
+                    class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition">
+            </div>
+            <div class="flex gap-2 mt-6">
+                <button type="submit" class="px-5 py-2 bg-theme-blue hover:bg-theme-darkBlue text-white text-xs font-semibold rounded-full transition">Simpan</button>
+                <a href="{{ route('ketua.laporan-bulanan.index') }}" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-full transition">Batal</a>
+            </div>
+        </form>
+    </div>
 @endsection

@@ -17,6 +17,7 @@ class PendaftaranController extends Controller
         $ekskul = $this->getEkskul();
         $pendaftarans = Pendaftaran::where('ekskul_id', $ekskul->id)
             ->with('siswa')
+            ->latest('tanggal_daftar')
             ->get();
 
         return view('ketua.pendaftaran.index', compact('pendaftarans'));
@@ -24,14 +25,14 @@ class PendaftaranController extends Controller
 
     public function show(Pendaftaran $pendaftaran)
     {
-        $pendaftaran->load(['siswa', 'ekskul', 'presensis.kegiatan']);
+        $pendaftaran->load(['siswa', 'ekskul']);
         return view('ketua.pendaftaran.show', compact('pendaftaran'));
     }
 
     public function update(Request $request, Pendaftaran $pendaftaran)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,diterima',
+            'status' => 'required|in:diterima,ditolak',
         ]);
 
         $pendaftaran->update($validated);

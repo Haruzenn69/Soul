@@ -2,79 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Presensi;
 use App\Models\Kegiatan;
+use App\Models\Presensi;
 use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
 
 class PresensiController extends Controller
 {
-    public function index(Kegiatan $kegiatan)
+    private function getEkskul()
     {
-        $presensis = Presensi::where('kegiatan_id', $kegiatan->id)
-            ->with('pendaftaran.siswa')
-            ->get();
-
-        return view('ketua.presensi.index', compact('presensis', 'kegiatan'));
+        return auth()->user()->siswa->pendaftarans()->where('status', 'diterima')->first()->ekskul;
     }
 
     public function create(Kegiatan $kegiatan)
     {
-        $pendaftarans = Pendaftaran::where('ekskul_id', $kegiatan->ekskul_id)
+        $ekskul = $this->getEkskul();
+        $anggotas = Pendaftaran::where('ekskul_id', $ekskul->id)
             ->where('status', 'diterima')
             ->with('siswa')
             ->get();
 
-        return view('ketua.presensi.create', compact('kegiatan', 'pendaftarans'));
+        $presensiExisting = Presensi::where('kegiatan_id', $kegiatan->id)
+            ->pluck('pendaftaran_id')
+            ->toArray();
+
+        return view('ketua.presensi.create', compact('kegiatan', 'anggotas', 'presensiExisting'));
     }
 
     public function store(Request $request, Kegiatan $kegiatan)
     {
         $validated = $request->validate([
-            'presensi'                      => 'required|array',
-            'presensi.*.pendaftaran_id'     => 'required|exists:pendaftarans,id',
-            'presensi.*.status'             => 'required|in:hadir,sakit,izin,alpha',
-            'dokumentasi'                   => 'nullable|array',
+            'presensi' => 'required|array',
+            'presensi.*.pendaftaran_id' => 'required|exists:pendaftarans,id',
+            'presensi.*.status' => 'required|in:hadir,sakit,izin,alpha',
         ]);
 
         foreach ($validated['presensi'] as $item) {
             Presensi::updateOrCreate(
-                [
-                    'kegiatan_id'    => $kegiatan->id,
-                    'pendaftaran_id' => $item['pendaftaran_id'],
-                ],
-                [
-                    'status'      => $item['status'],
-                    'dokumentasi' => $validated['dokumentasi'] ?? null,
-                ]
+                ['kegiatan_id' => $kegiatan->id, 'pendaftaran_id' => $item['pendaftaran_id']],
+                ['status' => $item['status']]
             );
         }
 
         return redirect()->route('ketua.kegiatan.show', $kegiatan)->with('success', 'Presensi berhasil disimpan.');
-    }
-
-    public function show(Presensi $presensi)
-    {
-        $presensi->load(['kegiatan', 'pendaftaran.siswa']);
-        return view('ketua.presensi.show', compact('presensi'));
-    }
-
-    public function update(Request $request, Presensi $presensi)
-    {
-        $validated = $request->validate([
-            'status'      => 'required|in:hadir,sakit,izin,alpha',
-            'dokumentasi' => 'nullable|array',
-        ]);
-
-        $presensi->update($validated);
-
-        return redirect()->route('ketua.kegiatan.show', $presensi->kegiatan)->with('success', 'Presensi berhasil diupdate.');
-    }
-
-    public function destroy(Presensi $presensi)
-    {
-        $presensi->delete();
-
-        return redirect()->route('ketua.kegiatan.show', $presensi->kegiatan)->with('success', 'Presensi berhasil dihapus.');
     }
 }

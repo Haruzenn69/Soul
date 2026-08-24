@@ -1,49 +1,37 @@
-@extends('layouts.sidebar-ketua')
+@extends('ketua.layout')
 @section('title', 'Detail Laporan Bulanan')
 
 @section('content')
-    <h1 class="text-2xl font-bold mb-4">Detail Laporan Bulanan</h1>
-
-    <div class="bg-white p-6 rounded shadow max-w-lg">
+    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm max-w-lg">
         <div class="mb-3">
-            <p class="text-sm text-gray-500">Bulan</p>
-            <p class="font-medium">{{ $laporanBulanan->bulan }}</p>
+            <p class="text-[11px] text-gray-400 font-bold uppercase">Bulan</p>
+            <p class="font-medium text-sm">{{ $laporan->bulan }}</p>
         </div>
         <div class="mb-3">
-            <p class="text-sm text-gray-500">Ekskul</p>
-            <p class="font-medium">{{ $laporanBulanan->ekskul->nama_ekskul }}</p>
-        </div>
-        <div class="mb-3">
-            <p class="text-sm text-gray-500">Materi Kegiatan</p>
-            <p class="font-medium">{{ $laporanBulanan->materi_kegiatan ?? '-' }}</p>
-        </div>
-        <div class="mb-3">
-            <p class="text-sm text-gray-500">Ringkasan</p>
-            <p class="font-medium">{{ $laporanBulanan->ringkasan ?? '-' }}</p>
-        </div>
-        <div class="mb-3">
-            <p class="text-sm text-gray-500">Dokumentasi</p>
-            <p class="font-medium">{{ $laporanBulanan->dokumentasi ?? '-' }}</p>
-        </div>
-        <div class="mb-3">
-            <p class="text-sm text-gray-500">Status</p>
-            @if($laporanBulanan->status === 'draft')
-                <span class="text-gray-600 font-medium">Draft</span>
-            @elseif($laporanBulanan->status === 'disetujui')
+            <p class="text-[11px] text-gray-400 font-bold uppercase">Status</p>
+            @if($laporan->status === 'draft')
+                <span class="text-gray-500 font-medium">Draft</span>
+            @elseif($laporan->status === 'disetujui')
                 <span class="text-green-600 font-medium">Disetujui</span>
             @else
                 <span class="text-red-600 font-medium">Ditolak</span>
             @endif
         </div>
-        @if($laporanBulanan->catatan_pembina)
-            <div class="mb-3">
-                <p class="text-sm text-gray-500">Catatan Pembina</p>
-                <p class="font-medium">{{ $laporanBulanan->catatan_pembina }}</p>
-            </div>
-        @endif
+        <div class="mb-3">
+            <p class="text-[11px] text-gray-400 font-bold uppercase">Materi Kegiatan</p>
+            <p class="font-medium text-sm">{{ $laporan->materi_kegiatan ?? '-' }}</p>
+        </div>
+        <div class="mb-3">
+            <p class="text-[11px] text-gray-400 font-bold uppercase">Ringkasan</p>
+            <p class="font-medium text-sm">{{ $laporan->ringkasan ?? '-' }}</p>
+        </div>
+        <div class="mb-3">
+            <p class="text-[11px] text-gray-400 font-bold uppercase">Dokumentasi</p>
+            <p class="font-medium text-sm">{{ $laporan->dokumentasi ?? '-' }}</p>
+        </div>
 
         <div class="mt-4">
-            <a href="{{ route('ketua.laporan-bulanan.index') }}" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Kembali</a>
+            <a href="{{ route('ketua.laporan-bulanan.index') }}" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-full transition">Kembali</a>
         </div>
     </div>
 @endsection

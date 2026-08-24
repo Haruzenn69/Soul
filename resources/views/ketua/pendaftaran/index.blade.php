@@ -1,46 +1,42 @@
-@extends('layouts.sidebar-ketua')
-@section('title', 'Pendaftaran')
+@extends('ketua.layout')
+@section('title', 'Daftar Pendaftaran')
 
 @section('content')
-    <h1 class="text-2xl font-bold mb-4">Pendaftaran Masuk</h1>
+    <p class="text-xs text-gray-400 mb-4">Total: {{ $pendaftarans->count() }} pendaftar</p>
 
-    <div class="bg-white rounded shadow overflow-hidden">
-        <table class="w-full text-sm">
-            <thead class="bg-gray-50">
+    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+        <table class="w-full text-left text-xs">
+            <thead class="bg-gray-50 text-gray-400 font-bold uppercase tracking-wider">
                 <tr>
-                    <th class="px-4 py-2 text-left">Tanggal</th>
-                    <th class="px-4 py-2 text-left">NIS</th>
-                    <th class="px-4 py-2 text-left">Nama</th>
-                    <th class="px-4 py-2 text-left">Status</th>
-                    <th class="px-4 py-2 text-left">Aksi</th>
+                    <th class="px-6 py-3">No</th>
+                    <th class="px-6 py-3">NIS</th>
+                    <th class="px-6 py-3">Nama</th>
+                    <th class="px-6 py-3">Tanggal Daftar</th>
+                    <th class="px-6 py-3">Status</th>
+                    <th class="px-6 py-3">Aksi</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-gray-50">
                 @forelse($pendaftarans as $pendaftaran)
-                    <tr class="border-t">
-                        <td class="px-4 py-2">{{ $pendaftaran->tanggal_daftar->format('d/m/Y') }}</td>
-                        <td class="px-4 py-2">{{ $pendaftaran->siswa->nis }}</td>
-                        <td class="px-4 py-2">{{ $pendaftaran->siswa->nama }}</td>
-                        <td class="px-4 py-2">
+                    <tr class="hover:bg-gray-50/50">
+                        <td class="px-6 py-4">{{ $loop->iteration }}</td>
+                        <td class="px-6 py-4">{{ $pendaftaran->siswa->nis }}</td>
+                        <td class="px-6 py-4">{{ $pendaftaran->siswa->nama }}</td>
+                        <td class="px-6 py-4">{{ $pendaftaran->tanggal_daftar->format('d/m/Y') }}</td>
+                        <td class="px-6 py-4">
                             @if($pendaftaran->status === 'pending')
-                                <span class="text-yellow-600">Pending</span>
+                                <span class="text-yellow-600 font-medium">Pending</span>
                             @else
-                                <span class="text-green-600">Diterima</span>
+                                <span class="text-green-600 font-medium">Diterima</span>
                             @endif
                         </td>
-                        <td class="px-4 py-2">
-                            @if($pendaftaran->status === 'pending')
-                                <form action="{{ route('ketua.pendaftaran.update', $pendaftaran) }}" method="POST" class="inline">
-                                    @csrf @method('PATCH')
-                                    <input type="hidden" name="status" value="diterima">
-                                    <button class="text-green-600 hover:underline">Terima</button>
-                                </form>
-                            @endif
+                        <td class="px-6 py-4">
+                            <a href="{{ route('ketua.pendaftaran.show', $pendaftaran) }}" class="text-theme-blue hover:underline font-medium">Detail</a>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-4 py-4 text-center text-gray-400">Tidak ada pendaftaran</td>
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-400">Belum ada pendaftaran.</td>
                     </tr>
                 @endforelse
             </tbody>
