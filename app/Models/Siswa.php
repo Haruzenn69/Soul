@@ -7,10 +7,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Siswa extends Model
 {
-    protected $fillable = ['nis', 'user_id', 'nama', 'jenis_kelamin', 'jabatan'];
+    protected $fillable = ['nis', 'user_id', 'nama', 'kelas_id', 'jenis_kelamin', 'jabatan'];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function kelas(): BelongsTo
+    {
+        return $this->belongsTo(Kelas::class);
     }
 }

@@ -41,7 +41,7 @@
                     Dashboard
                 </a>
                 <form method="POST" action="{{ route('logout') }}">
-                    @csrf
+                    @csrf   
                     <button class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-theme-dark text-xs font-semibold rounded-full transition">
                         Logout
                     </button>
