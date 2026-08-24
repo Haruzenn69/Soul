@@ -74,6 +74,13 @@ Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name
     Route::get('/dashboard', function () {
         return view('ketua.dashboard');
     })->name('dashboard');
+
+    Route::resource('kegiatan', KegiatanController::class)->except(['edit', 'update', 'destroy']);
+    Route::get('kegiatan/{kegiatan}/presensi', [PresensiController::class, 'create'])->name('presensi.create');
+    Route::post('kegiatan/{kegiatan}/presensi', [PresensiController::class, 'store'])->name('presensi.store');
+    Route::resource('pendaftaran', PendaftaranController::class)->only(['index', 'show', 'update']);
+    Route::resource('pengajuan-keluar', PengajuanKeluarController::class)->only(['index', 'show', 'update']);
+    Route::resource('laporan-bulanan', LaporanBulananController::class)->only(['index', 'create', 'store', 'show']);
 });
 
 Route::middleware('auth')->group(function () {
