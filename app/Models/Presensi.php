@@ -7,19 +7,25 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Presensi extends Model
 {
-    protected $fillable = ['kegiatan_id', 'pendaftaran_id', 'status', 'dokumentasi'];
+    protected $fillable = [
+        'siswa_id',
+        'kegiatan_id',
+        'status',
+        'waktu_presensi',
+        'keterangan'
+    ];
 
     protected $casts = [
-        'dokumentasi' => 'array',
+        'waktu_presensi' => 'datetime',
     ];
+
+    public function siswa(): BelongsTo
+    {
+        return $this->belongsTo(Siswa::class);
+    }
 
     public function kegiatan(): BelongsTo
     {
         return $this->belongsTo(Kegiatan::class);
-    }
-
-    public function pendaftaran(): BelongsTo
-    {
-        return $this->belongsTo(Pendaftaran::class);
     }
 }

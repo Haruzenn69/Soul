@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pelatih extends Model
 {
-    protected $fillable = ['nama', 'jenis_kelamin', 'no_hp', 'status'];
-
-    protected $casts = [
-        'status' => 'string',
+    protected $fillable = [
+        'nama',
+        'jenis_kelamin',
+        'no_hp',
+        'status'
     ];
 
     public function ekskuls(): HasMany

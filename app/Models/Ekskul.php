@@ -8,7 +8,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Ekskul extends Model
 {
-    protected $fillable = ['pembina_id', 'pelatih_id', 'nama_ekskul', 'deskripsi', 'jadwal', 'is_open_recruitment'];
+    protected $fillable = [
+        'pembina_id',
+        'pelatih_id',
+        'nama_ekskul',
+        'deskripsi',
+        'jadwal',
+        'is_open_recruitment',
+        // HAPUS 'logo', 'visi', 'misi', 'status'
+    ];
 
     protected $casts = [
         'is_open_recruitment' => 'boolean',
@@ -22,5 +30,20 @@ class Ekskul extends Model
     public function pelatih(): BelongsTo
     {
         return $this->belongsTo(Pelatih::class);
+    }
+
+    public function kegiatans(): HasMany
+    {
+        return $this->hasMany(Kegiatan::class);
+    }
+
+    public function pendaftarans(): HasMany
+    {
+        return $this->hasMany(Pendaftaran::class);
+    }
+
+    public function pengajuanKeluar(): HasMany
+    {
+        return $this->hasMany(PengajuanKeluar::class);
     }
 }

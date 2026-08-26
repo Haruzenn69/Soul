@@ -28,11 +28,10 @@ class User extends Authenticatable
         return $this->hasOne(Pembina::class);
     }
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+        protected $fillable = [
+        'username',
+        'email',
+        'password',
+        'role',
+    ];
 }
