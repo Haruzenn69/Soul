@@ -7,7 +7,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PengajuanKeluar extends Model
 {
-    protected $fillable = ['siswa_id', 'ekskul_id', 'alasan', 'status', 'tanggal_pengajuan'];
+    protected $fillable = [
+        'siswa_id',
+        'ekskul_id',
+        'alasan',
+        'status',
+        'tanggal_pengajuan'
+    ];
 
     protected $casts = [
         'tanggal_pengajuan' => 'date',

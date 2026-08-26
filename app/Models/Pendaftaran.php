@@ -8,7 +8,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pendaftaran extends Model
 {
-    protected $fillable = ['siswa_id', 'ekskul_id', 'tanggal_daftar', 'status'];
+    protected $fillable = [
+        'siswa_id',
+        'ekskul_id',
+        'tanggal_daftar',
+        'status',
+        // HAPUS 'alasan'
+    ];
 
     protected $casts = [
         'tanggal_daftar' => 'date',

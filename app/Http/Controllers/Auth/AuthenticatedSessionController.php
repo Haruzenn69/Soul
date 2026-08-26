@@ -28,12 +28,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // 1. Hapus memori redirect bawaan Breeze agar tidak dipaksa ke /dashboard
         $request->session()->forget('url.intended');
 
         $user = Auth::user();
 
-        // 2. Redirect berdasarkan Role & Jabatan
+        // Redirect berdasarkan Role & Jabatan
         if ($user->role === 'siswa') {
             if ($user->siswa && $user->siswa->jabatan === 'ketua') {
                 return redirect()->route('ketua.dashboard');
