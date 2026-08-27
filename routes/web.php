@@ -14,8 +14,11 @@ use App\Models\Kelas;
 use App\Models\Presensi;
 use App\Models\Siswa;
 use App\Models\User;
+use App\Models\Pendaftaran;
+use App\Models\PengajuanKeluar;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 
 Route::get('/', function () {
@@ -41,6 +44,7 @@ Route::get('/dashboard', function () {
     return redirect()->route('siswa.dashboard');
 })->middleware('auth')->name('dashboard');
 
+// Profile (default untuk semua role)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -69,7 +73,13 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
     ]);
 });
 
+
+// ============================================================
+// ROUTE SISWA - LENGKAP
+// ============================================================
 Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
+
+    // 1. DASHBOARD
     Route::get('/dashboard', function () {
         $user  = auth()->user();
         $siswa = $user->siswa;
@@ -81,23 +91,167 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
         ? $ekskul->kegiatans()->where('tanggal_kegiatan', '>=', now())->orderBy('tanggal_kegiatan', 'asc')->get() 
         : collect();
 
-        // ✅ DIPERBAIKI: pakai pendaftaran_id
         $totalHadir = $siswa && $pendaftaran 
             ? Presensi::where('pendaftaran_id', $pendaftaran->id)->where('status', 'hadir')->count() 
             : 0;
 
         return view('siswa.dashboard', compact('siswa', 'ekskul', 'kegiatanMendatang', 'totalHadir'));
     })->name('dashboard');
+
+    // 2. KATALOG EKSKUL
+    Route::get('/katalog', function () {
+        $user = auth()->user();
+        $siswa = $user->siswa;
+        
+        $isRegistered = false;
+        if ($siswa) {
+            $pendaftaran = $siswa->pendaftarans()->where('status', 'diterima')->first();
+            $isRegistered = $pendaftaran ? true : false;
+        }
+        
+        $ekskuls = Ekskul::with('pembina')->get();
+        return view('siswa.katalog', compact('ekskuls', 'siswa', 'isRegistered'));
+    })->name('katalog');
+
+    // 3. PRESENSI & KEGIATAN
+    Route::get('/presensi', function () {
+        $user = auth()->user();
+        $siswa = $user->siswa;
+        
+        $pendaftaran = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->first() : null;
+        $presensis = $pendaftaran ? Presensi::where('pendaftaran_id', $pendaftaran->id)->with('kegiatan')->get() : collect();
+        
+        return view('siswa.presensi', compact('presensis', 'siswa'));
+    })->name('presensi');
+
+    // 4. PROFILE SISWA
+    Route::get('/profile', function () {
+        $user = auth()->user();
+        $siswa = $user->siswa;
+        
+        $pendaftaran = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->with('ekskul.pembina')->first() : null;
+        $ekskul = $pendaftaran ? $pendaftaran->ekskul : null;
+        $pengajuan = $siswa ? $siswa->pengajuanKeluar()->get() : collect();
+        
+        return view('profile.edit', compact('siswa', 'ekskul', 'pengajuan'));
+    })->name('profile.edit');
+
+    // 5. HALAMAN DAFTAR EKSKUL (LIST CARD)
+    Route::get('/daftar-ekskul', function () {
+        $user = auth()->user();
+        $siswa = $user->siswa;
+        
+        $pendaftaran = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->first() : null;
+        if ($pendaftaran) {
+            return redirect()->route('siswa.dashboard')->with('error', 'Kamu sudah terdaftar di ekskul.');
+        }
+        
+        $ekskuls = Ekskul::with('pembina')->get();
+        return view('siswa.daftar-ekskul', compact('ekskuls', 'siswa'));
+    })->name('daftar-ekskul');
+
+    // 6. FORM DAFTAR EKSKUL (HALAMAN FORM)
+    Route::get('/daftar-ekskul/form/{ekskul}', function ($id) {
+        $user = auth()->user();
+        $siswa = $user->siswa;
+        
+        $pendaftaran = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->first() : null;
+        if ($pendaftaran) {
+            return redirect()->route('siswa.dashboard')->with('error', 'Kamu sudah terdaftar di ekskul.');
+        }
+        
+        $ekskul = Ekskul::findOrFail($id);
+        
+        return view('siswa.form-daftar', compact('siswa', 'ekskul'));
+    })->name('form-daftar');
+
+    // 7. PROSES DAFTAR EKSKUL (STORE)
+    Route::post('/daftar-ekskul', function (Request $request) {
+        $user = auth()->user();
+        $siswa = $user->siswa;
+        
+        $existing = $siswa->pendaftarans()->where('status', 'diterima')->first();
+        if ($existing) {
+            return redirect()->back()->with('error', 'Kamu sudah terdaftar di ekskul.');
+        }
+        
+        $pending = $siswa->pendaftarans()->where('status', 'pending')->first();
+        if ($pending) {
+            return redirect()->back()->with('error', 'Kamu sudah mengajukan pendaftaran. Tunggu verifikasi dari ketua ekskul.');
+        }
+        
+        Pendaftaran::create([
+            'siswa_id' => $siswa->id,
+            'ekskul_id' => $request->ekskul_id,
+            'tanggal_daftar' => now()->toDateString(),
+            'status' => 'pending',
+            'alasan' => $request->alasan,
+        ]);
+        
+        return redirect()->route('siswa.dashboard')->with('success', 'Pendaftaran berhasil dikirim!');
+    })->name('daftar-ekskul.store');
+
+    // 8. STORE PENGAJUAN KELUAR
+    Route::post('/pengajuan-keluar', function (Request $request) {
+        $user = auth()->user();
+        $siswa = $user->siswa;
+        
+        $pendaftaran = $siswa->pendaftarans()->where('status', 'diterima')->first();
+        if (!$pendaftaran) {
+            return redirect()->back()->with('error', 'Kamu belum terdaftar di ekskul manapun.');
+        }
+        
+        PengajuanKeluar::create([
+            'siswa_id' => $siswa->id,
+            'ekskul_id' => $pendaftaran->ekskul_id,
+            'alasan' => $request->alasan,
+            'status' => 'pending',
+            'tanggal_pengajuan' => now()->toDateString(),
+        ]);
+        
+        return redirect()->back()->with('success', 'Pengajuan keluar berhasil dikirim.');
+    })->name('pengajuan-keluar.store');
 });
 
+
+// ============================================================
+// ROUTE PEMBINA
+// ============================================================
 Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')->group(function () {
     Route::get('/dashboard', function () {
         $user    = auth()->user();
         $pembina = $user->pembina;
-        return view('pembina.dashboard', compact('pembina'));
+        
+        $ekskul = Ekskul::where('pembina_id', $pembina->id)->first();
+        
+        $anggota = [];
+        if ($ekskul) {
+            $anggota = Pendaftaran::where('ekskul_id', $ekskul->id)
+                ->where('status', 'diterima')
+                ->with(['siswa', 'siswa.kelas'])
+                ->get();
+        }
+        
+        $pendaftaranPending = [];
+        if ($ekskul) {
+            $pendaftaranPending = Pendaftaran::where('ekskul_id', $ekskul->id)
+                ->where('status', 'pending')
+                ->with(['siswa', 'siswa.kelas'])
+                ->get();
+        }
+        
+        return view('pembina.dashboard', compact('pembina', 'ekskul', 'anggota', 'pendaftaranPending'));
     })->name('dashboard');
+    
+    Route::get('/laporan/cetak', function () {
+        return view('pembina.laporan.cetak');
+    })->name('laporan.cetak');
 });
 
+
+// ============================================================
+// ROUTE KETUA
+// ============================================================
 Route::middleware(['auth', 'role:siswa'])->prefix('ketua')->name('ketua.')->group(function () {
     Route::get('/dashboard', function () {
         return view('ketua.dashboard');
