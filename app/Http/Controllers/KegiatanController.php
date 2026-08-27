@@ -9,7 +9,9 @@ class KegiatanController extends Controller
 {
     private function getEkskul()
     {
-        return auth()->user()->siswa->pendaftarans()->where('status', 'diterima')->first()->ekskul;
+        $pendaftaran = auth()->user()->siswa?->pendaftarans()->where('status', 'diterima')->first();
+        abort_unless($pendaftaran, 404, 'Anda belum tergabung dalam ekskul mana pun.');
+        return $pendaftaran->ekskul;
     }
 
     public function index()
@@ -32,6 +34,7 @@ class KegiatanController extends Controller
     {
         $validated = $request->validate([
             'materi' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
             'tanggal_kegiatan' => 'required|date',
         ]);
 
@@ -40,6 +43,7 @@ class KegiatanController extends Controller
         Kegiatan::create([
             'ekskul_id' => $ekskul->id,
             'materi' => $validated['materi'],
+            'deskripsi' => $validated['deskripsi'] ?? null,
             'tanggal_kegiatan' => $validated['tanggal_kegiatan'],
         ]);
 

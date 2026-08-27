@@ -12,6 +12,11 @@
                 @error('materi') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
             </div>
             <div class="mb-4">
+                <label class="block text-xs font-bold text-gray-500 mb-1">Deskripsi</label>
+                <textarea name="deskripsi" rows="4" placeholder="Deskripsi kegiatan..."
+                    class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition">{{ old('deskripsi') }}</textarea>
+            </div>
+            <div class="mb-4">
                 <label class="block text-xs font-bold text-gray-500 mb-1">Tanggal Kegiatan</label>
                 <input type="date" name="tanggal_kegiatan" value="{{ old('tanggal_kegiatan') }}" required
                     class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition">

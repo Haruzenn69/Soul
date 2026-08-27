@@ -44,6 +44,9 @@
                 <a href="{{ route('ketua.pengajuan-keluar.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('ketua.pengajuan-keluar.*') ? 'bg-blue-50 text-theme-blue rounded-2xl font-bold' : 'text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium' }} text-xs transition">
                     <span class="text-base">🚪</span> Pengajuan Keluar
                 </a>
+                <a href="{{ route('ketua.anggota.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('ketua.anggota.*') ? 'bg-blue-50 text-theme-blue rounded-2xl font-bold' : 'text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium' }} text-xs transition">
+                    <span class="text-base">👥</span> Kelola Anggota
+                </a>
                 <a href="{{ route('ketua.laporan-bulanan.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('ketua.laporan-bulanan.*') ? 'bg-blue-50 text-theme-blue rounded-2xl font-bold' : 'text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium' }} text-xs transition">
                     <span class="text-base">📊</span> Laporan Bulanan
                 </a>

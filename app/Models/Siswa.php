@@ -33,12 +33,7 @@ class Siswa extends Model
         return $this->hasMany(Pendaftaran::class);
     }
 
-    public function presensis(): HasMany
-    {
-        return $this->hasMany(Presensi::class);
-    }
-
-    public function pengajuanKeluar(): HasMany
+    public function pengajuanKeluars(): HasMany
     {
         return $this->hasMany(PengajuanKeluar::class);
     }

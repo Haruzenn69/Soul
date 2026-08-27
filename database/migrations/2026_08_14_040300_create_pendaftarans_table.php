@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('siswa_id')->constrained()->onDelete('cascade');
             $table->foreignId('ekskul_id')->constrained()->onDelete('cascade');
             $table->date('tanggal_daftar');
-            $table->enum('status', ['pending', 'diterima'])->default('pending');
+            $table->enum('status', ['pending', 'diterima', 'ditolak', 'nonaktif'])->default('pending');
             $table->timestamps();
         });
     }

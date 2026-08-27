@@ -11,6 +11,12 @@
             <p class="text-[11px] text-gray-400 font-bold uppercase">Materi</p>
             <p class="font-medium text-sm">{{ $kegiatan->materi }}</p>
         </div>
+        @if($kegiatan->deskripsi)
+        <div class="mb-6">
+            <p class="text-[11px] text-gray-400 font-bold uppercase">Deskripsi</p>
+            <p class="font-medium text-sm whitespace-pre-line">{{ $kegiatan->deskripsi }}</p>
+        </div>
+        @endif
 
         <h3 class="text-xs font-bold text-gray-400 uppercase mb-3">Daftar Presensi</h3>
         <table class="w-full text-left text-xs">
