@@ -72,12 +72,32 @@
         <header class="px-8 py-5 bg-white border-b border-gray-100 flex items-center justify-between gap-4">
             <div class="relative w-full max-w-md">
                 <input type="text" placeholder="Cari data siswa, presensi, laporan..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs text-theme-dark placeholder-gray-400 focus:outline-none focus:bg-white focus:border-theme-blue transition">
-                <span class="absolute left-3.5 top-2.5 text-gray-400 text-sm"></span>
+                <span class="absolute left-3.5 top-2.5 text-gray-400 text-sm">🔍</span>
             </div>
 
-            <div class="flex items-center gap-3">
-                <div class="bg-gray-900 text-white px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-theme-yellow"></span> Pembina ▾
+            <!-- HEADER PROFILE & LOGOUT DROPDOWN -->
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden sm:block">
+                        <h4 class="text-xs font-bold text-theme-dark leading-tight">
+                            {{ Auth::user()->username ?? Auth::user()->name }}
+                        </h4>
+                        <p class="text-[10px] text-gray-400 uppercase font-semibold">
+                            {{ Auth::user()->role }}
+                        </p>
+                    </div>
+
+                    <!-- Form Logout (Method POST) -->
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" 
+                                class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 border border-red-100 transition shadow-sm">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            Logout
+                        </button>
+                    </form>
                 </div>
             </div>
         </header>

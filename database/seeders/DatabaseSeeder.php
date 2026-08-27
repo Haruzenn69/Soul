@@ -194,5 +194,92 @@ class DatabaseSeeder extends Seeder
             'status'             => 'pending',
             'tanggal_pengajuan'  => now()->toDateString(),
         ]);
+
+        $pendaftaranSiswa = Pendaftaran::create([
+            'siswa_id'       => $siswa->id,
+            'ekskul_id'      => $ekskul1->id,
+            'tanggal_daftar' => now()->subDays(5)->toDateString(),
+            'status'         => 'diterima',
+        ]);
+
+        // Siswa Anggota 2
+        $userAnggota2 = User::create([
+            'username' => 'anggota02',
+            'email'    => 'anggota02@soul.test',
+            'password' => Hash::make('password'),
+            'role'     => 'siswa',
+        ]);
+
+        $anggota2 = Siswa::create([
+            'user_id'       => $userAnggota2->id,
+            'nis'           => '2406510003',
+            'nama'          => 'Siti Rahayu',
+            'kelas_id'      => $kelas['XI RPL 1']->id,
+            'jenis_kelamin' => 'perempuan',
+            'jabatan'       => 'anggota',
+        ]);
+
+        $pendaftaranAnggota2 = Pendaftaran::create([
+            'siswa_id'       => $anggota2->id,
+            'ekskul_id'      => $ekskul2->id,
+            'tanggal_daftar' => now()->subDays(3)->toDateString(),
+            'status'         => 'diterima',
+        ]);
+
+        // Kegiatan
+        $kegiatan1 = Kegiatan::create([
+            'ekskul_id'        => $ekskul1->id,
+            'materi'           => 'Latihan Tendangan Dasar',
+            'tanggal_kegiatan' => now()->addDays(2)->toDateString(),
+        ]);
+
+        $kegiatan2 = Kegiatan::create([
+            'ekskul_id'        => $ekskul1->id,
+            'materi'           => 'Latihan Bantingan Dasar',
+            'tanggal_kegiatan' => now()->addDays(5)->toDateString(),
+        ]);
+
+        $kegiatan3 = Kegiatan::create([
+            'ekskul_id'        => $ekskul1->id,
+            'materi'           => 'Ujian Kenaikan Sabuk',
+            'tanggal_kegiatan' => now()->addDays(10)->toDateString(),
+        ]);
+
+        // Presensi (pakai pendaftaran_id sesuai migration)
+        Presensi::create([
+            'kegiatan_id'     => $kegiatan1->id,
+            'pendaftaran_id'  => $pendaftaranSiswa->id,
+            'status'          => 'hadir',
+        ]);
+
+        Presensi::create([
+            'kegiatan_id'     => $kegiatan2->id,
+            'pendaftaran_id'  => $pendaftaranSiswa->id,
+            'status'          => 'hadir',
+        ]);
+
+        Presensi::create([
+            'kegiatan_id'     => $kegiatan3->id,
+            'pendaftaran_id'  => $pendaftaranSiswa->id,
+            'status'          => 'hadir',
+        ]);
+
+        // Pengajuan Keluar
+        PengajuanKeluar::create([
+            'siswa_id'          => $anggota2->id,
+            'ekskul_id'         => $ekskul2->id,
+            'alasan'            => 'Fokus pada pelajaran',
+            'status'            => 'pending',
+            'tanggal_pengajuan' => now()->toDateString(),
+        ]);
+
+        $this->command->info('✅ Database berhasil diisi!');
+        $this->command->info('');
+        $this->command->info('📧 AKUN LOGIN:');
+        $this->command->info('   Admin:     admin@soul.test     / password');
+        $this->command->info('   Kesiswaan: kesiswaan@soul.test / password');
+        $this->command->info('   Pembina:   pembina01@soul.test / password');
+        $this->command->info('   Siswa:     siswa@soul.test     / password');
+        $this->command->info('   Ketua:     ketua01@soul.test   / password');
     }
 }

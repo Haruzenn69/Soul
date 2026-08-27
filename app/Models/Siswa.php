@@ -8,7 +8,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Siswa extends Model
 {
-    protected $fillable = ['nis', 'user_id', 'nama', 'kelas_id', 'jenis_kelamin', 'jabatan'];
+    protected $fillable = [
+        'user_id',
+        'nis',
+        'nama',              // ← GANTI dari 'nama_lengkap' ke 'nama'
+        'kelas_id',
+        'jenis_kelamin',
+        'jabatan',
+        // HAPUS 'no_telepon' dan 'alamat'
+    ];
 
     public function user(): BelongsTo
     {

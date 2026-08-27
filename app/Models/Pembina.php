@@ -8,7 +8,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pembina extends Model
 {
-    protected $fillable = ['nip', 'user_id', 'nama', 'jenis_kelamin'];
+    protected $fillable = [
+        'user_id',
+        'nip',
+        'nama',
+        'jenis_kelamin',
+        // HAPUS 'no_telepon' dan 'alamat' karena tidak ada di migration
+    ];
 
     public function user(): BelongsTo
     {
