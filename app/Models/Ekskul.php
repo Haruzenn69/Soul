@@ -23,4 +23,24 @@ class Ekskul extends Model
     {
         return $this->belongsTo(Pelatih::class);
     }
+
+    public function pendaftarans(): HasMany
+    {
+        return $this->hasMany(Pendaftaran::class);
+    }
+
+    public function kegiatans(): HasMany
+    {
+        return $this->hasMany(Kegiatan::class);
+    }
+
+    public function pengajuanKeluars(): HasMany
+    {
+        return $this->hasMany(PengajuanKeluar::class);
+    }
+
+    public function laporanBulanans(): HasMany
+    {
+        return $this->hasMany(LaporanBulanan::class);
+    }
 }
