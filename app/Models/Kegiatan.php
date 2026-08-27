@@ -8,12 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Kegiatan extends Model
 {
-    protected $fillable = [
-        'ekskul_id',
-        'materi',           // ← HANYA INI (sesuai migration)
-        'tanggal_kegiatan', // ← HANYA INI (sesuai migration)
-        // HAPUS 'nama_kegiatan', 'waktu_mulai', 'waktu_selesai', 'tempat', 'deskripsi'
-    ];
+    protected $fillable = ['ekskul_id', 'materi', 'deskripsi', 'tanggal_kegiatan'];
 
     protected $casts = [
         'tanggal_kegiatan' => 'date',

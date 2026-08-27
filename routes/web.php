@@ -3,11 +3,12 @@
 use App\Http\Controllers\Kesiswaan\EkskulController;
 use App\Http\Controllers\Kesiswaan\KelasController;
 use App\Http\Controllers\Kesiswaan\UserController;
-use App\Http\Controllers\Ketua\KegiatanController;
-use App\Http\Controllers\Ketua\LaporanBulananController;
-use App\Http\Controllers\Ketua\PendaftaranController;
-use App\Http\Controllers\Ketua\PengajuanKeluarController;
-use App\Http\Controllers\Ketua\PresensiController;
+use App\Http\Controllers\AnggotaController;
+use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\PendaftaranController;
+use App\Http\Controllers\PresensiController;
+use App\Http\Controllers\PengajuanKeluarController;
+use App\Http\Controllers\LaporanBulananController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Ekskul;
 use App\Models\Kelas;
@@ -254,7 +255,27 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
 // ============================================================
 Route::middleware(['auth', 'role:siswa'])->prefix('ketua')->name('ketua.')->group(function () {
     Route::get('/dashboard', function () {
-        return view('ketua.dashboard');
+        $user = auth()->user();
+        $siswa = $user->siswa;
+        $pendaftaran = $siswa->pendaftarans()->where('status', 'diterima')->first();
+
+        if (!$pendaftaran) {
+            return view('ketua.dashboard', [
+                'ekskul'         => null,
+                'totalAnggota'   => 0,
+                'pendingCount'   => 0,
+                'pengajuanCount' => 0,
+            ]);
+        }
+
+        $ekskul = $pendaftaran->ekskul;
+
+        return view('ketua.dashboard', [
+            'ekskul'         => $ekskul,
+            'totalAnggota'   => $ekskul->pendaftarans()->where('status', 'diterima')->count(),
+            'pendingCount'   => $ekskul->pendaftarans()->where('status', 'pending')->count(),
+            'pengajuanCount' => $ekskul->pengajuanKeluars()->where('status', 'pending')->count(),
+        ]);
     })->name('dashboard');
 
     Route::resource('kegiatan', KegiatanController::class)->except(['edit', 'update', 'destroy']);
@@ -262,7 +283,10 @@ Route::middleware(['auth', 'role:siswa'])->prefix('ketua')->name('ketua.')->grou
     Route::post('kegiatan/{kegiatan}/presensi', [PresensiController::class, 'store'])->name('presensi.store');
     Route::resource('pendaftaran', PendaftaranController::class)->only(['index', 'show', 'update']);
     Route::resource('pengajuan-keluar', PengajuanKeluarController::class)->only(['index', 'show', 'update']);
+    Route::get('anggota', [AnggotaController::class, 'index'])->name('anggota.index');
+    Route::patch('anggota/{pendaftaran}/toggle', [AnggotaController::class, 'toggle'])->name('anggota.toggle');
     Route::resource('laporan-bulanan', LaporanBulananController::class)->only(['index', 'create', 'store', 'show']);
+    Route::get('laporan-bulanan/{laporan_bulanan}/download-pdf', [LaporanBulananController::class, 'downloadPdf'])->name('laporan-bulanan.download-pdf');
 });
 
 require __DIR__.'/auth.php';

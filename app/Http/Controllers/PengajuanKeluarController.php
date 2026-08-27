@@ -9,7 +9,9 @@ class PengajuanKeluarController extends Controller
 {
     private function getEkskul()
     {
-        return auth()->user()->siswa->pendaftarans()->where('status', 'diterima')->first()->ekskul;
+        $pendaftaran = auth()->user()->siswa?->pendaftarans()->where('status', 'diterima')->first();
+        abort_unless($pendaftaran, 404, 'Anda belum tergabung dalam ekskul mana pun.');
+        return $pendaftaran->ekskul;
     }
 
     public function index()
@@ -39,6 +41,10 @@ class PengajuanKeluarController extends Controller
 
         if ($validated['status'] === 'diterima') {
             $pengajuanKeluar->siswa->update(['jabatan' => 'siswa']);
+            \App\Models\Pendaftaran::where('siswa_id', $pengajuanKeluar->siswa_id)
+                ->where('ekskul_id', $pengajuanKeluar->ekskul_id)
+                ->where('status', 'diterima')
+                ->update(['status' => 'nonaktif']);
         }
 
         return redirect()->route('ketua.pengajuan-keluar.index')->with('success', 'Pengajuan keluar berhasil diupdate.');

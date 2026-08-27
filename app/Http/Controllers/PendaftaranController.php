@@ -9,7 +9,9 @@ class PendaftaranController extends Controller
 {
     private function getEkskul()
     {
-        return auth()->user()->siswa->pendaftarans()->where('status', 'diterima')->first()->ekskul;
+        $pendaftaran = auth()->user()->siswa?->pendaftarans()->where('status', 'diterima')->first();
+        abort_unless($pendaftaran, 404, 'Anda belum tergabung dalam ekskul mana pun.');
+        return $pendaftaran->ekskul;
     }
 
     public function index()
