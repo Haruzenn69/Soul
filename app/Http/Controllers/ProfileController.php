@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Models\Pendaftaran;
+use App\Models\PengajuanKeluar;
 
 class ProfileController extends Controller
 {
@@ -16,8 +18,21 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+        $siswa = $user->siswa;
+        
+        // Jika user adalah siswa, tampilkan profile dengan data ekskul
+        if ($user->role === 'siswa' && $siswa) {
+            $pendaftaran = $siswa->pendaftarans()->where('status', 'diterima')->with('ekskul.pembina')->first();
+            $ekskul = $pendaftaran ? $pendaftaran->ekskul : null;
+            $pengajuan = $siswa->pengajuanKeluar()->get();
+            
+            return view('profile.edit', compact('siswa', 'ekskul', 'pengajuan'));
+        }
+        
+        // Untuk role lain (admin, kesiswaan, pembina)
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
         ]);
     }
 
