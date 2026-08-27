@@ -8,6 +8,8 @@ use App\Models\Pelatih;
 use App\Models\Pendaftaran;
 use App\Models\Kegiatan;
 use App\Models\PengajuanKeluar;
+use App\Models\Presensi;
+use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -34,10 +36,17 @@ class DatabaseSeeder extends Seeder
         }
 
         // Pelatih
-        $pelatih = Pelatih::create([
+        $pelatih1 = Pelatih::create([
             'nama'            => 'Budi Hartono',
             'jenis_kelamin'   => 'laki-laki',
             'no_hp'           => '081234567890',
+            'status'          => 'aktif',
+        ]);
+
+        $pelatih2 = Pelatih::create([
+            'nama'            => 'Dewi Lestari',
+            'jenis_kelamin'   => 'perempuan',
+            'no_hp'           => '081298765432',
             'status'          => 'aktif',
         ]);
 
@@ -74,7 +83,7 @@ class DatabaseSeeder extends Seeder
         // Ekskul 1 - Karate
         $ekskul1 = Ekskul::create([
             'pembina_id'          => $pembina->id,
-            'pelatih_id'          => $pelatih->id,
+            'pelatih_id'          => $pelatih1->id,
             'nama_ekskul'         => 'Karate',
             'deskripsi'           => 'Ekstrakurikuler bela diri karate untuk membentuk karakter disiplin dan tangguh',
             'jadwal'              => 'Senin & Rabu, 15:30 - 17:00',
@@ -109,12 +118,12 @@ class DatabaseSeeder extends Seeder
 
         Pendaftaran::create([
             'siswa_id'       => $ketua->id,
-            'ekskul_id'      => $ekskul->id,
+            'ekskul_id'      => $ekskul1->id,
             'tanggal_daftar' => now()->subDays(10)->toDateString(),
             'status'         => 'diterima',
         ]);
 
-        // === SISWA ANGGOTA 1 (TERDAFTAR) ===
+        // === SISWA ANGGOTA 1 ===
         $userAnggota1 = User::create([
             'username' => 'siswa',
             'email'    => 'siswa@soul.test',
@@ -133,12 +142,12 @@ class DatabaseSeeder extends Seeder
 
         Pendaftaran::create([
             'siswa_id'       => $anggota1->id,
-            'ekskul_id'      => $ekskul->id,
+            'ekskul_id'      => $ekskul1->id,
             'tanggal_daftar' => now()->subDays(5)->toDateString(),
             'status'         => 'diterima',
         ]);
 
-        // Siswa Anggota 2
+        // === SISWA ANGGOTA 2 ===
         $userAnggota2 = User::create([
             'username' => 'anggota02',
             'email'    => 'anggota02@soul.test',
@@ -156,12 +165,12 @@ class DatabaseSeeder extends Seeder
 
         Pendaftaran::create([
             'siswa_id'       => $anggota2->id,
-            'ekskul_id'      => $ekskul->id,
+            'ekskul_id'      => $ekskul1->id,
             'tanggal_daftar' => now()->subDays(3)->toDateString(),
             'status'         => 'diterima',
         ]);
 
-        // Siswa Pending (belum diterima)
+        // === SISWA PENDING ===
         $userPending = User::create([
             'username' => 'siswa01',
             'email'    => 'siswa01@soul.test',
@@ -175,83 +184,6 @@ class DatabaseSeeder extends Seeder
             'kelas_id'      => $kelas['XI RPL 2']->id,
             'jenis_kelamin' => 'laki-laki',
             'jabatan'       => 'siswa',
-        ]);
-
-        Pendaftaran::create([
-            'siswa_id'       => $pending->id,
-            'ekskul_id'      => $ekskul->id,
-            'tanggal_daftar' => now()->toDateString(),
-            'status'         => 'pending',
-        ]);
-
-        // Kegiatan
-        Kegiatan::create([
-            'ekskul_id'         => $ekskul->id,
-            'materi'            => 'Tendangan Dasar',
-            'tanggal_kegiatan'  => now()->subDays(7)->toDateString(),
-        ]);
-
-        Kegiatan::create([
-            'ekskul_id'         => $ekskul->id,
-            'materi'            => 'Bantingan Dasar',
-            'tanggal_kegiatan'  => now()->subDays(2)->toDateString(),
-        ]);
-
-        // Pengajuan Keluar (pending)
-        PengajuanKeluar::create([
-            'siswa_id'           => $anggota1->id,
-            'ekskul_id'          => $ekskul->id,
-            'alasan'             => 'Fokus pada pelajaran semester',
-            'status'             => 'pending',
-            'tanggal_pengajuan'  => now()->toDateString(),
-        ]);
-
-        $pendaftaranSiswa = Pendaftaran::create([
-            'siswa_id'       => $anggota1->id,
-            'ekskul_id'      => $ekskul1->id,
-            'tanggal_daftar' => now()->subDays(5)->toDateString(),
-            'status'         => 'diterima',
-        ]);
-
-        // === SISWA ANGGOTA 2 ===
-        $userAnggota2 = User::create([
-            'username' => 'anggota02',
-            'email'    => 'anggota02@soul.test',
-            'password' => Hash::make('password'),
-            'role'     => 'siswa',
-        ]);
-
-        $anggota2 = Siswa::create([
-            'user_id'       => $userAnggota2->id,
-            'nis'           => '2406510003',
-            'nama'          => 'Siti Rahayu',
-            'kelas_id'      => $kelas['XI RPL 1']->id,
-            'jenis_kelamin' => 'perempuan',
-            'jabatan'       => 'anggota',
-        ]);
-
-        $pendaftaranAnggota2 = Pendaftaran::create([
-            'siswa_id'       => $anggota2->id,
-            'ekskul_id'      => $ekskul2->id,
-            'tanggal_daftar' => now()->subDays(3)->toDateString(),
-            'status'         => 'diterima',
-        ]);
-
-        // === SISWA PENDING ===
-        $userPending = User::create([
-            'username' => 'siswa01',
-            'email'    => 'siswa01@soul.test',
-            'password' => Hash::make('password'),
-            'role'     => 'siswa',
-        ]);
-
-        $pending = Siswa::create([
-            'user_id'       => $userPending->id,
-            'nis'           => '2406510004',
-            'nama'          => 'Andi Wijaya',
-            'kelas_id'      => $kelas['XI RPL 2']->id,
-            'jenis_kelamin' => 'laki-laki',
-            'jabatan'       => 'anggota',
         ]);
 
         Pendaftaran::create([
@@ -278,17 +210,17 @@ class DatabaseSeeder extends Seeder
             'jabatan'       => 'anggota',
         ]);
 
-        // === KEGIATAN ===
+        // === KEGIATAN (Ekskul 1 - Karate) ===
         $kegiatan1 = Kegiatan::create([
             'ekskul_id'        => $ekskul1->id,
             'materi'           => 'Latihan Tendangan Dasar',
-            'tanggal_kegiatan' => now()->addDays(2)->toDateString(),
+            'tanggal_kegiatan' => now()->subDays(7)->toDateString(),
         ]);
 
         $kegiatan2 = Kegiatan::create([
             'ekskul_id'        => $ekskul1->id,
             'materi'           => 'Latihan Bantingan Dasar',
-            'tanggal_kegiatan' => now()->addDays(5)->toDateString(),
+            'tanggal_kegiatan' => now()->subDays(2)->toDateString(),
         ]);
 
         $kegiatan3 = Kegiatan::create([
@@ -298,29 +230,51 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // === PRESENSI ===
+        $pendaftaranKetua = Pendaftaran::where('siswa_id', $ketua->id)->where('ekskul_id', $ekskul1->id)->first();
+        $pendaftaranAnggota1 = Pendaftaran::where('siswa_id', $anggota1->id)->where('ekskul_id', $ekskul1->id)->first();
+        $pendaftaranAnggota2 = Pendaftaran::where('siswa_id', $anggota2->id)->where('ekskul_id', $ekskul1->id)->first();
+
         Presensi::create([
             'kegiatan_id'     => $kegiatan1->id,
-            'pendaftaran_id'  => $pendaftaranSiswa->id,
+            'pendaftaran_id'  => $pendaftaranKetua->id,
+            'status'          => 'hadir',
+        ]);
+
+        Presensi::create([
+            'kegiatan_id'     => $kegiatan1->id,
+            'pendaftaran_id'  => $pendaftaranAnggota1->id,
+            'status'          => 'hadir',
+        ]);
+
+        Presensi::create([
+            'kegiatan_id'     => $kegiatan1->id,
+            'pendaftaran_id'  => $pendaftaranAnggota2->id,
             'status'          => 'hadir',
         ]);
 
         Presensi::create([
             'kegiatan_id'     => $kegiatan2->id,
-            'pendaftaran_id'  => $pendaftaranSiswa->id,
+            'pendaftaran_id'  => $pendaftaranKetua->id,
             'status'          => 'hadir',
         ]);
 
         Presensi::create([
-            'kegiatan_id'     => $kegiatan3->id,
-            'pendaftaran_id'  => $pendaftaranSiswa->id,
+            'kegiatan_id'     => $kegiatan2->id,
+            'pendaftaran_id'  => $pendaftaranAnggota1->id,
+            'status'          => 'sakit',
+        ]);
+
+        Presensi::create([
+            'kegiatan_id'     => $kegiatan2->id,
+            'pendaftaran_id'  => $pendaftaranAnggota2->id,
             'status'          => 'hadir',
         ]);
 
         // === PENGAJUAN KELUAR ===
         PengajuanKeluar::create([
-            'siswa_id'          => $anggota2->id,
-            'ekskul_id'         => $ekskul2->id,
-            'alasan'            => 'Fokus pada pelajaran',
+            'siswa_id'          => $anggota1->id,
+            'ekskul_id'         => $ekskul1->id,
+            'alasan'            => 'Fokus pada pelajaran semester',
             'status'            => 'pending',
             'tanggal_pengajuan' => now()->toDateString(),
         ]);
