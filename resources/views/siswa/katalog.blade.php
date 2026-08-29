@@ -126,13 +126,17 @@
                     <h1 class="text-xl font-bold text-slate-900">Katalog Ekskul</h1>
                     <p class="text-xs text-slate-400 mt-0.5">Temukan ekskul yang sesuai dengan minatmu</p>
                 </div>
-                @if(!$isRegistered)
+                @if(!$isRegistered && !$isPending)
                     <a href="{{ route('siswa.daftar-ekskul') }}" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
                         Daftar Ekskul
                     </a>
+                @elseif($isPending)
+                    <span class="px-4 py-2 bg-amber-50 text-amber-700 text-xs font-semibold rounded-lg border border-amber-200">
+                        Menunggu Verifikasi
+                    </span>
                 @else
                     <span class="px-4 py-2 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-lg border border-emerald-200">
                         Sudah Terdaftar
