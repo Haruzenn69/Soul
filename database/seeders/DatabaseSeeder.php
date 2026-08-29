@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Kelas;
 use App\Models\Ekskul;
 use App\Models\Pelatih;
+use App\Models\Pembina;
 use App\Models\Pendaftaran;
 use App\Models\Kegiatan;
 use App\Models\PengajuanKeluar;
@@ -27,7 +28,16 @@ class DatabaseSeeder extends Seeder
 
         // Kelas
         $kelas = [];
-        foreach ([['X RPL 1', 'x'], ['XI RPL 1', 'xi'], ['XI RPL 2', 'xi'], ['XII RPL 1', 'xii']] as [$nama, $tingkat]) {
+        $kelasData = [
+            ['X RPL 1', 'x'],
+            ['X RPL 2', 'x'],
+            ['XI RPL 1', 'xi'],
+            ['XI RPL 2', 'xi'],
+            ['XII RPL 1', 'xii'],
+            ['XII RPL 2', 'xii']
+        ];
+        
+        foreach ($kelasData as [$nama, $tingkat]) {
             $kelas[$nama] = Kelas::create([
                 'nama' => $nama,
                 'tingkat' => $tingkat,
@@ -66,7 +76,7 @@ class DatabaseSeeder extends Seeder
             'role'     => 'kesiswaan',
         ]);
 
-        // Pembina
+        // === PEMBINA ===
         $userPembina = User::create([
             'username' => 'pembina01',
             'email'    => 'pembina01@soul.test',
@@ -74,7 +84,8 @@ class DatabaseSeeder extends Seeder
             'role'     => 'pembina',
         ]);
 
-        $pembina = $userPembina->pembina()->create([
+        $pembina = Pembina::create([
+            'user_id'         => $userPembina->id,
             'nip'             => '198501012020011001',
             'nama'            => 'Pak Ahmad, S.Pd',
             'jenis_kelamin'   => 'laki-laki',
@@ -108,10 +119,11 @@ class DatabaseSeeder extends Seeder
             'role'     => 'siswa',
         ]);
 
-        $ketua = $userKetua->siswa()->create([
+        $ketua = Siswa::create([
+            'user_id'       => $userKetua->id,
             'nis'           => '2406510001',
             'nama'          => 'Rizki Pratama',
-            'kelas_id'      => $kelas['X RPL 1']->id,
+            'kelas_id'      => $kelas['XII RPL 1']->id,
             'jenis_kelamin' => 'laki-laki',
             'jabatan'       => 'ketua',
         ]);
@@ -123,7 +135,7 @@ class DatabaseSeeder extends Seeder
             'status'         => 'diterima',
         ]);
 
-        // === SISWA ANGGOTA 1 ===
+        // === SISWA ANGGOTA 1 (TERDAFTAR) ===
         $userAnggota1 = User::create([
             'username' => 'siswa',
             'email'    => 'siswa@soul.test',
@@ -134,13 +146,13 @@ class DatabaseSeeder extends Seeder
         $anggota1 = Siswa::create([
             'user_id'       => $userAnggota1->id,
             'nis'           => '2406510002',
-            'nama'          => 'Budi Santoso',
-            'kelas_id'      => $kelas['X RPL 1']->id,
-            'jenis_kelamin' => 'laki-laki',
+            'nama'          => 'Nazwa Nurhafiza',
+            'kelas_id'      => $kelas['XII RPL 1']->id,
+            'jenis_kelamin' => 'perempuan',
             'jabatan'       => 'anggota',
         ]);
 
-        Pendaftaran::create([
+        $pendaftaranSiswa = Pendaftaran::create([
             'siswa_id'       => $anggota1->id,
             'ekskul_id'      => $ekskul1->id,
             'tanggal_daftar' => now()->subDays(5)->toDateString(),
@@ -155,7 +167,8 @@ class DatabaseSeeder extends Seeder
             'role'     => 'siswa',
         ]);
 
-        $anggota2 = $userAnggota2->siswa()->create([
+        $anggota2 = Siswa::create([
+            'user_id'       => $userAnggota2->id,
             'nis'           => '2406510003',
             'nama'          => 'Siti Rahayu',
             'kelas_id'      => $kelas['XI RPL 1']->id,
@@ -165,7 +178,7 @@ class DatabaseSeeder extends Seeder
 
         Pendaftaran::create([
             'siswa_id'       => $anggota2->id,
-            'ekskul_id'      => $ekskul1->id,
+            'ekskul_id'      => $ekskul2->id,
             'tanggal_daftar' => now()->subDays(3)->toDateString(),
             'status'         => 'diterima',
         ]);
@@ -178,12 +191,13 @@ class DatabaseSeeder extends Seeder
             'role'     => 'siswa',
         ]);
 
-        $pending = $userPending->siswa()->create([
+        $pending = Siswa::create([
+            'user_id'       => $userPending->id,
             'nis'           => '2406510004',
             'nama'          => 'Andi Wijaya',
             'kelas_id'      => $kelas['XI RPL 2']->id,
             'jenis_kelamin' => 'laki-laki',
-            'jabatan'       => 'siswa',
+            'jabatan'       => 'anggota',
         ]);
 
         Pendaftaran::create([
@@ -210,17 +224,17 @@ class DatabaseSeeder extends Seeder
             'jabatan'       => 'anggota',
         ]);
 
-        // === KEGIATAN (Ekskul 1 - Karate) ===
+        // === KEGIATAN ===
         $kegiatan1 = Kegiatan::create([
             'ekskul_id'        => $ekskul1->id,
             'materi'           => 'Latihan Tendangan Dasar',
-            'tanggal_kegiatan' => now()->subDays(7)->toDateString(),
+            'tanggal_kegiatan' => now()->addDays(2)->toDateString(),
         ]);
 
         $kegiatan2 = Kegiatan::create([
             'ekskul_id'        => $ekskul1->id,
             'materi'           => 'Latihan Bantingan Dasar',
-            'tanggal_kegiatan' => now()->subDays(2)->toDateString(),
+            'tanggal_kegiatan' => now()->addDays(5)->toDateString(),
         ]);
 
         $kegiatan3 = Kegiatan::create([
@@ -230,53 +244,48 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // === PRESENSI ===
-        $pendaftaranKetua = Pendaftaran::where('siswa_id', $ketua->id)->where('ekskul_id', $ekskul1->id)->first();
-        $pendaftaranAnggota1 = Pendaftaran::where('siswa_id', $anggota1->id)->where('ekskul_id', $ekskul1->id)->first();
-        $pendaftaranAnggota2 = Pendaftaran::where('siswa_id', $anggota2->id)->where('ekskul_id', $ekskul1->id)->first();
-
         Presensi::create([
             'kegiatan_id'     => $kegiatan1->id,
-            'pendaftaran_id'  => $pendaftaranKetua->id,
-            'status'          => 'hadir',
-        ]);
-
-        Presensi::create([
-            'kegiatan_id'     => $kegiatan1->id,
-            'pendaftaran_id'  => $pendaftaranAnggota1->id,
-            'status'          => 'hadir',
-        ]);
-
-        Presensi::create([
-            'kegiatan_id'     => $kegiatan1->id,
-            'pendaftaran_id'  => $pendaftaranAnggota2->id,
+            'pendaftaran_id'  => $pendaftaranSiswa->id,
             'status'          => 'hadir',
         ]);
 
         Presensi::create([
             'kegiatan_id'     => $kegiatan2->id,
-            'pendaftaran_id'  => $pendaftaranKetua->id,
+            'pendaftaran_id'  => $pendaftaranSiswa->id,
             'status'          => 'hadir',
         ]);
 
         Presensi::create([
-            'kegiatan_id'     => $kegiatan2->id,
-            'pendaftaran_id'  => $pendaftaranAnggota1->id,
-            'status'          => 'sakit',
-        ]);
-
-        Presensi::create([
-            'kegiatan_id'     => $kegiatan2->id,
-            'pendaftaran_id'  => $pendaftaranAnggota2->id,
+            'kegiatan_id'     => $kegiatan3->id,
+            'pendaftaran_id'  => $pendaftaranSiswa->id,
             'status'          => 'hadir',
         ]);
 
         // === PENGAJUAN KELUAR ===
         PengajuanKeluar::create([
-            'siswa_id'          => $anggota1->id,
-            'ekskul_id'         => $ekskul1->id,
-            'alasan'            => 'Fokus pada pelajaran semester',
+            'siswa_id'          => $anggota2->id,
+            'ekskul_id'         => $ekskul2->id,
+            'alasan'            => 'Fokus pada pelajaran',
             'status'            => 'pending',
             'tanggal_pengajuan' => now()->toDateString(),
         ]);
+
+        $this->command->info('✅ Database berhasil diisi dengan data dummy!');
+        $this->command->info('');
+        $this->command->info('📧 AKUN LOGIN:');
+        $this->command->info('   ┌───────────────────┬──────────────────────────┬───────────┐');
+        $this->command->info('   │ Role              │ Email                    │ Password  │');
+        $this->command->info('   ├───────────────────┼──────────────────────────┼───────────┤');
+        $this->command->info('   │ Admin             │ admin@soul.test          │ password  │');
+        $this->command->info('   │ Kesiswaan         │ kesiswaan@soul.test      │ password  │');
+        $this->command->info('   │ Pembina           │ pembina01@soul.test      │ password  │');
+        $this->command->info('   │ Siswa (Terdaftar) │ siswa@soul.test          │ password  │');
+        $this->command->info('   │ Siswa (Baru)      │ siswa_baru@soul.test     │ password  │');
+        $this->command->info('   │ Ketua Ekskul      │ ketua01@soul.test        │ password  │');
+        $this->command->info('   │ Siswa Pending     │ siswa01@soul.test        │ password  │');
+        $this->command->info('   └───────────────────┴──────────────────────────┴───────────┘');
+        $this->command->info('');
+        $this->command->info('🔑 Login dengan siswa_baru@soul.test untuk melihat tombol daftar ekskul!');
     }
 }
