@@ -14,10 +14,13 @@
                 Selamat datang, <span class="font-semibold text-gray-700">{{ auth()->user()->username }}</span>. Kelola akun, ekskul, dan kelas dalam satu panel.
             </p>
         </div>
-        <a href="{{ route('kesiswaan.users.create') }}"
-           class="inline-flex items-center justify-center px-4 py-2.5 bg-theme-blue hover:bg-theme-darkBlue text-white font-semibold text-xs rounded-lg shadow-sm transition">
-            + Buat Akun Baru
-        </a>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('kesiswaan.users.create') }}"
+               class="inline-flex items-center justify-center px-4 py-2.5 bg-theme-blue hover:bg-theme-darkBlue text-white font-semibold text-xs rounded-lg shadow-sm transition">
+                + Buat Akun Baru
+            </a>
+            <!-- ❌ TOMBOL LOGOUT DI SINI SUDAH DIHAPUS -->
+        </div>
     </div>
 
     <!-- METRICS GRID -->
