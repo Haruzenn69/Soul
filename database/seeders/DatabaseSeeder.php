@@ -111,7 +111,7 @@ class DatabaseSeeder extends Seeder
             'is_open_recruitment' => true,
         ]);
 
-        // === SISWA KETUA ===
+        // === SISWA KETUA KARATE ===
         $userKetua = User::create([
             'username' => 'ketua01',
             'email'    => 'ketua01@soul.test',
@@ -133,6 +133,31 @@ class DatabaseSeeder extends Seeder
             'ekskul_id'      => $ekskul1->id,
             'tanggal_daftar' => now()->subDays(10)->toDateString(),
             'status'         => 'diterima',
+            'alasan'         => 'Ingin mengembangkan bakat bela diri karate.',
+        ]);
+
+        // === SISWA KETUA PASKIBRA ===
+        $userKetuaPaskibra = User::create([
+            'username' => 'ketua_paskibra',
+            'email'    => 'ketua_paskibra@soul.test',
+            'password' => Hash::make('password'),
+            'role'     => 'siswa',
+        ]);
+
+        $ketuaPaskibra = $userKetuaPaskibra->siswa()->create([
+            'nis'           => '2406510010',
+            'nama'          => 'Siti Nurhaliza',
+            'kelas_id'      => $kelas['XI RPL 1']->id,
+            'jenis_kelamin' => 'perempuan',
+            'jabatan'       => 'ketua',
+        ]);
+
+        Pendaftaran::create([
+            'siswa_id'       => $ketuaPaskibra->id,
+            'ekskul_id'      => $ekskul2->id,
+            'tanggal_daftar' => now()->subDays(12)->toDateString(),
+            'status'         => 'diterima',
+            'alasan'         => 'Ingin memimpin ekskul Paskibra dengan disiplin dan tangguh.',
         ]);
 
         // === SISWA ANGGOTA 1 (TERDAFTAR) ===
