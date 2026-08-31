@@ -316,5 +316,32 @@
         </main>
     </div>
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(session('success'))
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#2563EB'
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    title: 'Gagal!',
+                    text: '{{ session('error') }}',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#EF4444'
+                });
+            @endif
+        });
+    </script>
+
 </body>
 </html>
