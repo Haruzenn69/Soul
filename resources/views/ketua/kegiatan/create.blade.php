@@ -3,7 +3,7 @@
 
 @section('content')
     <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm max-w-lg">
-        <form action="{{ route('ketua.kegiatan.store') }}" method="POST">
+        <form action="{{ route('ketua.kegiatan.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-4">
                 <label class="block text-xs font-bold text-gray-500 mb-1">Materi</label>
@@ -15,6 +15,13 @@
                 <label class="block text-xs font-bold text-gray-500 mb-1">Deskripsi</label>
                 <textarea name="deskripsi" rows="4" placeholder="Deskripsi kegiatan..."
                     class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition">{{ old('deskripsi') }}</textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-gray-500 mb-1">Dokumentasi (Opsional)</label>
+                <input type="file" name="dokumentasi" accept="image/*"
+                    class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-theme-blue file:text-white hover:file:bg-theme-darkBlue">
+                <p class="text-[10px] text-gray-400 mt-1">Format: JPG, JPEG, PNG. Maks 2MB.</p>
+                @error('dokumentasi') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
             </div>
             <div class="mb-4">
                 <label class="block text-xs font-bold text-gray-500 mb-1">Tanggal Kegiatan</label>

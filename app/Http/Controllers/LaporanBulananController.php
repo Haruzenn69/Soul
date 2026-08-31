@@ -46,6 +46,18 @@ class LaporanBulananController extends Controller
         return $labels->implode(', ') . ', dan ' . $last;
     }
 
+    private function generateDokumentasiKegiatan($ekskul, $bulan)
+    {
+        return Kegiatan::where('ekskul_id', $ekskul->id)
+            ->whereYear('tanggal_kegiatan', substr($bulan, 0, 4))
+            ->whereMonth('tanggal_kegiatan', substr($bulan, 5, 2))
+            ->whereNotNull('dokumentasi')
+            ->orderBy('tanggal_kegiatan')
+            ->pluck('dokumentasi')
+            ->values()
+            ->toArray();
+    }
+
     private function generateMateri($ekskul, $bulan)
     {
         $kegiatans = Kegiatan::where('ekskul_id', $ekskul->id)
@@ -134,18 +146,13 @@ class LaporanBulananController extends Controller
             'evaluasi_keberhasilan' => 'nullable|string',
             'evaluasi_kendala' => 'nullable|string',
             'evaluasi_solusi' => 'nullable|string',
-            'dokumentasi' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $ekskul = $this->getEkskul();
 
-        $dokumentasiPath = null;
-        if ($request->hasFile('dokumentasi')) {
-            $dokumentasiPath = $request->file('dokumentasi')->store('dokumentasi', 'public');
-        }
-
         $materi = $this->generateMateri($ekskul, $validated['bulan']);
         $kehadiran = $this->generateKehadiran($ekskul, $validated['bulan']);
+        $dokumentasiKegiatan = $this->generateDokumentasiKegiatan($ekskul, $validated['bulan']);
 
         LaporanBulanan::create([
             'ekskul_id' => $ekskul->id,
@@ -156,7 +163,7 @@ class LaporanBulananController extends Controller
             'evaluasi_keberhasilan' => $validated['evaluasi_keberhasilan'] ?? null,
             'evaluasi_kendala' => $validated['evaluasi_kendala'] ?? null,
             'evaluasi_solusi' => $validated['evaluasi_solusi'] ?? null,
-            'dokumentasi' => $dokumentasiPath,
+            'dokumentasi_kegiatan' => $dokumentasiKegiatan,
             'status' => 'draft',
         ]);
 

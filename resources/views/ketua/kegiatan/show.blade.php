@@ -17,6 +17,12 @@
             <p class="font-medium text-sm whitespace-pre-line">{{ $kegiatan->deskripsi }}</p>
         </div>
         @endif
+        @if($kegiatan->dokumentasi)
+        <div class="mb-6">
+            <p class="text-[11px] text-gray-400 font-bold uppercase">Dokumentasi</p>
+            <img src="{{ asset('storage/' . $kegiatan->dokumentasi) }}" alt="Dokumentasi Kegiatan" class="mt-2 max-w-sm rounded-2xl border border-gray-100 shadow-sm">
+        </div>
+        @endif
 
         <h3 class="text-xs font-bold text-gray-400 uppercase mb-3">Daftar Presensi</h3>
         <table class="w-full text-left text-xs">

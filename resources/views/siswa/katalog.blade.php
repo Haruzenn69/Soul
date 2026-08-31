@@ -177,7 +177,7 @@
 
                     <!-- Tombol Lihat Detail (nanti untuk halaman info ekskul) -->
                     <div class="mt-3 pt-3 border-t border-slate-200/60">
-                        <a href="#" class="text-blue-600 text-xs font-semibold hover:underline">Lihat Detail</a>
+                        <a href="{{ route('ekskul.detail', $ekskul) }}" class="text-blue-600 text-xs font-semibold hover:underline">Lihat Detail</a>
                     </div>
                 </div>
                 @empty
