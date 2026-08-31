@@ -89,7 +89,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
         $ekskul      = $pendaftaran ? $pendaftaran->ekskul : null;
 
         $kegiatanMendatang = $ekskul 
-        ? $ekskul->kegiatans()->where('tanggal_kegiatan', '>=', now())->orderBy('tanggal_kegiatan', 'asc')->get() 
+        ? $ekskul->kegiatans()->whereDate('tanggal_kegiatan', '>=', today())->orderBy('tanggal_kegiatan', 'asc')->get() 
         : collect();
 
         $totalHadir = $siswa && $pendaftaran 
@@ -132,7 +132,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
         
         $pendaftaran = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->with('ekskul.pembina')->first() : null;
         $ekskul = $pendaftaran ? $pendaftaran->ekskul : null;
-        $pengajuan = $siswa ? $siswa->pengajuanKeluar()->get() : collect();
+        $pengajuan = $siswa ? $siswa->pengajuanKeluars()->latest('tanggal_pengajuan')->get() : collect();
         
         return view('profile.edit', compact('siswa', 'ekskul', 'pengajuan'));
     })->name('profile.edit');
@@ -197,20 +197,32 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
         $user = auth()->user();
         $siswa = $user->siswa;
         
-        $pendaftaran = $siswa->pendaftarans()->where('status', 'diterima')->first();
+        $pendaftaran = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->first() : null;
         if (!$pendaftaran) {
             return redirect()->back()->with('error', 'Kamu belum terdaftar di ekskul manapun.');
         }
         
+        $pending = $siswa->pengajuanKeluars()->where('status', 'pending')->first();
+        if ($pending) {
+            return redirect()->back()->with('error', 'Kamu masih memiliki permohonan keluar yang berstatus pending.');
+        }
+
+        $validated = $request->validate([
+            'alasan' => ['required', 'string', 'min:5'],
+        ], [
+            'alasan.required' => 'Alasan keluar wajib diisi.',
+            'alasan.min' => 'Alasan keluar minimal harus 5 karakter.',
+        ]);
+        
         PengajuanKeluar::create([
             'siswa_id' => $siswa->id,
             'ekskul_id' => $pendaftaran->ekskul_id,
-            'alasan' => $request->alasan,
+            'alasan' => $validated['alasan'],
             'status' => 'pending',
             'tanggal_pengajuan' => now()->toDateString(),
         ]);
         
-        return redirect()->back()->with('success', 'Pengajuan keluar berhasil dikirim.');
+        return redirect()->back()->with('success', 'Pengajuan keluar berhasil dikirim dan sedang menunggu keputusan ketua ekskul.');
     })->name('pengajuan-keluar.store');
 });
 
@@ -257,24 +269,62 @@ Route::middleware(['auth', 'role:siswa'])->prefix('ketua')->name('ketua.')->grou
     Route::get('/dashboard', function () {
         $user = auth()->user();
         $siswa = $user->siswa;
-        $pendaftaran = $siswa->pendaftarans()->where('status', 'diterima')->first();
+        $pendaftaran = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->first() : null;
 
-        if (!$pendaftaran) {
+        if (!$pendaftaran || !$pendaftaran->ekskul) {
             return view('ketua.dashboard', [
                 'ekskul'         => null,
                 'totalAnggota'   => 0,
                 'pendingCount'   => 0,
                 'pengajuanCount' => 0,
+                'chartKegiatan'  => ['labels' => [], 'hadir' => [], 'izin' => [], 'sakit' => [], 'alpha' => []],
+                'chartKelas'     => ['labels' => ['Kelas X', 'Kelas XI', 'Kelas XII'], 'data' => [0, 0, 0]],
             ]);
         }
 
         $ekskul = $pendaftaran->ekskul;
 
+        // 1. Data Line Chart: Tren Kehadiran Kegiatan Terakhir (Maks 6)
+        $kegiatanTerbaru = $ekskul->kegiatans()
+            ->with('presensis')
+            ->orderBy('tanggal_kegiatan', 'desc')
+            ->take(6)
+            ->get()
+            ->reverse()
+            ->values();
+
+        $chartKegiatan = [
+            'labels' => $kegiatanTerbaru->map(function ($k) {
+                return $k->tanggal_kegiatan ? $k->tanggal_kegiatan->translatedFormat('d M') : 'Kegiatan #'.$k->id;
+            })->toArray(),
+            'hadir' => $kegiatanTerbaru->map(fn($k) => $k->presensis->where('status', 'hadir')->count())->toArray(),
+            'izin'  => $kegiatanTerbaru->map(fn($k) => $k->presensis->where('status', 'izin')->count())->toArray(),
+            'sakit' => $kegiatanTerbaru->map(fn($k) => $k->presensis->where('status', 'sakit')->count())->toArray(),
+            'alpha' => $kegiatanTerbaru->map(fn($k) => $k->presensis->where('status', 'alpha')->count())->toArray(),
+        ];
+
+        // 2. Data Doughnut Chart: Distribusi Anggota per Tingkat Kelas
+        $anggotaAktif = $ekskul->pendaftarans()
+            ->where('status', 'diterima')
+            ->with('siswa.kelas')
+            ->get();
+
+        $countX = $anggotaAktif->filter(fn($p) => strtolower($p->siswa?->kelas?->tingkat ?? '') === 'x')->count();
+        $countXI = $anggotaAktif->filter(fn($p) => strtolower($p->siswa?->kelas?->tingkat ?? '') === 'xi')->count();
+        $countXII = $anggotaAktif->filter(fn($p) => strtolower($p->siswa?->kelas?->tingkat ?? '') === 'xii')->count();
+
+        $chartKelas = [
+            'labels' => ['Kelas X', 'Kelas XI', 'Kelas XII'],
+            'data'   => [$countX, $countXI, $countXII],
+        ];
+
         return view('ketua.dashboard', [
             'ekskul'         => $ekskul,
-            'totalAnggota'   => $ekskul->pendaftarans()->where('status', 'diterima')->count(),
+            'totalAnggota'   => $anggotaAktif->count(),
             'pendingCount'   => $ekskul->pendaftarans()->where('status', 'pending')->count(),
             'pengajuanCount' => $ekskul->pengajuanKeluars()->where('status', 'pending')->count(),
+            'chartKegiatan'  => $chartKegiatan,
+            'chartKelas'     => $chartKelas,
         ]);
     })->name('dashboard');
 

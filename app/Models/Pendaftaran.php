@@ -13,7 +13,7 @@ class Pendaftaran extends Model
         'ekskul_id',
         'tanggal_daftar',
         'status',
-        // HAPUS 'alasan'
+        'alasan',
     ];
 
     protected $casts = [

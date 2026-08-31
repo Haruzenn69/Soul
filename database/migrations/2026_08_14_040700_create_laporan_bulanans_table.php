@@ -12,7 +12,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('ekskul_id')->constrained()->onDelete('cascade');
             $table->string('bulan', 7);
-            $table->string('materi_kegiatan')->nullable();
+            $table->text('materi_kegiatan')->nullable();
+            $table->text('tujuan')->nullable();
+            $table->text('kehadiran')->nullable();
+            $table->text('evaluasi_keberhasilan')->nullable();
+            $table->text('evaluasi_kendala')->nullable();
+            $table->text('evaluasi_solusi')->nullable();
             $table->text('ringkasan')->nullable();
             $table->string('dokumentasi')->nullable();
             $table->enum('status', ['draft', 'disetujui', 'ditolak'])->default('draft');

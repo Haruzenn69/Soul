@@ -25,13 +25,17 @@
                         <td class="px-6 py-4">{{ $pendaftaran->tanggal_daftar->format('d/m/Y') }}</td>
                         <td class="px-6 py-4">
                             @if($pendaftaran->status === 'pending')
-                                <span class="text-yellow-600 font-medium">Pending</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Pending</span>
+                            @elseif($pendaftaran->status === 'diterima')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">Diterima</span>
+                            @elseif($pendaftaran->status === 'ditolak')
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">Ditolak</span>
                             @else
-                                <span class="text-green-600 font-medium">Diterima</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">{{ ucfirst($pendaftaran->status) }}</span>
                             @endif
                         </td>
                         <td class="px-6 py-4">
-                            <a href="{{ route('ketua.pendaftaran.show', $pendaftaran) }}" class="text-theme-blue hover:underline font-medium">Detail</a>
+                            <a href="{{ route('ketua.pendaftaran.show', $pendaftaran) }}" class="px-3 py-1 bg-blue-50 text-theme-blue hover:bg-blue-100 rounded-full font-semibold transition inline-block">Detail</a>
                         </td>
                     </tr>
                 @empty

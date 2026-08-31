@@ -36,7 +36,7 @@
         .header-table .text-cell { 
             text-align: center;
         }
-        .header-table p { font-size: 10pt; margin: 0.5px 0; }
+        .header-table p { font-size: 10pt; margin: 0.3px 0; }
         .header-table .school-name { font-size: 14pt; font-weight: bold; margin: 5px 0 2px; text-transform: uppercase; }
         .header-border { border-bottom: 3px double #000; margin-top: 5px; margin-bottom: 20px; }
 
@@ -241,7 +241,7 @@
     <!-- DOKUMENTASI (JIKA ADA) -->
     @if($laporan->dokumentasi)
     <div class="section">
-        <div class="section-title">Dokumentasi</div>
+        <div class="section-title">E. Dokumentasi</div>
         <div class="dokumentasi">
             @php
                 $imgPath = public_path('storage/' . $laporan->dokumentasi);
