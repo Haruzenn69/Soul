@@ -48,8 +48,8 @@
             </nav>
         </div>
 
-        <!-- User Profile Card Bottom -->
-        <div class="bg-gray-50 p-3.5 rounded-2xl flex items-center justify-between border border-gray-100">
+        <!-- User Profile Card Bottom (Tanpa Logout) -->
+        <div class="bg-gray-50 p-3.5 rounded-2xl flex items-center border border-gray-100">
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-full bg-theme-yellow text-theme-dark font-extrabold flex items-center justify-center text-xs shadow-sm uppercase">
                     {{ substr(auth()->user()->username, 0, 2) }}
@@ -59,17 +59,13 @@
                     <p class="text-[10px] text-gray-400">Staf Kesiswaan</p>
                 </div>
             </div>
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" title="Logout" class="text-gray-400 hover:text-red-500 text-xs font-bold">✕</button>
-            </form>
         </div>
     </aside>
 
     <!-- MAIN CONTENT CONTAINER -->
     <div class="flex-1 flex flex-col min-w-0">
 
-        <!-- TOP NAVBAR HEADER -->
+        <!-- TOP NAVBAR HEADER (DENGAN LOGOUT) -->
         <header class="px-8 py-5 bg-white border-b border-gray-100 flex items-center justify-between gap-4">
             <form action="#" class="relative w-full max-w-md" onsubmit="return false;">
                 <input type="text" placeholder="Cari akun, ekskul, kelas..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs text-theme-dark placeholder-gray-400 focus:outline-none focus:bg-white focus:border-theme-blue transition">
@@ -80,6 +76,16 @@
                 <div class="bg-theme-yellow/20 text-yellow-600 px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-theme-yellow"></span> Kesiswaan
                 </div>
+                <!-- ✅ TOMBOL LOGOUT DI NAVBAR -->
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg text-xs font-semibold border border-red-100 transition shadow-sm flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        Logout
+                    </button>
+                </form>
                 <button onclick="document.getElementById('sidebar-mobile').classList.toggle('hidden')" class="md:hidden w-9 h-9 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-xs text-gray-500">
                     ☰
                 </button>

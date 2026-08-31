@@ -17,7 +17,6 @@
         }
     </script>
 </head>
-
 <body class="bg-[#F8FAFC] text-slate-800 font-sans antialiased flex min-h-screen selection:bg-blue-100 selection:text-blue-600">
 
     <!-- SIDEBAR LEFT -->
@@ -132,6 +131,45 @@
         <!-- DASHBOARD CONTENT -->
         <main class="p-8 space-y-6 overflow-y-auto">
             
+            <!-- NOTIFIKASI STATUS PENDAFTARAN -->
+            @php
+                $pendaftaranStatus = null;
+                $pendaftaranMessage = '';
+                $pendaftaranColor = '';
+                $pendaftaranIcon = '';
+                
+                if ($siswa) {
+                    $pending = $siswa->pendaftarans()->where('status', 'pending')->first();
+                    $diterima = $siswa->pendaftarans()->where('status', 'diterima')->first();
+                    
+                    if ($diterima) {
+                        $pendaftaranStatus = 'diterima';
+                        $pendaftaranMessage = 'Kamu sudah terdaftar di ekskul ' . $diterima->ekskul->nama_ekskul . '.';
+                        $pendaftaranColor = 'bg-emerald-50 border-emerald-200 text-emerald-700';
+                        $pendaftaranIcon = '<svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+                    } elseif ($pending) {
+                        $pendaftaranStatus = 'pending';
+                        $pendaftaranMessage = 'Kamu sudah mengajukan pendaftaran ke ekskul ' . $pending->ekskul->nama_ekskul . '. Tunggu verifikasi dari ketua ekskul.';
+                        $pendaftaranColor = 'bg-amber-50 border-amber-200 text-amber-700';
+                        $pendaftaranIcon = '<svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+                    }
+                }
+            @endphp
+
+            @if($pendaftaranStatus)
+                <div class="p-4 rounded-2xl border {{ $pendaftaranColor }} flex items-start gap-3">
+                    <div class="mt-0.5">
+                        {!! $pendaftaranIcon !!}
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium">{{ $pendaftaranMessage }}</p>
+                        @if($pendaftaranStatus == 'pending')
+                            <p class="text-xs mt-1 opacity-75">Status pendaftaranmu sedang diproses oleh ketua ekskul.</p>
+                        @endif
+                    </div>
+                </div>
+            @endif
+
             <!-- Greeting & Header CTA -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
@@ -140,7 +178,7 @@
                     </h1>
                     <p class="text-xs text-slate-400 mt-0.5">{{ \Carbon\Carbon::now()->isoFormat('D MMMM Y') }} · Semester Ganjil 2026/2027</p>
                 </div>
-                @if(!$ekskul)
+                @if(!$ekskul && !$pendaftaranStatus)
                     <a href="{{ route('siswa.daftar-ekskul') }}" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -258,58 +296,6 @@
 
         </main>
     </div>
-
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script>
-        @if(session('success'))
-            Swal.fire({
-                title: 'Berhasil!',
-                text: '{{ session('success') }}',
-                icon: 'success',
-                timer: 5000,
-                timerProgressBar: true,
-                showConfirmButton: false,
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                    const content = Swal.getHtmlContainer();
-                    if (content) {
-                        const timerElement = document.createElement('div');
-                        timerElement.className = 'text-sm text-gray-500 mt-2';
-                        timerElement.id = 'timer-text';
-                        content.appendChild(timerElement);
-                    }
-                },
-                willClose: () => {
-                    window.location.href = '{{ route('siswa.dashboard') }}';
-                }
-            });
-
-            let timeLeft = 5;
-            const timerInterval = setInterval(() => {
-                timeLeft--;
-                const timerText = document.getElementById('timer-text');
-                if (timerText) {
-                    timerText.textContent = `Mengalihkan ke halaman dashboard dalam ${timeLeft} detik...`;
-                }
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                }
-            }, 1000);
-        @endif
-
-        @if(session('error'))
-            Swal.fire({
-                title: 'Gagal!',
-                text: '{{ session('error') }}',
-                icon: 'error',
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#2563EB'
-            });
-        @endif
-    </script>
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
