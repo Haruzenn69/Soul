@@ -8,19 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('kegiatans', function (Blueprint $table) {
+        Schema::create('testimonis', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ekskul_id')->constrained()->onDelete('cascade');
-            $table->string('materi', 255);
-            $table->text('deskripsi')->nullable();
-            $table->string('dokumentasi')->nullable();
-            $table->date('tanggal_kegiatan');
+            $table->string('nama');
+            $table->string('kelas')->nullable();
+            $table->text('quote');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('kegiatans');
+        Schema::dropIfExists('testimonis');
     }
 };

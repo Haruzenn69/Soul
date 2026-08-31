@@ -100,9 +100,10 @@
             margin: 15px 0; 
         }
         .dokumentasi img { 
-            max-width: 100%; 
+            max-width: 45%; 
             height: auto;
             border: 1px solid #ccc; 
+            margin: 5px 2%;
         }
 
         /* TANDA TANGAN */
@@ -239,46 +240,55 @@
     @endif
 
     <!-- DOKUMENTASI (JIKA ADA) -->
-    @if($laporan->dokumentasi)
+    @php
+        $dokumentasiPaths = [];
+        if ($laporan->dokumentasi) {
+            $dokumentasiPaths[] = $laporan->dokumentasi;
+        }
+        foreach ($laporan->dokumentasi_kegiatan ?? [] as $dk) {
+            $dokumentasiPaths[] = $dk;
+        }
+    @endphp
+    @if(count($dokumentasiPaths) > 0)
     <div class="section">
         <div class="section-title">E. Dokumentasi</div>
         <div class="dokumentasi">
-            @php
-                $imgPath = public_path('storage/' . $laporan->dokumentasi);
-                $imgExists = file_exists($imgPath);
-            @endphp
-            @if($imgExists)
+            @foreach($dokumentasiPaths as $dokDoc)
                 @php
-                    $exif = @exif_read_data($imgPath);
-                    $orientation = $exif['COMPUTED']['Orientation'] ?? $exif['Orientation'] ?? null;
-                    $img = @imagecreatefromstring(file_get_contents($imgPath));
-
-                    if ($img && $orientation) {
-                        $flip = [2, 4, 5, 7];
-                        $rotate = [3 => 180, 6 => 270, 8 => 90];
-                        if (in_array($orientation, $flip)) {
-                            $img = $orientation <= 2 ? $img : imagerotate($img, $rotate[$orientation] ?? 0, 0);
-                        } elseif (isset($rotate[$orientation])) {
-                            $img = imagerotate($img, $rotate[$orientation], 0);
-                        }
-                    }
-
-                    if ($img) {
-                        ob_start();
-                        imagejpeg($img, null, 90);
-                        $imageData = base64_encode(ob_get_clean());
-                        imagedestroy($img);
-                        $src = 'data:image/jpeg;base64,' . $imageData;
-                    } else {
-                        $imageData = base64_encode(file_get_contents($imgPath));
-                        $mime = mime_content_type($imgPath);
-                        $src = 'data:' . $mime . ';base64,' . $imageData;
-                    }
+                    $imgPath = public_path('storage/' . $dokDoc);
+                    $imgExists = file_exists($imgPath);
                 @endphp
-                <img src="{{ $src }}" alt="Dokumentasi">
-            @else
-                <p>{{ $laporan->dokumentasi }}</p>
-            @endif
+                @if($imgExists)
+                    @php
+                        $exif = @exif_read_data($imgPath);
+                        $orientation = $exif['COMPUTED']['Orientation'] ?? $exif['Orientation'] ?? null;
+                        $img = @imagecreatefromstring(file_get_contents($imgPath));
+
+                        if ($img && $orientation) {
+                            $flip = [2, 4, 5, 7];
+                            $rotate = [3 => 180, 6 => 270, 8 => 90];
+                            if (in_array($orientation, $flip)) {
+                                $img = $orientation <= 2 ? $img : imagerotate($img, $rotate[$orientation] ?? 0, 0);
+                            } elseif (isset($rotate[$orientation])) {
+                                $img = imagerotate($img, $rotate[$orientation], 0);
+                            }
+                        }
+
+                        if ($img) {
+                            ob_start();
+                            imagejpeg($img, null, 90);
+                            $imageData = base64_encode(ob_get_clean());
+                            imagedestroy($img);
+                            $src = 'data:image/jpeg;base64,' . $imageData;
+                        } else {
+                            $imageData = base64_encode(file_get_contents($imgPath));
+                            $mime = mime_content_type($imgPath);
+                            $src = 'data:' . $mime . ';base64,' . $imageData;
+                        }
+                    @endphp
+                    <img src="{{ $src }}" alt="Dokumentasi">
+                @endif
+            @endforeach
         </div>
     </div>
     @endif

@@ -1,13 +1,18 @@
 <?php
 
+use App\Http\Controllers\EkskulCatalogController;
 use App\Http\Controllers\Kesiswaan\EkskulController;
 use App\Http\Controllers\Kesiswaan\KelasController;
 use App\Http\Controllers\Kesiswaan\UserController;
 use App\Http\Controllers\AnggotaController;
+use App\Http\Controllers\FaqController;
 use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\PengajuanKeluarController;
+use App\Http\Controllers\PrestasiController;
+use App\Http\Controllers\ProfilEkskulController;
+use App\Http\Controllers\TestimoniController;
 use App\Http\Controllers\LaporanBulananController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Ekskul;
@@ -23,9 +28,11 @@ use Illuminate\Http\Request;
 
 
 Route::get('/', function () {
-    $ekskuls = Ekskul::with('pembina')->get();
+    $ekskuls = \App\Models\Ekskul::with('pembina')->get();
     return view('welcome', compact('ekskuls'));
 })->name('siswa.landing');
+
+Route::get('/ekskul/{ekskul}', [EkskulCatalogController::class, 'show'])->name('ekskul.detail');
 
 Route::get('/dashboard', function () {
     $user = auth()->user();
@@ -346,6 +353,18 @@ Route::middleware(['auth', 'role:siswa'])->prefix('ketua')->name('ketua.')->grou
     Route::resource('pengajuan-keluar', PengajuanKeluarController::class)->only(['index', 'show', 'update']);
     Route::get('anggota', [AnggotaController::class, 'index'])->name('anggota.index');
     Route::patch('anggota/{pendaftaran}/toggle', [AnggotaController::class, 'toggle'])->name('anggota.toggle');
+    Route::get('profil-ekskul', [ProfilEkskulController::class, 'edit'])->name('profil-ekskul.edit');
+    Route::patch('profil-ekskul', [ProfilEkskulController::class, 'update'])->name('profil-ekskul.update');
+    Route::match(['get', 'patch'], 'profil-ekskul/toggle-recruitment', [ProfilEkskulController::class, 'toggleRecruitment'])->name('profil-ekskul.toggle-recruitment');
+    Route::get('prestasi', [PrestasiController::class, 'index'])->name('prestasi.index');
+    Route::post('prestasi', [PrestasiController::class, 'store'])->name('prestasi.store');
+    Route::delete('prestasi/{prestasi}', [PrestasiController::class, 'destroy'])->name('prestasi.destroy');
+    Route::get('testimoni', [TestimoniController::class, 'index'])->name('testimoni.index');
+    Route::post('testimoni', [TestimoniController::class, 'store'])->name('testimoni.store');
+    Route::delete('testimoni/{testimoni}', [TestimoniController::class, 'destroy'])->name('testimoni.destroy');
+    Route::get('faq', [FaqController::class, 'index'])->name('faq.index');
+    Route::post('faq', [FaqController::class, 'store'])->name('faq.store');
+    Route::delete('faq/{faq}', [FaqController::class, 'destroy'])->name('faq.destroy');
     Route::resource('laporan-bulanan', LaporanBulananController::class)->only(['index', 'create', 'store', 'show']);
     Route::get('laporan-bulanan/{laporan_bulanan}/download-pdf', [LaporanBulananController::class, 'downloadPdf'])->name('laporan-bulanan.download-pdf');
 });
