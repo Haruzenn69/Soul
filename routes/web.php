@@ -164,25 +164,25 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
     })->name('daftar-ekskul');
 
     // 6. FORM DAFTAR EKSKUL (HALAMAN FORM)
-    Route::get('/daftar-ekskul', function () {
+    Route::get('/form-daftar/{ekskul}', function ($ekskul) {
         $user = auth()->user();
         $siswa = $user->siswa;
-        
+
         // Cek apakah sudah terdaftar (diterima)
         $diterima = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->first() : null;
         if ($diterima) {
             return redirect()->route('siswa.dashboard')->with('error', 'Kamu sudah terdaftar di ekskul.');
         }
-        
+
         // Cek apakah sudah mendaftar (pending)
         $pending = $siswa ? $siswa->pendaftarans()->where('status', 'pending')->first() : null;
         if ($pending) {
             return redirect()->route('siswa.dashboard')->with('error', 'Kamu sudah mengajukan pendaftaran. Tunggu verifikasi dari ketua ekskul.');
         }
-        
-        $ekskuls = Ekskul::with('pembina')->get();
-        return view('siswa.daftar-ekskul', compact('ekskuls', 'siswa'));
-    })->name('daftar-ekskul');
+
+        $ekskul = Ekskul::with('pembina')->findOrFail($ekskul);
+        return view('siswa.form-daftar', compact('ekskul', 'siswa'));
+    })->name('form-daftar');
 
     // 7. PROSES DAFTAR EKSKUL (STORE)
     Route::post('/daftar-ekskul', function (Request $request) {
