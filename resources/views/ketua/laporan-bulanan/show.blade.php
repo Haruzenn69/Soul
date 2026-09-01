@@ -56,8 +56,21 @@
 
         <div class="mb-3">
             <p class="text-[11px] text-gray-400 font-bold uppercase">Dokumentasi</p>
-            @if($laporan->dokumentasi)
-                <img src="{{ asset('storage/' . $laporan->dokumentasi) }}" alt="Dokumentasi" class="mt-2 max-w-sm rounded-2xl border border-gray-100 shadow-sm">
+            @php
+                $dokPaths = [];
+                if ($laporan->dokumentasi) {
+                    $dokPaths[] = $laporan->dokumentasi;
+                }
+                foreach ($laporan->dokumentasi_kegiatan ?? [] as $dk) {
+                    $dokPaths[] = $dk;
+                }
+            @endphp
+            @if(count($dokPaths) > 0)
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    @foreach($dokPaths as $dokPath)
+                        <img src="{{ asset('storage/' . $dokPath) }}" alt="Dokumentasi" class="max-w-full rounded-2xl border border-gray-100 shadow-sm">
+                    @endforeach
+                </div>
             @else
                 <p class="font-medium text-sm text-gray-400">Tidak ada dokumentasi</p>
             @endif

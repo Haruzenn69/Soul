@@ -108,20 +108,33 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 @foreach($ekskuls as $ekskul)
                     <div class="bg-theme-light rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition p-6 flex flex-col">
-                        <h3 class="font-bold text-lg text-theme-dark mb-2">{{ $ekskul->nama_ekskul }}</h3>
+                        <div class="flex items-center gap-3 mb-3">
+                            @if($ekskul->logo)
+                                <img src="{{ asset('storage/' . $ekskul->logo) }}" alt="Logo {{ $ekskul->nama_ekskul }}" class="w-10 h-10 object-contain rounded-xl bg-white p-1 border border-gray-100">
+                            @else
+                                <div class="w-10 h-10 rounded-xl bg-theme-blue text-white flex items-center justify-center text-sm font-bold">{{ substr($ekskul->nama_ekskul, 0, 1) }}</div>
+                            @endif
+                            <h3 class="font-bold text-lg text-theme-dark">{{ $ekskul->nama_ekskul }}</h3>
+                        </div>
+                        @if($ekskul->tagline)
+                            <p class="text-[11px] text-theme-blue font-semibold mb-1">{{ $ekskul->tagline }}</p>
+                        @endif
                         <p class="text-xs text-gray-500 mb-1">Pembina: {{ $ekskul->pembina->nama ?? '-' }}</p>
                         <p class="text-xs text-gray-500 mb-3">Jadwal: {{ $ekskul->jadwal ?? '-' }}</p>
                         <p class="text-sm text-gray-600 flex-1 mb-4">{{ $ekskul->deskripsi ?? 'Tidak ada deskripsi.' }}</p>
-                        <div class="mt-auto">
+                        <div class="mt-auto space-y-2">
                             @if($ekskul->is_open_recruitment)
-                                <span class="w-full text-center block py-2 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                                <span class="text-center block py-2 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
                                     Pendaftaran Dibuka
                                 </span>
                             @else
-                                <span class="w-full text-center block py-2 bg-gray-200 text-gray-500 text-xs font-semibold rounded-full">
+                                <span class="text-center block py-2 bg-gray-200 text-gray-500 text-xs font-semibold rounded-full">
                                     Pendaftaran Ditutup
                                 </span>
                             @endif
+                            <a href="{{ route('ekskul.detail', $ekskul) }}" class="text-center block py-2 bg-theme-blue hover:bg-theme-darkBlue text-white text-xs font-semibold rounded-full transition">
+                                Lihat Ekskul &rarr;
+                            </a>
                         </div>
                     </div>
                 @endforeach

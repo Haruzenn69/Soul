@@ -14,6 +14,10 @@ return new class extends Migration
             $table->foreignId('pelatih_id')->constrained()->onDelete('cascade');
             $table->string('nama_ekskul');
             $table->text('deskripsi')->nullable();
+            $table->string('tagline')->nullable();
+            $table->text('tujuan')->nullable();
+            $table->string('logo')->nullable();
+            $table->string('cover')->nullable();
             $table->text('jadwal')->nullable();
             $table->boolean('is_open_recruitment')->default(false);
             $table->timestamps();

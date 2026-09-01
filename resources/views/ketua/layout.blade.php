@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') - SOUL</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>[x-cloak] { display: none !important; }</style>
     <script>
         tailwind.config = {
             theme: {
@@ -47,6 +49,27 @@
                 <a href="{{ route('ketua.anggota.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('ketua.anggota.*') ? 'bg-blue-50 text-theme-blue rounded-2xl font-bold' : 'text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium' }} text-xs transition">
                     <span class="text-base">👥</span> Kelola Anggota
                 </a>
+@php $isKatalog = request()->routeIs('ketua.profil-ekskul.*','ketua.prestasi.*','ketua.testimoni.*','ketua.faq.*'); @endphp
+                <div x-data="{ open: false }" @if($isKatalog) x-init="open = true" @endif>
+                    <button @click="open = !open" class="w-full flex items-center justify-between gap-3 px-4 py-3 {{ request()->routeIs('ketua.profil-ekskul.*','ketua.prestasi.*','ketua.testimoni.*','ketua.faq.*') ? 'bg-blue-50 text-theme-blue rounded-2xl font-bold' : 'text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium' }} text-xs transition">
+                        <span class="flex items-center gap-3"><span class="text-base">📚</span> Kelola Katalog</span>
+                        <svg class="w-3 h-3 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" class="ml-4 mt-1 space-y-0.5 border-l-2 border-gray-100 pl-3">
+                        <a href="{{ route('ketua.profil-ekskul.edit') }}" class="flex items-center gap-3 px-3 py-2 {{ request()->routeIs('ketua.profil-ekskul.*') ? 'text-theme-blue font-bold' : 'text-gray-400 hover:text-theme-dark' }} text-xs transition rounded-xl">
+                            <span class="text-sm">🏫</span> Profil Ekskul
+                        </a>
+                        <a href="{{ route('ketua.prestasi.index') }}" class="flex items-center gap-3 px-3 py-2 {{ request()->routeIs('ketua.prestasi.*') ? 'text-theme-blue font-bold' : 'text-gray-400 hover:text-theme-dark' }} text-xs transition rounded-xl">
+                            <span class="text-sm">🏆</span> Prestasi
+                        </a>
+                        <a href="{{ route('ketua.testimoni.index') }}" class="flex items-center gap-3 px-3 py-2 {{ request()->routeIs('ketua.testimoni.*') ? 'text-theme-blue font-bold' : 'text-gray-400 hover:text-theme-dark' }} text-xs transition rounded-xl">
+                            <span class="text-sm">💬</span> Testimoni
+                        </a>
+                        <a href="{{ route('ketua.faq.index') }}" class="flex items-center gap-3 px-3 py-2 {{ request()->routeIs('ketua.faq.*') ? 'text-theme-blue font-bold' : 'text-gray-400 hover:text-theme-dark' }} text-xs transition rounded-xl">
+                            <span class="text-sm">❓</span> FAQ
+                        </a>
+                    </div>
+                </div>
                 <a href="{{ route('ketua.laporan-bulanan.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('ketua.laporan-bulanan.*') ? 'bg-blue-50 text-theme-blue rounded-2xl font-bold' : 'text-gray-500 hover:bg-gray-50 hover:text-theme-dark rounded-2xl font-medium' }} text-xs transition">
                     <span class="text-base">📊</span> Laporan Bulanan
                 </a>

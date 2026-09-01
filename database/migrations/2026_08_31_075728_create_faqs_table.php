@@ -8,19 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('kegiatans', function (Blueprint $table) {
+        Schema::create('faqs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ekskul_id')->constrained()->onDelete('cascade');
-            $table->string('materi', 255);
-            $table->text('deskripsi')->nullable();
-            $table->string('dokumentasi')->nullable();
-            $table->date('tanggal_kegiatan');
+            $table->string('pertanyaan');
+            $table->text('jawaban');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('kegiatans');
+        Schema::dropIfExists('faqs');
     }
 };

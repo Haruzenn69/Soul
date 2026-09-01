@@ -35,15 +35,22 @@ class KegiatanController extends Controller
         $validated = $request->validate([
             'materi' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
+            'dokumentasi' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'tanggal_kegiatan' => 'required|date',
         ]);
 
         $ekskul = $this->getEkskul();
 
+        $dokumentasiPath = null;
+        if ($request->hasFile('dokumentasi')) {
+            $dokumentasiPath = $request->file('dokumentasi')->store('dokumentasi-kegiatan', 'public');
+        }
+
         Kegiatan::create([
             'ekskul_id' => $ekskul->id,
             'materi' => $validated['materi'],
             'deskripsi' => $validated['deskripsi'] ?? null,
+            'dokumentasi' => $dokumentasiPath,
             'tanggal_kegiatan' => $validated['tanggal_kegiatan'],
         ]);
 
