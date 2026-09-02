@@ -38,6 +38,11 @@ class Siswa extends Model
         return $this->hasMany(PengajuanKeluar::class);
     }
 
+    public function notifikasis(): HasMany
+    {
+        return $this->hasMany(Notifikasi::class);
+    }
+
     public function pengajuanKeluar(): HasMany
     {
         return $this->pengajuanKeluars();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\LaporanBulanan;
 use App\Models\Kegiatan;
+use App\Models\Notifikasi;
 use App\Models\Presensi;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -154,7 +155,7 @@ class LaporanBulananController extends Controller
         $kehadiran = $this->generateKehadiran($ekskul, $validated['bulan']);
         $dokumentasiKegiatan = $this->generateDokumentasiKegiatan($ekskul, $validated['bulan']);
 
-        LaporanBulanan::create([
+        $laporan = LaporanBulanan::create([
             'ekskul_id' => $ekskul->id,
             'bulan' => $validated['bulan'],
             'materi_kegiatan' => $materi,
@@ -166,6 +167,17 @@ class LaporanBulananController extends Controller
             'dokumentasi_kegiatan' => $dokumentasiKegiatan,
             'status' => 'draft',
         ]);
+
+        if ($ekskul->pembina) {
+            $bulanLabel = \Carbon\Carbon::createFromFormat('Y-m', $validated['bulan'])->translatedFormat('F Y');
+            Notifikasi::create([
+                'pembina_id' => $ekskul->pembina->id,
+                'laporan_bulanan_id' => $laporan->id,
+                'judul' => 'Laporan Bulanan Diserahkan',
+                'pesan' => 'Ketua ekskul menyerahkan laporan bulanan untuk periode ' . $bulanLabel . ' ekskul ' . $ekskul->nama_ekskul . '. Silakan tinjau.',
+                'tipe' => 'info',
+            ]);
+        }
 
         return redirect()->route('ketua.laporan-bulanan.index')->with('success', 'Laporan bulanan berhasil dibuat.');
     }
