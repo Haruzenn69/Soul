@@ -25,4 +25,9 @@ class Pembina extends Model
     {
         return $this->hasMany(Ekskul::class);
     }
+
+    public function notifikasis(): HasMany
+    {
+        return $this->hasMany(Notifikasi::class);
+    }
 }

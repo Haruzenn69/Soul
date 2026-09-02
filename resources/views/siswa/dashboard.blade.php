@@ -112,12 +112,14 @@
                 <div class="bg-slate-100/80 text-slate-700 border border-slate-200/60 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2">
                     <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span> Siswa
                 </div>
-                <button class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-center text-xs relative text-slate-600 hover:bg-slate-100 transition-colors">
+                <a href="{{ route('siswa.notifikasi') }}" class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-center text-xs relative text-slate-600 hover:bg-slate-100 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                     </svg>
-                    <span class="w-2 h-2 rounded-full bg-amber-400 absolute top-2 right-2 border-2 border-white"></span>
-                </button>
+                    @if(($unreadNotifCount ?? 0) > 0)
+                        <span class="w-2 h-2 rounded-full bg-amber-400 absolute top-2 right-2 border-2 border-white"></span>
+                    @endif
+                </a>
                 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -141,6 +143,7 @@
                 if ($siswa) {
                     $pending = $siswa->pendaftarans()->where('status', 'pending')->first();
                     $diterima = $siswa->pendaftarans()->where('status', 'diterima')->first();
+                    $ditolak = $siswa->pendaftarans()->where('status', 'ditolak')->first();
                     
                     if ($diterima) {
                         $pendaftaranStatus = 'diterima';
@@ -152,6 +155,11 @@
                         $pendaftaranMessage = 'Kamu sudah mengajukan pendaftaran ke ekskul ' . $pending->ekskul->nama_ekskul . '. Tunggu verifikasi dari ketua ekskul.';
                         $pendaftaranColor = 'bg-amber-50 border-amber-200 text-amber-700';
                         $pendaftaranIcon = '<svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+                    } elseif ($ditolak) {
+                        $pendaftaranStatus = 'ditolak';
+                        $pendaftaranMessage = 'Pendaftaran kamu ke ekskul ' . $ditolak->ekskul->nama_ekskul . ' ditolak oleh ketua ekskul.';
+                        $pendaftaranColor = 'bg-red-50 border-red-200 text-red-700';
+                        $pendaftaranIcon = '<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
                     }
                 }
             @endphp
@@ -161,10 +169,12 @@
                     <div class="mt-0.5">
                         {!! $pendaftaranIcon !!}
                     </div>
-                    <div>
+                    <div class="flex-1">
                         <p class="text-sm font-medium">{{ $pendaftaranMessage }}</p>
                         @if($pendaftaranStatus == 'pending')
                             <p class="text-xs mt-1 opacity-75">Status pendaftaranmu sedang diproses oleh ketua ekskul.</p>
+                        @elseif($pendaftaranStatus == 'ditolak')
+                            <p class="text-xs mt-1 opacity-75">Kamu dapat mendaftar ke ekskul lain.</p>
                         @endif
                     </div>
                 </div>
