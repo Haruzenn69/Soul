@@ -25,7 +25,7 @@ class ProfileController extends Controller
         if ($user->role === 'siswa' && $siswa) {
             $pendaftaran = $siswa->pendaftarans()->where('status', 'diterima')->with('ekskul.pembina')->first();
             $ekskul = $pendaftaran ? $pendaftaran->ekskul : null;
-            $pengajuan = $siswa->pengajuanKeluar()->get();
+            $pengajuan = $siswa->pengajuanKeluars()->latest('tanggal_pengajuan')->get();
             
             return view('profile.edit', compact('siswa', 'ekskul', 'pengajuan'));
         }

@@ -125,6 +125,18 @@
                 <p class="text-xs text-slate-400 mt-0.5">Kelola informasi akun dan data diri kamu</p>
             </div>
 
+            @if(session('success'))
+                <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-xl">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="p-4 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-xl">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 <!-- KOLOM KIRI: Foto Profile & Informasi Singkat -->
@@ -237,18 +249,37 @@
                                 </p>
                             </div>
 
-                            <form method="POST" action="{{ route('siswa.pengajuan-keluar.store') }}">
-                                @csrf
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="text-xs font-semibold text-slate-700 block mb-1">Alasan Keluar</label>
-                                        <textarea name="alasan" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500 transition" rows="3" placeholder="Tuliskan alasan kamu keluar dari ekskul..."></textarea>
-                                    </div>
-                                    <button type="submit" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition shadow-sm">
-                                        Ajukan Permohonan Keluar
-                                    </button>
+                            @php
+                                $hasPendingPengajuan = isset($pengajuan) && $pengajuan->where('status', 'pending')->count() > 0;
+                            @endphp
+
+                            @if($hasPendingPengajuan)
+                                <div class="p-4 bg-amber-50 rounded-xl border border-amber-200 mb-4">
+                                    <p class="text-xs text-amber-800 font-medium">
+                                        ⏳ Kamu sudah mengajukan permohonan keluar. Mohon tunggu verifikasi dan persetujuan dari ketua ekskul.
+                                    </p>
                                 </div>
-                            </form>
+                            @else
+                                <form method="POST" action="{{ route('siswa.pengajuan-keluar.store') }}">
+                                    @csrf
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-700 block mb-1">
+                                                Alasan Keluar <span class="text-red-500">*</span>
+                                            </label>
+                                            <textarea name="alasan" required rows="3" 
+                                                class="w-full p-3 bg-slate-50 border @error('alasan') border-red-300 @else border-slate-200 @enderror rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500 transition" 
+                                                placeholder="Tuliskan alasan kamu ingin keluar dari ekskul ini...">{{ old('alasan') }}</textarea>
+                                            @error('alasan')
+                                                <p class="text-red-500 text-[10px] mt-1 font-medium">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                        <button type="submit" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition shadow-sm">
+                                            Ajukan Permohonan Keluar
+                                        </button>
+                                    </div>
+                                </form>
+                            @endif
 
                             <!-- Riwayat Pengajuan Keluar -->
                             @if(isset($pengajuan) && count($pengajuan) > 0)
@@ -284,6 +315,33 @@
 
         </main>
     </div>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(session('success'))
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#2563EB'
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    title: 'Gagal!',
+                    text: '{{ session('error') }}',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#EF4444'
+                });
+            @endif
+        });
+    </script>
 
 </body>
 </html>

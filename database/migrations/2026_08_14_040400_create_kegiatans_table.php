@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('ekskul_id')->constrained()->onDelete('cascade');
             $table->string('materi', 255);
             $table->text('deskripsi')->nullable();
+            $table->string('dokumentasi')->nullable();
             $table->date('tanggal_kegiatan');
             $table->timestamps();
         });

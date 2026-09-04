@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\LaporanBulanan;
 use App\Models\Kegiatan;
+use App\Models\Notifikasi;
 use App\Models\Presensi;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -44,6 +45,18 @@ class LaporanBulananController extends Controller
 
         $last = $labels->pop();
         return $labels->implode(', ') . ', dan ' . $last;
+    }
+
+    private function generateDokumentasiKegiatan($ekskul, $bulan)
+    {
+        return Kegiatan::where('ekskul_id', $ekskul->id)
+            ->whereYear('tanggal_kegiatan', substr($bulan, 0, 4))
+            ->whereMonth('tanggal_kegiatan', substr($bulan, 5, 2))
+            ->whereNotNull('dokumentasi')
+            ->orderBy('tanggal_kegiatan')
+            ->pluck('dokumentasi')
+            ->values()
+            ->toArray();
     }
 
     private function generateMateri($ekskul, $bulan)
@@ -134,20 +147,15 @@ class LaporanBulananController extends Controller
             'evaluasi_keberhasilan' => 'nullable|string',
             'evaluasi_kendala' => 'nullable|string',
             'evaluasi_solusi' => 'nullable|string',
-            'dokumentasi' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $ekskul = $this->getEkskul();
 
-        $dokumentasiPath = null;
-        if ($request->hasFile('dokumentasi')) {
-            $dokumentasiPath = $request->file('dokumentasi')->store('dokumentasi', 'public');
-        }
-
         $materi = $this->generateMateri($ekskul, $validated['bulan']);
         $kehadiran = $this->generateKehadiran($ekskul, $validated['bulan']);
+        $dokumentasiKegiatan = $this->generateDokumentasiKegiatan($ekskul, $validated['bulan']);
 
-        LaporanBulanan::create([
+        $laporan = LaporanBulanan::create([
             'ekskul_id' => $ekskul->id,
             'bulan' => $validated['bulan'],
             'materi_kegiatan' => $materi,
@@ -156,9 +164,20 @@ class LaporanBulananController extends Controller
             'evaluasi_keberhasilan' => $validated['evaluasi_keberhasilan'] ?? null,
             'evaluasi_kendala' => $validated['evaluasi_kendala'] ?? null,
             'evaluasi_solusi' => $validated['evaluasi_solusi'] ?? null,
-            'dokumentasi' => $dokumentasiPath,
+            'dokumentasi_kegiatan' => $dokumentasiKegiatan,
             'status' => 'draft',
         ]);
+
+        if ($ekskul->pembina) {
+            $bulanLabel = \Carbon\Carbon::createFromFormat('Y-m', $validated['bulan'])->translatedFormat('F Y');
+            Notifikasi::create([
+                'pembina_id' => $ekskul->pembina->id,
+                'laporan_bulanan_id' => $laporan->id,
+                'judul' => 'Laporan Bulanan Diserahkan',
+                'pesan' => 'Ketua ekskul menyerahkan laporan bulanan untuk periode ' . $bulanLabel . ' ekskul ' . $ekskul->nama_ekskul . '. Silakan tinjau.',
+                'tipe' => 'info',
+            ]);
+        }
 
         return redirect()->route('ketua.laporan-bulanan.index')->with('success', 'Laporan bulanan berhasil dibuat.');
     }

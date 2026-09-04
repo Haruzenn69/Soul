@@ -13,6 +13,10 @@ class Ekskul extends Model
         'pelatih_id',
         'nama_ekskul',
         'deskripsi',
+        'tagline',
+        'tujuan',
+        'logo',
+        'cover',
         'jadwal',
         'is_open_recruitment',
         'status',
@@ -40,7 +44,7 @@ class Ekskul extends Model
 
     public function kegiatans(): HasMany
     {
-        return $this->hasMany(Kegiatan::class);
+        return $this->hasMany(Kegiatan::class)->orderBy('tanggal_kegiatan');
     }
 
     public function pengajuanKeluars(): HasMany
@@ -51,5 +55,20 @@ class Ekskul extends Model
     public function laporanBulanans(): HasMany
     {
         return $this->hasMany(LaporanBulanan::class);
+    }
+
+    public function prestasis(): HasMany
+    {
+        return $this->hasMany(Prestasi::class);
+    }
+
+    public function testimoniss(): HasMany
+    {
+        return $this->hasMany(Testimoni::class);
+    }
+
+    public function faqs(): HasMany
+    {
+        return $this->hasMany(Faq::class);
     }
 }
