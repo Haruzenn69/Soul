@@ -15,7 +15,6 @@ class Siswa extends Model
         'kelas_id',
         'jenis_kelamin',
         'jabatan',
-        // HAPUS 'no_telepon' dan 'alamat'
     ];
 
     public function user(): BelongsTo
