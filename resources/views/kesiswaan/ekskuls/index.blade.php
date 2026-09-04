@@ -41,6 +41,9 @@
                         </span>
                     </div>
                     <h2 class="text-sm font-extrabold text-theme-dark">{{ $ekskul->nama_ekskul }}</h2>
+                    @if (!$ekskul->status)
+                        <span class="px-3 py-1 rounded-full bg-red-50 text-red-500 font-bold text-[10px]">Nonaktif</span>
+                    @endif
                     <p class="text-[11px] text-gray-400 mt-1 line-clamp-2">{{ $ekskul->deskripsi ?? 'Tanpa deskripsi' }}</p>
 
                     <div class="mt-4 space-y-1.5 text-[11px]">
@@ -58,14 +61,13 @@
                         "pelatih_id" => $ekskul->pelatih_id,
                         "deskripsi" => $ekskul->deskripsi,
                         "jadwal" => $ekskul->jadwal,
-                        "is_open_recruitment" => $ekskul->is_open_recruitment,
                     ]) }})' 
                             class="flex-1 px-3 py-2 bg-blue-50 text-theme-blue font-bold rounded-full hover:bg-blue-100 transition text-[11px]">Edit</button>
                     <form action="{{ route('kesiswaan.ekskuls.destroy', $ekskul) }}" method="POST" class="flex-1"
-                          onsubmit="return confirm('Hapus ekskul {{ $ekskul->nama_ekskul }}?')">
+                          onsubmit="return confirm('{{ $ekskul->status ? 'Nonaktifkan ekskul ' . $ekskul->nama_ekskul . '?' : 'Aktifkan ekskul ' . $ekskul->nama_ekskul . '?' }}')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="w-full px-3 py-2 bg-red-50 text-red-500 font-bold rounded-full hover:bg-red-100 transition text-[11px]">Hapus</button>
+                        <button type="submit" class="w-full px-3 py-2 bg-red-50 text-red-500 font-bold rounded-full hover:bg-red-100 transition text-[11px]">{{ $ekskul->status ? 'Nonaktifkan' : 'Aktifkan' }}</button>
                     </form>
                 </div>
             </div>
@@ -103,10 +105,6 @@
                       class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition"></textarea>
             <input type="text" name="jadwal" placeholder="Jadwal, misal: Senin & Rabu, 15:30 - 17:00"
                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
-            <label class="flex items-center gap-2 text-xs font-semibold text-gray-600">
-                <input type="checkbox" name="is_open_recruitment" value="1" class="accent-theme-blue w-4 h-4">
-                Buka pendaftaran
-            </label>
             <div class="flex gap-2 pt-2">
                 <button type="submit" class="flex-1 px-4 py-2.5 bg-theme-blue hover:bg-theme-darkBlue text-white font-bold text-xs rounded-full transition">Simpan</button>
                 <button type="button" onclick="this.closest('dialog').close()" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs rounded-full transition">Batal</button>
@@ -140,10 +138,6 @@
                       class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition"></textarea>
             <input type="text" name="jadwal" placeholder="Jadwal"
                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
-            <label class="flex items-center gap-2 text-xs font-semibold text-gray-600">
-                <input type="checkbox" name="is_open_recruitment" value="1" class="accent-theme-blue w-4 h-4">
-                Buka pendaftaran
-            </label>
             <div class="flex gap-2 pt-2">
                 <button type="submit" class="flex-1 px-4 py-2.5 bg-theme-blue hover:bg-theme-darkBlue text-white font-bold text-xs rounded-full transition">Simpan</button>
                 <button type="button" onclick="this.closest('dialog').close()" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs rounded-full transition">Batal</button>
@@ -160,7 +154,6 @@
             form.querySelector('[name=pelatih_id]').value = data.pelatih_id || '';
             form.querySelector('[name=deskripsi]').value = data.deskripsi || '';
             form.querySelector('[name=jadwal]').value = data.jadwal || '';
-            form.querySelector('[name=is_open_recruitment]').checked = !!data.is_open_recruitment;
             document.getElementById('modal-edit').showModal();
         }
     </script>
