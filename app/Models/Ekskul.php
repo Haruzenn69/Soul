@@ -15,11 +15,12 @@ class Ekskul extends Model
         'deskripsi',
         'jadwal',
         'is_open_recruitment',
-        // HAPUS 'logo', 'visi', 'misi', 'status'
+        'status',
     ];
 
     protected $casts = [
         'is_open_recruitment' => 'boolean',
+        'status' => 'boolean',
     ];
 
     public function pembina(): BelongsTo
