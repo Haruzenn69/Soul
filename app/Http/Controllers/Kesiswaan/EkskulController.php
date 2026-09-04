@@ -39,7 +39,6 @@ class EkskulController extends Controller
             'pelatih_id' => ['required', 'exists:pelatihs,id'],
             'deskripsi' => ['nullable', 'string'],
             'jadwal' => ['nullable', 'string', 'max:255'],
-            'is_open_recruitment' => ['nullable', 'boolean'],
         ]);
 
         Ekskul::create($data);
@@ -55,7 +54,6 @@ class EkskulController extends Controller
             'pelatih_id' => ['required', 'exists:pelatihs,id'],
             'deskripsi' => ['nullable', 'string'],
             'jadwal' => ['nullable', 'string', 'max:255'],
-            'is_open_recruitment' => ['nullable', 'boolean'],
         ]);
 
         $ekskul->update($data);
@@ -66,8 +64,10 @@ class EkskulController extends Controller
     public function destroy(Ekskul $ekskul): RedirectResponse
     {
         $nama = $ekskul->nama_ekskul;
-        $ekskul->delete();
+        $ekskul->update(['status' => !$ekskul->status]);
 
-        return back()->with('success', "Ekskul {$nama} berhasil dihapus.");
+        $state = $ekskul->status ? 'diaktifkan' : 'dinonaktifkan';
+
+        return back()->with('success', "Ekskul {$nama} berhasil {$state}.");
     }
 }

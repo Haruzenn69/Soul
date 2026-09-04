@@ -85,6 +85,10 @@
                     <p class="text-[10px] text-slate-400 font-medium">Staf Kesiswaan</p>
                 </div>
             </div>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" title="Logout" class="text-gray-400 hover:text-red-500 text-xs font-bold flex items-center gap-1">⟶ Logout</button>
+            </form>
         </div>
     </aside>
 
