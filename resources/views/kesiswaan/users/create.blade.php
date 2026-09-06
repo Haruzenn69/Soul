@@ -92,12 +92,26 @@
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Jabatan</label>
-                    <select name="jabatan"
-                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
-                        @foreach (['siswa' => 'Siswa', 'anggota' => 'Anggota Ekskul', 'ketua' => 'Ketua Ekskul'] as $value => $label)
+                    <select name="jabatan" id="jabatan"
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
+                        @foreach (['siswa' => 'Siswa', 'ketua' => 'Ketua Ekskul'] as $value => $label)
                             <option value="{{ $value }}" {{ old('jabatan', 'siswa') === $value ? 'selected' : '' }}>{{ $label }}</option>
                         @endforeach
                     </select>
+                </div>
+                <div id="field-ekskul" class="hidden">
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Ekskul</label>
+                    <select name="ekskul_id"
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
+                        <option value="">Pilih ekskul...</option>
+                        @foreach ($ekskuls as $ek)
+                            <option value="{{ $ek['id'] }}" {{ old('ekskul_id') == $ek['id'] ? 'selected' : '' }}
+                                {{ $ek['has_ketua'] ? 'disabled' : '' }}>
+                                {{ $ek['label'] }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="text-[10px] text-gray-400 mt-1">⚠ Ekskul yang sudah ada ketua tidak bisa dipilih.</p>
                 </div>
             </div>
         </div>
@@ -142,7 +156,15 @@
             const role = document.getElementById('role').value;
             document.getElementById('fields-siswa').classList.toggle('hidden', role !== 'siswa');
             document.getElementById('fields-pembina').classList.toggle('hidden', role !== 'pembina');
+            toggleEkskulField();
         }
-        document.addEventListener('DOMContentLoaded', toggleRoleFields);
+        function toggleEkskulField() {
+            const jabatan = document.getElementById('jabatan')?.value;
+            document.getElementById('field-ekskul').classList.toggle('hidden', jabatan !== 'ketua');
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleRoleFields();
+            document.getElementById('jabatan')?.addEventListener('change', toggleEkskulField);
+        });
     </script>
 @endsection

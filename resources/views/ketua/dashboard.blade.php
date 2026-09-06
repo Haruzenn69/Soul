@@ -1,6 +1,6 @@
 @extends('ketua.layout')
 
-@section('title', 'Dashboard Ketua')
+@section('title', 'Dashboard Ketua' . ($ekskul ? ' ' . $ekskul->nama_ekskul : ''))
 
 @section('content')
 <div class="space-y-6">
