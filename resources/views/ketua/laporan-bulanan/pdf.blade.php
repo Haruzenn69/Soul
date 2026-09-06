@@ -130,9 +130,9 @@
 
     <!-- HEADER / KOP SURAT -->
     @php
-        $logoPath = public_path('images/logo-smkn11.png');
+        $logoPath = public_path('images/logo-kop.webp');
     @endphp
-    <table class="header-table">
+    <table class="header-table" cellspacing="0">
         <tr>
             <td class="logo-cell">
                 @if(file_exists($logoPath))

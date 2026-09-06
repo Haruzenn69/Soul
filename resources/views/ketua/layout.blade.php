@@ -30,7 +30,7 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-sm tracking-tight text-slate-900 leading-none">SOUL</h1>
-                    <span class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Panel Ketua</span>
+                    <span class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Panel Ketua {{ auth()->user()->siswa?->pendaftarans()->where('status', 'diterima')->first()?->ekskul->nama_ekskul ?? '' }}</span>
                 </div>
             </div>
 
@@ -153,7 +153,7 @@
                 </div>
                 <div class="text-left">
                     <h4 class="text-xs font-bold text-slate-800 leading-tight">{{ auth()->user()->siswa->nama ?? 'Ketua' }}</h4>
-                    <p class="text-[10px] text-slate-400 font-medium">Ketua</p>
+                    <p class="text-[10px] text-slate-400 font-medium">Ketua {{ auth()->user()->siswa?->pendaftarans()->where('status', 'diterima')->first()?->ekskul->nama_ekskul ?? '' }}</p>
                 </div>
             </div>
             <form method="POST" action="{{ route('logout') }}">
@@ -186,7 +186,7 @@
                 </a>
                 <div class="text-right hidden sm:block">
                     <h4 class="text-xs font-bold text-slate-800 leading-tight">{{ auth()->user()->siswa->nama ?? 'Ketua' }}</h4>
-                    <p class="text-[10px] text-slate-400 uppercase font-semibold">{{ auth()->user()->role }}</p>
+                    <p class="text-[10px] text-slate-400 uppercase font-semibold">Ketua {{ auth()->user()->siswa?->pendaftarans()->where('status', 'diterima')->first()?->ekskul->nama_ekskul ?? '' }}</p>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
