@@ -28,7 +28,7 @@ class User extends Authenticatable
         return $this->hasOne(Pembina::class);
     }
 
-        protected $fillable = [
+    protected $fillable = [
         'username',
         'email',
         'password',

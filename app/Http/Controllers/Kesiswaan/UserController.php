@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Kesiswaan;
 
 use App\Http\Controllers\Controller;
+use App\Models\Ekskul;
 use App\Models\Kelas;
 use App\Models\Pembina;
+use App\Models\Pendaftaran;
 use App\Models\Siswa;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -38,6 +40,7 @@ class UserController extends Controller
     {
         return view('kesiswaan.users.create', [
             'kelas' => Kelas::with('tahunAjaran')->orderBy('nama')->get(),
+            'ekskuls' => $this->getEskulsWithKetuaStatus(),
         ]);
     }
 
@@ -58,6 +61,9 @@ class UserController extends Controller
                 'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
                 'jabatan' => ['required', 'in:siswa,anggota,ketua'],
             ];
+            if ($request->input('jabatan') === 'ketua') {
+                $rules['ekskul_id'] = ['required', 'exists:ekskuls,id'];
+            }
         } elseif ($request->input('role') === 'pembina') {
             $rules += [
                 'nip' => ['required', 'string', 'max:255', 'unique:pembinas,nip'],
@@ -77,13 +83,22 @@ class UserController extends Controller
         ]);
 
         if ($data['role'] === 'siswa') {
-            $user->siswa()->create([
+            $siswa = $user->siswa()->create([
                 'nis' => $data['nis'],
                 'nama' => $data['nama'],
                 'kelas_id' => $data['kelas_id'],
                 'jenis_kelamin' => $data['jenis_kelamin'],
                 'jabatan' => $data['jabatan'],
             ]);
+
+            if ($data['jabatan'] === 'ketua' && !empty($data['ekskul_id'])) {
+                Pendaftaran::create([
+                    'siswa_id' => $siswa->id,
+                    'ekskul_id' => $data['ekskul_id'],
+                    'tanggal_daftar' => now()->toDateString(),
+                    'status' => 'diterima',
+                ]);
+            }
         } elseif ($data['role'] === 'pembina') {
             $user->pembina()->create([
                 'nip' => $data['nip'],
@@ -100,11 +115,12 @@ class UserController extends Controller
     public function edit(User $user): View
     {
         $this->authorizeManage($user);
-        $user->load(['siswa.kelas', 'pembina']);
+        $user->load(['siswa.kelas', 'pembina', 'siswa.pendaftarans' => fn($q) => $q->where('status', 'diterima')]);
 
         return view('kesiswaan.users.edit', [
             'user' => $user,
             'kelas' => Kelas::with('tahunAjaran')->orderBy('nama')->get(),
+            'ekskuls' => $this->getEskulsWithKetuaStatus($user->id),
         ]);
     }
 
@@ -128,6 +144,9 @@ class UserController extends Controller
                 'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
                 'jabatan' => ['required', 'in:siswa,anggota,ketua'],
             ];
+            if ($request->input('jabatan') === 'ketua') {
+                $rules['ekskul_id'] = ['required', 'exists:ekskuls,id'];
+            }
         } elseif ($request->input('role') === 'pembina') {
             $nipIgnore = $user->pembina ? ','.$user->pembina->id : '';
             $rules += [
@@ -146,7 +165,7 @@ class UserController extends Controller
         ]);
 
         if ($data['role'] === 'siswa') {
-            Siswa::updateOrCreate(
+            $siswa = Siswa::updateOrCreate(
                 ['user_id' => $user->id],
                 [
                     'nis' => $data['nis'],
@@ -157,6 +176,29 @@ class UserController extends Controller
                 ]
             );
             $user->pembina()->delete();
+
+            // Handle pendaftaran for ketua
+            if ($data['jabatan'] === 'ketua' && !empty($data['ekskul_id'])) {
+                // Hapus pendaftaran ketua lama jika ada
+                Pendaftaran::where('siswa_id', $siswa->id)
+                    ->where('status', 'diterima')
+                    ->whereHas('siswa', fn($q) => $q->where('jabatan', 'ketua'))
+                    ->delete();
+
+                // Buat pendaftaran baru
+                Pendaftaran::create([
+                    'siswa_id' => $siswa->id,
+                    'ekskul_id' => $data['ekskul_id'],
+                    'tanggal_daftar' => now()->toDateString(),
+                    'status' => 'diterima',
+                ]);
+            } elseif ($data['jabatan'] !== 'ketua') {
+                // Jika jabatan bukan ketua lagi, hapus pendaftaran ketua
+                Pendaftaran::where('siswa_id', $siswa->id)
+                    ->where('status', 'diterima')
+                    ->whereHas('siswa', fn($q) => $q->where('jabatan', 'ketua'))
+                    ->delete();
+            }
         } elseif ($data['role'] === 'pembina') {
             Pembina::updateOrCreate(
                 ['user_id' => $user->id],
@@ -218,5 +260,39 @@ class UserController extends Controller
         return auth()->user()->role === 'admin'
             ? 'admin,kesiswaan,pembina,siswa'
             : 'kesiswaan,pembina,siswa';
+    }
+
+    /**
+     * Get all ekskuls with ketua status.
+     * If $currentUserId is provided, exclude that user's ketua assignment (for edit mode).
+     */
+    private function getEskulsWithKetuaStatus(?int $currentUserId = null): \Illuminate\Support\Collection
+    {
+        // Get ekskul_ids that already have a ketua (via pendaftaran diterima + siswa jabatan ketua)
+        $ekskulWithKetua = Pendaftaran::where('status', 'diterima')
+            ->whereHas('siswa', fn($q) => $q->where('jabatan', 'ketua'))
+            ->pluck('ekskul_id');
+
+        return Ekskul::all()->map(function ($ekskul) use ($ekskulWithKetua, $currentUserId) {
+            $hasKetua = $ekskulWithKetua->contains($ekskul->id);
+
+            // If editing, check if this ekskul's ketua is the current user
+            if ($hasKetua && $currentUserId) {
+                $currentKetua = Pendaftaran::where('ekskul_id', $ekskul->id)
+                    ->where('status', 'diterima')
+                    ->whereHas('siswa', fn($q) => $q->where('jabatan', 'ketua'))
+                    ->first();
+                if ($currentKetua && $currentKetua->siswa?->user_id === $currentUserId) {
+                    $hasKetua = false; // This ekskul's ketua is the user being edited
+                }
+            }
+
+            return [
+                'id' => $ekskul->id,
+                'nama_ekskul' => $ekskul->nama_ekskul,
+                'has_ketua' => $hasKetua,
+                'label' => $ekskul->nama_ekskul . ($hasKetua ? ' ( sudah ada ketua )' : ''),
+            ];
+        });
     }
 }
