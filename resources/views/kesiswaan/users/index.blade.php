@@ -29,7 +29,7 @@
 
     <!-- Tabel Akun -->
     <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm overflow-x-auto">
-        <table class="w-full text-left">
+        <table class="card-table w-full text-left">
             <thead>
                 <tr class="text-[11px] font-bold text-gray-400 tracking-wider uppercase border-b border-gray-100">
                     <th class="py-3 px-2">Pengguna</th>
@@ -67,7 +67,7 @@
                         </td>
                         <td class="py-3.5 px-2 text-gray-400">
                             @if ($user->siswa)
-                                NIS {{ $user->siswa->nis }} · {{ $user->siswa->kelas?->nama ?? '-' }}
+                                NIS {{ $user->siswa->nis }} Â· {{ $user->siswa->kelas?->nama ?? '-' }}
                             @elseif ($user->pembina)
                                 NIP {{ $user->pembina->nip }}
                             @else
@@ -77,7 +77,7 @@
                         <td class="py-3.5 px-2">
                             <div class="flex gap-2 justify-end items-center">
                                 @if ($user->role === 'admin' && auth()->user()->role !== 'admin')
-                                    <span class="text-[10px] text-gray-400 italic px-3">🔒 Dikelola Admin</span>
+                                    <span class="text-[10px] text-gray-400 italic px-3">ðŸ”’ Dikelola Admin</span>
                                 @else
                                     <a href="{{ route('kesiswaan.users.edit', $user) }}"
                                        class="px-3 py-1.5 bg-blue-50 text-theme-blue font-bold rounded-full hover:bg-blue-100 transition">Edit</a>
