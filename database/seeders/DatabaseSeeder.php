@@ -278,19 +278,19 @@ class DatabaseSeeder extends Seeder
         // === KEGIATAN ===
         $kegiatan1 = Kegiatan::create([
             'ekskul_id'        => $ekskul1->id,
-            'materi'           => 'Latihan Tendangan Dasar',
+            'kegiatan'         => 'Latihan Tendangan Dasar',
             'tanggal_kegiatan' => now()->addDays(2)->toDateString(),
         ]);
 
         $kegiatan2 = Kegiatan::create([
             'ekskul_id'        => $ekskul1->id,
-            'materi'           => 'Latihan Bantingan Dasar',
+            'kegiatan'         => 'Latihan Bantingan Dasar',
             'tanggal_kegiatan' => now()->addDays(5)->toDateString(),
         ]);
 
         $kegiatan3 = Kegiatan::create([
             'ekskul_id'        => $ekskul1->id,
-            'materi'           => 'Ujian Kenaikan Sabuk',
+            'kegiatan'         => 'Ujian Kenaikan Sabuk',
             'tanggal_kegiatan' => now()->addDays(10)->toDateString(),
         ]);
 

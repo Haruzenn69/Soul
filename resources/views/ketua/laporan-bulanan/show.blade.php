@@ -11,6 +11,8 @@
             <p class="text-[11px] text-gray-400 font-bold uppercase">Status</p>
             @if($laporan->status === 'draft')
                 <span class="inline-block px-3 py-1 bg-gray-100 text-gray-500 text-xs font-semibold rounded-full">Draft</span>
+            @elseif($laporan->status === 'menunggu')
+                <span class="inline-block px-3 py-1 bg-blue-100 text-blue-600 text-xs font-semibold rounded-full">Menunggu Pembina</span>
             @elseif($laporan->status === 'disetujui')
                 <span class="inline-block px-3 py-1 bg-green-100 text-green-600 text-xs font-semibold rounded-full">Disetujui</span>
             @else
@@ -84,6 +86,17 @@
         @endif
 
         <div class="mt-4 flex gap-2">
+            @if(in_array($laporan->status, ['draft', 'ditolak']))
+                <a href="{{ route('ketua.laporan-bulanan.edit', $laporan) }}" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-full transition">
+                    ✏️ Edit Laporan
+                </a>
+                <form action="{{ route('ketua.laporan-bulanan.submit', $laporan) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="px-5 py-2 bg-theme-blue hover:bg-theme-darkBlue text-white text-xs font-semibold rounded-full transition">
+                        🚀 Serahkan ke Pembina
+                    </button>
+                </form>
+            @endif
             <a href="{{ route('ketua.laporan-bulanan.download-pdf', $laporan) }}" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-full transition flex items-center gap-1">
                 📄 Download PDF
             </a>

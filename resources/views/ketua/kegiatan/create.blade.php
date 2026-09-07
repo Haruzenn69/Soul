@@ -6,10 +6,10 @@
         <form action="{{ route('ketua.kegiatan.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-4">
-                <label class="block text-xs font-bold text-gray-500 mb-1">Materi</label>
-                <input type="text" name="materi" value="{{ old('materi') }}" required
+                <label class="block text-xs font-bold text-gray-500 mb-1">Kegiatan</label>
+                <input type="text" name="kegiatan" value="{{ old('kegiatan') }}" required
                     class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition">
-                @error('materi') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                @error('kegiatan') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
             </div>
             <div class="mb-4">
                 <label class="block text-xs font-bold text-gray-500 mb-1">Deskripsi</label>
@@ -20,14 +20,8 @@
                 <label class="block text-xs font-bold text-gray-500 mb-1">Dokumentasi (Opsional)</label>
                 <input type="file" name="dokumentasi" accept="image/*"
                     class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-theme-blue file:text-white hover:file:bg-theme-darkBlue">
-                <p class="text-[10px] text-gray-400 mt-1">Format: JPG, JPEG, PNG. Maks 2MB.</p>
+                <p class="text-[10px] text-gray-400 mt-1">Format: JPG, JPEG, PNG. Ukuran maksimal <strong>2 MB</strong>.</p>
                 @error('dokumentasi') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
-            </div>
-            <div class="mb-4">
-                <label class="block text-xs font-bold text-gray-500 mb-1">Tanggal Kegiatan</label>
-                <input type="date" name="tanggal_kegiatan" value="{{ old('tanggal_kegiatan') }}" required
-                    class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition">
-                @error('tanggal_kegiatan') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
             </div>
             <div class="flex gap-2 mt-6">
                 <button type="submit" class="px-5 py-2 bg-theme-blue hover:bg-theme-darkBlue text-white text-xs font-semibold rounded-full transition">Simpan</button>

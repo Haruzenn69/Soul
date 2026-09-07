@@ -142,13 +142,13 @@
                 @foreach($ekskul->kegiatans as $kegiatan)
                     <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition">
                         @if($kegiatan->dokumentasi)
-                            <img src="{{ asset('storage/' . $kegiatan->dokumentasi) }}" alt="{{ $kegiatan->materi }}" class="w-full h-40 object-cover">
+                            <img src="{{ asset('storage/' . $kegiatan->dokumentasi) }}" alt="{{ $kegiatan->kegiatan }}" class="w-full h-40 object-cover">
                         @else
                             <div class="w-full h-40 bg-theme-blue/10 flex items-center justify-center text-theme-blue text-3xl">📋</div>
                         @endif
                         <div class="p-5">
                             <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">{{ $kegiatan->tanggal_kegiatan->translatedFormat('d F Y') }}</p>
-                            <h3 class="font-bold text-sm mb-2">{{ $kegiatan->materi }}</h3>
+                            <h3 class="font-bold text-sm mb-2">{{ $kegiatan->kegiatan }}</h3>
                             @if($kegiatan->deskripsi)
                                 <p class="text-xs text-gray-500 leading-relaxed">{{ \Illuminate\Support\Str::limit($kegiatan->deskripsi, 90) }}</p>
                             @endif

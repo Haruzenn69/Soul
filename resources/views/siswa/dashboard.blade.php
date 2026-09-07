@@ -290,7 +290,7 @@
                         <div class="space-y-3">
                             @forelse($kegiatanMendatang ?? [] as $kegiatan)
                                 <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/50">
-                                    <h4 class="text-xs font-semibold text-slate-800">{{ $kegiatan->materi ?? 'Kegiatan' }}</h4>
+                                    <h4 class="text-xs font-semibold text-slate-800">{{ $kegiatan->kegiatan ?? 'Kegiatan' }}</h4>
                                     <p class="text-[10px] text-slate-400 mt-0.5">
                                         {{ \Carbon\Carbon::parse($kegiatan->tanggal_kegiatan)->isoFormat('dddd, DD MMM Y') }}
                                     </p>

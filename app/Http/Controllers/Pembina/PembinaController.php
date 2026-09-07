@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ekskul;
 use App\Models\Kegiatan;
 use App\Models\LaporanBulanan;
+use App\Models\Notifikasi;
 use App\Models\Pendaftaran;
 use App\Models\Presensi;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -126,6 +127,7 @@ class PembinaController extends Controller
         $ekskulIds = $ekskuls->pluck('id');
 
         $laporans = LaporanBulanan::whereIn('ekskul_id', $ekskulIds)
+            ->where('status', '!=', 'draft')
             ->with('ekskul')
             ->latest('bulan')
             ->get();
@@ -153,6 +155,7 @@ class PembinaController extends Controller
     public function laporanShow(LaporanBulanan $laporanBulanan)
     {
         abort_unless($this->getEkskuls()->pluck('id')->contains($laporanBulanan->ekskul_id), 403);
+        abort_if($laporanBulanan->status === 'draft', 404);
 
         $laporanBulanan->load('ekskul');
 
@@ -162,12 +165,74 @@ class PembinaController extends Controller
     public function laporanDownload(LaporanBulanan $laporanBulanan)
     {
         abort_unless($this->getEkskuls()->pluck('id')->contains($laporanBulanan->ekskul_id), 403);
+        abort_if($laporanBulanan->status === 'draft', 404);
 
         $ekskul = $laporanBulanan->ekskul;
         $kelas = $this->generateKelas($ekskul);
         $pdf = Pdf::loadView('ketua.laporan-bulanan.pdf', ['laporan' => $laporanBulanan, 'kelas' => $kelas]);
         $filename = 'laporan-' . str_replace('/', '-', $laporanBulanan->bulan) . '-' . ($ekskul->nama_ekskul ?? 'ekskul') . '.pdf';
         return $pdf->download($filename);
+    }
+
+    public function laporanApprove(LaporanBulanan $laporanBulanan)
+    {
+        abort_unless($this->getEkskuls()->pluck('id')->contains($laporanBulanan->ekskul_id), 403);
+        abort_if($laporanBulanan->status !== 'menunggu', 403, 'Laporan hanya bisa disetujui saat berstatus menunggu.');
+
+        $laporanBulanan->update([
+            'status' => 'disetujui',
+            'catatan_pembina' => null,
+        ]);
+
+        $this->notifyKetua($laporanBulanan, 'Laporan Disetujui', 'terima');
+
+        return redirect()->route('pembina.laporan.show', $laporanBulanan)
+            ->with('success', 'Laporan disetujui.');
+    }
+
+    public function laporanReject(Request $request, LaporanBulanan $laporanBulanan)
+    {
+        abort_unless($this->getEkskuls()->pluck('id')->contains($laporanBulanan->ekskul_id), 403);
+        abort_if($laporanBulanan->status !== 'menunggu', 403, 'Laporan hanya bisa ditolak saat berstatus menunggu.');
+
+        $validated = $request->validate([
+            'catatan_pembina' => 'nullable|string',
+        ]);
+
+        $laporanBulanan->update([
+            'status' => 'ditolak',
+            'catatan_pembina' => $validated['catatan_pembina'] ?? null,
+        ]);
+
+        $this->notifyKetua($laporanBulanan, 'Laporan Ditolak', 'tolak');
+
+        return redirect()->route('pembina.laporan.show', $laporanBulanan)
+            ->with('success', 'Laporan ditolak.');
+    }
+
+    private function notifyKetua(LaporanBulanan $laporanBulanan, string $judul, string $tipe)
+    {
+        $ketua = Pendaftaran::query()
+            ->where('ekskul_id', $laporanBulanan->ekskul_id)
+            ->where('status', 'diterima')
+            ->with(['siswa.user'])
+            ->get()
+            ->map(fn($p) => $p->siswa)
+            ->firstWhere('jabatan', 'ketua');
+
+        if (!$ketua) {
+            return;
+        }
+
+        $bulanLabel = \Carbon\Carbon::createFromFormat('Y-m', $laporanBulanan->bulan)->translatedFormat('F Y');
+
+        Notifikasi::create([
+            'siswa_id' => $ketua->id,
+            'laporan_bulanan_id' => $laporanBulanan->id,
+            'judul' => $judul,
+            'pesan' => 'Laporan bulanan periode ' . $bulanLabel . ' ekskul ' . $laporanBulanan->ekskul->nama_ekskul . ' telah ditinjau oleh pembina.',
+            'tipe' => $tipe === 'terima' ? 'diterima' : 'ditolak',
+        ]);
     }
 
     public function presensi()

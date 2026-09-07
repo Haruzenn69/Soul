@@ -21,7 +21,7 @@ return new class extends Migration
             $table->text('ringkasan')->nullable();
             $table->string('dokumentasi')->nullable();
             $table->json('dokumentasi_kegiatan')->nullable();
-            $table->enum('status', ['draft', 'disetujui', 'ditolak'])->default('draft');
+            $table->enum('status', ['draft', 'menunggu', 'disetujui', 'ditolak'])->default('draft');
             $table->text('catatan_pembina')->nullable();
             $table->string('file_laporan')->nullable();
             $table->timestamps();

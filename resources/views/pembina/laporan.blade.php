@@ -38,6 +38,7 @@
                             <td class="p-3">
                                 <span class="px-2 py-1 rounded-full text-[10px] font-semibold
                                     @if($laporan->status == 'draft') bg-slate-100 text-slate-600
+                                    @elseif($laporan->status == 'menunggu') bg-sky-100 text-sky-700
                                     @elseif($laporan->status == 'disetujui') bg-emerald-100 text-emerald-700
                                     @else bg-red-100 text-red-700 @endif">
                                     {{ ucfirst($laporan->status) }}
@@ -87,7 +88,7 @@
                     <tbody>
                         @foreach($kegiatans as $kegiatan)
                         <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
-                            <td class="p-3 font-medium">{{ $kegiatan->materi }}</td>
+                            <td class="p-3 font-medium">{{ $kegiatan->kegiatan }}</td>
                             <td class="p-3">{{ \Carbon\Carbon::parse($kegiatan->tanggal_kegiatan)->isoFormat('DD MMM Y') }}</td>
                             <td class="p-3 text-center font-bold text-emerald-600">{{ $kegiatan->hadir_count }}</td>
                             <td class="p-3 text-center font-bold text-blue-600">{{ $kegiatan->izin_count }}</td>

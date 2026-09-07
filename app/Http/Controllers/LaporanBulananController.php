@@ -74,7 +74,7 @@ class LaporanBulananController extends Controller
         $teks = '';
         foreach ($kegiatans as $k) {
             $tanggal = $k->tanggal_kegiatan->translatedFormat('d F Y');
-            $line = "Pada tanggal {$tanggal}, kegiatan yang dilaksanakan berupa {$k->materi}.";
+            $line = "Pada tanggal {$tanggal}, kegiatan yang dilaksanakan berupa {$k->kegiatan}.";
             if ($k->deskripsi) {
                 $line .= " {$k->deskripsi}";
             }
@@ -142,7 +142,6 @@ class LaporanBulananController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'bulan' => 'required|string',
             'tujuan' => 'nullable|string',
             'evaluasi_keberhasilan' => 'nullable|string',
             'evaluasi_kendala' => 'nullable|string',
@@ -151,13 +150,20 @@ class LaporanBulananController extends Controller
 
         $ekskul = $this->getEkskul();
 
-        $materi = $this->generateMateri($ekskul, $validated['bulan']);
-        $kehadiran = $this->generateKehadiran($ekskul, $validated['bulan']);
-        $dokumentasiKegiatan = $this->generateDokumentasiKegiatan($ekskul, $validated['bulan']);
+        $bulan = now()->format('Y-m');
+
+        $existing = LaporanBulanan::where('ekskul_id', $ekskul->id)->where('bulan', $bulan)->first();
+        if ($existing) {
+            return back()->with('error', 'Laporan untuk bulan ini sudah pernah dibuat.');
+        }
+
+        $materi = $this->generateMateri($ekskul, $bulan);
+        $kehadiran = $this->generateKehadiran($ekskul, $bulan);
+        $dokumentasiKegiatan = $this->generateDokumentasiKegiatan($ekskul, $bulan);
 
         $laporan = LaporanBulanan::create([
             'ekskul_id' => $ekskul->id,
-            'bulan' => $validated['bulan'],
+            'bulan' => $bulan,
             'materi_kegiatan' => $materi,
             'tujuan' => $validated['tujuan'] ?? null,
             'kehadiran' => $kehadiran,
@@ -168,27 +174,85 @@ class LaporanBulananController extends Controller
             'status' => 'draft',
         ]);
 
+        return redirect()->route('ketua.laporan-bulanan.index')->with('success', 'Laporan bulanan berhasil dibuat.');
+    }
+
+    public function show(LaporanBulanan $laporan_bulanan)
+    {
+        abort_unless($laporan_bulanan->ekskul_id === $this->getEkskul()->id, 403);
+
+        return view('ketua.laporan-bulanan.show', ['laporan' => $laporan_bulanan]);
+    }
+
+    public function edit(LaporanBulanan $laporan_bulanan)
+    {
+        abort_unless($laporan_bulanan->ekskul_id === $this->getEkskul()->id, 403);
+        abort_if(in_array($laporan_bulanan->status, ['menunggu', 'disetujui']), 403, 'Laporan yang sudah diserahkan atau disetujui tidak dapat diubah.');
+
+        return view('ketua.laporan-bulanan.edit', ['laporan' => $laporan_bulanan]);
+    }
+
+    public function update(Request $request, LaporanBulanan $laporan_bulanan)
+    {
+        abort_unless($laporan_bulanan->ekskul_id === $this->getEkskul()->id, 403);
+        abort_if(in_array($laporan_bulanan->status, ['menunggu', 'disetujui']), 403, 'Laporan yang sudah diserahkan atau disetujui tidak dapat diubah.');
+
+        $validated = $request->validate([
+            'tujuan' => 'nullable|string',
+            'evaluasi_keberhasilan' => 'nullable|string',
+            'evaluasi_kendala' => 'nullable|string',
+            'evaluasi_solusi' => 'nullable|string',
+        ]);
+
+        $ekskul = $laporan_bulanan->ekskul;
+        $bulan = $laporan_bulanan->bulan;
+
+        $materi = $this->generateMateri($ekskul, $bulan);
+        $kehadiran = $this->generateKehadiran($ekskul, $bulan);
+        $dokumentasiKegiatan = $this->generateDokumentasiKegiatan($ekskul, $bulan);
+
+        $laporan_bulanan->update([
+            'materi_kegiatan' => $materi,
+            'tujuan' => $validated['tujuan'] ?? null,
+            'kehadiran' => $kehadiran,
+            'evaluasi_keberhasilan' => $validated['evaluasi_keberhasilan'] ?? null,
+            'evaluasi_kendala' => $validated['evaluasi_kendala'] ?? null,
+            'evaluasi_solusi' => $validated['evaluasi_solusi'] ?? null,
+            'dokumentasi_kegiatan' => $dokumentasiKegiatan,
+            'status' => 'draft',
+        ]);
+
+        return redirect()->route('ketua.laporan-bulanan.show', $laporan_bulanan)
+            ->with('success', 'Laporan bulanan berhasil diperbarui.');
+    }
+
+    public function submitToPembina(LaporanBulanan $laporan_bulanan)
+    {
+        abort_unless($laporan_bulanan->ekskul_id === $this->getEkskul()->id, 403);
+        abort_if(in_array($laporan_bulanan->status, ['menunggu', 'disetujui']), 403, 'Laporan ini sudah diserahkan atau disetujui.');
+
+        $laporan_bulanan->update(['status' => 'menunggu']);
+
+        $ekskul = $laporan_bulanan->ekskul;
         if ($ekskul->pembina) {
-            $bulanLabel = \Carbon\Carbon::createFromFormat('Y-m', $validated['bulan'])->translatedFormat('F Y');
+            $bulanLabel = \Carbon\Carbon::createFromFormat('Y-m', $laporan_bulanan->bulan)->translatedFormat('F Y');
             Notifikasi::create([
                 'pembina_id' => $ekskul->pembina->id,
-                'laporan_bulanan_id' => $laporan->id,
+                'laporan_bulanan_id' => $laporan_bulanan->id,
                 'judul' => 'Laporan Bulanan Diserahkan',
                 'pesan' => 'Ketua ekskul menyerahkan laporan bulanan untuk periode ' . $bulanLabel . ' ekskul ' . $ekskul->nama_ekskul . '. Silakan tinjau.',
                 'tipe' => 'info',
             ]);
         }
 
-        return redirect()->route('ketua.laporan-bulanan.index')->with('success', 'Laporan bulanan berhasil dibuat.');
-    }
-
-    public function show(LaporanBulanan $laporan_bulanan)
-    {
-        return view('ketua.laporan-bulanan.show', ['laporan' => $laporan_bulanan]);
+        return redirect()->route('ketua.laporan-bulanan.show', $laporan_bulanan)
+            ->with('success', 'Laporan berhasil diserahkan ke pembina.');
     }
 
     public function downloadPdf(LaporanBulanan $laporan_bulanan)
     {
+        abort_unless($laporan_bulanan->ekskul_id === $this->getEkskul()->id, 403);
+
         $ekskul = $laporan_bulanan->ekskul;
         $kelas = $this->generateKelas($ekskul);
         $pdf = Pdf::loadView('ketua.laporan-bulanan.pdf', ['laporan' => $laporan_bulanan, 'kelas' => $kelas]);
