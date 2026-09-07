@@ -30,6 +30,8 @@
                         <td class="px-6 py-4">
                             @if($laporan->status === 'draft')
                                 <span class="text-gray-500 font-medium">Draft</span>
+                            @elseif($laporan->status === 'menunggu')
+                                <span class="text-blue-600 font-medium">Menunggu Pembina</span>
                             @elseif($laporan->status === 'disetujui')
                                 <span class="text-green-600 font-medium">Disetujui</span>
                             @else
@@ -37,7 +39,12 @@
                             @endif
                         </td>
                         <td class="px-6 py-4">
-                            <a href="{{ route('ketua.laporan-bulanan.show', $laporan) }}" class="text-theme-blue hover:underline font-medium">Detail</a>
+                            <div class="flex items-center gap-3">
+                                <a href="{{ route('ketua.laporan-bulanan.show', $laporan) }}" class="text-theme-blue hover:underline font-medium">Detail</a>
+                                @if(in_array($laporan->status, ['draft', 'ditolak']))
+                                    <a href="{{ route('ketua.laporan-bulanan.edit', $laporan) }}" class="text-amber-600 hover:underline font-medium">Edit</a>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                 @empty

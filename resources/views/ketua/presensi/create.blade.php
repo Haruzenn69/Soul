@@ -1,5 +1,5 @@
 @extends('ketua.layout')
-@section('title', 'Input Presensi - ' . $kegiatan->materi)
+@section('title', 'Input Presensi - ' . $kegiatan->kegiatan)
 
 @section('content')
     <p class="text-xs text-gray-400 mb-4">{{ $kegiatan->tanggal_kegiatan->format('d/m/Y') }}</p>

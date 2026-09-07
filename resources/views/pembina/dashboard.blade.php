@@ -108,7 +108,7 @@
                 @forelse($kegiatanMendatang ?? [] as $kegiatan)
                     <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/50 flex items-center justify-between mb-2">
                         <div>
-                            <h4 class="text-xs font-semibold text-slate-800">{{ $kegiatan->materi }}</h4>
+                            <h4 class="text-xs font-semibold text-slate-800">{{ $kegiatan->kegiatan }}</h4>
                             <p class="text-[10px] text-slate-400 mt-0.5">{{ $kegiatan->ekskul->nama_ekskul ?? 'Ekskul' }}</p>
                         </div>
                         <span class="text-[10px] font-medium text-slate-500 shrink-0 ml-3">

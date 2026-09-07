@@ -329,6 +329,8 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::get('/laporan', [PembinaController::class, 'laporan'])->name('laporan.index');
     Route::get('/laporan/{laporanBulanan}/detail', [PembinaController::class, 'laporanShow'])->name('laporan.show');
     Route::get('/laporan/{laporanBulanan}/download', [PembinaController::class, 'laporanDownload'])->name('laporan.download');
+    Route::post('/laporan/{laporanBulanan}/approve', [PembinaController::class, 'laporanApprove'])->name('laporan.approve');
+    Route::post('/laporan/{laporanBulanan}/reject', [PembinaController::class, 'laporanReject'])->name('laporan.reject');
     Route::get('/presensi', [PembinaController::class, 'presensi'])->name('presensi');
     Route::get('/profile', [PembinaController::class, 'profile'])->name('profile');
 
@@ -423,8 +425,9 @@ Route::middleware(['auth', 'role:siswa'])->prefix('ketua')->name('ketua.')->grou
     Route::get('faq', [FaqController::class, 'index'])->name('faq.index');
     Route::post('faq', [FaqController::class, 'store'])->name('faq.store');
     Route::delete('faq/{faq}', [FaqController::class, 'destroy'])->name('faq.destroy');
-    Route::resource('laporan-bulanan', LaporanBulananController::class)->only(['index', 'create', 'store', 'show']);
+    Route::resource('laporan-bulanan', LaporanBulananController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update']);
     Route::get('laporan-bulanan/{laporan_bulanan}/download-pdf', [LaporanBulananController::class, 'downloadPdf'])->name('laporan-bulanan.download-pdf');
+    Route::post('laporan-bulanan/{laporan_bulanan}/serahkan', [LaporanBulananController::class, 'submitToPembina'])->name('laporan-bulanan.submit');
 
     // Notifikasi Ketua
     Route::get('/notifikasi', [KetuaNotifikasiController::class, 'index'])->name('notifikasi');

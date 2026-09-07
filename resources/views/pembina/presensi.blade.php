@@ -14,7 +14,7 @@
                     <div class="bg-slate-50 rounded-2xl border border-slate-200/60 overflow-hidden">
                         <div class="p-4 bg-white border-b border-slate-200/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <div>
-                                <h3 class="text-sm font-bold text-slate-900">{{ $kegiatan->materi }}</h3>
+                                <h3 class="text-sm font-bold text-slate-900">{{ $kegiatan->kegiatan }}</h3>
                                 <p class="text-[11px] text-slate-400 mt-0.5">{{ \Carbon\Carbon::parse($kegiatan->tanggal_kegiatan)->isoFormat('dddd, DD MMM Y') }}</p>
                             </div>
                             <span class="text-[10px] font-medium text-slate-500">{{ $kegiatan->presensis->count() }} anggota tercatat</span>

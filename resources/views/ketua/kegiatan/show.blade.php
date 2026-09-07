@@ -8,8 +8,8 @@
             <p class="font-medium text-sm">{{ $kegiatan->tanggal_kegiatan->format('d/m/Y') }}</p>
         </div>
         <div class="mb-6">
-            <p class="text-[11px] text-gray-400 font-bold uppercase">Materi</p>
-            <p class="font-medium text-sm">{{ $kegiatan->materi }}</p>
+            <p class="text-[11px] text-gray-400 font-bold uppercase">Kegiatan</p>
+            <p class="font-medium text-sm">{{ $kegiatan->kegiatan }}</p>
         </div>
         @if($kegiatan->deskripsi)
         <div class="mb-6">

@@ -16,7 +16,7 @@
                 <tr>
                     <th class="px-6 py-3">No</th>
                     <th class="px-6 py-3">Tanggal</th>
-                    <th class="px-6 py-3">Materi</th>
+                    <th class="px-6 py-3">Kegiatan</th>
                     <th class="px-6 py-3">Presensi</th>
                     <th class="px-6 py-3">Aksi</th>
                 </tr>
@@ -26,7 +26,7 @@
                     <tr class="hover:bg-gray-50/50">
                         <td class="px-6 py-4 font-medium">{{ $loop->iteration }}</td>
                         <td class="px-6 py-4">{{ $kegiatan->tanggal_kegiatan->format('d/m/Y') }}</td>
-                        <td class="px-6 py-4">{{ $kegiatan->materi }}</td>
+                        <td class="px-6 py-4">{{ $kegiatan->kegiatan }}</td>
                         <td class="px-6 py-4">{{ $kegiatan->presensis_count }} orang</td>
                         <td class="px-6 py-4">
                             <a href="{{ route('ketua.kegiatan.show', $kegiatan) }}" class="text-theme-blue hover:underline font-medium">Detail</a>
