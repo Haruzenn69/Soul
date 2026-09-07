@@ -10,7 +10,7 @@
         </div>
         @if ($tahunAjarans->isEmpty())
             <span class="px-4 py-2 bg-amber-50 text-amber-600 rounded-full text-[11px] font-bold">
-                ⚠ Jalankan seeder untuk membuat data tahun ajaran terlebih dahulu.
+                âš  Jalankan seeder untuk membuat data tahun ajaran terlebih dahulu.
             </span>
         @else
             <button onclick="document.getElementById('modal-create').showModal()"
@@ -35,7 +35,7 @@
 
     <!-- Tabel Kelas -->
     <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm overflow-x-auto">
-        <table class="w-full text-left">
+        <table class="card-table w-full text-left">
             <thead>
                 <tr class="text-[11px] font-bold text-gray-400 tracking-wider uppercase border-b border-gray-100">
                     <th class="py-3 px-2">Nama Kelas</th>

@@ -42,7 +42,7 @@
 
         @if(count($anggota) > 0)
             <div class="overflow-x-auto">
-                <table class="w-full text-xs">
+                <table class="card-table w-full text-xs">
                     <thead class="bg-slate-50">
                         <tr>
                             <th class="text-left p-3 font-semibold text-slate-500 rounded-l-xl">No</th>

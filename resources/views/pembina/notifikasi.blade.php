@@ -18,7 +18,7 @@
     </div>
 
     <!-- RINGKASAN STATISTIK -->
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-white p-4 rounded-xl border border-slate-200/70 shadow-sm text-center">
             <p class="text-2xl font-bold text-slate-900">{{ $notifikasis->count() }}</p>
             <p class="text-[11px] font-semibold text-slate-400">Total</p>

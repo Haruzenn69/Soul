@@ -26,7 +26,7 @@
     </div>
 
     <!-- METRICS GRID -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
         <!-- Card 1: Total Akun -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200/70 shadow-sm flex items-center justify-between">
             <div>

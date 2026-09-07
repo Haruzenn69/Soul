@@ -16,8 +16,9 @@
             }
         }
     </script>
+    @include('partials.responsive-tables')
 </head>
-<body class="bg-[#F8FAFC] text-slate-800 font-sans antialiased flex min-h-screen">
+<body class="bg-[#F8FAFC] text-slate-800 font-sans antialiased flex min-h-screen overflow-x-hidden">
 
     <!-- MOBILE BACKDROP -->
     <div id="mobileBackdrop" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden"></div>
@@ -121,6 +122,10 @@
             </div>
 
             <div class="flex items-center gap-2 md:gap-3">
+                <div class="flex items-center gap-2 md:hidden">
+                    <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">S</div>
+                    <span class="font-bold text-sm tracking-tight text-slate-900">SOUL</span>
+                </div>
                 <span class="bg-slate-100/80 text-slate-700 border border-slate-200/60 px-3 py-1 rounded-lg text-xs font-semibold hidden sm:inline-block">
                     Siswa
                 </span>
@@ -157,7 +162,7 @@
             </div>
 
             <!-- Ringkasan Statistik -->
-            <div class="grid grid-cols-3 gap-3 md:gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
                 <div class="bg-white p-3.5 md:p-4 rounded-xl border border-slate-200/70 shadow-sm text-center">
                     <p class="text-lg md:text-2xl font-bold text-slate-900">{{ $notifikasis->count() }}</p>
                     <p class="text-[10px] md:text-[11px] font-semibold text-slate-400">Total</p>
