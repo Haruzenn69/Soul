@@ -20,7 +20,7 @@ class PresensiController extends Controller
     {
         $ekskul = $this->getEkskul();
         $anggotas = Pendaftaran::where('ekskul_id', $ekskul->id)
-            ->where('status', 'diterima')
+            ->whereIn('status', ['diterima', 'peringatan'])
             ->with('siswa')
             ->get();
 

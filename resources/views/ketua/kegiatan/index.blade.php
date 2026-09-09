@@ -28,9 +28,13 @@
                         <td class="px-6 py-4">{{ $kegiatan->kegiatan }}</td>
                         <td class="px-6 py-4">{{ $kegiatan->presensis_count }} orang</td>
                         <td class="px-6 py-4">
-                            <a href="{{ route('ketua.kegiatan.show', $kegiatan) }}" class="text-theme-blue hover:underline font-medium">Detail</a>
-                            <span class="mx-1 text-gray-300">|</span>
-                            <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="text-green-600 hover:underline font-medium">Absensi</a>
+                            <div class="flex items-center gap-3">
+                                <a href="{{ route('ketua.kegiatan.show', $kegiatan) }}" class="text-theme-blue hover:underline font-medium">Detail</a>
+                                <span class="text-gray-300">|</span>
+                                <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="text-green-600 hover:underline font-medium">Absensi</a>
+                                <span class="text-gray-300">|</span>
+                                <a href="{{ route('ketua.kegiatan.edit', $kegiatan) }}" class="text-amber-600 hover:underline font-medium">Edit</a>
+                            </div>
                         </td>
                     </tr>
                 @empty
