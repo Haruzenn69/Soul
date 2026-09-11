@@ -15,7 +15,7 @@ class EkskulCatalogController extends Controller
             'prestasis',
             'testimoniss',
             'faqs',
-            'pendaftarans' => fn($q) => $q->where('status', 'diterima'),
+            'pendaftarans' => fn($q) => $q->whereIn('status', ['diterima', 'peringatan']),
         ]);
 
         $totalAnggota = $ekskul->pendaftarans->count();

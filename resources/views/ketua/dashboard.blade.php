@@ -23,6 +23,24 @@
         </a>
     </div>
 
+    <!-- Alert: Kegiatan Bulan Ini -->
+    @if(isset($kegiatanBulanIni) && $kegiatanBulanIni === 0 && ($ekskul ?? null))
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
+            <div class="w-9 h-9 shrink-0 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <p class="text-xs font-bold text-amber-800">Belum ada kegiatan di bulan {{ now()->translatedFormat('F Y') }}</p>
+                <p class="text-[11px] text-amber-700 mt-0.5">
+                    Laporan bulanan nanti akan otomatis menampilkan "Belum ada kegiatan yang tercatat". Buat kegiatan baru supaya laporan & presensi tidak kosong.
+                </p>
+            </div>
+            <a href="{{ route('ketua.kegiatan.create') }}" class="shrink-0 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-semibold rounded-lg transition">Buat Kegiatan</a>
+        </div>
+    @endif
+
     <!-- STATS CARDS -->
     <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
         <div class="bg-white p-5 rounded-2xl border border-slate-200/70 shadow-sm flex items-center justify-between">

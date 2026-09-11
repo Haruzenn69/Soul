@@ -86,7 +86,7 @@ class LaporanBulananController extends Controller
 
     private function generateKehadiran($ekskul, $bulan)
     {
-        $anggotas = $ekskul->pendaftarans()->where('status', 'diterima')->with('siswa.kelas')->get();
+        $anggotas = $ekskul->pendaftarans()->whereIn('status', ['diterima', 'peringatan'])->with('siswa.kelas')->get();
 
         $kegiatanIds = Kegiatan::where('ekskul_id', $ekskul->id)
             ->whereYear('tanggal_kegiatan', substr($bulan, 0, 4))
