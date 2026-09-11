@@ -2,15 +2,16 @@
 @section('title', 'Daftar Laporan Bulanan')
 
 @section('content')
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <p class="text-xs text-gray-400">Total: {{ $laporans->count() }} laporan</p>
-        <a href="{{ route('ketua.laporan-bulanan.create') }}" class="px-5 py-2 bg-theme-blue hover:bg-theme-darkBlue text-white text-xs font-semibold rounded-full transition">
+        <a href="{{ route('ketua.laporan-bulanan.create') }}" class="px-5 py-2 bg-theme-blue hover:bg-theme-darkBlue text-white text-xs font-semibold rounded-full transition inline-flex w-full sm:w-auto justify-center">
             + Laporan Baru
         </a>
     </div>
 
     <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-        <table class="w-full text-left text-xs">
+        <div class="overflow-x-auto">
+        <table class="card-table w-full text-left text-xs">
             <thead class="bg-gray-50 text-gray-400 font-bold uppercase tracking-wider">
                 <tr>
                     <th class="px-6 py-3">No</th>
@@ -53,5 +54,6 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 @endsection

@@ -7,7 +7,8 @@
     <form action="{{ route('ketua.presensi.store', $kegiatan) }}" method="POST">
         @csrf
         <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-            <table class="w-full text-left text-xs">
+            <div class="overflow-x-auto">
+            <table class="card-table w-full text-left text-xs">
                 <thead class="bg-gray-50 text-gray-400 font-bold uppercase tracking-wider">
                     <tr>
                         <th class="px-6 py-3">No</th>
@@ -38,6 +39,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
 
         <div class="mt-4 flex gap-2">

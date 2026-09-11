@@ -22,7 +22,7 @@
 
                         @if($kegiatan->presensis->count() > 0)
                             <div class="overflow-x-auto">
-                                <table class="w-full text-xs">
+                                <table class="card-table w-full text-xs">
                                     <thead class="bg-slate-100/70">
                                         <tr>
                                             <th class="text-left p-3 font-semibold text-slate-500">Nama</th>

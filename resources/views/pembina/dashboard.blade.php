@@ -10,7 +10,7 @@
     </div>
 
     <!-- STATS -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
         <div class="bg-white p-5 rounded-2xl border border-slate-200/70 shadow-sm flex items-center justify-between">
             <div>
                 <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Ekskul Dibina</p>
@@ -64,7 +64,7 @@
 
                 @if(isset($anggota) && count($anggota) > 0)
                     <div class="overflow-x-auto">
-                        <table class="w-full text-xs">
+                        <table class="card-table w-full text-xs">
                             <thead class="bg-slate-50">
                                 <tr>
                                     <th class="text-left p-3 font-semibold text-slate-500 rounded-l-xl">No</th>
@@ -139,7 +139,7 @@
                             <div>
                                 <h4 class="text-xs font-bold text-slate-800">{{ $item->siswa->nama ?? '-' }}</h4>
                                 <p class="text-[10px] text-slate-400">
-                                    {{ $item->siswa->kelas->nama ?? '-' }} · 
+                                    {{ $item->siswa->kelas->nama ?? '-' }} Â· 
                                     {{ \Carbon\Carbon::parse($item->tanggal_daftar)->isoFormat('DD MMM Y') }}
                                 </p>
                             </div>

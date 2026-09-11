@@ -42,7 +42,7 @@
     @endif
 
     <!-- STATS CARDS -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
         <div class="bg-white p-5 rounded-2xl border border-slate-200/70 shadow-sm flex items-center justify-between">
             <div>
                 <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Total Anggota</p>

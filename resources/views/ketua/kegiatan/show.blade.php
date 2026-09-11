@@ -53,7 +53,8 @@
         </div>
 
         <h3 class="text-xs font-bold text-gray-400 uppercase mb-3">Daftar Presensi</h3>
-        <table class="w-full text-left text-xs">
+        <div class="overflow-x-auto">
+        <table class="card-table w-full text-left text-xs">
             <thead class="bg-gray-50 text-gray-400 font-bold uppercase tracking-wider">
                 <tr>
                     <th class="px-4 py-2">No</th>
@@ -85,6 +86,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
 
         <div class="mt-4 flex gap-2">
             <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="px-5 py-2 bg-theme-blue hover:bg-theme-darkBlue text-white text-xs font-semibold rounded-full transition">Input Presensi</a>

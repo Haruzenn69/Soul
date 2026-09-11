@@ -16,8 +16,9 @@
             }
         }
     </script>
+    @include('partials.responsive-tables')
 </head>
-<body class="bg-[#F8FAFC] text-slate-800 font-sans antialiased flex min-h-screen">
+<body class="bg-[#F8FAFC] text-slate-800 font-sans antialiased flex min-h-screen overflow-x-hidden">
 
     <!-- SIDEBAR LEFT -->
     <aside class="w-64 bg-white border-r border-slate-200/80 flex flex-col justify-between p-5 hidden md:flex shrink-0">
@@ -92,11 +93,13 @@
         </div>
     </aside>
 
+    @include('siswa.partials.mobile-sidebar')
+
     <!-- MAIN CONTENT -->
     <div class="flex-1 flex flex-col min-w-0">
         
-        <header class="px-8 py-4 bg-white border-b border-slate-200/80 flex items-center justify-between gap-4">
-            <div class="relative w-full max-w-md">
+        <header class="px-4 md:px-8 py-4 bg-white border-b border-slate-200/80 flex items-center justify-between gap-3 md:gap-4">
+            <div class="relative w-full max-w-md hidden sm:block">
                 <input type="text" placeholder="Cari presensi..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 transition-all">
                 <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,8 +108,12 @@
                 </span>
             </div>
 
-            <div class="flex items-center gap-3">
-                <div class="bg-slate-100/80 text-slate-700 border border-slate-200/60 px-3 py-1 rounded-lg text-xs font-semibold">
+            <div class="flex items-center gap-2 md:gap-3 ml-auto">
+                <div class="flex items-center gap-2 md:hidden">
+                    <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">S</div>
+                    <span class="font-bold text-sm tracking-tight text-slate-900">SOUL</span>
+                </div>
+                <div class="bg-slate-100/80 text-slate-700 border border-slate-200/60 px-3 py-1 rounded-lg text-xs font-semibold hidden sm:block">
                     Siswa
                 </div>
                 <a href="{{ route('siswa.notifikasi') }}" class="w-9 h-9 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-center text-xs relative text-slate-600 hover:bg-slate-100 transition-colors">
@@ -114,7 +121,10 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                     </svg>
                 </a>
-                <form method="POST" action="{{ route('logout') }}">
+                <button onclick="openSidebar()" class="w-9 h-9 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-500 md:hidden">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <form method="POST" action="{{ route('logout') }}" class="hidden sm:block">
                     @csrf
                     <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg text-xs font-semibold border border-red-100 transition shadow-sm">
                         Logout
@@ -123,7 +133,7 @@
             </div>
         </header>
 
-        <main class="p-8 space-y-6 overflow-y-auto">
+        <main class="p-4 md:p-8 space-y-6 overflow-y-auto">
             
             <div>
                 <h1 class="text-xl font-bold text-slate-900">Riwayat Presensi</h1>
