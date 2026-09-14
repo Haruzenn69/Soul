@@ -40,10 +40,12 @@ class PembinaController extends Controller
         $ekskulIds = $ekskuls->pluck('id');
 
         $anggota = Pendaftaran::whereIn('ekskul_id', $ekskulIds)
-            ->where('status', 'diterima')
+            ->whereIn('status', ['diterima', 'nonaktif'])
             ->with(['siswa', 'siswa.kelas'])
             ->latest('tanggal_daftar')
             ->get();
+
+        $anggotaAktifCount = $anggota->where('status', 'diterima')->count();
 
         $pendaftaranPending = Pendaftaran::whereIn('ekskul_id', $ekskulIds)
             ->where('status', 'pending')
@@ -61,7 +63,7 @@ class PembinaController extends Controller
             ->latest('bulan')
             ->get();
 
-        return view('pembina.dashboard', compact('ekskul', 'anggota', 'pendaftaranPending', 'kegiatanMendatang', 'laporanDraft'));
+        return view('pembina.dashboard', compact('ekskul', 'anggota', 'anggotaAktifCount', 'pendaftaranPending', 'kegiatanMendatang', 'laporanDraft'));
     }
 
     public function anggota(Request $request)

@@ -2,49 +2,60 @@
 @section('title', 'Input Presensi - ' . $kegiatan->materi)
 
 @section('content')
-    <p class="text-xs text-gray-400 mb-4">{{ $kegiatan->tanggal_kegiatan->format('d/m/Y') }}</p>
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+        <div>
+            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Input Presensi</h1>
+            <p class="text-xs text-slate-400 mt-1">{{ $kegiatan->materi }} - {{ $kegiatan->tanggal_kegiatan->format('d/m/Y') }}</p>
+        </div>
+        <a href="{{ route('ketua.kegiatan.show', $kegiatan) }}" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition w-full sm:w-auto items-center justify-center gap-2">Kembali</a>
+    </div>
 
-    <form action="{{ route('ketua.presensi.store', $kegiatan) }}" method="POST">
-        @csrf
-        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+    <!-- Form Card -->
+    <div class="bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
+        <form action="{{ route('ketua.presensi.store', $kegiatan) }}" method="POST">
+            @csrf
             <div class="overflow-x-auto">
-            <table class="card-table w-full text-left text-xs">
-                <thead class="bg-gray-50 text-gray-400 font-bold uppercase tracking-wider">
+            <table class="card-table w-full text-left text-xs md:text-sm">
+                <thead class="bg-sky-50">
                     <tr>
-                        <th class="px-6 py-3">No</th>
-                        <th class="px-6 py-3">Nama</th>
-                        <th class="px-6 py-3">Status</th>
+                        <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
+                        <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Nama</th>
+                        <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Status</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-50">
+                <tbody class="divide-y divide-sky-50">
                     @foreach($anggotas as $anggota)
-                        <tr class="hover:bg-gray-50/50">
-                            <td class="px-6 py-4">{{ $loop->iteration }}</td>
-                            <td class="px-6 py-4">{{ $anggota->siswa->nama }}</td>
-                            <td class="px-6 py-4">
-                                <select name="presensi[{{ $loop->index }}][pendaftaran_id]" class="hidden">
-                                    <option value="{{ $anggota->id }}"></option>
-                                </select>
+                        <tr class="hover:bg-sky-50/50 transition">
+                            <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $loop->iteration }}</td>
+                            <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $anggota->siswa->nama }}</td>
+                            <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
                                 <select name="presensi[{{ $loop->index }}][status]"
-                                    class="px-3 py-1.5 rounded-full bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue">
-                                    @php $current = in_array($anggota->id, $presensiExisting) ? \App\Models\Presensi::where('kegiatan_id', $kegiatan->id)->where('pendaftaran_id', $anggota->id)->first()->status : 'hadir'; @endphp
+                                    class="px-3 py-1.5 rounded-full bg-sky-50/50 border border-sky-100 text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition w-full sm:w-auto">
+                                    @php 
+                                        $current = 'hadir';
+                                        if (in_array($anggota->id, $presensiExisting ?? [])) {
+                                            $existing = \App\Models\Presensi::where('kegiatan_id', $kegiatan->id)->where('pendaftaran_id', $anggota->id)->first();
+                                            if ($existing) $current = $existing->status;
+                                        }
+                                    @endphp
                                     <option value="hadir" {{ $current === 'hadir' ? 'selected' : '' }}>Hadir</option>
                                     <option value="sakit" {{ $current === 'sakit' ? 'selected' : '' }}>Sakit</option>
                                     <option value="izin" {{ $current === 'izin' ? 'selected' : '' }}>Izin</option>
                                     <option value="alpha" {{ $current === 'alpha' ? 'selected' : '' }}>Alpha</option>
                                 </select>
+                                <input type="hidden" name="presensi[{{ $loop->index }}][pendaftaran_id]" value="{{ $anggota->id }}">
                             </td>
                         </tr>
-                        <input type="hidden" name="presensi[{{ $loop->index }}][pendaftaran_id]" value="{{ $anggota->id }}">
                     @endforeach
                 </tbody>
             </table>
             </div>
-        </div>
-
-        <div class="mt-4 flex gap-2">
-            <button type="submit" class="px-5 py-2 bg-theme-blue hover:bg-theme-darkBlue text-white text-xs font-semibold rounded-full transition">Simpan Presensi</button>
-            <a href="{{ route('ketua.kegiatan.show', $kegiatan) }}" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-full transition">Batal</a>
-        </div>
-    </form>
+            <div class="p-4 md:p-6 border-t border-sky-100 flex gap-2 flex-wrap">
+                <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 transition w-full sm:w-auto">Simpan Presensi</button>
+                <a href="{{ route('ketua.kegiatan.show', $kegiatan) }}" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition w-full sm:w-auto text-center">Batal</a>
+            </div>
+        </form>
+    </div>
 @endsection
