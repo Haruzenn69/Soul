@@ -34,10 +34,9 @@ class KegiatanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'materi' => 'required|string|max:255',
+            'kegiatan' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
             'dokumentasi' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'tanggal_kegiatan' => 'required|date',
         ]);
 
         $ekskul = $this->getEkskul();
@@ -49,29 +48,29 @@ class KegiatanController extends Controller
 
         $kegiatan = Kegiatan::create([
             'ekskul_id' => $ekskul->id,
-            'materi' => $validated['materi'],
+            'kegiatan' => $validated['kegiatan'],
             'deskripsi' => $validated['deskripsi'] ?? null,
             'dokumentasi' => $dokumentasiPath,
-            'tanggal_kegiatan' => $validated['tanggal_kegiatan'],
+            'tanggal_kegiatan' => now()->toDateString(),
         ]);
 
-        $tanggalLabel = \Carbon\Carbon::parse($validated['tanggal_kegiatan'])->isoFormat('dddd, DD MMM Y');
+        $tanggalLabel = now()->isoFormat('dddd, DD MMM Y');
 
         if ($ekskul->pembina) {
             Notifikasi::create([
                 'pembina_id' => $ekskul->pembina->id,
                 'judul' => 'Kegiatan Mendatang',
-                'pesan' => 'Kegiatan baru "' . $validated['materi'] . '" dijadwalkan pada ' . $tanggalLabel . ' untuk ekskul ' . $ekskul->nama_ekskul . '.',
+                'pesan' => 'Kegiatan baru "' . $validated['kegiatan'] . '" dijadwalkan pada ' . $tanggalLabel . ' untuk ekskul ' . $ekskul->nama_ekskul . '.',
                 'tipe' => 'info',
             ]);
         }
 
-        $anggotas = $ekskul->pendaftarans()->where('status', 'diterima')->get();
+        $anggotas = $ekskul->pendaftarans()->whereIn('status', ['diterima', 'peringatan'])->get();
         foreach ($anggotas as $anggota) {
             Notifikasi::create([
                 'siswa_id' => $anggota->siswa_id,
                 'judul' => 'Kegiatan Mendatang',
-                'pesan' => 'Ada kegiatan "' . $validated['materi'] . '" di ekskul ' . $ekskul->nama_ekskul . ' pada ' . $tanggalLabel . '. Jangan lupa hadir!',
+                'pesan' => 'Ada kegiatan "' . $validated['kegiatan'] . '" di ekskul ' . $ekskul->nama_ekskul . ' pada ' . $tanggalLabel . '. Jangan lupa hadir!',
                 'tipe' => 'info',
             ]);
         }
@@ -81,7 +80,58 @@ class KegiatanController extends Controller
 
     public function show(Kegiatan $kegiatan)
     {
+        abort_unless($kegiatan->ekskul_id === $this->getEkskul()->id, 403);
+
         $kegiatan->load(['presensis.pendaftaran.siswa']);
         return view('ketua.kegiatan.show', compact('kegiatan'));
+    }
+
+    public function edit(Kegiatan $kegiatan)
+    {
+        abort_unless($kegiatan->ekskul_id === $this->getEkskul()->id, 403);
+
+        return view('ketua.kegiatan.edit', compact('kegiatan'));
+    }
+
+    public function update(Request $request, Kegiatan $kegiatan)
+    {
+        abort_unless($kegiatan->ekskul_id === $this->getEkskul()->id, 403);
+
+        $validated = $request->validate([
+            'kegiatan' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'dokumentasi' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $dokumentasiPath = $kegiatan->dokumentasi;
+        if ($request->hasFile('dokumentasi')) {
+            if ($kegiatan->dokumentasi) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($kegiatan->dokumentasi);
+            }
+            $dokumentasiPath = $request->file('dokumentasi')->store('dokumentasi-kegiatan', 'public');
+        }
+
+        $kegiatan->update([
+            'kegiatan' => $validated['kegiatan'],
+            'deskripsi' => $validated['deskripsi'] ?? null,
+            'dokumentasi' => $dokumentasiPath,
+        ]);
+
+        return redirect()->route('ketua.kegiatan.show', $kegiatan)
+            ->with('success', 'Kegiatan berhasil diperbarui.');
+    }
+
+    public function destroy(Kegiatan $kegiatan)
+    {
+        abort_unless($kegiatan->ekskul_id === $this->getEkskul()->id, 403);
+        abort_if($kegiatan->presensis()->exists(), 422, 'Kegiatan yang sudah diisi presensinya tidak dapat dihapus.');
+
+        if ($kegiatan->dokumentasi) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($kegiatan->dokumentasi);
+        }
+
+        $kegiatan->delete();
+
+        return redirect()->route('ketua.kegiatan.index')->with('success', 'Kegiatan berhasil dihapus.');
     }
 }

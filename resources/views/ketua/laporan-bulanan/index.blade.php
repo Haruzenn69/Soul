@@ -36,15 +36,22 @@
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $laporan->materi_kegiatan ?? '-' }}</td>
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
                             @if($laporan->status === 'draft')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">Draft</span>
+                                <span class="text-gray-500 font-medium">Draft</span>
+                            @elseif($laporan->status === 'menunggu')
+                                <span class="text-blue-600 font-medium">Menunggu Pembina</span>
                             @elseif($laporan->status === 'disetujui')
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Disetujui</span>
                             @else
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">Ditolak</span>
                             @endif
                         </td>
-                        <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
-                            <a href="{{ route('ketua.laporan-bulanan.show', $laporan) }}" class="text-sky-600 hover:underline font-medium">Detail</a>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <a href="{{ route('ketua.laporan-bulanan.show', $laporan) }}" class="text-theme-blue hover:underline font-medium">Detail</a>
+                                @if(in_array($laporan->status, ['draft', 'ditolak']))
+                                    <a href="{{ route('ketua.laporan-bulanan.edit', $laporan) }}" class="text-amber-600 hover:underline font-medium">Edit</a>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                 @empty

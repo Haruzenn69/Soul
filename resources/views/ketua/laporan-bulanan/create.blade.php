@@ -16,11 +16,8 @@
         <form action="{{ route('ketua.laporan-bulanan.store') }}" method="POST">
             @csrf
 
-            <div>
-                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Bulan (YYYY-MM)</label>
-                <input type="month" name="bulan" value="{{ old('bulan') }}" required
-                    class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
-                @error('bulan') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+            <div class="mb-4 p-3 bg-blue-50 rounded-2xl border border-blue-100">
+                <p class="text-[11px] text-blue-600 font-medium">📅 Laporan dibuat otomatis untuk <strong>{{ now()->translatedFormat('F Y') }}</strong> (bulan berjalan).</p>
             </div>
 
             <div class="p-3 bg-sky-50 rounded-2xl border border-sky-100">

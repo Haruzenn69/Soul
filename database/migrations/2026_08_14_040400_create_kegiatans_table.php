@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('kegiatans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ekskul_id')->constrained()->onDelete('cascade');
-            $table->string('materi', 255);
+            $table->string('kegiatan', 255);
             $table->text('deskripsi')->nullable();
             $table->string('dokumentasi')->nullable();
             $table->date('tanggal_kegiatan');

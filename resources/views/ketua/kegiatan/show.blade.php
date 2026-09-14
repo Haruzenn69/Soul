@@ -21,9 +21,9 @@
             <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal</p>
             <p class="font-medium text-sm">{{ $kegiatan->tanggal_kegiatan->format('d/m/Y') }}</p>
         </div>
-        <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Materi</p>
-            <p class="font-medium text-sm">{{ $kegiatan->materi }}</p>
+        <div class="mb-6">
+            <p class="text-[11px] text-gray-400 font-bold uppercase">Kegiatan</p>
+            <p class="font-medium text-sm">{{ $kegiatan->kegiatan }}</p>
         </div>
         @if($kegiatan->deskripsi)
         <div>
@@ -38,7 +38,39 @@
         </div>
         @endif
 
+<<<<<<< HEAD
         <h3 class="text-sm font-extrabold text-slate-900 pt-2 border-t border-sky-100">Daftar Presensi</h3>
+=======
+        @php
+            $rekap = [
+                'hadir' => $kegiatan->presensis->where('status', 'hadir')->count(),
+                'izin' => $kegiatan->presensis->where('status', 'izin')->count(),
+                'sakit' => $kegiatan->presensis->where('status', 'sakit')->count(),
+                'alpha' => $kegiatan->presensis->where('status', 'alpha')->count(),
+            ];
+        @endphp
+        <h3 class="text-xs font-bold text-gray-400 uppercase mb-2">Rekap Presensi</h3>
+        <div class="grid grid-cols-4 gap-2 mb-6">
+            <div class="p-3 rounded-2xl bg-green-50 border border-green-100 text-center">
+                <p class="text-lg font-bold text-green-600">{{ $rekap['hadir'] }}</p>
+                <p class="text-[10px] text-green-600/70 font-semibold uppercase">Hadir</p>
+            </div>
+            <div class="p-3 rounded-2xl bg-blue-50 border border-blue-100 text-center">
+                <p class="text-lg font-bold text-blue-600">{{ $rekap['izin'] }}</p>
+                <p class="text-[10px] text-blue-600/70 font-semibold uppercase">Izin</p>
+            </div>
+            <div class="p-3 rounded-2xl bg-yellow-50 border border-yellow-100 text-center">
+                <p class="text-lg font-bold text-yellow-600">{{ $rekap['sakit'] }}</p>
+                <p class="text-[10px] text-yellow-600/70 font-semibold uppercase">Sakit</p>
+            </div>
+            <div class="p-3 rounded-2xl bg-red-50 border border-red-100 text-center">
+                <p class="text-lg font-bold text-red-600">{{ $rekap['alpha'] }}</p>
+                <p class="text-[10px] text-red-600/70 font-semibold uppercase">Alpha</p>
+            </div>
+        </div>
+
+        <h3 class="text-xs font-bold text-gray-400 uppercase mb-3">Daftar Presensi</h3>
+>>>>>>> d97cf39f3376236af827b8d53471f2f44ce4b427
         <div class="overflow-x-auto">
         <table class="card-table w-full text-left text-xs md:text-sm">
             <thead class="bg-sky-50">
@@ -73,5 +105,19 @@
             </tbody>
         </table>
         </div>
+<<<<<<< HEAD
+=======
+
+        <div class="mt-4 flex gap-2">
+            <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="px-5 py-2 bg-theme-blue hover:bg-theme-darkBlue text-white text-xs font-semibold rounded-full transition">Input Presensi</a>
+            <a href="{{ route('ketua.kegiatan.edit', $kegiatan) }}" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-full transition">Edit</a>
+            <form action="{{ route('ketua.kegiatan.destroy', $kegiatan) }}" method="POST" onsubmit="return confirm('Yakin hapus kegiatan ini?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-full transition">Hapus</button>
+            </form>
+            <a href="{{ route('ketua.kegiatan.index') }}" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-full transition">Kembali</a>
+        </div>
+>>>>>>> d97cf39f3376236af827b8d53471f2f44ce4b427
     </div>
 @endsection

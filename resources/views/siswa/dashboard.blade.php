@@ -243,7 +243,7 @@
 
                 if ($siswa) {
                     $pending = $siswa->pendaftarans()->where('status', 'pending')->first();
-                    $diterima = $siswa->pendaftarans()->where('status', 'diterima')->first();
+                    $diterima = $siswa->pendaftarans()->whereIn('status', ['diterima', 'peringatan'])->first();
                     $ditolak = $siswa->pendaftarans()->where('status', 'ditolak')->first();
 
                     if ($diterima) {
@@ -284,13 +284,42 @@
                 </div>
             @endif
 
-            <!-- HERO GREETING -->
-            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200 animate-fade-up">
-                <div class="absolute inset-0 pointer-events-none">
-                    <div class="absolute -top-20 -right-10 w-72 h-72 rounded-full bg-amber-200/40 blur-3xl"></div>
-                    <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
-                    <div class="absolute top-10 right-1/4 w-16 h-16 rounded-full bg-amber-300/50 blur-2xl animate-floaty"></div>
-                    <div class="absolute top-16 right-1/4 translate-x-10 w-6 h-6 rounded-full bg-amber-200/60 blur-md animate-floaty" style="animation-delay: 1.5s"></div>
+            <!-- ALERT PERINGATAN / NONAKTIF -->
+            @if(isset($isWarned) && $isWarned)
+                <div class="p-4 rounded-2xl border bg-amber-50 border-amber-200 flex items-start gap-3">
+                    <div class="mt-0.5 text-amber-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-bold text-amber-800">Kamu mendapatkan peringatan dari ketua ekskul</p>
+                        <p class="text-xs mt-1 text-amber-700">Tingkatkan keaktifan dan kehadiranmu. Kamu tetap terhitung sebagai anggota aktif ekskul {{ $ekskul->nama_ekskul ?? '' }}.</p>
+                    </div>
+                    <a href="{{ route('siswa.notifikasi') }}" class="shrink-0 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-semibold rounded-lg transition">Lihat Notifikasi</a>
+                </div>
+            @elseif(isset($isNonaktif) && $isNonaktif)
+                <div class="p-4 rounded-2xl border bg-red-50 border-red-200 flex items-start gap-3">
+                    <div class="mt-0.5 text-red-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-bold text-red-800">Kamu dinonaktifkan dari ekskul</p>
+                        <p class="text-xs mt-1 text-red-700">Status keanggotaanmu saat ini nonaktif. Hubungi ketua ekskul jika ini kurang tepat.</p>
+                    </div>
+                    <a href="{{ route('siswa.notifikasi') }}" class="shrink-0 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-[11px] font-semibold rounded-lg transition">Lihat Notifikasi</a>
+                </div>
+            @endif
+
+            <!-- Greeting & Header CTA -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">
+                        Selamat datang, {{ $siswa->nama ?? auth()->user()->username }}
+                    </h1>
+                    <p class="text-xs text-slate-400 mt-0.5">{{ \Carbon\Carbon::now()->isoFormat('D MMMM Y') }} · Semester Ganjil 2026/2027</p>
                 </div>
 
                 <div class="relative flex flex-col lg:flex-row lg:items-center gap-6">
@@ -521,6 +550,7 @@
 
                 <!-- RIGHT COLUMN: Kegiatan Mendatang -->
                 <div class="space-y-6">
+<<<<<<< HEAD
                     <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .25s">
                         <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
                             <div>
@@ -558,6 +588,17 @@
                                             <span class="inline-flex mt-2 px-2.5 py-1 rounded-full bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-bold">Terdekat</span>
                                         @endif
                                     </div>
+=======
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200/70 shadow-sm">
+                        <h2 class="text-sm font-bold text-slate-900 mb-3.5">Kegiatan Mendatang</h2>
+                        <div class="space-y-3">
+                            @forelse($kegiatanMendatang ?? [] as $kegiatan)
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/50">
+                                    <h4 class="text-xs font-semibold text-slate-800">{{ $kegiatan->kegiatan ?? 'Kegiatan' }}</h4>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">
+                                        {{ \Carbon\Carbon::parse($kegiatan->tanggal_kegiatan)->isoFormat('dddd, DD MMM Y') }}
+                                    </p>
+>>>>>>> d97cf39f3376236af827b8d53471f2f44ce4b427
                                 </div>
                             @empty
                                 <div class="text-center py-8">

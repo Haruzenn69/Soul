@@ -97,8 +97,13 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
         $user  = auth()->user();
         $siswa = $user->siswa;
 
-        $pendaftaran = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->with('ekskul')->first() : null;
+        $pendaftaran = $siswa ? $siswa->pendaftarans()->whereIn('status', ['diterima', 'peringatan'])->with('ekskul')->first() : null;
         $ekskul      = $pendaftaran ? $pendaftaran->ekskul : null;
+
+        $isWarned = $pendaftaran && $pendaftaran->status === 'peringatan';
+
+        $statusTerakhir = $siswa ? $siswa->pendaftarans()->latest('tanggal_daftar')->first() : null;
+        $isNonaktif = $siswa && $statusTerakhir && $statusTerakhir->status === 'nonaktif' && !$pendaftaran;
 
         $kegiatanMendatang = $ekskul 
         ? $ekskul->kegiatans()->whereDate('tanggal_kegiatan', '>=', today())->orderBy('tanggal_kegiatan', 'asc')->get() 
@@ -110,7 +115,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 
         $unreadNotifCount = $siswa ? $siswa->notifikasis()->where('is_read', false)->count() : 0;
 
-        return view('siswa.dashboard', compact('siswa', 'ekskul', 'kegiatanMendatang', 'totalHadir', 'unreadNotifCount'));
+        return view('siswa.dashboard', compact('siswa', 'ekskul', 'kegiatanMendatang', 'totalHadir', 'unreadNotifCount', 'isWarned', 'isNonaktif'));
     })->name('dashboard');
 
     // 2. KATALOG EKSKUL
@@ -122,7 +127,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
         $isPending = false;
         
         if ($siswa) {
-            $pendaftaran = $siswa->pendaftarans()->where('status', 'diterima')->first();
+            $pendaftaran = $siswa->pendaftarans()->whereIn('status', ['diterima', 'peringatan'])->first();
             $isRegistered = $pendaftaran ? true : false;
             
             $pending = $siswa->pendaftarans()->where('status', 'pending')->first();
@@ -138,7 +143,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
         $user = auth()->user();
         $siswa = $user->siswa;
         
-        $pendaftaran = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->first() : null;
+        $pendaftaran = $siswa ? $siswa->pendaftarans()->whereIn('status', ['diterima', 'peringatan'])->first() : null;
         $presensis = $pendaftaran ? Presensi::where('pendaftaran_id', $pendaftaran->id)->with('kegiatan')->get() : collect();
         
         return view('siswa.presensi', compact('presensis', 'siswa'));
@@ -149,7 +154,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
         $user = auth()->user();
         $siswa = $user->siswa;
         
-        $pendaftaran = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->with('ekskul.pembina')->first() : null;
+        $pendaftaran = $siswa ? $siswa->pendaftarans()->whereIn('status', ['diterima', 'peringatan'])->with('ekskul.pembina')->first() : null;
         $ekskul = $pendaftaran ? $pendaftaran->ekskul : null;
         $pengajuan = $siswa ? $siswa->pengajuanKeluars()->latest('tanggal_pengajuan')->get() : collect();
         
@@ -161,7 +166,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
         $user = auth()->user();
         $siswa = $user->siswa;
         
-        $pendaftaran = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->first() : null;
+        $pendaftaran = $siswa ? $siswa->pendaftarans()->whereIn('status', ['diterima', 'peringatan'])->first() : null;
         if ($pendaftaran) {
             return redirect()->route('siswa.dashboard')->with('error', 'Kamu sudah terdaftar di ekskul.');
         }
@@ -175,8 +180,8 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
         $user = auth()->user();
         $siswa = $user->siswa;
 
-        // Cek apakah sudah terdaftar (diterima)
-        $diterima = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->first() : null;
+        // Cek apakah sudah terdaftar (diterima/peringatan)
+        $diterima = $siswa ? $siswa->pendaftarans()->whereIn('status', ['diterima', 'peringatan'])->first() : null;
         if ($diterima) {
             return redirect()->route('siswa.dashboard')->with('error', 'Kamu sudah terdaftar di ekskul.');
         }
@@ -196,7 +201,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
         $user = auth()->user();
         $siswa = $user->siswa;
         
-        $existing = $siswa->pendaftarans()->where('status', 'diterima')->first();
+        $existing = $siswa->pendaftarans()->whereIn('status', ['diterima', 'peringatan'])->first();
         if ($existing) {
             return redirect()->back()->with('error', 'Kamu sudah terdaftar di ekskul.');
         }
@@ -284,7 +289,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
         $user = auth()->user();
         $siswa = $user->siswa;
         
-        $pendaftaran = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->first() : null;
+        $pendaftaran = $siswa ? $siswa->pendaftarans()->whereIn('status', ['diterima', 'peringatan'])->first() : null;
         if (!$pendaftaran) {
             return redirect()->back()->with('error', 'Kamu belum terdaftar di ekskul manapun.');
         }
@@ -351,6 +356,8 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::get('/laporan', [PembinaController::class, 'laporan'])->name('laporan.index');
     Route::get('/laporan/{laporanBulanan}/detail', [PembinaController::class, 'laporanShow'])->name('laporan.show');
     Route::get('/laporan/{laporanBulanan}/download', [PembinaController::class, 'laporanDownload'])->name('laporan.download');
+    Route::post('/laporan/{laporanBulanan}/approve', [PembinaController::class, 'laporanApprove'])->name('laporan.approve');
+    Route::post('/laporan/{laporanBulanan}/reject', [PembinaController::class, 'laporanReject'])->name('laporan.reject');
     Route::get('/presensi', [PembinaController::class, 'presensi'])->name('presensi');
     Route::get('/profile', [PembinaController::class, 'profile'])->name('profile');
 
@@ -381,6 +388,11 @@ Route::middleware(['auth', 'role:siswa'])->prefix('ketua')->name('ketua.')->grou
         }
 
         $ekskul = $pendaftaran->ekskul;
+
+        $kegiatanBulanIni = $ekskul->kegiatans()
+            ->whereYear('tanggal_kegiatan', now()->year)
+            ->whereMonth('tanggal_kegiatan', now()->month)
+            ->count();
 
         // 1. Data Line Chart: Tren Kehadiran Kegiatan Terakhir (Maks 6)
         $kegiatanTerbaru = $ekskul->kegiatans()
@@ -423,16 +435,17 @@ Route::middleware(['auth', 'role:siswa'])->prefix('ketua')->name('ketua.')->grou
             'pengajuanCount' => $ekskul->pengajuanKeluars()->where('status', 'pending')->count(),
             'chartKegiatan'  => $chartKegiatan,
             'chartKelas'     => $chartKelas,
+            'kegiatanBulanIni' => $kegiatanBulanIni,
         ]);
     })->name('dashboard');
 
-    Route::resource('kegiatan', KegiatanController::class)->except(['edit', 'update', 'destroy']);
+    Route::resource('kegiatan', KegiatanController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
     Route::get('kegiatan/{kegiatan}/presensi', [PresensiController::class, 'create'])->name('presensi.create');
     Route::post('kegiatan/{kegiatan}/presensi', [PresensiController::class, 'store'])->name('presensi.store');
     Route::resource('pendaftaran', PendaftaranController::class)->only(['index', 'show', 'update']);
     Route::resource('pengajuan-keluar', PengajuanKeluarController::class)->only(['index', 'show', 'update']);
     Route::get('anggota', [AnggotaController::class, 'index'])->name('anggota.index');
-    Route::patch('anggota/{pendaftaran}/toggle', [AnggotaController::class, 'toggle'])->name('anggota.toggle');
+    Route::patch('anggota/{pendaftaran}/status', [AnggotaController::class, 'updateStatus'])->name('anggota.update-status');
     Route::get('profil-ekskul', [ProfilEkskulController::class, 'edit'])->name('profil-ekskul.edit');
     Route::patch('profil-ekskul', [ProfilEkskulController::class, 'update'])->name('profil-ekskul.update');
     Route::match(['get', 'patch'], 'profil-ekskul/toggle-recruitment', [ProfilEkskulController::class, 'toggleRecruitment'])->name('profil-ekskul.toggle-recruitment');
@@ -445,8 +458,9 @@ Route::middleware(['auth', 'role:siswa'])->prefix('ketua')->name('ketua.')->grou
     Route::get('faq', [FaqController::class, 'index'])->name('faq.index');
     Route::post('faq', [FaqController::class, 'store'])->name('faq.store');
     Route::delete('faq/{faq}', [FaqController::class, 'destroy'])->name('faq.destroy');
-    Route::resource('laporan-bulanan', LaporanBulananController::class)->only(['index', 'create', 'store', 'show']);
+    Route::resource('laporan-bulanan', LaporanBulananController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update']);
     Route::get('laporan-bulanan/{laporan_bulanan}/download-pdf', [LaporanBulananController::class, 'downloadPdf'])->name('laporan-bulanan.download-pdf');
+    Route::post('laporan-bulanan/{laporan_bulanan}/serahkan', [LaporanBulananController::class, 'submitToPembina'])->name('laporan-bulanan.submit');
 
     // Notifikasi Ketua
     Route::get('/notifikasi', [KetuaNotifikasiController::class, 'index'])->name('notifikasi');

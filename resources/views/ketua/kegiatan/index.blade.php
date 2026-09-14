@@ -15,23 +15,42 @@
         </a>
     </div>
 
-    <!-- Statistik Kegiatan -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-        <div class="bg-white p-3 md:p-4 rounded-xl border border-sky-100 shadow-sm text-center animate-fade-up" style="animation-delay: .1s">
-            <p class="text-lg md:text-2xl font-extrabold text-sky-700">{{ $kegiatans->count() }}</p>
-            <p class="text-[9px] md:text-[10px] font-semibold text-slate-400">Total Kegiatan</p>
-        </div>
-        <div class="bg-white p-3 md:p-4 rounded-xl border border-sky-100 shadow-sm text-center animate-fade-up" style="animation-delay: .2s">
-            <p class="text-lg md:text-2xl font-extrabold text-emerald-600">{{ $kegiatans->where('tanggal_kegiatan', '>=', now())->count() }}</p>
-            <p class="text-[9px] md:text-[10px] font-semibold text-slate-400">Mendatang</p>
-        </div>
-        <div class="bg-white p-3 md:p-4 rounded-xl border border-sky-100 shadow-sm text-center animate-fade-up" style="animation-delay: .3s">
-            <p class="text-lg md:text-2xl font-extrabold text-amber-600">{{ $kegiatans->where('tanggal_kegiatan', '<', now())->count() }}</p>
-            <p class="text-[9px] md:text-[10px] font-semibold text-slate-400">Selesai</p>
-        </div>
-        <div class="bg-white p-3 md:p-4 rounded-xl border border-sky-100 shadow-sm text-center animate-fade-up" style="animation-delay: .4s">
-            <p class="text-lg md:text-2xl font-extrabold text-purple-600">{{ $totalPresensi ?? 0 }}</p>
-            <p class="text-[9px] md:text-[10px] font-semibold text-slate-400">Total Presensi</p>
+    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+        <table class="card-table w-full text-left text-xs">
+            <thead class="bg-gray-50 text-gray-400 font-bold uppercase tracking-wider">
+                <tr>
+                    <th class="px-6 py-3">No</th>
+                    <th class="px-6 py-3">Tanggal</th>
+                    <th class="px-6 py-3">Kegiatan</th>
+                    <th class="px-6 py-3">Presensi</th>
+                    <th class="px-6 py-3">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                @forelse($kegiatans as $kegiatan)
+                    <tr class="hover:bg-gray-50/50">
+                        <td class="px-6 py-4 font-medium">{{ $loop->iteration }}</td>
+                        <td class="px-6 py-4">{{ $kegiatan->tanggal_kegiatan->format('d/m/Y') }}</td>
+                        <td class="px-6 py-4">{{ $kegiatan->kegiatan }}</td>
+                        <td class="px-6 py-4">{{ $kegiatan->presensis_count }} orang</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <a href="{{ route('ketua.kegiatan.show', $kegiatan) }}" class="text-theme-blue hover:underline font-medium">Detail</a>
+                                <span class="text-gray-300">|</span>
+                                <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="text-green-600 hover:underline font-medium">Absensi</a>
+                                <span class="text-gray-300">|</span>
+                                <a href="{{ route('ketua.kegiatan.edit', $kegiatan) }}" class="text-amber-600 hover:underline font-medium">Edit</a>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-gray-400">Belum ada kegiatan.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
         </div>
     </div>
 

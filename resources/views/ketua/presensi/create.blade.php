@@ -1,5 +1,5 @@
 @extends('ketua.layout')
-@section('title', 'Input Presensi - ' . $kegiatan->materi)
+@section('title', 'Input Presensi - ' . $kegiatan->kegiatan)
 
 @section('content')
 <div class="space-y-6">
