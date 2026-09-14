@@ -26,6 +26,7 @@ use App\Models\Siswa;
 use App\Models\User;
 use App\Models\Pendaftaran;
 use App\Models\PengajuanKeluar;
+use App\Rules\AlasanValid;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -210,19 +211,29 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
             return redirect()->back()->with('error', 'Kamu sudah mengajukan pendaftaran. Tunggu verifikasi dari ketua ekskul.');
         }
         
+        $validated = $request->validate([
+            'ekskul_id' => ['required', 'exists:ekskuls,id'],
+            'alasan'    => ['required', 'string', 'max:1000', new AlasanValid()],
+        ], [
+            'ekskul_id.required' => 'Pilih ekskul terlebih dahulu.',
+            'ekskul_id.exists'   => 'Ekskul yang dipilih tidak valid.',
+            'alasan.required'    => 'Alasan bergabung wajib diisi.',
+            'alasan.max'         => 'Alasan bergabung maksimal 1000 karakter.',
+        ]);
+
         $pendaftaran = Pendaftaran::create([
             'siswa_id' => $siswa->id,
-            'ekskul_id' => $request->ekskul_id,
+            'ekskul_id' => $validated['ekskul_id'],
             'tanggal_daftar' => now()->toDateString(),
             'status' => 'pending',
-            'alasan' => $request->alasan,
+            'alasan' => $validated['alasan'],
         ]);
 
         \App\Models\Notifikasi::create([
             'siswa_id' => $siswa->id,
             'pendaftaran_id' => $pendaftaran->id,
             'judul' => 'Pendaftaran Terkirim',
-            'pesan' => 'Pendaftaran kamu ke ekskul berhasil dikirim. Menunggu verifikasi dari ketua ekskul.',
+            'pesan' => 'Pendaftaran kamu ke ekskul telah terkirim kepada ketua ekskul. Menunggu konfirmasi dari ketua ekskul.',
             'tipe' => 'info',
         ]);
 
@@ -254,7 +265,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
             ]);
         }
         
-        return redirect()->route('siswa.dashboard')->with('success', 'Pendaftaran berhasil dikirim!');
+        return redirect()->route('siswa.dashboard')->with('success', 'Pendaftaran kamu telah terkirim kepada ketua ekskul. Silakan menunggu konfirmasi dari ketua ekskul.');
     })->name('daftar-ekskul.store');
 
     // 7b. NOTIFIKASI
@@ -263,6 +274,17 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
     Route::post('/notifikasi/read-all', [NotifikasiController::class, 'readAll'])->name('notifikasi.read-all');
 
     // 8. STORE PENGAJUAN KELUAR
+    Route::get('/pengajuan-keluar', function () {
+        $user = auth()->user();
+        $siswa = $user->siswa;
+
+        $pendaftaran = $siswa ? $siswa->pendaftarans()->where('status', 'diterima')->with('ekskul')->first() : null;
+        $ekskul = $pendaftaran ? $pendaftaran->ekskul : null;
+        $pengajuan = $siswa ? $siswa->pengajuanKeluars()->latest('tanggal_pengajuan')->get() : collect();
+
+        return view('siswa.pengajuan-keluar', compact('siswa', 'ekskul', 'pengajuan'));
+    })->name('pengajuan-keluar');
+
     Route::post('/pengajuan-keluar', function (Request $request) {
         $user = auth()->user();
         $siswa = $user->siswa;
@@ -278,13 +300,13 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
         }
 
         $validated = $request->validate([
-            'alasan' => ['required', 'string', 'min:5'],
+            'alasan' => ['required', 'string', 'max:1000', new AlasanValid()],
         ], [
             'alasan.required' => 'Alasan keluar wajib diisi.',
-            'alasan.min' => 'Alasan keluar minimal harus 5 karakter.',
+            'alasan.max'      => 'Alasan keluar maksimal 1000 karakter.',
         ]);
-        
-        PengajuanKeluar::create([
+
+        $pengajuanKeluar = PengajuanKeluar::create([
             'siswa_id' => $siswa->id,
             'ekskul_id' => $pendaftaran->ekskul_id,
             'alasan' => $validated['alasan'],

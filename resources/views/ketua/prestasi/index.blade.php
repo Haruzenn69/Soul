@@ -2,76 +2,87 @@
 @section('title', 'Kelola Prestasi')
 
 @section('content')
-    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm max-w-2xl mb-6">
-        <h3 class="text-sm font-bold text-theme-dark mb-4">Tambah Prestasi</h3>
-        <form action="{{ route('ketua.prestasi.store') }}" method="POST" enctype="multipart/form-data">
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+        <div>
+            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Kelola Prestasi</h1>
+            <p class="text-xs text-slate-400 mt-1">Tambah dan kelola prestasi ekskul</p>
+        </div>
+    </div>
+
+    <!-- Add Form Card -->
+    <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl space-y-5 animate-fade-up" style="animation-delay: .1s">
+        <h3 class="text-sm font-extrabold text-slate-900 mb-4">Tambah Prestasi</h3>
+        <form action="{{ route('ketua.prestasi.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="md:col-span-2">
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Judul</label>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Judul</label>
                     <input type="text" name="judul" value="{{ old('judul') }}" required placeholder="Contoh: Juara 1"
-                        class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition">
+                        class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                     @error('judul') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Tahun</label>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tahun</label>
                     <input type="text" name="tahun" value="{{ old('tahun') }}" placeholder="2025"
-                        class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition">
+                        class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                 </div>
             </div>
-            <div class="mb-4">
-                <label class="block text-xs font-bold text-gray-500 mb-1">Kategori / Perlombaan</label>
+            <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Kategori / Perlombaan</label>
                 <input type="text" name="kategori" value="{{ old('kategori') }}" placeholder="Contoh: DBL School Competition"
-                    class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition">
+                    class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
             </div>
-            <div class="mb-4">
-                <label class="block text-xs font-bold text-gray-500 mb-1">Foto (Opsional)</label>
+            <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Foto (Opsional)</label>
                 <input type="file" name="foto" accept="image/*"
-                    class="w-full px-4 py-2.5 rounded-2xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-theme-blue transition file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-theme-blue file:text-white hover:file:bg-theme-darkBlue">
+                    class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-gradient-to-r file:from-sky-400 file:to-blue-500 file:text-white hover:file:from-sky-500 hover:file:to-blue-600">
                 @error('foto') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
             </div>
-            <button type="submit" class="px-5 py-2 bg-theme-blue hover:bg-theme-darkBlue text-white text-xs font-semibold rounded-full transition">Simpan</button>
+            <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 transition w-full sm:w-auto">Simpan</button>
         </form>
     </div>
 
-    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+    <!-- Table Card -->
+    <div class="bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
         <div class="overflow-x-auto">
-        <table class="card-table w-full text-left text-xs">
-            <thead class="bg-gray-50 text-gray-400 font-bold uppercase tracking-wider">
+        <table class="card-table w-full text-left text-xs md:text-sm">
+            <thead class="bg-sky-50">
                 <tr>
-                    <th class="px-6 py-3">No</th>
-                    <th class="px-6 py-3">Judul</th>
-                    <th class="px-6 py-3">Kategori</th>
-                    <th class="px-6 py-3">Tahun</th>
-                    <th class="px-6 py-3">Foto</th>
-                    <th class="px-6 py-3">Aksi</th>
+                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
+                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Judul</th>
+                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Kategori</th>
+                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Tahun</th>
+                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Foto</th>
+                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50">
+            <tbody class="divide-y divide-sky-50">
                 @forelse($prestasis as $prestasi)
-                    <tr>
-                        <td class="px-6 py-4">{{ $loop->iteration }}</td>
-                        <td class="px-6 py-4 font-medium">{{ $prestasi->judul }}</td>
-                        <td class="px-6 py-4">{{ $prestasi->kategori ?? '-' }}</td>
-                        <td class="px-6 py-4">{{ $prestasi->tahun ?? '-' }}</td>
-                        <td class="px-6 py-4">
+                    <tr class="hover:bg-sky-50/50 transition">
+                        <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $loop->iteration }}</td>
+                        <td class="px-4 md:px-6 py-3.5 font-medium whitespace-nowrap">{{ $prestasi->judul }}</td>
+                        <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $prestasi->kategori ?? '-' }}</td>
+                        <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $prestasi->tahun ?? '-' }}</td>
+                        <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
                             @if($prestasi->foto)
-                                <img src="{{ asset('storage/' . $prestasi->foto) }}" alt="Foto" class="w-14 h-10 object-cover rounded-lg border border-gray-100">
+                                <img src="{{ asset('storage/' . $prestasi->foto) }}" alt="Foto" class="w-14 h-10 object-cover rounded-lg border border-sky-100">
                             @else
-                                <span class="text-gray-400">-</span>
+                                <span class="text-slate-400">-</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
                             <form action="{{ route('ketua.prestasi.destroy', $prestasi) }}" method="POST" class="inline" onsubmit="return confirm('Hapus prestasi ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-500 hover:underline font-medium">Hapus</button>
+                                <button type="submit" class="text-red-600 hover:underline font-medium">Hapus</button>
                             </form>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-8 text-center text-gray-400">Belum ada prestasi.</td>
+                        <td colspan="6" class="px-4 md:px-6 py-8 text-center text-slate-400">Belum ada prestasi.</td>
                     </tr>
                 @endforelse
             </tbody>
