@@ -19,8 +19,8 @@
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                     Diterima: {{ $pendaftarans->where('status', 'diterima')->count() }}
                 </span>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">
-                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-700 border border-rose-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                     Ditolak: {{ $pendaftarans->where('status', 'ditolak')->count() }}
                 </span>
             </div>
@@ -28,9 +28,9 @@
     </div>
 
     <!-- Table Card dengan overflow-x-auto -->
-    <div class="bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
+    <div class="ketua-card-list bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs md:text-sm">
+            <table class="card-table ketua-card-pendaftaran w-full text-left text-xs md:text-sm">
                 <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
                     <tr>
                         <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap rounded-l-xl">No</th>
@@ -44,7 +44,7 @@
                 </thead>
                 <tbody class="divide-y divide-sky-50">
                     @forelse($pendaftarans as $pendaftaran)
-                        <tr class="hover:bg-sky-50/50 transition">
+                        <tr class="hover:bg-sky-50/50 transition" data-card-href="{{ route('ketua.pendaftaran.show', $pendaftaran) }}">
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap text-slate-500">{{ $loop->iteration }}</td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap font-medium text-slate-700">{{ $pendaftaran->siswa->nis }}</td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap font-medium text-slate-800">{{ $pendaftaran->siswa->nama }}</td>
@@ -62,8 +62,8 @@
                                         Diterima
                                     </span>
                                 @elseif($pendaftaran->status === 'ditolak')
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-700 border border-rose-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500 mr-1.5"></span>
                                         Ditolak
                                     </span>
                                 @else
@@ -71,7 +71,7 @@
                                 @endif
                             </td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap">
-                                <a href="{{ route('ketua.pendaftaran.show', $pendaftaran) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 font-semibold rounded-full hover:from-sky-200 hover:to-blue-200 transition text-[10px] md:text-[11px]">
+                                <a href="{{ route('ketua.pendaftaran.show', $pendaftaran) }}" class="card-detail-link inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 font-semibold rounded-xl hover:from-sky-200 hover:to-blue-200 transition text-[10px] md:text-[11px]">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -98,7 +98,7 @@
         </div>
 
         <!-- Footer Tabel dengan Total -->
-        <div class="px-3 md:px-6 py-3 border-t border-sky-50 flex justify-between items-center">
+        <div class="ketua-card-footer px-3 md:px-6 py-3 border-t border-sky-50 flex justify-between items-center">
             <span class="text-[10px] md:text-xs text-slate-400">Menampilkan {{ $pendaftarans->count() }} data</span>
             @if(method_exists($pendaftarans, 'hasPages') && $pendaftarans->hasPages())
                 <div class="flex gap-1">

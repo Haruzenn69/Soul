@@ -16,11 +16,12 @@
         <form action="{{ route('ketua.laporan-bulanan.store') }}" method="POST">
             @csrf
 
-            <div class="mb-4 p-3 bg-blue-50 rounded-2xl border border-blue-100">
-                <p class="text-[11px] text-blue-600 font-medium">📅 Laporan dibuat otomatis untuk <strong>{{ now()->translatedFormat('F Y') }}</strong> (bulan berjalan).</p>
+            <div class="mb-4 p-4 bg-sky-50/70 rounded-2xl border border-sky-100">
+                <p class="text-xs text-sky-700 font-semibold">Periode laporan</p>
+                <p class="text-[11px] text-sky-600 mt-1">Laporan dibuat untuk <strong>{{ now()->translatedFormat('F Y') }}</strong> (bulan berjalan).</p>
             </div>
 
-            <div class="p-3 bg-sky-50 rounded-2xl border border-sky-100">
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
                 <p class="text-[11px] text-sky-600 font-medium">Materi kegiatan akan digenerate otomatis berdasarkan data kegiatan yang tercatat di bulan tersebut.</p>
             </div>
 
@@ -30,11 +31,11 @@
                     class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('tujuan') }}</textarea>
             </div>
 
-            <div class="p-3 bg-sky-50 rounded-2xl border border-sky-100">
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
                 <p class="text-[11px] text-sky-600 font-medium">Kehadiran peserta akan digenerate otomatis berdasarkan data presensi kegiatan bulan tersebut.</p>
             </div>
 
-            <div class="p-3 bg-sky-50 rounded-2xl border border-sky-100">
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
                 <p class="text-[11px] text-sky-600 font-medium">Dokumentasi akan diambil otomatis dari dokumentasi kegiatan di bulan tersebut.</p>
             </div>
 

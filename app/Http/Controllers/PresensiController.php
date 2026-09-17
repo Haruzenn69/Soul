@@ -25,7 +25,7 @@ class PresensiController extends Controller
             ->get();
 
         $presensiExisting = Presensi::where('kegiatan_id', $kegiatan->id)
-            ->pluck('pendaftaran_id')
+            ->pluck('status', 'pendaftaran_id')
             ->toArray();
 
         return view('ketua.presensi.create', compact('kegiatan', 'anggotas', 'presensiExisting'));

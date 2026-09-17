@@ -13,7 +13,8 @@
     </div>
 
     <!-- Detail Card -->
-    <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-lg space-y-5">
+    <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl space-y-5">
+        <div class="grid gap-5 sm:grid-cols-2">
         <div>
             <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal Pengajuan</p>
             <p class="font-medium text-sm">{{ $pengajuanKeluar->tanggal_pengajuan->format('d/m/Y') }}</p>
@@ -22,9 +23,10 @@
             <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nama</p>
             <p class="font-medium text-sm">{{ $pengajuanKeluar->siswa->nama }}</p>
         </div>
-        <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Alasan</p>
-            <p class="font-medium text-sm">{{ $pengajuanKeluar->alasan }}</p>
+        </div>
+        <div class="p-4 bg-sky-50/60 border border-sky-100 rounded-2xl">
+            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Alasan pengajuan</p>
+            <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{{ $pengajuanKeluar->alasan }}</p>
         </div>
         <div>
             <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status</p>
@@ -47,7 +49,7 @@
             <form action="{{ route('ketua.pengajuan-keluar.update', $pengajuanKeluar) }}" method="POST" class="w-full sm:w-auto">
                 @csrf @method('PATCH')
                 <input type="hidden" name="status" value="ditolak">
-                <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-red-200 transition">Tolak</button>
+                <button type="submit" class="px-5 py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl transition">Tolak</button>
             </form>
         </div>
         @endif

@@ -42,16 +42,16 @@
         </div>
     </div>
 
-    <!-- STATS CARDS (3 CARD → SELALU 3 DALAM SATU BARIS) -->
-    <div class="grid grid-cols-3 gap-3 md:gap-4">
+    <!-- STATS CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
         <!-- Card 1: Total Anggota -->
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-3 md:p-5 shadow-md shadow-sky-100 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-fade-up" style="animation-delay: .1s">
+        <a href="{{ route('ketua.anggota.index') }}" class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-4 md:p-5 shadow-md shadow-sky-100 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-fade-up group" style="animation-delay: .1s">
             <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-sky-100 blur-2xl"></div>
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[8px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Total Anggota</p>
-                    <h3 class="text-xl md:text-2xl font-extrabold mt-0.5 md:mt-1 text-sky-700">{{ $totalAnggota }}</h3>
-                    <p class="text-[9px] md:text-[11px] font-semibold text-sky-600 mt-0.5 md:mt-1">Anggota Aktif</p>
+                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Total Anggota</p>
+                    <h3 class="text-2xl md:text-3xl font-extrabold mt-1 text-sky-700">{{ $totalAnggota }}</h3>
+                    <p class="text-[11px] font-semibold text-sky-600 mt-1">Anggota aktif</p>
                 </div>
                 <div class="w-8 h-8 md:w-10 md:h-10 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center border border-white/40 shadow-lg shadow-sky-300">
                     <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,16 +59,17 @@
                     </svg>
                 </div>
             </div>
-        </div>
+            <span class="relative mt-4 inline-flex items-center gap-1 text-[10px] font-bold text-sky-600 opacity-0 group-hover:opacity-100 transition-opacity">Kelola anggota <span aria-hidden="true">→</span></span>
+        </a>
 
         <!-- Card 2: Pendaftaran Pending -->
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 to-white border border-amber-200 p-3 md:p-5 shadow-md shadow-amber-100 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-fade-up" style="animation-delay: .2s">
+        <a href="{{ route('ketua.pendaftaran.index') }}" class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 to-white border border-amber-200 p-4 md:p-5 shadow-md shadow-amber-100 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-fade-up group" style="animation-delay: .2s">
             <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-amber-100 blur-2xl"></div>
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[8px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Pendaftaran Pending</p>
-                    <h3 class="text-xl md:text-2xl font-extrabold mt-0.5 md:mt-1 text-amber-600">{{ $pendingCount }}</h3>
-                    <p class="text-[9px] md:text-[11px] font-semibold text-amber-600 mt-0.5 md:mt-1">Perlu Ditinjau</p>
+                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Pendaftaran Pending</p>
+                    <h3 class="text-2xl md:text-3xl font-extrabold mt-1 text-amber-600">{{ $pendingCount }}</h3>
+                    <p class="text-[11px] font-semibold text-amber-600 mt-1">Perlu ditinjau</p>
                 </div>
                 <div class="w-8 h-8 md:w-10 md:h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-500 text-white flex items-center justify-center border border-white/40 shadow-lg shadow-amber-300">
                     <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,16 +77,17 @@
                     </svg>
                 </div>
             </div>
-        </div>
+            <span class="relative mt-4 inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 opacity-0 group-hover:opacity-100 transition-opacity">Tinjau pendaftaran <span aria-hidden="true">→</span></span>
+        </a>
 
         <!-- Card 3: Pengajuan Keluar -->
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-100 to-white border border-rose-200 p-3 md:p-5 shadow-md shadow-rose-100 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-fade-up" style="animation-delay: .3s">
+        <a href="{{ route('ketua.pengajuan-keluar.index') }}" class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-100 to-white border border-rose-200 p-4 md:p-5 shadow-md shadow-rose-100 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-fade-up group" style="animation-delay: .3s">
             <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-rose-100 blur-2xl"></div>
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[8px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Pengajuan Keluar</p>
-                    <h3 class="text-xl md:text-2xl font-extrabold mt-0.5 md:mt-1 text-rose-600">{{ $pengajuanCount }}</h3>
-                    <p class="text-[9px] md:text-[11px] font-semibold text-rose-600 mt-0.5 md:mt-1">Menunggu Keputusan</p>
+                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Pengajuan Keluar</p>
+                    <h3 class="text-2xl md:text-3xl font-extrabold mt-1 text-rose-600">{{ $pengajuanCount }}</h3>
+                    <p class="text-[11px] font-semibold text-rose-600 mt-1">Menunggu keputusan</p>
                 </div>
                 <div class="w-8 h-8 md:w-10 md:h-10 rounded-2xl bg-gradient-to-br from-rose-400 to-red-500 text-white flex items-center justify-center border border-white/40 shadow-lg shadow-rose-300">
                     <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,6 +95,62 @@
                     </svg>
                 </div>
             </div>
+            <span class="relative mt-4 inline-flex items-center gap-1 text-[10px] font-bold text-rose-600 opacity-0 group-hover:opacity-100 transition-opacity">Lihat pengajuan <span aria-hidden="true">→</span></span>
+        </a>
+
+        <!-- Card 4: Kegiatan Bulan Ini -->
+        <a href="{{ route('ketua.kegiatan.index') }}" class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-100 to-white border border-emerald-200 p-4 md:p-5 shadow-md shadow-emerald-100 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-fade-up group" style="animation-delay: .4s">
+            <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-emerald-100 blur-2xl"></div>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Kegiatan Bulan Ini</p>
+                    <h3 class="text-2xl md:text-3xl font-extrabold mt-1 text-emerald-600">{{ $kegiatanBulanIni ?? 0 }}</h3>
+                    <p class="text-[11px] font-semibold text-emerald-600 mt-1">Agenda tercatat</p>
+                </div>
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white flex items-center justify-center border border-white/40 shadow-lg shadow-emerald-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+            </div>
+            <span class="relative mt-4 inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity">Buka kegiatan <span aria-hidden="true">→</span></span>
+        </a>
+    </div>
+
+    <!-- PRIORITY ACTIONS -->
+    <div class="bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 p-5 md:p-6 animate-fade-up" style="animation-delay: .45s">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+            <div>
+                <h2 class="text-sm font-extrabold text-slate-900">Yang perlu kamu cek</h2>
+                <p class="text-[11px] text-slate-400 mt-1">Akses cepat untuk tugas ketua yang masih menunggu.</p>
+            </div>
+            <span class="text-[10px] font-semibold text-slate-400">{{ ($pendingCount + $pengajuanCount) }} item tertunda</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <a href="{{ route('ketua.pendaftaran.index') }}" class="flex items-center justify-between gap-3 rounded-xl border border-amber-100 bg-amber-50/70 px-4 py-3 hover:bg-amber-100/70 transition">
+                <span class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </span>
+                    <span>
+                        <span class="block text-xs font-bold text-slate-700">Pendaftaran baru</span>
+                        <span class="block text-[10px] text-slate-400">{{ $pendingCount }} menunggu tinjauan</span>
+                    </span>
+                </span>
+                <span class="text-amber-600 text-sm" aria-hidden="true">→</span>
+            </a>
+            <a href="{{ route('ketua.pengajuan-keluar.index') }}" class="flex items-center justify-between gap-3 rounded-xl border border-rose-100 bg-rose-50/70 px-4 py-3 hover:bg-rose-100/70 transition">
+                <span class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    </span>
+                    <span>
+                        <span class="block text-xs font-bold text-slate-700">Pengajuan keluar</span>
+                        <span class="block text-[10px] text-slate-400">{{ $pengajuanCount }} menunggu keputusan</span>
+                    </span>
+                </span>
+                <span class="text-rose-600 text-sm" aria-hidden="true">→</span>
+            </a>
         </div>
     </div>
 
@@ -143,6 +201,7 @@
                 @endif
             </div>
         </div>
+
     </div>
 </div>
 @endsection

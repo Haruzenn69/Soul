@@ -13,7 +13,8 @@
     </div>
 
     <!-- Detail Card -->
-    <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-lg space-y-5">
+    <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl space-y-5">
+        <div class="grid gap-5 sm:grid-cols-2">
         <div>
             <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal Daftar</p>
             <p class="font-medium text-sm">{{ $pendaftaran->tanggal_daftar->format('d/m/Y') }}</p>
@@ -21,6 +22,7 @@
         <div>
             <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">NIS</p>
             <p class="font-medium text-sm">{{ $pendaftaran->siswa->nis }}</p>
+        </div>
         </div>
         <div>
             <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nama</p>
@@ -49,15 +51,15 @@
 
         @if($pendaftaran->status === 'pending')
         <div class="pt-4 border-t border-sky-100 flex gap-2 flex-wrap">
-            <form action="{{ route('ketua.pendaftaran.update', $pendaftaran) }}" method="POST">
+            <form action="{{ route('ketua.pendaftaran.update', $pendaftaran) }}" method="POST" class="w-full sm:w-auto">
                 @csrf @method('PATCH')
                 <input type="hidden" name="status" value="diterima">
                 <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-200 transition w-full sm:w-auto">Terima</button>
             </form>
-            <form action="{{ route('ketua.pendaftaran.update', $pendaftaran) }}" method="POST">
+            <form action="{{ route('ketua.pendaftaran.update', $pendaftaran) }}" method="POST" class="w-full sm:w-auto">
                 @csrf @method('PATCH')
                 <input type="hidden" name="status" value="ditolak">
-                <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-red-200 transition w-full sm:w-auto">Tolak</button>
+                <button type="submit" class="px-5 py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl transition w-full sm:w-auto">Tolak</button>
             </form>
         </div>
         @endif

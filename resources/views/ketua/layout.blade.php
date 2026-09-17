@@ -29,21 +29,49 @@
         @keyframes blob { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(24px, -18px) scale(1.08); } 66% { transform: translate(-16px, 12px) scale(.94); } }
         .animate-fade-up { animation: fadeUp .6s cubic-bezier(.22,1,.36,1) both; }
         .animate-blob { animation: blob 10s ease-in-out infinite; }
+        aside nav a,
+        aside nav button,
+        #sidebar-mobile nav a {
+            min-height: 42px;
+        }
+        aside nav a:focus-visible,
+        aside nav button:focus-visible,
+        #sidebar-mobile a:focus-visible,
+        #sidebar-mobile button:focus-visible,
+        header a:focus-visible,
+        header button:focus-visible {
+            outline: 3px solid rgba(56, 189, 248, .45);
+            outline-offset: 2px;
+        }
+        aside nav > a:hover,
+        #sidebar-mobile nav > a:hover {
+            transform: translateX(2px);
+        }
+        #sidebar-mobile {
+            animation: sidebarIn .22s cubic-bezier(.22,1,.36,1);
+        }
+        @keyframes sidebarIn {
+            from { opacity: 0; transform: translateX(-18px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .animate-fade-up, .animate-blob, #sidebar-mobile { animation: none !important; }
+        }
     </style>
     @include('partials.responsive-tables')
 </head>
-<body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased flex min-h-screen overflow-x-hidden">
+<body class="ketua-layout bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased flex min-h-screen overflow-x-hidden">
 
     @php $namaEkskul = auth()->user()->siswa?->pendaftarans()->where('status', 'diterima')->first()?->ekskul->nama_ekskul ?? ''; @endphp
 
     <!-- SIDEBAR -->
-    <aside class="w-64 bg-white/90 backdrop-blur border-r border-sky-100 shadow-sm flex flex-col justify-between p-5 hidden md:flex shrink-0 relative overflow-hidden">
+    <aside aria-label="Navigasi utama Ketua" class="w-72 bg-white/90 backdrop-blur border-r border-sky-100 shadow-sm flex flex-col justify-between p-5 hidden md:flex shrink-0 relative overflow-hidden">
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -top-24 -right-16 w-64 h-64 rounded-full bg-sky-100/70 blur-3xl animate-blob"></div>
             <div class="absolute bottom-0 -left-20 w-56 h-56 rounded-full bg-amber-100/70 blur-3xl animate-blob" style="animation-delay: 3s"></div>
         </div>
         <div class="relative">
-            <div class="flex items-center gap-3 mb-8 px-2">
+            <div class="flex items-center gap-3 mb-7 px-2">
                 <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-extrabold text-lg shadow-lg shadow-sky-300">
                     SOUL
                 </div>
@@ -53,9 +81,12 @@
                 </div>
             </div>
 
-            <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-2 px-3">Menu</div>
-            <nav class="space-y-1.5">
-                <a href="{{ route('ketua.dashboard') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.dashboard') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+            <div class="flex items-center justify-between mb-2 px-3">
+                <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Menu utama</div>
+                <span class="text-[9px] font-semibold text-slate-300">PANEL KETUA</span>
+            </div>
+            <nav aria-label="Menu utama" class="space-y-1.5">
+                <a href="{{ route('ketua.dashboard') }}" aria-current="{{ request()->routeIs('ketua.dashboard') ? 'page' : 'false' }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.dashboard') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if(request()->routeIs('ketua.dashboard'))
                         <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                     @endif
@@ -70,7 +101,7 @@
                     Dashboard
                 </a>
 
-                <a href="{{ route('ketua.kegiatan.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.kegiatan.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                <a href="{{ route('ketua.kegiatan.index') }}" aria-current="{{ request()->routeIs('ketua.kegiatan.*') ? 'page' : 'false' }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.kegiatan.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if (request()->routeIs('ketua.kegiatan.*'))
                         <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                     @endif
@@ -82,7 +113,7 @@
                     Kegiatan
                 </a>
 
-                <a href="{{ route('ketua.pendaftaran.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.pendaftaran.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                <a href="{{ route('ketua.pendaftaran.index') }}" aria-current="{{ request()->routeIs('ketua.pendaftaran.*') ? 'page' : 'false' }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.pendaftaran.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if (request()->routeIs('ketua.pendaftaran.*'))
                         <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                     @endif
@@ -94,7 +125,7 @@
                     Pendaftaran
                 </a>
 
-                <a href="{{ route('ketua.pengajuan-keluar.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.pengajuan-keluar.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                <a href="{{ route('ketua.pengajuan-keluar.index') }}" aria-current="{{ request()->routeIs('ketua.pengajuan-keluar.*') ? 'page' : 'false' }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.pengajuan-keluar.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if (request()->routeIs('ketua.pengajuan-keluar.*'))
                         <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                     @endif
@@ -106,7 +137,7 @@
                     Pengajuan Keluar
                 </a>
 
-                <a href="{{ route('ketua.anggota.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.anggota.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                <a href="{{ route('ketua.anggota.index') }}" aria-current="{{ request()->routeIs('ketua.anggota.*') ? 'page' : 'false' }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.anggota.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if (request()->routeIs('ketua.anggota.*'))
                         <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                     @endif
@@ -120,7 +151,7 @@
 
                 @php $isKatalog = request()->routeIs('ketua.profil-ekskul.*','ketua.prestasi.*','ketua.testimoni.*','ketua.faq.*'); @endphp
                 <div x-data="{ open: false }" @if($isKatalog) x-init="open = true" @endif>
-                    <button @click="open = !open" class="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 {{ $isKatalog ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                    <button type="button" @click="open = !open" :aria-expanded="open.toString()" aria-controls="ketua-katalog-menu" class="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 {{ $isKatalog ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                         <span class="flex items-center gap-3 relative">
                             @if($isKatalog)
                                 <span class="absolute -left-3.5 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
@@ -136,7 +167,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
-                    <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" class="ml-4 mt-1 space-y-0.5 border-l-2 border-sky-100 pl-3">
+                    <div id="ketua-katalog-menu" x-cloak x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-1" class="ml-4 mt-1 space-y-0.5 border-l-2 border-sky-100 pl-3">
                         <a href="{{ route('ketua.profil-ekskul.edit') }}" class="flex items-center gap-3 px-3 py-2 {{ request()->routeIs('ketua.profil-ekskul.*') ? 'text-sky-600 font-semibold' : 'text-slate-400 hover:text-sky-700' }} text-xs transition rounded-xl">
                             <span class="text-sm flex items-center justify-center w-4 h-4">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,7 +203,7 @@
                     </div>
                 </div>
 
-                <a href="{{ route('ketua.laporan-bulanan.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.laporan-bulanan.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                <a href="{{ route('ketua.laporan-bulanan.index') }}" aria-current="{{ request()->routeIs('ketua.laporan-bulanan.*') ? 'page' : 'false' }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.laporan-bulanan.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if (request()->routeIs('ketua.laporan-bulanan.*'))
                         <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                     @endif
@@ -206,10 +237,10 @@
     </aside>
 
     <!-- MOBILE SIDEBAR OVERLAY -->
-    <div id="sidebar-overlay" class="hidden fixed inset-0 z-40 bg-slate-900/50 md:hidden" onclick="closeSidebar()"></div>
+    <div id="sidebar-overlay" aria-hidden="true" class="hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-[2px] md:hidden" onclick="closeSidebar()"></div>
 
     <!-- MOBILE SIDEBAR -->
-    <div id="sidebar-mobile" class="hidden fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-sky-100 relative overflow-hidden flex flex-col justify-between p-4 md:p-5 md:hidden shadow-2xl">
+    <div id="sidebar-mobile" role="dialog" aria-modal="true" aria-label="Menu navigasi Ketua" class="hidden fixed inset-y-0 left-0 z-50 w-[min(21rem,88vw)] bg-white border-r border-sky-100 overflow-hidden flex flex-col justify-between p-4 md:p-5 md:hidden shadow-2xl">
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -top-24 -right-16 w-64 h-64 rounded-full bg-sky-100/80 blur-3xl animate-blob"></div>
             <div class="absolute -bottom-24 -left-16 w-64 h-64 rounded-full bg-amber-100/80 blur-3xl animate-blob" style="animation-delay: 3s"></div>
@@ -226,13 +257,16 @@
                         <span class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Panel Ketua {{ $namaEkskul }}</span>
                     </div>
                 </div>
-                <button onclick="closeSidebar()" class="w-8 h-8 rounded-full bg-slate-50 border border-sky-100 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors">
+                <button type="button" aria-label="Tutup menu navigasi" onclick="closeSidebar()" class="w-9 h-9 rounded-xl bg-slate-50 border border-sky-100 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
 
-            <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-2 px-3">Menu</div>
-            <nav class="space-y-1.5">
+            <div class="flex items-center justify-between mb-2 px-3">
+                <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Menu utama</div>
+                <span class="text-[9px] font-semibold text-slate-300">PANEL KETUA</span>
+            </div>
+            <nav aria-label="Menu utama mobile" class="space-y-1.5">
                 <a href="{{ route('ketua.dashboard') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.dashboard') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if(request()->routeIs('ketua.dashboard'))
                         <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
@@ -341,7 +375,7 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <div class="flex-1 flex flex-col min-w-0">
+    <div class="flex-1 flex flex-col min-w-0 w-full">
 
         <header class="px-4 md:px-8 py-4 bg-white/70 backdrop-blur-lg border-b border-sky-100 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
             <div class="relative w-full max-w-md hidden sm:block">
@@ -353,15 +387,14 @@
                 <input type="text" placeholder="Cari kegiatan, anggota, pendaftaran..." class="w-full pl-10 pr-4 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
             </div>
 
-            <div class="flex items-center gap-2 md:gap-3 ml-auto">
-                <div class="flex items-center gap-2 md:hidden">
-                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-extrabold text-sm shadow-md shadow-sky-300">S</div>
-                    <span class="font-extrabold text-sm tracking-tight text-slate-900">SOUL</span>
-                </div>
+            <div class="flex items-center gap-2 md:gap-3 ml-0 md:ml-auto">
+                <button type="button" aria-label="Buka menu navigasi" aria-controls="sidebar-mobile" aria-expanded="false" onclick="openSidebar()" class="w-9 h-9 rounded-xl bg-white border border-sky-100 flex items-center justify-center text-slate-500 md:hidden shadow-sm shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
                 <div class="bg-sky-50 text-sky-700 border border-sky-100 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 hidden sm:block">
                     <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Ketua
                 </div>
-                <a href="{{ route('ketua.notifikasi') }}" class="w-9 h-9 rounded-xl bg-white border border-sky-100 flex items-center justify-center text-xs relative text-slate-600 hover:bg-sky-50 hover:border-sky-200 transition-all shadow-sm">
+                <a href="{{ route('ketua.notifikasi') }}" aria-label="Buka notifikasi" class="w-9 h-9 rounded-xl bg-white border border-sky-100 flex items-center justify-center text-xs relative text-slate-600 hover:bg-sky-50 hover:border-sky-200 transition-all shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                     </svg>
@@ -369,9 +402,9 @@
                         <span class="absolute -top-1 -right-1 min-w-5 h-5 px-1.5 rounded-full bg-amber-400 border-2 border-white flex items-center justify-center text-[9px] font-bold text-white">{{ $unreadNotifCount }}</span>
                     @endif
                 </a>
-                <button onclick="openSidebar()" class="w-9 h-9 rounded-full bg-white border border-sky-100 flex items-center justify-center text-slate-500 md:hidden shadow-sm">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                </button>
+                <span class="min-w-0 max-w-[calc(100vw-7rem)] truncate text-sm font-extrabold tracking-tight text-slate-900 md:hidden">
+                    @yield('title')
+                </span>
                 <form method="POST" action="{{ route('logout') }}" class="hidden sm:block">
                     @csrf
                     <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-400 px-4 py-2 rounded-lg text-xs font-semibold border border-red-100 transition shadow-sm">
@@ -381,7 +414,7 @@
             </div>
         </header>
 
-        <main class="p-4 md:p-8 space-y-6 overflow-y-auto">
+        <main class="w-full min-w-0 p-4 md:p-8 space-y-6 overflow-y-auto">
             @if(session('success'))
                 <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-xl">
                     {{ session('success') }}
@@ -400,16 +433,33 @@
     @stack('scripts')
 
     <script>
+        let sidebarTrigger = null;
+
         function openSidebar() {
+            sidebarTrigger = document.activeElement;
             document.getElementById('sidebar-mobile').classList.remove('hidden');
             document.getElementById('sidebar-overlay').classList.remove('hidden');
             document.body.classList.add('overflow-hidden');
+            document.querySelector('[aria-controls="sidebar-mobile"]')?.setAttribute('aria-expanded', 'true');
+            document.querySelector('#sidebar-mobile a, #sidebar-mobile button')?.focus();
         }
         function closeSidebar() {
             document.getElementById('sidebar-mobile').classList.add('hidden');
             document.getElementById('sidebar-overlay').classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
+            document.querySelector('[aria-controls="sidebar-mobile"]')?.setAttribute('aria-expanded', 'false');
+            if (sidebarTrigger) sidebarTrigger.focus();
         }
+
+        document.querySelectorAll('#sidebar-mobile a').forEach((link) => {
+            link.addEventListener('click', closeSidebar);
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !document.getElementById('sidebar-mobile').classList.contains('hidden')) {
+                closeSidebar();
+            }
+        });
     </script>
 </body>
 </html>
