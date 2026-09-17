@@ -12,10 +12,10 @@
     </div>
 
     <!-- Table Card -->
-    <div class="bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
+    <div class="ketua-card-list bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
         <div class="overflow-x-auto">
-        <table class="card-table w-full text-left text-xs md:text-sm">
-            <thead class="bg-sky-50">
+        <table class="card-table ketua-card-pengajuan w-full text-left text-xs md:text-sm">
+            <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
                 <tr>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Nama</th>
@@ -27,7 +27,7 @@
             </thead>
             <tbody class="divide-y divide-sky-50">
                 @forelse($pengajuanKeluars as $pengajuan)
-                    <tr class="hover:bg-sky-50/50 transition">
+                    <tr class="hover:bg-sky-50/50 transition" data-card-href="{{ route('ketua.pengajuan-keluar.show', $pengajuan) }}">
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $loop->iteration }}</td>
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $pengajuan->siswa->nama }}</td>
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $pengajuan->tanggal_pengajuan->format('d/m/Y') }}</td>
@@ -42,12 +42,15 @@
                             @endif
                         </td>
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
-                            <a href="{{ route('ketua.pengajuan-keluar.show', $pengajuan) }}" class="text-sky-600 hover:underline font-medium">Detail</a>
+                            <a href="{{ route('ketua.pengajuan-keluar.show', $pengajuan) }}" class="card-detail-link inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 font-semibold rounded-xl hover:from-sky-200 hover:to-blue-200 transition text-[10px] md:text-[11px]">Detail</a>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-4 md:px-6 py-8 text-center text-slate-400">Belum ada pengajuan keluar.</td>
+                        <td colspan="6" class="px-4 md:px-6 py-10 text-center text-slate-400">
+                            <p class="text-sm font-medium">Belum ada pengajuan keluar</p>
+                            <p class="text-xs mt-1">Pengajuan siswa akan muncul di halaman ini.</p>
+                        </td>
                     </tr>
                 @endforelse
             </tbody>

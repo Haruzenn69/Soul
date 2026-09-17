@@ -28,8 +28,27 @@ use App\Models\Pendaftaran;
 use App\Models\PengajuanKeluar;
 use App\Rules\AlasanValid;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+
+Route::get('/storage/{path}', function (string $path) {
+    $storageRoot = realpath(Storage::disk('public')->path(''));
+    $filePath = realpath(Storage::disk('public')->path($path));
+
+    abort_unless(
+        $storageRoot &&
+        $filePath &&
+        str_starts_with(
+            strtolower($filePath),
+            strtolower($storageRoot . DIRECTORY_SEPARATOR)
+        ) &&
+        is_file($filePath),
+        404
+    );
+
+    return response()->file($filePath);
+})->where('path', '.*')->name('storage.public');
 
 
 Route::get('/', function () {

@@ -19,7 +19,7 @@
     </div>
 
     <!-- Detail Card -->
-    <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl space-y-5">
+    <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-3xl space-y-5">
         <div>
             <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Bulan</p>
             <p class="font-medium text-sm">{{ $laporan->bulan }}</p>
@@ -27,13 +27,13 @@
         <div>
             <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status</p>
             @if($laporan->status === 'draft')
-                <span class="inline-block px-3 py-1 bg-gray-100 text-gray-500 text-xs font-semibold rounded-full">Draft</span>
+                <span class="inline-flex items-center px-2.5 py-1 bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-semibold rounded-full">Draft</span>
             @elseif($laporan->status === 'menunggu')
-                <span class="inline-block px-3 py-1 bg-blue-100 text-blue-600 text-xs font-semibold rounded-full">Menunggu Pembina</span>
+                <span class="inline-flex items-center px-2.5 py-1 bg-sky-100 text-sky-700 border border-sky-200 text-[10px] font-semibold rounded-full">Menunggu Pembina</span>
             @elseif($laporan->status === 'disetujui')
                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Disetujui</span>
             @else
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">Ditolak</span>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-700 border border-rose-200">Ditolak</span>
             @endif
         </div>
 
@@ -102,22 +102,22 @@
         </div>
         @endif
 
-        <div class="mt-4 flex gap-2">
+        <div class="mt-4 pt-5 border-t border-sky-100 flex flex-col sm:flex-row gap-2 flex-wrap">
             @if(in_array($laporan->status, ['draft', 'ditolak']))
-                <a href="{{ route('ketua.laporan-bulanan.edit', $laporan) }}" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-full transition">
-                    ✏️ Edit Laporan
+                <a href="{{ route('ketua.laporan-bulanan.edit', $laporan) }}" class="px-5 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-bold rounded-xl transition text-center">
+                    Edit laporan
                 </a>
                 <form action="{{ route('ketua.laporan-bulanan.submit', $laporan) }}" method="POST">
                     @csrf
-                    <button type="submit" class="px-5 py-2 bg-theme-blue hover:bg-theme-darkBlue text-white text-xs font-semibold rounded-full transition">
-                        🚀 Serahkan ke Pembina
+                    <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-lg shadow-sky-200 transition">
+                        Serahkan ke pembina
                     </button>
                 </form>
             @endif
-            <a href="{{ route('ketua.laporan-bulanan.download-pdf', $laporan) }}" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-full transition flex items-center gap-1">
-                📄 Download PDF
+            <a href="{{ route('ketua.laporan-bulanan.download-pdf', $laporan) }}" class="px-5 py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-bold rounded-xl transition flex items-center gap-1">
+                Download PDF
             </a>
-            <a href="{{ route('ketua.laporan-bulanan.index') }}" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-full transition">Kembali</a>
+            <a href="{{ route('ketua.laporan-bulanan.index') }}" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition">Kembali</a>
         </div>
     </div>
 @endsection

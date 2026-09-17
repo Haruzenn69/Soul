@@ -15,68 +15,29 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
-        <table class="card-table w-full text-left text-xs">
-            <thead class="bg-gray-50 text-gray-400 font-bold uppercase tracking-wider">
-                <tr>
-                    <th class="px-6 py-3">No</th>
-                    <th class="px-6 py-3">Tanggal</th>
-                    <th class="px-6 py-3">Kegiatan</th>
-                    <th class="px-6 py-3">Presensi</th>
-                    <th class="px-6 py-3">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-50">
-                @forelse($kegiatans as $kegiatan)
-                    <tr class="hover:bg-gray-50/50">
-                        <td class="px-6 py-4 font-medium">{{ $loop->iteration }}</td>
-                        <td class="px-6 py-4">{{ $kegiatan->tanggal_kegiatan->format('d/m/Y') }}</td>
-                        <td class="px-6 py-4">{{ $kegiatan->kegiatan }}</td>
-                        <td class="px-6 py-4">{{ $kegiatan->presensis_count }} orang</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <a href="{{ route('ketua.kegiatan.show', $kegiatan) }}" class="text-theme-blue hover:underline font-medium">Detail</a>
-                                <span class="text-gray-300">|</span>
-                                <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="text-green-600 hover:underline font-medium">Absensi</a>
-                                <span class="text-gray-300">|</span>
-                                <a href="{{ route('ketua.kegiatan.edit', $kegiatan) }}" class="text-amber-600 hover:underline font-medium">Edit</a>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="px-6 py-8 text-center text-gray-400">Belum ada kegiatan.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-        </div>
-    </div>
-
     <!-- Table Card -->
-    <div class="bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
+    <div class="ketua-card-list bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs md:text-sm">
+            <table class="card-table ketua-card-kegiatan w-full text-left text-xs md:text-sm">
                 <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
                     <tr>
                         <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap rounded-l-xl">No</th>
                         <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Tanggal</th>
                         <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Hari</th>
-                        <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Materi</th>
+                        <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Kegiatan</th>
                         <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Presensi</th>
                         <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap rounded-r-xl">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-sky-50">
                     @forelse($kegiatans as $kegiatan)
-                        <tr class="hover:bg-sky-50/50 transition">
+                        <tr class="hover:bg-sky-50/50 transition" data-card-href="{{ route('ketua.kegiatan.show', $kegiatan) }}">
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap text-slate-500">{{ $loop->iteration }}</td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap font-medium text-slate-700">{{ $kegiatan->tanggal_kegiatan->format('d/m/Y') }}</td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap text-slate-600">
                                 {{ $kegiatan->tanggal_kegiatan->isoFormat('dddd') }}
                             </td>
-                            <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap font-medium text-slate-800">{{ $kegiatan->materi }}</td>
+                            <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap font-medium text-slate-800">{{ $kegiatan->kegiatan }}</td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap">
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-sky-100 text-sky-700 border border-sky-200">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,7 +48,7 @@
                             </td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap">
                                 <div class="flex items-center gap-1.5 md:gap-2">
-                                    <a href="{{ route('ketua.kegiatan.show', $kegiatan) }}" class="inline-flex items-center gap-1 px-2.5 md:px-3 py-1.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 font-semibold rounded-full hover:from-sky-200 hover:to-blue-200 transition text-[10px] md:text-[11px]">
+                                    <a href="{{ route('ketua.kegiatan.show', $kegiatan) }}" class="card-detail-link inline-flex items-center gap-1 px-2.5 md:px-3 py-1.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 font-semibold rounded-full hover:from-sky-200 hover:to-blue-200 transition text-[10px] md:text-[11px]">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -99,6 +60,12 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                         Absensi
+                                    </a>
+                                    <a href="{{ route('ketua.kegiatan.edit', $kegiatan) }}" class="inline-flex items-center gap-1 px-2.5 md:px-3 py-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 font-semibold rounded-full hover:from-amber-200 hover:to-yellow-200 transition text-[10px] md:text-[11px]">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.5-9.5a2.121 2.121 0 013 3L12 16l-4 1 1-4 8.5-8.5z"/>
+                                        </svg>
+                                        Edit
                                     </a>
                                 </div>
                             </td>
@@ -121,7 +88,7 @@
         </div>
 
         <!-- Footer Tabel dengan Total -->
-        <div class="px-3 md:px-6 py-3 border-t border-sky-50 flex justify-between items-center">
+        <div class="ketua-card-footer px-3 md:px-6 py-3 border-t border-sky-50 flex justify-between items-center">
             <span class="text-[10px] md:text-xs text-slate-400">Menampilkan {{ $kegiatans->count() }} kegiatan</span>
             @if(method_exists($kegiatans, 'hasPages') && $kegiatans->hasPages())
                 <div class="flex gap-1">

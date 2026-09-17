@@ -7,18 +7,22 @@
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Input Presensi</h1>
-            <p class="text-xs text-slate-400 mt-1">{{ $kegiatan->materi }} - {{ $kegiatan->tanggal_kegiatan->format('d/m/Y') }}</p>
+            <p class="text-xs text-slate-400 mt-1">{{ $kegiatan->kegiatan }} · {{ $kegiatan->tanggal_kegiatan->isoFormat('dddd, D MMMM Y') }}</p>
         </div>
         <a href="{{ route('ketua.kegiatan.show', $kegiatan) }}" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition w-full sm:w-auto items-center justify-center gap-2">Kembali</a>
     </div>
 
     <!-- Form Card -->
-    <div class="bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
+    <div class="ketua-card-list bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
         <form action="{{ route('ketua.presensi.store', $kegiatan) }}" method="POST">
             @csrf
+            <div class="px-5 md:px-6 py-4 bg-sky-50/60 border-b border-sky-100">
+                <p class="text-xs font-bold text-slate-700">Tandai kehadiran anggota</p>
+                <p class="text-[10px] text-slate-400 mt-1">Periksa status setiap anggota, lalu simpan setelah semua data sesuai.</p>
+            </div>
             <div class="overflow-x-auto">
             <table class="card-table w-full text-left text-xs md:text-sm">
-                <thead class="bg-sky-50">
+                <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
                     <tr>
                         <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
                         <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Nama</th>
@@ -26,18 +30,17 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-sky-50">
-                    @foreach($anggotas as $anggota)
+                    @forelse($anggotas as $anggota)
                         <tr class="hover:bg-sky-50/50 transition">
                             <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $loop->iteration }}</td>
                             <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $anggota->siswa->nama }}</td>
                             <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
                                 <select name="presensi[{{ $loop->index }}][status]"
                                     class="px-3 py-1.5 rounded-full bg-sky-50/50 border border-sky-100 text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition w-full sm:w-auto">
-                                    @php 
+                                    @php
                                         $current = 'hadir';
-                                        if (in_array($anggota->id, $presensiExisting ?? [])) {
-                                            $existing = \App\Models\Presensi::where('kegiatan_id', $kegiatan->id)->where('pendaftaran_id', $anggota->id)->first();
-                                            if ($existing) $current = $existing->status;
+                                        if (isset($presensiExisting[$anggota->id])) {
+                                            $current = $presensiExisting[$anggota->id];
                                         }
                                     @endphp
                                     <option value="hadir" {{ $current === 'hadir' ? 'selected' : '' }}>Hadir</option>
@@ -48,7 +51,11 @@
                                 <input type="hidden" name="presensi[{{ $loop->index }}][pendaftaran_id]" value="{{ $anggota->id }}">
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-4 py-10 text-center text-slate-400">Belum ada anggota aktif untuk diabsen.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
             </div>
