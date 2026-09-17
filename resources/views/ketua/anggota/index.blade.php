@@ -10,6 +10,22 @@
         </div>
     </div>
 
+    <form method="GET" action="{{ route('ketua.anggota.index') }}" class="bg-white p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 flex flex-wrap items-center gap-3">
+        <div class="relative flex-1 min-w-[220px]">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </span>
+            <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari nama / NIS anggota..." class="w-full pl-9 pr-4 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+        </div>
+        <select name="status" class="px-3 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+            <option value="semua" {{ !request('status') || request('status') === 'semua' ? 'selected' : '' }}>Semua Status</option>
+            <option value="diterima" {{ request('status') === 'diterima' ? 'selected' : '' }}>Aktif</option>
+            <option value="peringatan" {{ request('status') === 'peringatan' ? 'selected' : '' }}>Peringatan</option>
+            <option value="nonaktif" {{ request('status') === 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+        </select>
+        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition-all hover:-translate-y-0.5">Filter</button>
+    </form>
+
     <div class="bg-white p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 mb-4">
         <p class="text-xs font-bold text-slate-500 mb-3 flex items-center gap-2">
             <span class="w-7 h-7 rounded-xl bg-gradient-to-br from-amber-100 to-yellow-100 border border-amber-200 flex items-center justify-center text-amber-600">

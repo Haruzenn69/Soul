@@ -77,7 +77,7 @@
                         <td class="py-3.5 px-2">
                             <div class="flex gap-2 justify-end items-center">
                                 @if ($user->role === 'admin' && auth()->user()->role !== 'admin')
-                                    <span class="text-[10px] text-gray-400 italic px-3">ðŸ”’ Dikelola Admin</span>
+                                    <span class="text-[10px] text-gray-400 italic px-3">🔒 Dikelola Admin</span>
                                 @else
                                     <a href="{{ route('kesiswaan.users.edit', $user) }}"
                                        class="px-3 py-1.5 bg-blue-50 text-theme-blue font-bold rounded-full hover:bg-blue-100 transition">Edit</a>

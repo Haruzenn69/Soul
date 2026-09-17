@@ -10,6 +10,7 @@ class Notifikasi extends Model
     protected $fillable = [
         'siswa_id',
         'pembina_id',
+        'user_id',
         'pendaftaran_id',
         'pengajuan_keluar_id',
         'laporan_bulanan_id',
@@ -27,6 +28,11 @@ class Notifikasi extends Model
     public function pembina(): BelongsTo
     {
         return $this->belongsTo(Pembina::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function pendaftaran(): BelongsTo
