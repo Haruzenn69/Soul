@@ -15,10 +15,17 @@ class KegiatanController extends Controller
         return $pendaftaran->ekskul;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $ekskul = $this->getEkskul();
         $kegiatans = Kegiatan::where('ekskul_id', $ekskul->id)
+            ->when($request->filled('cari'), function ($query) use ($request) {
+                $cari = $request->input('cari');
+                $query->where(function ($sub) use ($cari) {
+                    $sub->where('kegiatan', 'like', '%'.$cari.'%')
+                        ->orWhere('deskripsi', 'like', '%'.$cari.'%');
+                });
+            })
             ->withCount('presensis')
             ->latest('tanggal_kegiatan')
             ->get();

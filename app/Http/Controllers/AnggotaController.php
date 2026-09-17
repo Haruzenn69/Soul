@@ -15,11 +15,16 @@ class AnggotaController extends Controller
         return $pendaftaran->ekskul;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $ekskul = $this->getEkskul();
         $anggotas = Pendaftaran::where('ekskul_id', $ekskul->id)
             ->whereIn('status', ['diterima', 'nonaktif', 'peringatan'])
+            ->when($request->filled('cari'), function ($query) use ($request) {
+                $cari = $request->input('cari');
+                $query->whereHas('siswa', fn ($s) => $s->where('nama', 'like', "%{$cari}%")->orWhere('nis', 'like', "%{$cari}%"));
+            })
+            ->when($request->filled('status') && $request->input('status') !== 'semua', fn ($query) => $query->where('status', $request->input('status')))
             ->with('siswa.kelas')
             ->latest('tanggal_daftar')
             ->get();

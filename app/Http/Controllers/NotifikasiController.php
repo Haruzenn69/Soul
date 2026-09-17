@@ -7,12 +7,21 @@ use Illuminate\Http\Request;
 
 class NotifikasiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $siswa = auth()->user()->siswa;
 
         $notifikasis = $siswa
-            ? $siswa->notifikasis()->with('pendaftaran.ekskul')->latest()->get()
+            ? $siswa->notifikasis()->with('pendaftaran.ekskul')
+                ->when($request->filled('q'), function ($query) use ($request) {
+                    $q = $request->input('q');
+                    $query->where(function ($sub) use ($q) {
+                        $sub->where('judul', 'like', "%{$q}%")
+                            ->orWhere('pesan', 'like', "%{$q}%");
+                    });
+                })
+                ->latest()
+                ->get()
             : collect();
 
         $unreadCount = $siswa ? $siswa->notifikasis()->where('is_read', false)->count() : 0;
