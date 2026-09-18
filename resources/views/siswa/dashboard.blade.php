@@ -550,7 +550,6 @@
 
                 <!-- RIGHT COLUMN: Kegiatan Mendatang -->
                 <div class="space-y-6">
-<<<<<<< HEAD
                     <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .25s">
                         <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
                             <div>
@@ -588,17 +587,6 @@
                                             <span class="inline-flex mt-2 px-2.5 py-1 rounded-full bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-bold">Terdekat</span>
                                         @endif
                                     </div>
-=======
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200/70 shadow-sm">
-                        <h2 class="text-sm font-bold text-slate-900 mb-3.5">Kegiatan Mendatang</h2>
-                        <div class="space-y-3">
-                            @forelse($kegiatanMendatang ?? [] as $kegiatan)
-                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/50">
-                                    <h4 class="text-xs font-semibold text-slate-800">{{ $kegiatan->kegiatan ?? 'Kegiatan' }}</h4>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">
-                                        {{ \Carbon\Carbon::parse($kegiatan->tanggal_kegiatan)->isoFormat('dddd, DD MMM Y') }}
-                                    </p>
->>>>>>> d97cf39f3376236af827b8d53471f2f44ce4b427
                                 </div>
                             @empty
                                 <div class="text-center py-8">
@@ -686,6 +674,8 @@
             @endif
         });
     </script>
+
+    @include('partials.username-modal')
 
 </body>
 </html>

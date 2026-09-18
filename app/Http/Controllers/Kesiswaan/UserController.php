@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Kesiswaan;
 
+use App\Exports\AkunTemplateExport;
 use App\Http\Controllers\Controller;
+use App\Imports\AkunImport;
 use App\Models\Ekskul;
 use App\Models\Kelas;
 use App\Models\Pembina;
@@ -47,7 +49,6 @@ class UserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $rules = [
-            'username' => ['required', 'string', 'max:255', 'unique:users,username'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             // Role admin hanya bisa dibuat oleh admin (kesiswaan tidak boleh)
             'role' => ['required', 'in:'.$this->allowedRoles()],
@@ -75,7 +76,7 @@ class UserController extends Controller
         $data = $request->validate($rules);
 
         $user = User::create([
-            'username' => $data['username'],
+            'username' => null,
             'email' => $data['email'],
             'password' => Hash::make('password'),
             'role' => $data['role'],
@@ -109,7 +110,7 @@ class UserController extends Controller
 
         return redirect()
             ->route('kesiswaan.users.index')
-            ->with('success', "Akun {$user->username} berhasil dibuat dengan password default: password");
+            ->with('success', "Akun {$user->email} berhasil dibuat dengan password default: password. Username akan diisi user saat login pertama.");
     }
 
     public function edit(User $user): View
@@ -129,7 +130,7 @@ class UserController extends Controller
         $this->authorizeManage($user);
 
         $rules = [
-            'username' => ['required', 'string', 'max:255', 'unique:users,username,'.$user->id],
+            'username' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9._]*$/', 'unique:users,username,'.$user->id],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
             // Role admin hanya bisa dipilih oleh admin (kesiswaan tidak boleh)
             'role' => ['required', 'in:'.$this->allowedRoles()],
@@ -159,7 +160,7 @@ class UserController extends Controller
         $data = $request->validate($rules);
 
         $user->update([
-            'username' => $data['username'],
+            'username' => $data['username'] !== '' ? $data['username'] : null,
             'email' => $data['email'],
             'role' => $data['role'],
         ]);
@@ -216,7 +217,7 @@ class UserController extends Controller
 
         return redirect()
             ->route('kesiswaan.users.index')
-            ->with('success', "Akun {$user->username} berhasil diperbarui.");
+            ->with('success', "Akun {$user->email} berhasil diperbarui.");
     }
 
     public function destroy(User $user): RedirectResponse
@@ -227,12 +228,54 @@ class UserController extends Controller
             return back()->with('error', 'Anda tidak bisa menghapus akun sendiri.');
         }
 
-        $username = $user->username;
+        $username = $user->username ?? $user->email;
         $user->delete();
 
         return redirect()
             ->route('kesiswaan.users.index')
             ->with('success', "Akun {$username} berhasil dihapus.");
+    }
+
+    public function import(): View
+    {
+        return view('kesiswaan.users.import');
+    }
+
+    public function importStore(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv,ods', 'max:4096'],
+        ], [
+            'file.required' => 'Pilih file Excel terlebih dahulu.',
+            'file.mimes'    => 'File harus berformat .xlsx, .xls, .csv, atau .ods.',
+            'file.max'      => 'Ukuran file maksimal 4 MB.',
+        ]);
+
+        $import = new AkunImport;
+
+        \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
+
+        $baseMessage = $import->getCreated() > 0
+            ? "{$import->getCreated()} akun berhasil diimpor. Password default: password."
+            : 'Tidak ada akun yang berhasil diimpor.';
+
+        if (count($import->getErrors()) > 0) {
+            return back()
+                ->with('success', $baseMessage)
+                ->with('importErrors', $import->getErrors());
+        }
+
+        return back()->with('success', $baseMessage);
+    }
+
+    public function downloadTemplate(Request $request)
+    {
+        $role = $request->input('role', 'siswa');
+        $fileName = $role === 'pembina'
+            ? 'template-import-pembina.xlsx'
+            : 'template-import-siswa.xlsx';
+
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\AkunTemplateExport($role), $fileName);
     }
 
     public function resetPassword(User $user): RedirectResponse
@@ -241,7 +284,9 @@ class UserController extends Controller
 
         $user->update(['password' => Hash::make('password')]);
 
-        return back()->with('success', "Password akun {$user->username} direset ke: password");
+        $label = $user->username ?? $user->email;
+
+        return back()->with('success', "Password akun {$label} direset ke: password");
     }
 
     /**

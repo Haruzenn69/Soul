@@ -4,7 +4,7 @@
 
 @section('content')
     <div>
-        <h1 class="text-2xl font-extrabold text-theme-dark">Edit Akun: {{ $user->username }}</h1>
+        <h1 class="text-2xl font-extrabold text-theme-dark">Edit Akun: {{ $user->username ?? '(username belum diisi)' }}</h1>
         <p class="text-xs text-gray-400 mt-1">Ubah data login atau ganti role akun ini.</p>
     </div>
 
@@ -29,8 +29,9 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Username</label>
-                    <input type="text" name="username" value="{{ old('username', $user->username) }}" required
+                    <input type="text" name="username" value="{{ old('username', $user->username) }}" placeholder="Kosongkan jika belum diisi user"
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
+                    <p class="text-[10px] text-gray-400 mt-1">Boleh kosong — akan diisi user saat login pertama.</p>
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Email</label>

@@ -87,13 +87,8 @@
                     </thead>
                     <tbody>
                         @foreach($kegiatans as $kegiatan)
-<<<<<<< HEAD
                         <tr class="border-b border-sky-50 hover:bg-sky-50/50 transition">
                             <td class="p-3 font-medium">{{ $kegiatan->materi }}</td>
-=======
-                        <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
-                            <td class="p-3 font-medium">{{ $kegiatan->kegiatan }}</td>
->>>>>>> d97cf39f3376236af827b8d53471f2f44ce4b427
                             <td class="p-3">{{ \Carbon\Carbon::parse($kegiatan->tanggal_kegiatan)->isoFormat('DD MMM Y') }}</td>
                             <td class="p-3 text-center font-bold text-emerald-600">{{ $kegiatan->hadir_count }}</td>
                             <td class="p-3 text-center font-bold text-sky-600">{{ $kegiatan->izin_count }}</td>

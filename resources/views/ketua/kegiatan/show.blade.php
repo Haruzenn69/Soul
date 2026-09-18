@@ -38,10 +38,7 @@
         </div>
         @endif
 
-<<<<<<< HEAD
-        <h3 class="text-sm font-extrabold text-slate-900 pt-2 border-t border-sky-100">Daftar Presensi</h3>
-=======
-        @php
+@php
             $rekap = [
                 'hadir' => $kegiatan->presensis->where('status', 'hadir')->count(),
                 'izin' => $kegiatan->presensis->where('status', 'izin')->count(),
@@ -49,7 +46,7 @@
                 'alpha' => $kegiatan->presensis->where('status', 'alpha')->count(),
             ];
         @endphp
-        <h3 class="text-xs font-bold text-gray-400 uppercase mb-2">Rekap Presensi</h3>
+        <h3 class="text-sm font-extrabold text-slate-900 pt-2 border-t border-sky-100">Rekap Presensi</h3>
         <div class="grid grid-cols-4 gap-2 mb-6">
             <div class="p-3 rounded-2xl bg-green-50 border border-green-100 text-center">
                 <p class="text-lg font-bold text-green-600">{{ $rekap['hadir'] }}</p>
@@ -69,8 +66,7 @@
             </div>
         </div>
 
-        <h3 class="text-xs font-bold text-gray-400 uppercase mb-3">Daftar Presensi</h3>
->>>>>>> d97cf39f3376236af827b8d53471f2f44ce4b427
+        <h3 class="text-sm font-extrabold text-slate-900 pt-2 border-t border-sky-100">Daftar Presensi</h3>
         <div class="overflow-x-auto">
         <table class="card-table w-full text-left text-xs md:text-sm">
             <thead class="bg-sky-50">
@@ -105,8 +101,6 @@
             </tbody>
         </table>
         </div>
-<<<<<<< HEAD
-=======
 
         <div class="mt-4 flex gap-2">
             <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="px-5 py-2 bg-theme-blue hover:bg-theme-darkBlue text-white text-xs font-semibold rounded-full transition">Input Presensi</a>
@@ -118,6 +112,5 @@
             </form>
             <a href="{{ route('ketua.kegiatan.index') }}" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-full transition">Kembali</a>
         </div>
->>>>>>> d97cf39f3376236af827b8d53471f2f44ce4b427
     </div>
 @endsection

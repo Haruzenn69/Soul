@@ -32,19 +32,33 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
+        // Pertama kali login: biarkan masuk ke dashboard, modal username akan muncul di sana
+        if (!in_array($user->role, ['admin', 'kesiswaan'], true) && !$user->username) {
+            return redirect($this->home($user));
+        }
+
+        return redirect($this->home($user));
+    }
+
+    /**
+     * Redirect ke beranda sesuai role & jabatan.
+     */
+    private function home(\App\Models\User $user): string
+    {
         // Redirect berdasarkan Role & Jabatan
         if ($user->role === 'siswa') {
             if ($user->siswa && $user->siswa->jabatan === 'ketua') {
-                return redirect()->route('ketua.dashboard');
+                return route('ketua.dashboard');
             }
-            return redirect()->route('siswa.dashboard');
+
+            return route('siswa.dashboard');
         }
 
         if ($user->role === 'pembina') {
-            return redirect()->route('pembina.dashboard');
+            return route('pembina.dashboard');
         }
 
-        return redirect()->route('dashboard');
+        return route('dashboard');
     }
 
     /**

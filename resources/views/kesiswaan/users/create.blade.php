@@ -5,7 +5,7 @@
 @section('content')
     <div>
         <h1 class="text-2xl font-extrabold text-theme-dark">Buat Akun Baru</h1>
-        <p class="text-xs text-gray-400 mt-1">Password default otomatis diisi <span class="font-bold text-theme-dark">password</span>. User bisa langsung login dengan email + password.</p>
+        <p class="text-xs text-gray-400 mt-1">Password default otomatis diisi <span class="font-bold text-theme-dark">password</span>. Username akan diisi sendiri oleh user saat pertama kali login.</p>
     </div>
 
     @if ($errors->any())
@@ -24,12 +24,7 @@
         <!-- Data Login -->
         <div>
             <h2 class="text-sm font-extrabold text-theme-dark mb-4">Data Login</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Username</label>
-                    <input type="text" name="username" value="{{ old('username') }}" required
-                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Email</label>
                     <input type="email" name="email" value="{{ old('email') }}" required

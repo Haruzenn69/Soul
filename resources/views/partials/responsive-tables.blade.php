@@ -49,36 +49,79 @@
             max-width: 45%;
             word-break: break-word;
         }
+
+        /* Baris "tidak ada data" / sel dengan colspan: tampil penuh, tanpa label kolom */
+        table.card-table td[colspan] {
+            display: block;
+            text-align: center;
+            color: #94a3b8;
+        }
+        table.card-table td[colspan]::before {
+            content: none;
+        }
     }
 </style>
 <script>
     (function () {
-        function applyCardLabels() {
-            document.querySelectorAll('table.card-table').forEach(function (table) {
-                var headCells = [];
-                var headerRow = table.querySelector('thead tr');
-                if (headerRow) {
-                    headerRow.querySelectorAll('th').forEach(function (th) {
-                        headCells.push(th.textContent.trim());
-                    });
-                }
-                table.querySelectorAll('tbody tr').forEach(function (tr) {
-                    var cells = tr.querySelectorAll('td');
-                    cells.forEach(function (td, i) {
-                        var label = headCells[i] || '';
-                        if (label) {
-                            td.setAttribute('data-label', label);
-                        } else if (!td.hasAttribute('data-label')) {
-                            td.setAttribute('data-label', ' ');
-                        }
-                    });
+        function applyCardLabels(table) {
+            var headCells = [];
+            var headerRow = table.querySelector('thead tr');
+            if (headerRow) {
+                headerRow.querySelectorAll('th').forEach(function (th) {
+                    headCells.push(th.textContent.trim());
+                });
+            }
+            table.querySelectorAll('tbody tr').forEach(function (tr) {
+                var cells = tr.querySelectorAll('td');
+                cells.forEach(function (td, i) {
+                    // Sel yang merentang beberapa kolom (mis. "Tidak ada data")
+                    // ditampilkan apa adanya, tanpa label kolom.
+                    if (td.hasAttribute('colspan')) {
+                        td.removeAttribute('data-label');
+                        return;
+                    }
+                    var label = headCells[i] || '';
+                    if (label) {
+                        td.setAttribute('data-label', label);
+                    } else if (!td.hasAttribute('data-label')) {
+                        td.setAttribute('data-label', ' ');
+                    }
                 });
             });
+            table.setAttribute('data-card-labels-applied', 'true');
         }
+
+        function scanAllTables() {
+            document.querySelectorAll('table.card-table').forEach(applyCardLabels);
+        }
+
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', applyCardLabels);
+            document.addEventListener('DOMContentLoaded', scanAllTables);
         } else {
-            applyCardLabels();
+            scanAllTables();
+        }
+
+        // Tabel yang dimuat belakangan (AJAX, Livewire, pagination, dsb.)
+        // ikut diberi label secara otomatis.
+        var observer = new MutationObserver(function (mutations) {
+            var needsScan = false;
+            for (var i = 0; i < mutations.length; i++) {
+                if (mutations[i].addedNodes && mutations[i].addedNodes.length) {
+                    needsScan = true;
+                    break;
+                }
+            }
+            if (needsScan) {
+                scanAllTables();
+            }
+        });
+
+        if (document.body) {
+            observer.observe(document.body, { childList: true, subtree: true });
+        } else {
+            document.addEventListener('DOMContentLoaded', function () {
+                observer.observe(document.body, { childList: true, subtree: true });
+            });
         }
     })();
 </script>

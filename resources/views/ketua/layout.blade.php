@@ -411,5 +411,7 @@
             document.body.classList.remove('overflow-hidden');
         }
     </script>
+
+    @include('partials.username-modal')
 </body>
 </html>

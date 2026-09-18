@@ -107,6 +107,130 @@
         </div>
     </div>
 
+    <!-- GRAFIK & ANALISIS -->
+    <div class="space-y-6 pt-2">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm md:text-base font-extrabold text-slate-900 tracking-tight">Grafik Pembuatan</h2>
+                <p class="text-[10px] md:text-xs text-slate-500 font-medium mt-0.5">Tren 6 bulan terakhir</p>
+            </div>
+            <span class="text-[10px] md:text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3 py-1.5 rounded-lg hidden sm:inline-flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span> Live dari database
+            </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-5">
+            <!-- Grafik Akun (besar) -->
+            <div class="lg:col-span-2 bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 p-4 md:p-5">
+                <div class="flex items-center justify-between mb-3 md:mb-4">
+                    <div>
+                        <h3 class="text-xs md:text-sm font-extrabold text-slate-900">Pembuatan Akun</h3>
+                        <p class="text-[10px] md:text-[11px] text-slate-400 font-medium mt-0.5">Semua role pengguna</p>
+                    </div>
+                    <span class="text-2xl md:text-3xl font-extrabold text-sky-600">{{ $totalUsers }}</span>
+                </div>
+                <div class="h-48 md:h-56 lg:h-64 relative">
+                    <canvas id="akunChart"></canvas>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 md:gap-5">
+                <!-- Grafik Kelas -->
+                <div class="bg-white rounded-2xl border border-amber-100 shadow-lg shadow-amber-100/60 p-4 md:p-5">
+                    <div class="flex items-center justify-between mb-2 md:mb-3">
+                        <div>
+                            <h3 class="text-xs md:text-sm font-extrabold text-slate-900">Pembuatan Kelas</h3>
+                            <p class="text-[10px] md:text-[11px] text-slate-400 font-medium mt-0.5">Semua tingkat</p>
+                        </div>
+                        <span class="text-xl md:text-2xl font-extrabold text-amber-500">{{ $totalKelas }}</span>
+                    </div>
+                    <div class="h-32 md:h-40 lg:h-52 relative">
+                        <canvas id="kelasChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Grafik Ekskul -->
+                <div class="bg-white rounded-2xl border border-emerald-100 shadow-lg shadow-emerald-100/60 p-4 md:p-5">
+                    <div class="flex items-center justify-between mb-2 md:mb-3">
+                        <div>
+                            <h3 class="text-xs md:text-sm font-extrabold text-slate-900">Pembuatan Ekskul</h3>
+                            <p class="text-[10px] md:text-[11px] text-slate-400 font-medium mt-0.5">Ekstrakurikuler</p>
+                        </div>
+                        <span class="text-xl md:text-2xl font-extrabold text-emerald-500">{{ $totalEkskul }}</span>
+                    </div>
+                    <div class="h-32 md:h-40 lg:h-52 relative">
+                        <canvas id="ekskulChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EKSUL BUKA / TUTUP PENDAFTARAN -->
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-lg shadow-slate-100/60 p-4 md:p-5">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3 md:mb-4">
+                <div>
+                    <h3 class="text-xs md:text-sm font-extrabold text-slate-900">Status Pendaftaran Ekskul</h3>
+                    <p class="text-[10px] md:text-[11px] text-slate-400 font-medium mt-0.5">Ekskul mana yang sedang membuka atau menutup pendaftaran</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {{ $ekskulStatus->get(1, 0) }} Terbuka
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg">
+                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> {{ $ekskulStatus->get(0, 0) }} Tertutup
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                @php($ekskulBuka = $ekskulDetail->where('is_open_recruitment', true)->values())
+                @php($ekskulTutup = $ekskulDetail->where('is_open_recruitment', false)->values())
+
+                <div class="rounded-xl bg-emerald-50/60 border border-emerald-100 p-3.5 md:p-4">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-7 h-7 rounded-lg bg-emerald-500 text-white flex items-center justify-center shadow-md shadow-emerald-200">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </span>
+                        <span class="text-xs font-extrabold text-emerald-700">Buka Pendaftaran</span>
+                    </div>
+                    <ul class="space-y-2">
+                        @forelse($ekskulBuka as $ekskul)
+                            <li class="flex items-center justify-between gap-2 bg-white rounded-lg border border-emerald-100 px-3 py-2">
+                                <span class="truncate text-[11px] md:text-xs font-semibold text-slate-700">{{ $ekskul->nama_ekskul }}</span>
+                                <span class="shrink-0 text-[9px] md:text-[10px] font-bold text-emerald-600 bg-emerald-100/80 px-2 py-0.5 rounded-full">Terbuka</span>
+                            </li>
+                        @empty
+                            <li class="text-[11px] text-slate-400 font-medium py-2">Belum ada ekskul yang membuka pendaftaran.</li>
+                        @endforelse
+                    </ul>
+                </div>
+
+                <div class="rounded-xl bg-slate-50/70 border border-slate-100 p-3.5 md:p-4">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-7 h-7 rounded-lg bg-slate-400 text-white flex items-center justify-center shadow-md shadow-slate-200">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </span>
+                        <span class="text-xs font-extrabold text-slate-600">Tutup Pendaftaran</span>
+                    </div>
+                    <ul class="space-y-2">
+                        @forelse($ekskulTutup as $ekskul)
+                            <li class="flex items-center justify-between gap-2 bg-white rounded-lg border border-slate-200 px-3 py-2">
+                                <span class="truncate text-[11px] md:text-xs font-semibold text-slate-600">{{ $ekskul->nama_ekskul }}</span>
+                                <span class="shrink-0 text-[9px] md:text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Tertutup</span>
+                            </li>
+                        @empty
+                            <li class="text-[11px] text-slate-400 font-medium py-2">Belum ada ekskul yang menutup pendaftaran.</li>
+                        @endforelse
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- NAVIGATION MENU (3 CARD → 1 di HP, 3 di Desktop) -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5 pt-2">
         <a href="{{ route('kesiswaan.users.index') }}"
@@ -143,4 +267,149 @@
         </a>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const anim = reduceMotion ? {} : { duration: 900, easing: 'easeOutQuart' };
+
+        Chart.defaults.font.family = '"Plus Jakarta Sans", system-ui, sans-serif';
+        Chart.defaults.font.size = 11;
+        Chart.defaults.color = '#64748b';
+
+        const akunLabels = @json($akunPerBulan['labels']);
+        const akunData   = @json($akunPerBulan['data']);
+        const kelasData  = @json($kelasPerBulan['data']);
+        const ekskulData = @json($ekskulPerBulan['data']);
+
+        // --- GRAFIK AKUN (line + area gradient) ---
+        const akunCanvas = document.getElementById('akunChart');
+        if (akunCanvas) {
+            const ctx = akunCanvas.getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, akunCanvas.clientHeight);
+            gradient.addColorStop(0, 'rgba(56, 189, 248, 0.35)');
+            gradient.addColorStop(1, 'rgba(56, 189, 248, 0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: akunLabels,
+                    datasets: [{
+                        label: 'Akun',
+                        data: akunData,
+                        borderColor: '#2563EB',
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#2563EB',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: anim,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0F172A',
+                            titleFont: { weight: 700 },
+                            padding: 10,
+                            cornerRadius: 10,
+                            displayColors: false,
+                            callbacks: {
+                                label: function (ctx) { return ctx.parsed.y + ' akun'; }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0, stepSize: 1 },
+                            grid: { color: 'rgba(226, 232, 240, 0.6)', drawBorder: false }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { maxRotation: 0, autoSkip: true }
+                        }
+                    }
+                }
+            });
+        }
+
+        const barOptions = (color) => ({
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: anim,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0F172A',
+                    titleFont: { weight: 700 },
+                    padding: 10,
+                    cornerRadius: 10,
+                    displayColors: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0, stepSize: 1, font: { size: 10 } },
+                    grid: { color: 'rgba(226, 232, 240, 0.6)', drawBorder: false }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 10 }, maxRotation: 0, autoSkip: true }
+                }
+            }
+        });
+
+        // --- GRAFIK KELAS (bar) ---
+        const kelasCanvas = document.getElementById('kelasChart');
+        if (kelasCanvas) {
+            new Chart(kelasCanvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: akunLabels,
+                    datasets: [{
+                        label: 'Kelas',
+                        data: kelasData,
+                        backgroundColor: '#FACC15',
+                        hoverBackgroundColor: '#F59E0B',
+                        borderRadius: 6,
+                        maxBarThickness: 24,
+                    }]
+                },
+                options: barOptions('#FACC15')
+            });
+        }
+
+        // --- GRAFIK EKSUL (bar emerald) ---
+        const ekskulCanvas = document.getElementById('ekskulChart');
+        if (ekskulCanvas) {
+            new Chart(ekskulCanvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: akunLabels,
+                    datasets: [{
+                        label: 'Ekskul',
+                        data: ekskulData,
+                        backgroundColor: '#34D399',
+                        hoverBackgroundColor: '#10B981',
+                        borderRadius: 6,
+                        maxBarThickness: 24,
+                    }]
+                },
+                options: barOptions('#34D399')
+            });
+        }
+    });
+</script>
 @endsection
