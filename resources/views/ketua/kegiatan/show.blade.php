@@ -7,7 +7,7 @@
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Detail Kegiatan</h1>
-            <p class="text-xs text-slate-400 mt-1">{{ $kegiatan->kegiatan }}</p>
+            <p class="text-xs text-slate-400 mt-1">{{ $kegiatan->materi }}</p>
         </div>
         <div class="flex gap-2 flex-wrap">
             <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 transition w-full sm:w-auto items-center justify-center gap-2">Input Presensi</a>
@@ -24,7 +24,7 @@
             </div>
             <div>
                 <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nama kegiatan</p>
-                <p class="font-semibold text-sm text-slate-800">{{ $kegiatan->kegiatan }}</p>
+                <p class="font-semibold text-sm text-slate-800">{{ $kegiatan->materi }}</p>
             </div>
         </div>
         @if($kegiatan->deskripsi)

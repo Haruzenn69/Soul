@@ -74,7 +74,7 @@ class LaporanBulananController extends Controller
         $teks = '';
         foreach ($kegiatans as $k) {
             $tanggal = $k->tanggal_kegiatan->translatedFormat('d F Y');
-            $line = "Pada tanggal {$tanggal}, kegiatan yang dilaksanakan berupa {$k->kegiatan}.";
+            $line = "Pada tanggal {$tanggal}, kegiatan yang dilaksanakan berupa {$k->materi}.";
             if ($k->deskripsi) {
                 $line .= " {$k->deskripsi}";
             }

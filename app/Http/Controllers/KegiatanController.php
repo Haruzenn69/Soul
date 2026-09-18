@@ -22,7 +22,7 @@ class KegiatanController extends Controller
             ->when($request->filled('cari'), function ($query) use ($request) {
                 $cari = $request->input('cari');
                 $query->where(function ($sub) use ($cari) {
-                    $sub->where('kegiatan', 'like', '%'.$cari.'%')
+                    $sub->where('materi', 'like', '%'.$cari.'%')
                         ->orWhere('deskripsi', 'like', '%'.$cari.'%');
                 });
             })
@@ -41,7 +41,7 @@ class KegiatanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'kegiatan' => 'required|string|max:255',
+            'materi' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
             'dokumentasi' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -55,7 +55,7 @@ class KegiatanController extends Controller
 
         $kegiatan = Kegiatan::create([
             'ekskul_id' => $ekskul->id,
-            'kegiatan' => $validated['kegiatan'],
+            'materi' => $validated['materi'],
             'deskripsi' => $validated['deskripsi'] ?? null,
             'dokumentasi' => $dokumentasiPath,
             'tanggal_kegiatan' => now()->toDateString(),
@@ -67,7 +67,7 @@ class KegiatanController extends Controller
             Notifikasi::create([
                 'pembina_id' => $ekskul->pembina->id,
                 'judul' => 'Kegiatan Mendatang',
-                'pesan' => 'Kegiatan baru "' . $validated['kegiatan'] . '" dijadwalkan pada ' . $tanggalLabel . ' untuk ekskul ' . $ekskul->nama_ekskul . '.',
+                'pesan' => 'Kegiatan baru "' . $validated['materi'] . '" dijadwalkan pada ' . $tanggalLabel . ' untuk ekskul ' . $ekskul->nama_ekskul . '.',
                 'tipe' => 'info',
             ]);
         }
@@ -77,7 +77,7 @@ class KegiatanController extends Controller
             Notifikasi::create([
                 'siswa_id' => $anggota->siswa_id,
                 'judul' => 'Kegiatan Mendatang',
-                'pesan' => 'Ada kegiatan "' . $validated['kegiatan'] . '" di ekskul ' . $ekskul->nama_ekskul . ' pada ' . $tanggalLabel . '. Jangan lupa hadir!',
+                'pesan' => 'Ada kegiatan "' . $validated['materi'] . '" di ekskul ' . $ekskul->nama_ekskul . ' pada ' . $tanggalLabel . '. Jangan lupa hadir!',
                 'tipe' => 'info',
             ]);
         }
@@ -105,7 +105,7 @@ class KegiatanController extends Controller
         abort_unless($kegiatan->ekskul_id === $this->getEkskul()->id, 403);
 
         $validated = $request->validate([
-            'kegiatan' => 'required|string|max:255',
+            'materi' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
             'dokumentasi' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -119,7 +119,7 @@ class KegiatanController extends Controller
         }
 
         $kegiatan->update([
-            'kegiatan' => $validated['kegiatan'],
+            'materi' => $validated['materi'],
             'deskripsi' => $validated['deskripsi'] ?? null,
             'dokumentasi' => $dokumentasiPath,
         ]);
