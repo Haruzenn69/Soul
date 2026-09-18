@@ -37,7 +37,7 @@
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap text-slate-600">
                                 {{ $kegiatan->tanggal_kegiatan->isoFormat('dddd') }}
                             </td>
-                            <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap font-medium text-slate-800">{{ $kegiatan->kegiatan }}</td>
+                            <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap font-medium text-slate-800">{{ $kegiatan->materi }}</td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap">
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-sky-100 text-sky-700 border border-sky-200">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

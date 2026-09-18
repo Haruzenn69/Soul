@@ -17,9 +17,9 @@
             @csrf
             <div class="mb-5">
                 <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama kegiatan <span class="text-rose-500">*</span></label>
-                <input type="text" name="kegiatan" value="{{ old('kegiatan') }}" required maxlength="255" placeholder="Contoh: Latihan teknik dasar"
+                <input type="text" name="materi" value="{{ old('materi') }}" required maxlength="255" placeholder="Contoh: Latihan teknik dasar"
                     class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
-                @error('kegiatan') <p class="text-rose-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                @error('materi') <p class="text-rose-500 text-[10px] mt-1">{{ $message }}</p> @enderror
             </div>
             <div class="mb-5">
                 <label class="block text-xs font-bold text-slate-700 mb-1.5">Deskripsi <span class="font-normal text-slate-400">(opsional)</span></label>

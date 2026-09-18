@@ -422,7 +422,7 @@
                                         <div class="min-w-0">
                                             <div class="flex items-center gap-2 flex-wrap">
                                                 <h4 class="text-xs font-bold text-slate-800 truncate">
-                                                    {{ $presensi->kegiatan->kegiatan ?? 'Kegiatan' }}
+                                                    {{ $presensi->kegiatan->materi ?? 'Kegiatan' }}
                                                 </h4>
                                                 <span class="inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold border {{ $statusColors[$presensi->status] ?? 'bg-slate-100 text-slate-600 border-slate-200' }}">
                                                     {{ $statusLabels[$presensi->status] ?? $presensi->status }}
