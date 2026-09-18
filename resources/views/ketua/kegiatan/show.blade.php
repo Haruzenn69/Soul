@@ -7,7 +7,7 @@
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Detail Kegiatan</h1>
-            <p class="text-xs text-slate-400 mt-1">{{ $kegiatan->materi }}</p>
+            <p class="text-xs text-slate-400 mt-1">{{ $kegiatan->kegiatan }}</p>
         </div>
         <div class="flex gap-2 flex-wrap">
             <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 transition w-full sm:w-auto items-center justify-center gap-2">Input Presensi</a>
@@ -17,13 +17,15 @@
 
     <!-- Info Card -->
     <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 space-y-5">
-        <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal</p>
-            <p class="font-medium text-sm">{{ $kegiatan->tanggal_kegiatan->format('d/m/Y') }}</p>
-        </div>
-        <div class="mb-6">
-            <p class="text-[11px] text-gray-400 font-bold uppercase">Kegiatan</p>
-            <p class="font-medium text-sm">{{ $kegiatan->kegiatan }}</p>
+        <div class="grid gap-5 sm:grid-cols-2">
+            <div>
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal kegiatan</p>
+                <p class="font-semibold text-sm text-slate-800">{{ $kegiatan->tanggal_kegiatan->isoFormat('dddd, D MMMM Y') }}</p>
+            </div>
+            <div>
+                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nama kegiatan</p>
+                <p class="font-semibold text-sm text-slate-800">{{ $kegiatan->kegiatan }}</p>
+            </div>
         </div>
         @if($kegiatan->deskripsi)
         <div>
@@ -38,7 +40,7 @@
         </div>
         @endif
 
-@php
+        @php
             $rekap = [
                 'hadir' => $kegiatan->presensis->where('status', 'hadir')->count(),
                 'izin' => $kegiatan->presensis->where('status', 'izin')->count(),
@@ -46,8 +48,14 @@
                 'alpha' => $kegiatan->presensis->where('status', 'alpha')->count(),
             ];
         @endphp
-        <h3 class="text-sm font-extrabold text-slate-900 pt-2 border-t border-sky-100">Rekap Presensi</h3>
-        <div class="grid grid-cols-4 gap-2 mb-6">
+        <div class="flex items-center justify-between gap-3">
+            <div>
+                <h3 class="text-sm font-bold text-slate-800">Rekap presensi</h3>
+                <p class="text-[10px] text-slate-400 mt-1">Ringkasan status kehadiran anggota.</p>
+            </div>
+            <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="text-[11px] font-bold text-sky-600 hover:text-sky-800 transition">Perbarui presensi</a>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
             <div class="p-3 rounded-2xl bg-green-50 border border-green-100 text-center">
                 <p class="text-lg font-bold text-green-600">{{ $rekap['hadir'] }}</p>
                 <p class="text-[10px] text-green-600/70 font-semibold uppercase">Hadir</p>
@@ -66,7 +74,7 @@
             </div>
         </div>
 
-        <h3 class="text-sm font-extrabold text-slate-900 pt-2 border-t border-sky-100">Daftar Presensi</h3>
+        <h3 class="text-sm font-bold text-slate-800 mb-3">Daftar presensi</h3>
         <div class="overflow-x-auto">
         <table class="card-table w-full text-left text-xs md:text-sm">
             <thead class="bg-sky-50">
@@ -101,16 +109,14 @@
             </tbody>
         </table>
         </div>
-
-        <div class="mt-4 flex gap-2">
-            <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="px-5 py-2 bg-theme-blue hover:bg-theme-darkBlue text-white text-xs font-semibold rounded-full transition">Input Presensi</a>
-            <a href="{{ route('ketua.kegiatan.edit', $kegiatan) }}" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-full transition">Edit</a>
+        <div class="mt-5 pt-5 border-t border-sky-100 flex flex-col sm:flex-row gap-2">
+            <a href="{{ route('ketua.kegiatan.edit', $kegiatan) }}" class="px-5 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-bold rounded-xl transition text-center">Edit kegiatan</a>
             <form action="{{ route('ketua.kegiatan.destroy', $kegiatan) }}" method="POST" onsubmit="return confirm('Yakin hapus kegiatan ini?');">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-full transition">Hapus</button>
+                <button type="submit" class="w-full px-5 py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-bold rounded-xl transition">Hapus kegiatan</button>
             </form>
-            <a href="{{ route('ketua.kegiatan.index') }}" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-full transition">Kembali</a>
+            <a href="{{ route('ketua.kegiatan.index') }}" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition text-center">Kembali</a>
         </div>
     </div>
 @endsection

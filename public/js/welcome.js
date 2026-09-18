@@ -420,3 +420,28 @@
 
             updateVisibility();
         })();
+
+        /* ===================== LOGIN POPUP (MODAL) ===================== */
+        var loginModal = document.getElementById('loginModal');
+
+        function openLoginModal() {
+            if (!loginModal) return;
+            loginModal.classList.add('is-open');
+            loginModal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            var email = loginModal.querySelector('input[name="email"]');
+            if (email) setTimeout(function () { email.focus(); }, 180);
+        }
+
+        function closeLoginModal() {
+            if (!loginModal) return;
+            loginModal.classList.remove('is-open');
+            loginModal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && loginModal && loginModal.classList.contains('is-open')) {
+                closeLoginModal();
+            }
+        });

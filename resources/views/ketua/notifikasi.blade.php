@@ -53,7 +53,7 @@
                     <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-sky-100 shrink-0">
                         {!! $typeIcon !!}
                     </div>
-                    <div class="flex-1 min-w-0 flex items-center justify-between gap-2">
+                    <div class="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
                         <h3 class="text-sm font-bold text-slate-900 leading-snug truncate">{{ $notif->judul }}</h3>
                         <span class="text-[10px] text-slate-400 shrink-0 whitespace-nowrap">{{ $notif->created_at->diffForHumans() }}</span>
                     </div>

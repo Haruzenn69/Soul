@@ -15,7 +15,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'ketua_ekskul' => \App\Http\Middleware\KetuaEkskulMiddleware::class,
-            'username.set' => \App\Http\Middleware\EnsureUsernameIsSet::class,
         ]);
         
         $middleware->trustProxies(at: '*');

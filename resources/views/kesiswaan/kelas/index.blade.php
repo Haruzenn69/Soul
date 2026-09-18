@@ -10,7 +10,7 @@
         </div>
         @if ($tahunAjarans->isEmpty())
             <span class="px-4 py-2 bg-amber-50 text-amber-600 rounded-full text-[11px] font-bold">
-                âš  Jalankan seeder untuk membuat data tahun ajaran terlebih dahulu.
+                ⚠ Jalankan seeder untuk membuat data tahun ajaran terlebih dahulu.
             </span>
         @else
             <button onclick="document.getElementById('modal-create').showModal()"

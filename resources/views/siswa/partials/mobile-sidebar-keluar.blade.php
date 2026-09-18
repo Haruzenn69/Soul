@@ -1,7 +1,7 @@
 {{-- Mobile sidebar overlay + drawer untuk panel siswa (versi Pengajuan Keluar) --}}
 <div id="sidebar-overlay" class="hidden fixed inset-0 z-40 bg-black/50 md:hidden" onclick="closeSidebar()"></div>
 
-<div id="sidebar-mobile" class="hidden fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-sky-100 relative overflow-hidden flex flex-col justify-between p-5 md:hidden shadow-2xl">
+<div id="sidebar-mobile" class="hidden fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-sky-100 overflow-hidden flex flex-col justify-between p-5 md:hidden shadow-2xl">
     <div class="absolute inset-0 pointer-events-none">
         <div class="absolute -top-24 -right-16 w-64 h-64 rounded-full bg-sky-100/80 blur-3xl animate-blob"></div>
         <div class="absolute -bottom-24 -left-16 w-64 h-64 rounded-full bg-amber-100/80 blur-3xl animate-blob" style="animation-delay: 3s"></div>

@@ -3,18 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOUL — Platform Komunitas Sekolah</title>
-    <meta name="description" content="SOUL menyatukan pendaftaran, presensi, dan laporan seluruh Komunitas sekolah dalam satu platform.">
+    <title>SOUL — Platform Ekstrakurikuler Sekolah</title>
+    <meta name="description" content="SOUL menyatukan pendaftaran, presensi, dan laporan seluruh ekstrakurikuler sekolah dalam satu platform.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/welcome.css') }}">
 </head>
 <body>
-    @php
-        $accountUrl = auth()->check() ? route('dashboard') : route('login');
-        $firstName = auth()->check() ? (auth()->user()->username ? explode(' ', trim(auth()->user()->username))[0] : 'Sobat') : '';
-    @endphp
+    @php($accountUrl = auth()->check() ? route('dashboard') : route('login'))
 
     <!-- ===================== HEADER ===================== -->
     <header class="site-header">
@@ -30,18 +27,6 @@
                     <a href="#features" class="header-nav-link">Fitur</a>
                     <a href="#community" class="header-nav-link">Tentang Kami</a>
                 </div>
-
-                @auth
-                    <a href="{{ $accountUrl }}" class="header-auth" aria-label="Buka dashboard Anda">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/></svg>
-                        <span>Halo, {{ $firstName }}</span>
-                    </a>
-                @else
-                    <a href="{{ route('login') }}" class="header-auth" aria-label="Masuk ke akun Anda">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/></svg>
-                        <span>Masuk</span>
-                    </a>
-                @endauth
 
                 <button class="menu-btn" onclick="openSheet()" type="button" aria-label="Menu">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
@@ -68,9 +53,42 @@
                 <a href="{{ $accountUrl }}" class="btn-outline">Sign In</a>
                 <a href="{{ $accountUrl }}" class="btn-primary">Get Started</a>
             @else
-                <a href="{{ route('login') }}" class="btn-outline">Sign In</a>
-                <a href="{{ route('login') }}" class="btn-primary">Get Started</a>
+                <button type="button" class="btn-outline" onclick="openLoginModal()">Sign In</button>
+                <button type="button" class="btn-primary" onclick="openLoginModal()">Get Started</button>
             @endauth
+        </div>
+    </div>
+
+    <!-- ===================== LOGIN POPUP (GUEST) ===================== -->
+    <div class="login-modal" id="loginModal" aria-hidden="true">
+        <div class="login-modal-overlay" onclick="closeLoginModal()"></div>
+        <div class="login-modal-box" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+            <div class="login-modal-card">
+                <button class="login-modal-close" onclick="closeLoginModal()" type="button" aria-label="Tutup">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+
+                <h2 class="login-modal-title" id="loginModalTitle">HELLO SOULERS</h2>
+                <p class="login-modal-subtitle">Masuk dan akses semua fitur kami</p>
+
+                @if ($errors->any())
+                    <div class="login-modal-alert">{{ $errors->first() }}</div>
+                @endif
+
+                <form action="{{ route('login') }}" method="POST" class="login-modal-form">
+                    @csrf
+
+                    <div class="login-modal-field">
+                        <input type="email" name="email" value="{{ old('email') }}" placeholder="Email" required autofocus>
+                    </div>
+
+                    <div class="login-modal-field">
+                        <input type="password" name="password" placeholder="Password" required>
+                    </div>
+
+                    <button type="submit" class="login-modal-submit">Masuk</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -88,14 +106,14 @@
             </h1>
 
             <p class="hero-desc">
-                Satu platform untuk pendaftaran, presensi, dan laporan seluruh komunitas SMKN 11 Bandung
+                Satu platform untuk pendaftaran, presensi, dan laporan seluruh ekstrakurikuler SMKN 11 Bandung
             </p>
 
             <div class="hero-cta">
                 @auth
                     <a href="{{ $accountUrl }}"><button>Mulai Sekarang</button></a>
                 @else
-                    <button type="button" onclick="window.location.href='{{ route('login') }}'">Mulai Sekarang</button>
+                    <button type="button" onclick="openLoginModal()">Mulai Sekarang</button>
                 @endauth
             </div>
         </div>
@@ -112,10 +130,10 @@
 
             <div class="vision-quote">
                 <p class="vision-quote-text reveal" style="--reveal-delay: 0.1s;">
-                    "Membangun generasi muda yang berkarakter, kreatif, dan berdaya saing melalui wadah komunitas yang inklusif, terorganisir, dan bermakna."
+                    "Membangun generasi muda yang berkarakter, kreatif, dan berdaya saing melalui wadah ekstrakurikuler yang inklusif, terorganisir, dan bermakna."
                 </p>
                 <p class="vision-quote-desc reveal" style="--reveal-delay: 0.2s;">
-                    SOUL hadir untuk memudahkan siswa menemukan, mengikuti, dan berkembang dalam setiap komunitas di SMKN 11 Bandung.
+                    SOUL hadir untuk memudahkan siswa menemukan, mengikuti, dan berkembang dalam setiap komunitas ekstrakurikuler di SMKN 11 Bandung.
                 </p>
             </div>
         </div>
@@ -131,7 +149,7 @@
         <div class="coverflow-inner" data-coverflow>
             <div class="coverflow-eyebrow reveal reveal--left">
                 <span class="coverflow-eyebrow-line"></span>
-                <h2 class="coverflow-eyebrow-text">Komunitas</h2>
+                <h2 class="coverflow-eyebrow-text">EKSTRAKURIKULER</h2>
                 <span class="coverflow-eyebrow-line coverflow-eyebrow-line--right"></span>
             </div>
             @if($ekskuls->count() > 0)
@@ -193,7 +211,7 @@
             </div>
 
             @else
-            <p class="ekskul-empty">Belum ada Komunitas yang tersedia.</p>
+            <p class="ekskul-empty">Belum ada ekstrakurikuler yang tersedia.</p>
             @endif
         </div>
     </section>
@@ -283,7 +301,7 @@
         <div class="team-container">
             <header class="team-header reveal">
                 <h2 class="team-heading" id="team-heading">Di balik satu platform,<br>ada kami</h2>
-                <p class="team-desc">Sekelompok siswa dan pendidik yang menyatukan seluruh Komunitas SMKN 11 Bandung dalam satu platform yang mudah, aman, dan terintegrasi.</p>
+                <p class="team-desc">Sekelompok siswa dan pendidik yang menyatukan seluruh ekstrakurikuler SMKN 11 Bandung dalam satu platform yang mudah, aman, dan terintegrasi.</p>
             </header>
 
             <div class="team-grid">
@@ -493,12 +511,11 @@
 <script>
     function checkEkskulLogin(ekskulId) {
         @if(auth()->check())
-            window.location.href = `/ekskul/${ekskulId}`;
+            window.location.href = '{{ route('ekskul.detail', $ekskul) }}';
         @else
-            window.location.href = '{{ route('login') }}';
+            openLoginModal();
         @endif
     }
 </script>
-
 </body>
 </html>

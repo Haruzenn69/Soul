@@ -1,4 +1,4 @@
-﻿:root {
+:root {
             --background: 0 0% 100%;
             --foreground: 240 10% 3.9%;
             --card: 0 0% 100%;
@@ -135,59 +135,6 @@
         }
         .site-header.is-scrolled .menu-btn:hover { background: hsl(var(--accent)); }
 
-        /* ===================== HEADER WELCOME (auth pill) ===================== */
-        .header-auth {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            height: 34px;
-            padding: 0 16px 0 13px;
-            font-family: 'Fredoka', 'Inter', sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.015em;
-            color: #ffffff;
-            text-decoration: none;
-            white-space: nowrap;
-            border-radius: 9999px;
-            background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 45%, #2563eb 100%);
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.45),
-                0 3px 10px rgba(59, 130, 246, 0.4);
-            transition: transform 0.15s ease, box-shadow 0.2s ease;
-            animation: glowPulse 4.5s ease-in-out infinite;
-            cursor: pointer;
-        }
-        .header-auth svg { width: 14px; height: 14px; }
-        .header-auth span {
-            display: block;
-            max-width: 160px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .header-auth:hover {
-            transform: translateY(-1px);
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.45),
-                0 0 16px rgba(59, 130, 246, 0.6),
-                0 3px 10px rgba(59, 130, 246, 0.5);
-        }
-        .header-auth:focus-visible { outline: 2px solid #93c5fd; outline-offset: 3px; }
-
-        @keyframes glowPulse {
-            0%, 100% {
-                box-shadow:
-                    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-                    0 3px 10px rgba(59, 130, 246, 0.4);
-            }
-            50% {
-                box-shadow:
-                    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-                    0 0 16px 2px rgba(59, 130, 246, 0.6),
-                    0 3px 10px rgba(59, 130, 246, 0.45);
-            }
-        }
-
         /* ===================== MOBILE SHEET ===================== */
         .sheet-overlay {
             display: none;
@@ -296,15 +243,12 @@
             height: 36px;
             padding: 0 16px;
             font-size: 14px;
-            font-weight: 600;
-            font-family: 'Fredoka', 'Inter', sans-serif;
-            color: #ffffff;
-            background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 45%, #2563eb 100%);
-            border: 1px solid transparent;
-            border-radius: 9999px;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.45),
-                0 3px 10px rgba(59, 130, 246, 0.4);
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            background: hsl(var(--foreground));
+            border: 1px solid hsl(var(--foreground));
+            border-radius: 6px;
             cursor: pointer;
             text-decoration: none;
             transition: opacity 0.1s ease;
@@ -325,7 +269,7 @@
             align-items: center;
             justify-content: flex-start;
             text-align: center;
-            padding: 96px 16px 140px;
+            padding: 170px 16px 140px;
         }
 
         /* Two background layers: image URLs are set inline in the Blade template.
@@ -473,31 +417,22 @@
             animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
         }
         .hero-cta button {
-            padding: 13px 34px;
-            font-family: 'Fredoka', 'Inter', sans-serif;
-            font-size: 17px;
-            font-weight: 600;
-            letter-spacing: 0.01em;
+            padding: 12px 32px;
+            background: #3b82f6;
             color: #ffffff;
-            background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 45%, #2563eb 100%);
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
             border: none;
             border-radius: 9999px;
             cursor: pointer;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.45),
-                0 0 18px rgba(59, 130, 246, 0.45);
-            transition: box-shadow 0.2s ease, transform 0.15s ease;
-            animation: glowPulse 4.5s ease-in-out infinite;
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.25);
+            transition: background-color 0.15s ease, transform 0.15s ease;
             outline: none;
         }
-        .hero-cta button:hover {
-            transform: scale(1.04);
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.45),
-                0 0 26px rgba(59, 130, 246, 0.7);
-        }
-        .hero-cta button:active { transform: scale(0.97); }
-        .hero-cta button:focus-visible { outline: 2px solid #93c5fd; outline-offset: 3px; }
+        .hero-cta button:hover { background: #2563eb; transform: scale(1.05); }
+        .hero-cta button:active { transform: scale(0.95); }
+        .hero-cta button:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
 
         @media (max-width: 640px) {
             .hero-section {
@@ -510,17 +445,13 @@
                 font-size: 12px;
                 padding: 5px 14px;
             }
-            .hero-title {
-                font-size: clamp(2.4rem, 7.8vw, 4.75rem);
-            }
             .hero-desc {
-                font-size: 1.125rem;
-                line-height: 1.55;
+                font-size: 1rem;
                 max-width: 92vw;
             }
             .hero-cta button {
                 padding: 12px 28px;
-                font-size: 16px;
+                font-size: 15px;
             }
         }
 
@@ -2266,4 +2197,262 @@
             .tablet-card { width: 240px; }
             .tablet-frame { width: 200px; height: 400px; }
             .scanner-frame { width: 160px; height: 160px; }
+        }
+
+        /* ===================== LOGIN POPUP (MODAL) ===================== */
+        .login-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-modal.is-open { display: flex; }
+
+        .login-modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(2, 8, 23, 0.6);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .login-modal.is-open .login-modal-overlay { opacity: 1; }
+
+        /* Kotak luar: sekarang jadi wadah 2 kolom -> kiri foto tajam (mengambang
+           dengan jarak putih di sekelilingnya), kanan form. Foto & overlay
+           gradasinya dirender lewat ::before / ::after; .login-modal-card
+           mengisi sisa ruang di kanan. */
+        .login-modal-box {
+            position: relative;
+            width: 100%;
+            max-width: 920px;
+            border-radius: 28px;
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.7);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.55);
+            opacity: 0;
+            transform: translateY(32px) scale(0.94);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        .login-modal.is-open .login-modal-box {
+            animation: loginModalPopIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes loginModalPopIn {
+            0% {
+                opacity: 0;
+                transform: translateY(40px) scale(0.94);
+            }
+            55% {
+                opacity: 1;
+                transform: translateY(-8px) scale(1.015);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .login-modal-box::before {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            bottom: 18px;
+            width: 42%;
+            border-radius: 20px;
+            background-image: url('../images/firefly.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        .login-modal-box::after {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            bottom: 18px;
+            width: 42%;
+            border-radius: 20px;
+            background: linear-gradient(195deg, rgba(11, 26, 46, 0) 38%, rgba(11, 26, 46, 0.8) 100%);
+        }
+
+        /* Kotak dalam: menampung form login, sekarang jadi panel kanan */
+        .login-modal-card {
+            position: relative;
+            z-index: 1;
+            margin-left: calc(42% + 36px);
+            padding: 56px 52px 56px 0;
+            min-height: 560px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #ffffff;
+            box-shadow: none;
+            text-align: left;
+        }
+
+        .login-modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 9999px;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+        .login-modal-close:hover { background: #f1f5f9; color: #0f172a; }
+
+        .login-modal-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            margin: 0 0 22px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #c5a880 0%, #a48256 100%);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 15px rgba(197, 168, 128, 0.3);
+            overflow: hidden;
+        }
+        .login-modal-logo img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+        .login-modal-logo--hidden { visibility: hidden; }
+
+        /* Judul mengikuti gaya heading utama landing page (Inter 800, non-uppercase,
+           letter-spacing rapat) dengan garis emas kecil di atasnya, senada dengan
+           motif "coverflow-divider" / eyebrow yang dipakai di section lain. */
+        .login-modal-title {
+            position: relative;
+            margin: 0 0 8px;
+            padding-top: 16px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: clamp(1.5rem, 2.4vw, 1.85rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            text-transform: none;
+            color: #0f172a;
+        }
+        .login-modal-title::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 34px;
+            height: 3px;
+            border-radius: 2px;
+            background: linear-gradient(90deg, #c5a880, #a48256);
+            box-shadow: 0 0 8px rgba(197, 168, 128, 0.6);
+        }
+        .login-modal-subtitle {
+            margin: 0 0 28px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            line-height: 1.6;
+            color: #64748b;
+        }
+
+        .login-modal-alert {
+            width: 100%;
+            margin: 0 0 16px;
+            padding: 10px 14px;
+            border: 1px solid #fecdd3;
+            border-radius: 12px;
+            background: #fff1f2;
+            color: #e11d48;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-align: left;
+        }
+
+        .login-modal-form { display: block; }
+
+        .login-modal-field { margin-bottom: 16px; }
+        .login-modal-field input {
+            width: 100%;
+            padding: 15px 22px;
+            border: 1px solid transparent;
+            border-radius: 9999px;
+            background: #f1f5f9;
+            color: #1e293b;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .login-modal-field input::placeholder { color: #94a3b8; }
+        .login-modal-field input:focus {
+            background: #ffffff;
+            border-color: #2563EB;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .login-modal-submit {
+            width: 100%;
+            margin-top: 14px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, #c5a880 0%, #a48256 100%);
+            color: #110d0c;
+            font-size: 0.78rem;
+            font-weight: 800;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 15px rgba(197, 168, 128, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .login-modal-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35), 0 0 20px rgba(197, 168, 128, 0.45);
+        }
+        .login-modal-submit:active { transform: translateY(0) scale(0.98); }
+        .login-modal-submit:focus-visible { outline: 2px solid #2563EB; outline-offset: 2px; }
+
+        /* ---- Mobile: foto jadi banner di atas, form full-width di bawah ---- */
+        @media (max-width: 760px) {
+            .login-modal-box { max-width: 440px; }
+            .login-modal-box::before {
+                top: 14px;
+                left: 14px;
+                right: 14px;
+                bottom: auto;
+                width: auto;
+                height: 170px;
+                border-radius: 18px;
+            }
+            .login-modal-box::after {
+                top: 14px;
+                left: 14px;
+                right: 14px;
+                bottom: auto;
+                width: auto;
+                height: 170px;
+                border-radius: 18px;
+                background: linear-gradient(180deg, rgba(11, 26, 46, 0) 30%, rgba(11, 26, 46, 0.78) 100%);
+            }
+            .login-modal-card {
+                margin-left: 0;
+                margin-top: calc(170px + 28px);
+                padding: 0 26px 32px;
+                min-height: auto;
+                text-align: center;
+            }
+            .login-modal-logo { margin: 0 auto 14px; }
+            .login-modal-title::before { left: 50%; transform: translateX(-50%); }
         }

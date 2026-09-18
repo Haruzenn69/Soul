@@ -53,5 +53,12 @@ class AppServiceProvider extends ServiceProvider
             }
             $view->with('unreadNotifCount', $unreadNotifCount);
         });
+
+        // Data bersama untuk seluruh view kesiswaan (unread notifikasi kesiswaan)
+        View::composer('kesiswaan.*', function (\Illuminate\View\View $view) {
+            $user = auth()->user();
+            $unreadNotifCount = $user ? \App\Models\Notifikasi::where('user_id', $user->id)->where('is_read', false)->count() : 0;
+            $view->with('unreadNotifCount', $unreadNotifCount);
+        });
     }
 }

@@ -33,10 +33,10 @@
     </div>
 
     <!-- Table Card -->
-    <div class="bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
+    <div class="ketua-card-list bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
         <div class="overflow-x-auto">
         <table class="card-table w-full text-left text-xs md:text-sm">
-            <thead class="bg-sky-50">
+            <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
                 <tr>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Pertanyaan</th>
@@ -54,13 +54,13 @@
                             <form action="{{ route('ketua.faq.destroy', $faq) }}" method="POST" class="inline" onsubmit="return confirm('Hapus FAQ ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:underline font-medium">Hapus</button>
+                                <button type="submit" class="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 rounded-xl text-[10px] font-bold transition">Hapus</button>
                             </form>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="px-4 md:px-6 py-8 text-center text-slate-400">Belum ada FAQ.</td>
+                        <td colspan="4" class="px-4 md:px-6 py-10 text-center text-slate-400">Belum ada FAQ. Tambahkan pertanyaan yang sering ditanyakan siswa.</td>
                     </tr>
                 @endforelse
             </tbody>
