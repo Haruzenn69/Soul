@@ -8,6 +8,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pendaftaran extends Model
 {
+    public const STATUS_PENDING = 'pending';
+
+    public const STATUS_DITERIMA = 'diterima';
+
+    public const STATUS_DITOLAK = 'ditolak';
+
+    public const STATUS_NONAKTIF = 'nonaktif';
+
+    public const STATUS_PERINGATAN = 'peringatan';
+
     protected $fillable = [
         'siswa_id',
         'ekskul_id',
@@ -33,5 +43,10 @@ class Pendaftaran extends Model
     public function presensis(): HasMany
     {
         return $this->hasMany(Presensi::class);
+    }
+
+    public function isActive(): bool
+    {
+        return in_array($this->status, [self::STATUS_DITERIMA, self::STATUS_PERINGATAN], true);
     }
 }

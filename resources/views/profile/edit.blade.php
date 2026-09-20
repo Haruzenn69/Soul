@@ -346,7 +346,7 @@
 
                         <div class="mt-4 pt-4 border-t border-sky-50">
                             <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Bergabung sejak</p>
-                            <p class="text-xs font-bold text-slate-700 mt-1">{{ $siswa->created_at ? \Carbon\Carbon::parse($siswa->created_at)->isoFormat('D MMMM Y') : '-' }}</p>
+                            <p class="text-xs font-bold text-slate-700 mt-1">{{ $siswa?->created_at ? \Carbon\Carbon::parse($siswa->created_at)->isoFormat('D MMMM Y') : '-' }}</p>
                         </div>
                     </div>
                 </div>
@@ -409,7 +409,7 @@
                                     <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
                                         <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Jabatan</p>
                                         <p class="mt-1.5">
-                                            <span class="px-2.5 py-1 rounded-full text-xs font-bold {{ $siswa->jabatan == 'ketua' ? 'bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 border border-amber-200' : 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 border border-sky-200' }}">
+                                            <span class="px-2.5 py-1 rounded-full text-xs font-bold {{ $siswa?->jabatan == 'ketua' ? 'bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 border border-amber-200' : 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 border border-sky-200' }}">
                                                 {{ ucfirst($siswa->jabatan ?? 'Anggota') }}
                                             </span>
                                         </p>

@@ -7,6 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class LaporanBulanan extends Model
 {
+    public const STATUS_DRAFT = 'draft';
+
+    public const STATUS_MENUNGGU = 'menunggu';
+
+    public const STATUS_DISETUJUI = 'disetujui';
+
+    public const STATUS_DITOLAK = 'ditolak';
+
     protected $fillable = ['ekskul_id', 'bulan', 'materi_kegiatan', 'ringkasan', 'dokumentasi', 'dokumentasi_kegiatan', 'status', 'catatan_pembina', 'file_laporan', 'tujuan', 'kehadiran', 'evaluasi_keberhasilan', 'evaluasi_kendala', 'evaluasi_solusi'];
 
     protected $casts = [

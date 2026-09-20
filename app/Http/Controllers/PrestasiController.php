@@ -2,28 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Models\Prestasi;
 use Illuminate\Http\Request;
 
 class PrestasiController extends Controller
 {
-    private function getEkskul()
-    {
-        $pendaftaran = auth()->user()->siswa?->pendaftarans()->where('status', 'diterima')->first();
-        abort_unless($pendaftaran, 404, 'Anda belum tergabung dalam ekskul mana pun.');
-        return $pendaftaran->ekskul;
-    }
+    use KetuaEkskul;
 
     public function index()
     {
-        $ekskul = $this->getEkskul();
+        $ekskul = $this->ekskul();
         $prestasis = $ekskul->prestasis()->latest()->get();
+
         return view('ketua.prestasi.index', compact('prestasis'));
     }
 
     public function store(Request $request)
     {
-        $ekskul = $this->getEkskul();
+        $ekskul = $this->ekskul();
 
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
@@ -49,8 +46,9 @@ class PrestasiController extends Controller
 
     public function destroy(Prestasi $prestasi)
     {
-        abort_unless($prestasi->ekskul_id === $this->getEkskul()->id, 403);
+        $this->ensureEkskul($prestasi);
         $prestasi->delete();
+
         return back()->with('success', 'Prestasi berhasil dihapus.');
     }
 }

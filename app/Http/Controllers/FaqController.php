@@ -2,28 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Models\Faq;
 use Illuminate\Http\Request;
 
 class FaqController extends Controller
 {
-    private function getEkskul()
-    {
-        $pendaftaran = auth()->user()->siswa?->pendaftarans()->where('status', 'diterima')->first();
-        abort_unless($pendaftaran, 404, 'Anda belum tergabung dalam ekskul mana pun.');
-        return $pendaftaran->ekskul;
-    }
+    use KetuaEkskul;
 
     public function index()
     {
-        $ekskul = $this->getEkskul();
+        $ekskul = $this->ekskul();
         $faqs = $ekskul->faqs()->latest()->get();
+
         return view('ketua.faq.index', compact('faqs'));
     }
 
     public function store(Request $request)
     {
-        $ekskul = $this->getEkskul();
+        $ekskul = $this->ekskul();
 
         $validated = $request->validate([
             'pertanyaan' => 'required|string|max:255',
@@ -40,8 +37,9 @@ class FaqController extends Controller
 
     public function destroy(Faq $faq)
     {
-        abort_unless($faq->ekskul_id === $this->getEkskul()->id, 403);
+        $this->ensureEkskul($faq);
         $faq->delete();
+
         return back()->with('success', 'FAQ berhasil dihapus.');
     }
 }
