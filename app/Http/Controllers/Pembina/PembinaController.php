@@ -6,9 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Ekskul;
 use App\Models\Kegiatan;
 use App\Models\LaporanBulanan;
-use App\Models\Notifikasi;
 use App\Models\Pendaftaran;
-use App\Models\Presensi;
+use App\Services\NotifikasiService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -22,7 +21,7 @@ class PembinaController extends Controller
     {
         $pembina = auth()->user()?->pembina;
 
-        if (!$pembina) {
+        if (! $pembina) {
             return collect();
         }
 
@@ -172,21 +171,22 @@ class PembinaController extends Controller
         $ekskul = $laporanBulanan->ekskul;
         $kelas = $this->generateKelas($ekskul);
         $pdf = Pdf::loadView('ketua.laporan-bulanan.pdf', ['laporan' => $laporanBulanan, 'kelas' => $kelas]);
-        $filename = 'laporan-' . str_replace('/', '-', $laporanBulanan->bulan) . '-' . ($ekskul->nama_ekskul ?? 'ekskul') . '.pdf';
+        $filename = 'laporan-'.str_replace('/', '-', $laporanBulanan->bulan).'-'.($ekskul->nama_ekskul ?? 'ekskul').'.pdf';
+
         return $pdf->download($filename);
     }
 
     public function laporanApprove(LaporanBulanan $laporanBulanan)
     {
         abort_unless($this->getEkskuls()->pluck('id')->contains($laporanBulanan->ekskul_id), 403);
-        abort_if($laporanBulanan->status !== 'menunggu', 403, 'Laporan hanya bisa disetujui saat berstatus menunggu.');
+        abort_if($laporanBulanan->status !== LaporanBulanan::STATUS_MENUNGGU, 403, 'Laporan hanya bisa disetujui saat berstatus menunggu.');
 
         $laporanBulanan->update([
-            'status' => 'disetujui',
+            'status' => LaporanBulanan::STATUS_DISETUJUI,
             'catatan_pembina' => null,
         ]);
 
-        $this->notifyKetua($laporanBulanan, 'Laporan Disetujui', 'terima');
+        NotifikasiService::laporanDitinjau($laporanBulanan, LaporanBulanan::STATUS_DISETUJUI);
 
         return redirect()->route('pembina.laporan.show', $laporanBulanan)
             ->with('success', 'Laporan disetujui.');
@@ -195,46 +195,21 @@ class PembinaController extends Controller
     public function laporanReject(Request $request, LaporanBulanan $laporanBulanan)
     {
         abort_unless($this->getEkskuls()->pluck('id')->contains($laporanBulanan->ekskul_id), 403);
-        abort_if($laporanBulanan->status !== 'menunggu', 403, 'Laporan hanya bisa ditolak saat berstatus menunggu.');
+        abort_if($laporanBulanan->status !== LaporanBulanan::STATUS_MENUNGGU, 403, 'Laporan hanya bisa ditolak saat berstatus menunggu.');
 
         $validated = $request->validate([
             'catatan_pembina' => 'nullable|string',
         ]);
 
         $laporanBulanan->update([
-            'status' => 'ditolak',
+            'status' => LaporanBulanan::STATUS_DITOLAK,
             'catatan_pembina' => $validated['catatan_pembina'] ?? null,
         ]);
 
-        $this->notifyKetua($laporanBulanan, 'Laporan Ditolak', 'tolak');
+        NotifikasiService::laporanDitinjau($laporanBulanan, LaporanBulanan::STATUS_DITOLAK);
 
         return redirect()->route('pembina.laporan.show', $laporanBulanan)
             ->with('success', 'Laporan ditolak.');
-    }
-
-    private function notifyKetua(LaporanBulanan $laporanBulanan, string $judul, string $tipe)
-    {
-        $ketua = Pendaftaran::query()
-            ->where('ekskul_id', $laporanBulanan->ekskul_id)
-            ->where('status', 'diterima')
-            ->with(['siswa.user'])
-            ->get()
-            ->map(fn($p) => $p->siswa)
-            ->firstWhere('jabatan', 'ketua');
-
-        if (!$ketua) {
-            return;
-        }
-
-        $bulanLabel = \Carbon\Carbon::createFromFormat('Y-m', $laporanBulanan->bulan)->translatedFormat('F Y');
-
-        Notifikasi::create([
-            'siswa_id' => $ketua->id,
-            'laporan_bulanan_id' => $laporanBulanan->id,
-            'judul' => $judul,
-            'pesan' => 'Laporan bulanan periode ' . $bulanLabel . ' ekskul ' . $laporanBulanan->ekskul->nama_ekskul . ' telah ditinjau oleh pembina.',
-            'tipe' => $tipe === 'terima' ? 'diterima' : 'ditolak',
-        ]);
     }
 
     public function presensi()
@@ -270,7 +245,7 @@ class PembinaController extends Controller
             return '-';
         }
 
-        $labels = $tingkats->map(fn($t) => strtoupper($t))->values();
+        $labels = $tingkats->map(fn ($t) => strtoupper($t))->values();
 
         if ($labels->count() === 1) {
             return $labels->first();
@@ -281,6 +256,7 @@ class PembinaController extends Controller
         }
 
         $last = $labels->pop();
-        return $labels->implode(', ') . ', dan ' . $last;
+
+        return $labels->implode(', ').', dan '.$last;
     }
 }

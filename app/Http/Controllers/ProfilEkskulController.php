@@ -2,26 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\KetuaEkskul;
 use Illuminate\Http\Request;
 
 class ProfilEkskulController extends Controller
 {
-    private function getEkskul()
-    {
-        $pendaftaran = auth()->user()->siswa?->pendaftarans()->where('status', 'diterima')->first();
-        abort_unless($pendaftaran, 404, 'Anda belum tergabung dalam ekskul mana pun.');
-        return $pendaftaran->ekskul;
-    }
+    use KetuaEkskul;
 
     public function edit()
     {
-        $ekskul = $this->getEkskul();
+        $ekskul = $this->ekskul();
+
         return view('ketua.profil-ekskul.edit', compact('ekskul'));
     }
 
     public function update(Request $request)
     {
-        $ekskul = $this->getEkskul();
+        $ekskul = $this->ekskul();
 
         $validated = $request->validate([
             'nama_ekskul' => 'required|string|max:255',
@@ -56,10 +53,11 @@ class ProfilEkskulController extends Controller
 
     public function toggleRecruitment()
     {
-        $ekskul = $this->getEkskul();
-        $ekskul->update(['is_open_recruitment' => !$ekskul->is_open_recruitment]);
+        $ekskul = $this->ekskul();
+        $ekskul->update(['is_open_recruitment' => ! $ekskul->is_open_recruitment]);
 
         $status = $ekskul->is_open_recruitment ? 'dibuka' : 'ditutup';
+
         return back()->with('success', "Pendaftaran ekskul telah {$status}.");
     }
 }

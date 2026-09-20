@@ -7,12 +7,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PengajuanKeluar extends Model
 {
+    public const STATUS_PENDING = 'pending';
+
+    public const STATUS_DITERIMA = 'diterima';
+
+    public const STATUS_DITOLAK = 'ditolak';
+
     protected $fillable = [
         'siswa_id',
         'ekskul_id',
         'alasan',
         'status',
-        'tanggal_pengajuan'
+        'tanggal_pengajuan',
     ];
 
     protected $casts = [

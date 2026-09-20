@@ -46,4 +46,30 @@ class Siswa extends Model
     {
         return $this->pengajuanKeluars();
     }
+
+    public function activePendaftaran(): ?Pendaftaran
+    {
+        return $this->pendaftarans()
+            ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
+            ->latest('id')
+            ->first();
+    }
+
+    public function activeEkskul(): ?Ekskul
+    {
+        return $this->activePendaftaran()?->ekskul;
+    }
+
+    public function pendingPendaftaran(): ?Pendaftaran
+    {
+        return $this->pendaftarans()
+            ->where('status', Pendaftaran::STATUS_PENDING)
+            ->latest('id')
+            ->first();
+    }
+
+    public function isKetua(): bool
+    {
+        return $this->jabatan === 'ketua';
+    }
 }

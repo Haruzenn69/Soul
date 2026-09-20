@@ -7,6 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Presensi extends Model
 {
+    public const STATUS_HADIR = 'hadir';
+
+    public const STATUS_IZIN = 'izin';
+
+    public const STATUS_SAKIT = 'sakit';
+
+    public const STATUS_ALPHA = 'alpha';
+
     protected $fillable = [
         'kegiatan_id',
         'pendaftaran_id',

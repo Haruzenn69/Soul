@@ -2,22 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Models\Kegiatan;
-use App\Models\Notifikasi;
+use App\Services\NotifikasiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class KegiatanController extends Controller
 {
-    private function getEkskul()
-    {
-        $pendaftaran = auth()->user()->siswa?->pendaftarans()->where('status', 'diterima')->first();
-        abort_unless($pendaftaran, 404, 'Anda belum tergabung dalam ekskul mana pun.');
-        return $pendaftaran->ekskul;
-    }
+    use KetuaEkskul;
 
     public function index(Request $request)
     {
-        $ekskul = $this->getEkskul();
+        $ekskul = $this->ekskul();
         $kegiatans = Kegiatan::where('ekskul_id', $ekskul->id)
             ->when($request->filled('cari'), function ($query) use ($request) {
                 $cari = $request->input('cari');
@@ -46,7 +43,7 @@ class KegiatanController extends Controller
             'dokumentasi' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $ekskul = $this->getEkskul();
+        $ekskul = $this->ekskul();
 
         $dokumentasiPath = null;
         if ($request->hasFile('dokumentasi')) {
@@ -61,48 +58,30 @@ class KegiatanController extends Controller
             'tanggal_kegiatan' => now()->toDateString(),
         ]);
 
-        $tanggalLabel = now()->isoFormat('dddd, DD MMM Y');
-
-        if ($ekskul->pembina) {
-            Notifikasi::create([
-                'pembina_id' => $ekskul->pembina->id,
-                'judul' => 'Kegiatan Mendatang',
-                'pesan' => 'Kegiatan baru "' . $validated['materi'] . '" dijadwalkan pada ' . $tanggalLabel . ' untuk ekskul ' . $ekskul->nama_ekskul . '.',
-                'tipe' => 'info',
-            ]);
-        }
-
-        $anggotas = $ekskul->pendaftarans()->whereIn('status', ['diterima', 'peringatan'])->get();
-        foreach ($anggotas as $anggota) {
-            Notifikasi::create([
-                'siswa_id' => $anggota->siswa_id,
-                'judul' => 'Kegiatan Mendatang',
-                'pesan' => 'Ada kegiatan "' . $validated['materi'] . '" di ekskul ' . $ekskul->nama_ekskul . ' pada ' . $tanggalLabel . '. Jangan lupa hadir!',
-                'tipe' => 'info',
-            ]);
-        }
+        NotifikasiService::kegiatanDibuat($kegiatan);
 
         return redirect()->route('ketua.kegiatan.index')->with('success', 'Kegiatan berhasil dibuat.');
     }
 
     public function show(Kegiatan $kegiatan)
     {
-        abort_unless($kegiatan->ekskul_id === $this->getEkskul()->id, 403);
+        $this->ensureEkskul($kegiatan);
 
         $kegiatan->load(['presensis.pendaftaran.siswa']);
+
         return view('ketua.kegiatan.show', compact('kegiatan'));
     }
 
     public function edit(Kegiatan $kegiatan)
     {
-        abort_unless($kegiatan->ekskul_id === $this->getEkskul()->id, 403);
+        $this->ensureEkskul($kegiatan);
 
         return view('ketua.kegiatan.edit', compact('kegiatan'));
     }
 
     public function update(Request $request, Kegiatan $kegiatan)
     {
-        abort_unless($kegiatan->ekskul_id === $this->getEkskul()->id, 403);
+        $this->ensureEkskul($kegiatan);
 
         $validated = $request->validate([
             'materi' => 'required|string|max:255',
@@ -113,7 +92,7 @@ class KegiatanController extends Controller
         $dokumentasiPath = $kegiatan->dokumentasi;
         if ($request->hasFile('dokumentasi')) {
             if ($kegiatan->dokumentasi) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($kegiatan->dokumentasi);
+                Storage::disk('public')->delete($kegiatan->dokumentasi);
             }
             $dokumentasiPath = $request->file('dokumentasi')->store('dokumentasi-kegiatan', 'public');
         }
@@ -130,11 +109,11 @@ class KegiatanController extends Controller
 
     public function destroy(Kegiatan $kegiatan)
     {
-        abort_unless($kegiatan->ekskul_id === $this->getEkskul()->id, 403);
+        $this->ensureEkskul($kegiatan);
         abort_if($kegiatan->presensis()->exists(), 422, 'Kegiatan yang sudah diisi presensinya tidak dapat dihapus.');
 
         if ($kegiatan->dokumentasi) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($kegiatan->dokumentasi);
+            Storage::disk('public')->delete($kegiatan->dokumentasi);
         }
 
         $kegiatan->delete();

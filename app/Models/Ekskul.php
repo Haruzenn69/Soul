@@ -69,4 +69,13 @@ class Ekskul extends Model
     {
         return $this->hasMany(Faq::class);
     }
+
+    public function ketua(): ?Siswa
+    {
+        return $this->pendaftarans()
+            ->where('status', Pendaftaran::STATUS_DITERIMA)
+            ->whereHas('siswa', fn ($q) => $q->where('jabatan', 'ketua'))
+            ->first()
+            ?->siswa;
+    }
 }
