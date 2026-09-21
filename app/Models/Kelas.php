@@ -11,8 +11,17 @@ class Kelas extends Model
     protected $fillable = [
         'nama',
         'tingkat',
-        'tahun_ajaran_id'
+        'jurusan',
+        'rombel',
+        'tahun_ajaran_id',
     ];
+
+    public function getJurusanLabelAttribute(): ?string
+    {
+        return $this->jurusan
+            ? config("kelas.jurusan.{$this->jurusan}.{$this->tingkat}")
+            : null;
+    }
 
     public function tahunAjaran(): BelongsTo
     {

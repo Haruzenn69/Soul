@@ -26,7 +26,7 @@
                class="flex-1 min-w-[180px] px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
         <select name="tingkat" class="px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
             <option value="">Semua Tingkat</option>
-            @foreach (['x' => 'X', 'xi' => 'XI', 'xii' => 'XII'] as $value => $label)
+            @foreach (config('kelas.tingkat') as $value => $label)
                 <option value="{{ $value }}" {{ request('tingkat') === $value ? 'selected' : '' }}>{{ $label }}</option>
             @endforeach
         </select>
@@ -50,7 +50,7 @@
                     <tr class="hover:bg-gray-50/60 transition text-xs">
                         <td class="py-3.5 px-2 font-bold">{{ $k->nama }}</td>
                         <td class="py-3.5 px-2">
-                            <span class="px-3 py-1 rounded-full font-bold text-[11px] bg-blue-50 text-theme-blue uppercase">{{ $k->tingkat }}</span>
+                            <span class="px-3 py-1 rounded-full font-bold text-[11px] bg-blue-50 text-theme-blue uppercase">{{ config("kelas.tingkat.{$k->tingkat}") }}</span>
                         </td>
                         <td class="py-3.5 px-2 text-gray-500">{{ $k->tahunAjaran?->nama ?? '-' }}
                             @if ($k->tahunAjaran?->is_active)
@@ -64,6 +64,8 @@
                                     "id" => $k->id,
                                     "nama" => $k->nama,
                                     "tingkat" => $k->tingkat,
+                                    "jurusan" => $k->jurusan,
+                                    "rombel" => $k->rombel,
                                     "tahun_ajaran_id" => $k->tahun_ajaran_id,
                                 ]) }})'
                                         class="px-4 py-1.5 bg-blue-50 text-theme-blue font-bold rounded-full hover:bg-blue-100 transition">Edit</button>
@@ -94,15 +96,32 @@
         <form method="POST" action="{{ route('kesiswaan.kelas.store') }}" class="p-8 space-y-4">
             @csrf
             <h2 class="text-base font-extrabold text-theme-dark mb-2">Tambah Kelas</h2>
-            <input type="text" name="nama" placeholder="Nama kelas, misal: XI RPL 1" required
-                   class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
-            <select name="tingkat" required
-                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
-                <option value="" disabled selected>Pilih tingkat...</option>
-                <option value="x">X</option>
-                <option value="xi">XI</option>
-                <option value="xii">XII</option>
-            </select>
+
+            <div>
+                <label class="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Tingkat</label>
+                <select name="tingkat" required data-tingkat
+                        class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
+                    <option value="" disabled selected>Pilih tingkat...</option>
+                    @foreach (config('kelas.tingkat') as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Jurusan</label>
+                <select name="jurusan" required data-jurusan disabled
+                        class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition disabled:opacity-60">
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Nomor Rombel</label>
+                <input type="number" name="rombel" min="1" required data-rombel
+                       placeholder="misal: 1, 2, 3..."
+                       class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
+            </div>
+
             <select name="tahun_ajaran_id" required
                     class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
                 <option value="" disabled selected>Pilih tahun ajaran...</option>
@@ -112,6 +131,12 @@
                     </option>
                 @endforeach
             </select>
+
+            <div class="px-4 py-3 bg-blue-50/60 border border-blue-100 rounded-2xl">
+                <span class="block text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-1">Nama Kelas</span>
+                <p data-preview class="text-sm font-extrabold text-theme-blue">Pilih tingkat, jurusan, dan rombel</p>
+            </div>
+
             <div class="flex gap-2 pt-2">
                 <button type="submit" class="flex-1 px-4 py-2.5 bg-theme-blue hover:bg-theme-darkBlue text-white font-bold text-xs rounded-full transition">Simpan</button>
                 <button type="button" onclick="this.closest('dialog').close()" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs rounded-full transition">Batal</button>
@@ -125,20 +150,43 @@
             @csrf
             @method('PUT')
             <h2 class="text-base font-extrabold text-theme-dark mb-2">Edit Kelas</h2>
-            <input type="text" name="nama" placeholder="Nama kelas" required
-                   class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
-            <select name="tingkat" required
-                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
-                <option value="x">X</option>
-                <option value="xi">XI</option>
-                <option value="xii">XII</option>
-            </select>
+
+            <div>
+                <label class="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Tingkat</label>
+                <select name="tingkat" required data-tingkat
+                        class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
+                    @foreach (config('kelas.tingkat') as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Jurusan</label>
+                <select name="jurusan" required data-jurusan
+                        class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Nomor Rombel</label>
+                <input type="number" name="rombel" min="1" required data-rombel
+                       placeholder="misal: 1, 2, 3..."
+                       class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
+            </div>
+
             <select name="tahun_ajaran_id" required
                     class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
                 @foreach ($tahunAjarans as $ta)
                     <option value="{{ $ta->id }}">{{ $ta->nama }} {{ $ta->is_active ? '(Aktif)' : '' }}</option>
                 @endforeach
             </select>
+
+            <div class="px-4 py-3 bg-blue-50/60 border border-blue-100 rounded-2xl">
+                <span class="block text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-1">Nama Kelas</span>
+                <p data-preview class="text-sm font-extrabold text-theme-blue">Pilih tingkat, jurusan, dan rombel</p>
+            </div>
+
             <div class="flex gap-2 pt-2">
                 <button type="submit" class="flex-1 px-4 py-2.5 bg-theme-blue hover:bg-theme-darkBlue text-white font-bold text-xs rounded-full transition">Simpan</button>
                 <button type="button" onclick="this.closest('dialog').close()" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs rounded-full transition">Batal</button>
@@ -147,12 +195,95 @@
     </dialog>
 
     <script>
+        const tingkatLabels = @json(config('kelas.tingkat'));
+
+        const jurusanMap = (function () {
+            const map = {};
+            const jurusan = @json(config('kelas.jurusan'));
+            Object.entries(jurusan).forEach(([kode, labels]) => {
+                Object.keys(tingkatLabels).forEach((tingkat) => {
+                    map[tingkat] = map[tingkat] || [];
+                    map[tingkat].push({ value: kode, label: labels[tingkat] || kode });
+                });
+            });
+            return map;
+        })();
+
+        function fillJurusan(select, tingkat, selectedValue) {
+            select.innerHTML = '';
+            if (!tingkat) {
+                select.appendChild(placeholderOption('Pilih tingkat dulu...'));
+                select.disabled = true;
+                return;
+            }
+
+            select.disabled = false;
+            (jurusanMap[tingkat] || []).forEach((j) => {
+                const opt = document.createElement('option');
+                opt.value = j.value;
+                opt.textContent = j.label;
+                select.appendChild(opt);
+            });
+
+            if (selectedValue && [...select.options].some((o) => o.value === selectedValue)) {
+                select.value = selectedValue;
+            } else if (!selectedValue) {
+                select.appendChild(placeholderOption('Pilih jurusan...', true));
+                select.selectedIndex = 0;
+            }
+
+            if (select.value && select.selectedIndex === -1) {
+                select.selectedIndex = 0;
+            }
+        }
+
+        function placeholderOption(text, isPlaceholder) {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = text;
+            if (isPlaceholder) {
+                opt.disabled = true;
+                opt.selected = true;
+            }
+            return opt;
+        }
+
+        function updatePreview(form) {
+            const tingkat = form.querySelector('[name=tingkat]').value;
+            const jurusan = form.querySelector('[name=jurusan]').value;
+            const rombel = form.querySelector('[name=rombel]').value;
+            const tLabel = tingkatLabels[tingkat] || '';
+            const jLabel = (jurusanMap[tingkat] || []).find((j) => j.value === jurusan)?.label || '';
+            const preview = form.querySelector('[data-preview]');
+            preview.textContent = [tLabel, jLabel, rombel].filter(Boolean).join(' ') || 'Pilih tingkat, jurusan, dan rombel';
+        }
+
+        function bindFormEvents(form) {
+            const tingkat = form.querySelector('[name=tingkat]');
+            const jurusan = form.querySelector('[name=jurusan]');
+            const rombel = form.querySelector('[name=rombel]');
+
+            tingkat.addEventListener('change', () => {
+                fillJurusan(jurusan, tingkat.value, '');
+                updatePreview(form);
+            });
+            jurusan.addEventListener('change', () => updatePreview(form));
+            rombel.addEventListener('input', () => updatePreview(form));
+
+            updatePreview(form);
+        }
+
+        bindFormEvents(document.querySelector('#modal-create form'));
+        bindFormEvents(document.querySelector('#modal-edit form'));
+
         function openEdit(data) {
             const form = document.getElementById('form-edit');
             form.action = '{{ url('kesiswaan/kelas') }}/' + data.id;
-            form.querySelector('[name=nama]').value = data.nama || '';
             form.querySelector('[name=tingkat]').value = data.tingkat || '';
+            fillJurusan(form.querySelector('[name=jurusan]'), data.tingkat || '', data.jurusan || '');
+            form.querySelector('[name=rombel]').value = data.rombel || '';
             form.querySelector('[name=tahun_ajaran_id]').value = data.tahun_ajaran_id || '';
+            updatePreview(form);
             document.getElementById('modal-edit').showModal();
         }
     </script>

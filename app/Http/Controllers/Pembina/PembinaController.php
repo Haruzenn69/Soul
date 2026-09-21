@@ -245,7 +245,7 @@ class PembinaController extends Controller
             return '-';
         }
 
-        $labels = $tingkats->map(fn ($t) => strtoupper($t))->values();
+        $labels = $tingkats->map(fn ($t) => config("kelas.tingkat.{$t}"))->values();
 
         if ($labels->count() === 1) {
             return $labels->first();

@@ -7,6 +7,7 @@ use App\Models\Kelas;
 use App\Models\TahunAjaran;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class KelasController extends Controller
@@ -30,28 +31,44 @@ class KelasController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $data = $request->validate([
-            'nama' => ['required', 'string', 'max:255'],
-            'tingkat' => ['required', 'in:x,xi,xii'],
-            'tahun_ajaran_id' => ['required', 'exists:tahun_ajarans,id'],
+        $data = $this->validatedData($request);
+
+        $nama = $this->buildNama($data['tingkat'], $data['jurusan'], $data['rombel']);
+
+        if ($this->kelasExists($nama, $data['tahun_ajaran_id'])) {
+            return back()->with('error', "Kelas {$nama} sudah ada pada tahun ajaran ini.");
+        }
+
+        Kelas::create([
+            'nama' => $nama,
+            'tingkat' => $data['tingkat'],
+            'jurusan' => $data['jurusan'],
+            'rombel' => $data['rombel'],
+            'tahun_ajaran_id' => $data['tahun_ajaran_id'],
         ]);
 
-        Kelas::create($data);
-
-        return back()->with('success', "Kelas {$data['nama']} berhasil ditambahkan.");
+        return back()->with('success', "Kelas {$nama} berhasil ditambahkan.");
     }
 
     public function update(Request $request, Kelas $kela): RedirectResponse
     {
-        $data = $request->validate([
-            'nama' => ['required', 'string', 'max:255'],
-            'tingkat' => ['required', 'in:x,xi,xii'],
-            'tahun_ajaran_id' => ['required', 'exists:tahun_ajarans,id'],
+        $data = $this->validatedData($request);
+
+        $nama = $this->buildNama($data['tingkat'], $data['jurusan'], $data['rombel']);
+
+        if ($this->kelasExists($nama, $data['tahun_ajaran_id'], $kela->id)) {
+            return back()->with('error', "Kelas {$nama} sudah ada pada tahun ajaran ini.");
+        }
+
+        $kela->update([
+            'nama' => $nama,
+            'tingkat' => $data['tingkat'],
+            'jurusan' => $data['jurusan'],
+            'rombel' => $data['rombel'],
+            'tahun_ajaran_id' => $data['tahun_ajaran_id'],
         ]);
 
-        $kela->update($data);
-
-        return back()->with('success', "Kelas {$kela->nama} berhasil diperbarui.");
+        return back()->with('success', "Kelas {$nama} berhasil diperbarui.");
     }
 
     public function destroy(Kelas $kela): RedirectResponse
@@ -64,5 +81,32 @@ class KelasController extends Controller
         $kela->delete();
 
         return back()->with('success', "Kelas {$nama} berhasil dihapus.");
+    }
+
+    private function validatedData(Request $request): array
+    {
+        return Validator::make($request->all(), [
+            'tingkat' => ['required', 'in:x,xi,xii'],
+            'jurusan' => ['required', 'in:rpl,tkj,dkv'],
+            'rombel' => ['required', 'integer', 'min:1'],
+            'tahun_ajaran_id' => ['required', 'exists:tahun_ajarans,id'],
+        ])->validate();
+    }
+
+    private function buildNama(string $tingkat, string $jurusan, string $rombel): string
+    {
+        $labelTingkat = config("kelas.tingkat.{$tingkat}", $tingkat);
+        $labelJurusan = config("kelas.jurusan.{$jurusan}.{$tingkat}", $jurusan);
+
+        return trim("{$labelTingkat} {$labelJurusan} {$rombel}");
+    }
+
+    private function kelasExists(string $nama, int $tahunAjaranId, ?int $ignoreId = null): bool
+    {
+        return Kelas::query()
+            ->where('nama', $nama)
+            ->where('tahun_ajaran_id', $tahunAjaranId)
+            ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+            ->exists();
     }
 }
