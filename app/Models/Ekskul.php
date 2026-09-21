@@ -19,10 +19,12 @@ class Ekskul extends Model
         'cover',
         'jadwal',
         'is_open_recruitment',
+        'status',
     ];
 
     protected $casts = [
         'is_open_recruitment' => 'boolean',
+        'status' => 'boolean',
     ];
 
     public function pembina(): BelongsTo
