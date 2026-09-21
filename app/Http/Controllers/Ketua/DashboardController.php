@@ -20,7 +20,11 @@ class DashboardController extends Controller
                 'pendingCount' => 0,
                 'pengajuanCount' => 0,
                 'chartKegiatan' => ['labels' => [], 'hadir' => [], 'izin' => [], 'sakit' => [], 'alpha' => []],
-                'chartKelas' => ['labels' => ['Kelas X', 'Kelas XI', 'Kelas XII'], 'data' => [0, 0, 0]],
+                'chartKelas' => ['labels' => [
+                    'Kelas 10',
+                    'Kelas 11',
+                    'Kelas 12',
+                ], 'data' => [0, 0, 0]],
             ]);
         }
 
@@ -59,7 +63,11 @@ class DashboardController extends Controller
         $countXII = $anggotaAktif->filter(fn ($p) => strtolower($p->siswa?->kelas?->tingkat ?? '') === 'xii')->count();
 
         $chartKelas = [
-            'labels' => ['Kelas X', 'Kelas XI', 'Kelas XII'],
+            'labels' => [
+                'Kelas 10',
+                'Kelas 11',
+                'Kelas 12',
+            ],
             'data' => [$countX, $countXI, $countXII],
         ];
 

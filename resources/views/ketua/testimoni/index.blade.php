@@ -25,7 +25,7 @@
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Kelas</label>
-                    <input type="text" name="kelas" value="{{ old('kelas') }}" placeholder="Contoh: XI IPA 2"
+                    <input type="text" name="kelas" value="{{ old('kelas') }}" placeholder="Contoh: 11 IPA 2"
                         class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                 </div>
             </div>

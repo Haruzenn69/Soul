@@ -30,7 +30,7 @@ class LaporanBulananController extends Controller
             return '-';
         }
 
-        $labels = $tingkats->map(fn ($t) => strtoupper($t))->values();
+        $labels = $tingkats->map(fn ($t) => config("kelas.tingkat.{$t}"))->values();
 
         if ($labels->count() === 1) {
             return $labels->first();
@@ -101,7 +101,7 @@ class LaporanBulananController extends Controller
         $teksParts = [];
 
         foreach ($byTingkat as $tingkat => $anggotaTingkat) {
-            $label = strtoupper($tingkat);
+            $label = config("kelas.tingkat.{$tingkat}");
             $total = $anggotaTingkat->count();
 
             $hadirCount = 0;

@@ -7,6 +7,7 @@ use App\Models\Kelas;
 use App\Models\Pembina;
 use App\Models\Pendaftaran;
 use App\Models\Siswa;
+use App\Models\TahunAjaran;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -21,16 +22,16 @@ class KetuaPaskibraSeeder extends Seeder
             [
                 'username' => 'pembina_paskibra',
                 'password' => Hash::make('password'),
-                'role'     => 'pembina',
+                'role' => 'pembina',
             ]
         );
 
         $pembinaPaskibra = Pembina::firstOrCreate(
             ['user_id' => $userPembinaPaskibra->id],
             [
-                'nip'             => '198502022020022002',
-                'nama'            => 'Bu Siti, S.Pd',
-                'jenis_kelamin'   => 'perempuan',
+                'nip' => '198502022020022002',
+                'nama' => 'Bu Siti, S.Pd',
+                'jenis_kelamin' => 'perempuan',
             ]
         );
 
@@ -38,12 +39,12 @@ class KetuaPaskibraSeeder extends Seeder
         $ekskulPaskibra = Ekskul::firstOrCreate(
             ['nama_ekskul' => 'Paskibra'],
             [
-                'pembina_id'          => $pembinaPaskibra->id,
-                'pelatih_id'          => null,
-                'tagline'             => 'Berkibar Tinggi, Berkarakter Kuat.',
-                'deskripsi'           => 'Pasukan Pengibar Bendera - Ekskul prestisius di sekolah',
-                'tujuan'              => 'Melatih kedisiplinan, kepemimpinan, dan rasa cinta tanah air melalui latihan baris-berbaris dan upacara.',
-                'jadwal'              => 'Selasa & Jumat, 15:30 - 17:30',
+                'pembina_id' => $pembinaPaskibra->id,
+                'pelatih_id' => null,
+                'tagline' => 'Berkibar Tinggi, Berkarakter Kuat.',
+                'deskripsi' => 'Pasukan Pengibar Bendera - Ekskul prestisius di sekolah',
+                'tujuan' => 'Melatih kedisiplinan, kepemimpinan, dan rasa cinta tanah air melalui latihan baris-berbaris dan upacara.',
+                'jadwal' => 'Selasa & Jumat, 15:30 - 17:30',
                 'is_open_recruitment' => true,
             ]
         );
@@ -53,18 +54,18 @@ class KetuaPaskibraSeeder extends Seeder
             $ekskulPaskibra->update(['pembina_id' => $pembinaPaskibra->id]);
         }
 
-        // ===== KELAS XII RPL 1 (ambil dari seeder existing) =====
-        $kelas = Kelas::where('nama', 'XII RPL 1')->first();
-        if (!$kelas) {
-            $tahunAjaran = \App\Models\TahunAjaran::where('is_active', true)->first();
-            if (!$tahunAjaran) {
-                $tahunAjaran = \App\Models\TahunAjaran::create([
+        // ===== KELAS XII RPL 1 - nama "12 RPL 1" (ambil dari seeder existing) =====
+        $kelas = Kelas::where('nama', '12 RPL 1')->first();
+        if (! $kelas) {
+            $tahunAjaran = TahunAjaran::where('is_active', true)->first();
+            if (! $tahunAjaran) {
+                $tahunAjaran = TahunAjaran::create([
                     'nama' => '2026/2027',
                     'is_active' => true,
                 ]);
             }
             $kelas = Kelas::create([
-                'nama' => 'XII RPL 1',
+                'nama' => '12 RPL 1',
                 'tingkat' => 'xii',
                 'tahun_ajaran_id' => $tahunAjaran->id,
             ]);
@@ -76,18 +77,18 @@ class KetuaPaskibraSeeder extends Seeder
             [
                 'username' => 'ketua_paskibra2',
                 'password' => Hash::make('password'),
-                'role'     => 'siswa',
+                'role' => 'siswa',
             ]
         );
 
         $siswaKetua = Siswa::firstOrCreate(
             ['user_id' => $userKetua->id],
             [
-                'nis'           => '2406510099',
-                'nama'          => 'Fajar Ramadhan',
-                'kelas_id'      => $kelas->id,
+                'nis' => '2406510099',
+                'nama' => 'Fajar Ramadhan',
+                'kelas_id' => $kelas->id,
                 'jenis_kelamin' => 'laki-laki',
-                'jabatan'       => 'ketua',
+                'jabatan' => 'ketua',
             ]
         );
 
@@ -96,8 +97,8 @@ class KetuaPaskibraSeeder extends Seeder
             ['siswa_id' => $siswaKetua->id, 'ekskul_id' => $ekskulPaskibra->id],
             [
                 'tanggal_daftar' => now()->subDays(1)->toDateString(),
-                'status'         => 'diterima',
-                'alasan'         => 'Ingin memimpin ekskul Paskibra dengan dedikasi dan disiplin.',
+                'status' => 'diterima',
+                'alasan' => 'Ingin memimpin ekskul Paskibra dengan dedikasi dan disiplin.',
             ]
         );
 
@@ -111,12 +112,12 @@ class KetuaPaskibraSeeder extends Seeder
         $this->command->info('📋 Detail Siswa:');
         $this->command->info('   Nama     : Fajar Ramadhan');
         $this->command->info('   NIS      : 2406510099');
-        $this->command->info('   Kelas    : ' . $kelas->nama);
+        $this->command->info('   Kelas    : '.$kelas->nama);
         $this->command->info('   Jabatan  : Ketua');
         $this->command->info('');
         $this->command->info('🔗 Koneksi data:');
-        $this->command->info('   - Ekskul Paskibra (id: ' . $ekskulPaskibra->id . ') terhubung ke Pembina: ' . $pembinaPaskibra->nama);
-        $this->command->info('   - Ketua terdaftar di Pendaftaran (id: ' . $pendaftaran->id . ') dengan status: ' . $pendaftaran->status);
+        $this->command->info('   - Ekskul Paskibra (id: '.$ekskulPaskibra->id.') terhubung ke Pembina: '.$pembinaPaskibra->nama);
+        $this->command->info('   - Ketua terdaftar di Pendaftaran (id: '.$pendaftaran->id.') dengan status: '.$pendaftaran->status);
         $this->command->info('');
         $this->command->info('💡 Bisa login sekarang untuk mengkonfirmasi pendaftaran via dashboard ketua.');
     }

@@ -76,7 +76,7 @@
                         <option value="">Pilih kelas...</option>
                         @foreach ($kelas as $k)
                             <option value="{{ $k->id }}" {{ old('kelas_id') == $k->id ? 'selected' : '' }}>
-                                {{ $k->nama }} ({{ strtoupper($k->tingkat) }})
+                                {{ $k->nama }} ({{ config("kelas.tingkat.{$k->tingkat}") }})
                             </option>
                         @endforeach
                     </select>
