@@ -126,6 +126,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 // ============================================================
 Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')->group(function () {
     Route::get('/dashboard', [PembinaController::class, 'dashboard'])->name('dashboard');
+    Route::patch('/ekskuls/{ekskul}/pelatih', [PembinaController::class, 'updatePelatih'])->name('ekskul.pelatih');
     Route::get('/anggota', [PembinaController::class, 'anggota'])->name('anggota');
     Route::get('/pendaftaran', [PembinaController::class, 'pendaftaran'])->name('pendaftaran');
     Route::get('/laporan', [PembinaController::class, 'laporan'])->name('laporan.index');

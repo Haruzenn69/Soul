@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Kesiswaan;
 use App\Http\Controllers\Controller;
 use App\Models\Ekskul;
 use App\Models\Pembina;
-use App\Models\Pelatih;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -27,7 +26,6 @@ class EkskulController extends Controller
         return view('kesiswaan.ekskuls.index', [
             'ekskuls' => $ekskuls,
             'pembinas' => Pembina::with('user')->orderBy('nama')->get(),
-            'pelatihs' => Pelatih::orderBy('nama')->get(),
         ]);
     }
 
@@ -36,7 +34,6 @@ class EkskulController extends Controller
         $data = $request->validate([
             'nama_ekskul' => ['required', 'string', 'max:255'],
             'pembina_id' => ['required', 'exists:pembinas,id'],
-            'pelatih_id' => ['required', 'exists:pelatihs,id'],
             'deskripsi' => ['nullable', 'string'],
             'jadwal' => ['nullable', 'string', 'max:255'],
         ]);
@@ -51,7 +48,6 @@ class EkskulController extends Controller
         $data = $request->validate([
             'nama_ekskul' => ['required', 'string', 'max:255'],
             'pembina_id' => ['required', 'exists:pembinas,id'],
-            'pelatih_id' => ['required', 'exists:pelatihs,id'],
             'deskripsi' => ['nullable', 'string'],
             'jadwal' => ['nullable', 'string', 'max:255'],
         ]);
@@ -64,7 +60,7 @@ class EkskulController extends Controller
     public function destroy(Ekskul $ekskul): RedirectResponse
     {
         $nama = $ekskul->nama_ekskul;
-        $ekskul->update(['status' => !$ekskul->status]);
+        $ekskul->update(['status' => ! $ekskul->status]);
 
         $state = $ekskul->status ? 'diaktifkan' : 'dinonaktifkan';
 
