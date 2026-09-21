@@ -6,11 +6,11 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
             <h1 class="text-2xl font-extrabold text-theme-dark">Data Ekskul</h1>
-            <p class="text-xs text-gray-400 mt-1">Kelola ekstrakurikuler beserta pembina dan pelatihnya.</p>
+            <p class="text-xs text-gray-400 mt-1">Kelola ekstrakurikuler beserta pembinanya.</p>
         </div>
-        @if ($pembinas->isEmpty() || $pelatihs->isEmpty())
+        @if ($pembinas->isEmpty())
             <span class="px-4 py-2 bg-amber-50 text-amber-600 rounded-full text-[11px] font-bold">
-                ⚠ {{ $pembinas->isEmpty() ? 'Buat akun pembina dulu di menu Akun Pengguna.' : 'Tambahkan data pelatih terlebih dahulu (seeder).' }}
+                ⚠ Buat akun pembina dulu di menu Akun Pengguna.
             </span>
         @else
             <button onclick="document.getElementById('modal-create').showModal()"
@@ -58,7 +58,6 @@
                         "id" => $ekskul->id,
                         "nama_ekskul" => $ekskul->nama_ekskul,
                         "pembina_id" => $ekskul->pembina_id,
-                        "pelatih_id" => $ekskul->pelatih_id,
                         "deskripsi" => $ekskul->deskripsi,
                         "jadwal" => $ekskul->jadwal,
                     ]) }})' 
@@ -94,13 +93,6 @@
                     <option value="{{ $p->id }}">{{ $p->nama }}</option>
                 @endforeach
             </select>
-            <select name="pelatih_id" required
-                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
-                <option value="" disabled selected>Pilih pelatih...</option>
-                @foreach ($pelatihs as $pl)
-                    <option value="{{ $pl->id }}">{{ $pl->nama }} ({{ $pl->status }})</option>
-                @endforeach
-            </select>
             <textarea name="deskripsi" rows="2" placeholder="Deskripsi (opsional)"
                       class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition"></textarea>
             <input type="text" name="jadwal" placeholder="Jadwal, misal: Senin & Rabu, 15:30 - 17:00"
@@ -127,13 +119,6 @@
                     <option value="{{ $p->id }}">{{ $p->nama }}</option>
                 @endforeach
             </select>
-            <select name="pelatih_id" required
-                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
-                <option value="" disabled>Pilih pelatih...</option>
-                @foreach ($pelatihs as $pl)
-                    <option value="{{ $pl->id }}">{{ $pl->nama }} ({{ $pl->status }})</option>
-                @endforeach
-            </select>
             <textarea name="deskripsi" rows="2" placeholder="Deskripsi (opsional)"
                       class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition"></textarea>
             <input type="text" name="jadwal" placeholder="Jadwal"
@@ -151,7 +136,6 @@
             form.action = '{{ url('kesiswaan/ekskuls') }}/' + data.id;
             form.querySelector('[name=nama_ekskul]').value = data.nama_ekskul || '';
             form.querySelector('[name=pembina_id]').value = data.pembina_id || '';
-            form.querySelector('[name=pelatih_id]').value = data.pelatih_id || '';
             form.querySelector('[name=deskripsi]').value = data.deskripsi || '';
             form.querySelector('[name=jadwal]').value = data.jadwal || '';
             document.getElementById('modal-edit').showModal();

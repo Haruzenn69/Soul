@@ -65,11 +65,11 @@
         </div>
         <div class="sheet-footer">
             @auth
-                <a href="{{ $accountUrl }}" class="btn-outline">Sign In</a>
-                <a href="{{ $accountUrl }}" class="btn-primary">Get Started</a>
+                <a href="{{ $accountUrl }}" class="btn-outline">Dashboard</a>
+                <a href="{{ $accountUrl }}" class="btn-primary">Mulai Sekarang</a>
             @else
-                <a href="{{ route('login') }}" class="btn-outline">Sign In</a>
-                <a href="{{ route('login') }}" class="btn-primary">Get Started</a>
+                <a href="{{ route('login') }}" class="btn-outline">Masuk</a>
+                <a href="{{ route('login') }}" class="btn-primary">Mulai Sekarang</a>
             @endauth
         </div>
     </div>

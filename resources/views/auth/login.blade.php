@@ -450,7 +450,7 @@
                     @csrf
 
                     <div class="form-group">
-                        <label class="form-label" for="email">Email atau No. Handphone<span class="required">*</span></label>
+                        <label class="form-label" for="email">Email<span class="required">*</span></label>
                         <input class="form-control" id="email" type="text" name="email" value="{{ old('email') }}" placeholder="Masukkan email atau no. handphone" required autofocus>
                     </div>
 

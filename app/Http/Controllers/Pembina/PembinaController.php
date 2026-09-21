@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ekskul;
 use App\Models\Kegiatan;
 use App\Models\LaporanBulanan;
+use App\Models\Pelatih;
 use App\Models\Pendaftaran;
 use App\Services\NotifikasiService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -63,7 +64,24 @@ class PembinaController extends Controller
             ->latest('bulan')
             ->get();
 
-        return view('pembina.dashboard', compact('ekskul', 'anggota', 'anggotaAktifCount', 'pendaftaranPending', 'kegiatanMendatang', 'laporanDraft'));
+        $pelatihs = Pelatih::orderBy('nama')->get();
+
+        return view('pembina.dashboard', compact('ekskul', 'ekskuls', 'pelatihs', 'anggota', 'anggotaAktifCount', 'pendaftaranPending', 'kegiatanMendatang', 'laporanDraft'));
+    }
+
+    public function updatePelatih(Request $request, Ekskul $ekskul)
+    {
+        abort_unless($this->getEkskuls()->pluck('id')->contains($ekskul->id), 403);
+
+        $validated = $request->validate([
+            'pelatih_id' => ['nullable', 'exists:pelatihs,id'],
+        ]);
+
+        $ekskul->update(['pelatih_id' => $validated['pelatih_id'] ?? null]);
+
+        $namaPelatih = $ekskul->pelatih?->nama ?? '-';
+
+        return back()->with('success', "Pelatih {$ekskul->nama_ekskul} diperbarui: {$namaPelatih}.");
     }
 
     public function anggota(Request $request)

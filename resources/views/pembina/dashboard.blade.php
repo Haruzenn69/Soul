@@ -264,6 +264,50 @@
         <!-- RIGHT COLUMN -->
         <div class="space-y-6">
 
+            <!-- PELATIH EKSRUL -->
+            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .22s">
+                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
+                    <div>
+                        <h2 class="text-sm font-extrabold text-slate-900">Pelatih Ekskul</h2>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Tentukan pelatih untuk ekskul binaanmu</p>
+                    </div>
+                    <span class="text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">{{ $ekskuls->count() ?? 0 }} Ekskul</span>
+                </div>
+
+                @forelse($ekskuls ?? collect() as $ekskulBinaan)
+                    <div class="p-5">
+                        <form method="POST" action="{{ route('pembina.ekskul.pelatih', $ekskulBinaan) }}" class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-xl border border-sky-100 hover:border-sky-200 transition">
+                            @csrf
+                            @method('PATCH')
+                            <p class="text-xs font-bold text-slate-800 mb-1">{{ $ekskulBinaan->nama_ekskul }}</p>
+                            <p class="text-[10px] text-slate-400 mb-3">Pelatih saat ini: <span class="font-bold text-slate-600">{{ $ekskulBinaan->pelatih?->nama ?? '-' }}</span></p>
+                            <div class="flex gap-2">
+                                <select name="pelatih_id"
+                                    class="flex-1 min-w-0 px-3 py-2.5 bg-white border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 transition">
+                                    <option value="" {{ $ekskulBinaan->pelatih_id ? '' : 'selected' }}>Tanpa pelatih</option>
+                                    @foreach ($pelatihs as $pl)
+                                        <option value="{{ $pl->id }}" {{ $ekskulBinaan->pelatih_id == $pl->id ? 'selected' : '' }}>{{ $pl->nama }} ({{ $pl->status }})</option>
+                                    @endforeach
+                                </select>
+                                <button type="submit" class="shrink-0 px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl transition">
+                                    Simpan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                @empty
+                    <div class="text-center py-10">
+                        <div class="mx-auto w-16 h-16 rounded-2xl bg-sky-50 flex items-center justify-center text-sky-300 border border-sky-100">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18z"/>
+                            </svg>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-500 mt-3">Belum ada ekskul binaan</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Hubungi kesiswaan untuk mendapatkan binaan ekskul</p>
+                    </div>
+                @endforelse
+            </div>
+
             <!-- PENDAFTARAN SISWA -->
             <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .25s">
                 <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">

@@ -22,6 +22,7 @@ class KatalogController extends Controller
         }
 
         $ekskuls = Ekskul::with('pembina')
+            ->where('status', true)
             ->when($request->filled('cari'), function ($query) use ($request) {
                 $cari = $request->input('cari');
                 $query->where(function ($sub) use ($cari) {

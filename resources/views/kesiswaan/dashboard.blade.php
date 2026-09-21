@@ -334,7 +334,7 @@
                             </div>
                             <div class="min-w-0">
                                 <h4 class="text-xs font-bold text-slate-800">Data Ekskul</h4>
-                                <p class="text-[10px] text-slate-400 mt-0.5">Pengaturan data ekstrakurikuler beserta penetapan pembina dan pelatih</p>
+                                <p class="text-[10px] text-slate-400 mt-0.5">Pengaturan data ekstrakurikuler beserta penetapan pembina</p>
                             </div>
                         </div>
                         <span class="px-2.5 py-1 bg-sky-50 border border-sky-100 text-sky-600 text-[10px] font-bold rounded-full shrink-0">{{ $totalEkskul }} Ekskul</span>
