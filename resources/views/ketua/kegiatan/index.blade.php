@@ -4,15 +4,23 @@
 @section('content')
 <div class="space-y-6">
     <!-- Page Header -->
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
         <div>
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Daftar Kegiatan</h1>
             <p class="text-xs text-slate-400 mt-1">Total: {{ $kegiatans->count() }} kegiatan</p>
         </div>
-        <a href="{{ route('ketua.kegiatan.create') }}" class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 transition inline-flex w-full sm:w-auto items-center justify-center gap-2 shrink-0">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            Kegiatan Baru
-        </a>
+        <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <form method="GET" action="{{ route('ketua.kegiatan.index') }}" class="flex gap-2 min-w-0">
+                <label for="cari-kegiatan" class="sr-only">Cari kegiatan</label>
+                <input id="cari-kegiatan" type="search" name="cari" value="{{ request('cari') }}"
+                    placeholder="Cari kegiatan..." class="w-full sm:w-56 px-3 py-2 border border-slate-200 rounded-xl text-sm">
+                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition-all">Cari</button>
+            </form>
+            <a href="{{ route('ketua.kegiatan.create') }}" class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 transition inline-flex items-center justify-center gap-2 shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Kegiatan baru
+            </a>
+        </div>
     </div>
 
     <!-- Table Card -->

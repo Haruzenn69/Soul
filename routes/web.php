@@ -150,6 +150,7 @@ Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name
     Route::resource('kegiatan', KegiatanController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
     Route::get('kegiatan/{kegiatan}/presensi', [PresensiController::class, 'create'])->name('presensi.create');
     Route::post('kegiatan/{kegiatan}/presensi', [PresensiController::class, 'store'])->name('presensi.store');
+    Route::get('rekap-absensi', [PresensiController::class, 'rekap'])->name('presensi.rekap');
     Route::resource('pendaftaran', PendaftaranController::class)->only(['index', 'show', 'update']);
     Route::resource('pengajuan-keluar', PengajuanKeluarController::class)->only(['index', 'show', 'update']);
     Route::get('anggota', [AnggotaController::class, 'index'])->name('anggota.index');

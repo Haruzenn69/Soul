@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Siswa;
 use App\Http\Controllers\Controller;
 use App\Models\Ekskul;
 use App\Models\Pendaftaran;
+use App\Models\Siswa;
 use App\Rules\AlasanValid;
 use App\Services\NotifikasiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PendaftaranController extends Controller
 {
@@ -22,6 +24,8 @@ class PendaftaranController extends Controller
         }
 
         $ekskuls = Ekskul::with('pembina')
+            ->where('status', true)
+            ->where('is_open_recruitment', true)
             ->when($request->filled('cari'), function ($query) use ($request) {
                 $cari = $request->input('cari');
                 $query->where(function ($sub) use ($cari) {
@@ -47,6 +51,10 @@ class PendaftaranController extends Controller
             return redirect()->route('siswa.dashboard')->with('error', 'Kamu sudah mengajukan pendaftaran. Tunggu verifikasi dari ketua ekskul.');
         }
 
+        if (! $ekskul->status || ! $ekskul->is_open_recruitment) {
+            return redirect()->route('siswa.daftar-ekskul')->with('error', 'Pendaftaran ekskul ini sedang ditutup.');
+        }
+
         $ekskul->load('pembina');
 
         return view('siswa.form-daftar', compact('ekskul', 'siswa'));
@@ -56,6 +64,8 @@ class PendaftaranController extends Controller
     {
         $user = auth()->user();
         $siswa = $user->siswa;
+
+        abort_unless($siswa, 403, 'Profil siswa belum tersedia. Hubungi kesiswaan.');
 
         if ($siswa->activePendaftaran()) {
             return redirect()->back()->with('error', 'Kamu sudah terdaftar di ekskul.');
@@ -75,13 +85,36 @@ class PendaftaranController extends Controller
             'alasan.max' => 'Alasan bergabung maksimal 1000 karakter.',
         ]);
 
-        $pendaftaran = Pendaftaran::create([
-            'siswa_id' => $siswa->id,
-            'ekskul_id' => $validated['ekskul_id'],
-            'tanggal_daftar' => now()->toDateString(),
-            'status' => Pendaftaran::STATUS_PENDING,
-            'alasan' => $validated['alasan'],
-        ]);
+        $pendaftaran = DB::transaction(function () use ($siswa, $validated) {
+            // Serialize submissions for this student so concurrent requests
+            // cannot both pass the active/pending enrollment checks.
+            Siswa::whereKey($siswa->id)->lockForUpdate()->firstOrFail();
+
+            $ekskul = Ekskul::query()->whereKey($validated['ekskul_id'])->firstOrFail();
+            if (! $ekskul->status || ! $ekskul->is_open_recruitment) {
+                return null;
+            }
+
+            if ($siswa->activePendaftaran() || $siswa->pendingPendaftaran()) {
+                return false;
+            }
+
+            return Pendaftaran::create([
+                'siswa_id' => $siswa->id,
+                'ekskul_id' => $ekskul->id,
+                'tanggal_daftar' => now()->toDateString(),
+                'status' => Pendaftaran::STATUS_PENDING,
+                'alasan' => $validated['alasan'],
+            ]);
+        });
+
+        if ($pendaftaran === null) {
+            return redirect()->back()->with('error', 'Pendaftaran ekskul ini sedang ditutup.');
+        }
+
+        if ($pendaftaran === false) {
+            return redirect()->back()->with('error', 'Kamu sudah mengajukan pendaftaran atau terdaftar di ekskul.');
+        }
 
         NotifikasiService::pendaftaranMasuk($pendaftaran);
 
