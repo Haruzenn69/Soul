@@ -35,7 +35,7 @@
 <body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased flex min-h-screen overflow-x-hidden">
 
     <!-- SIDEBAR LEFT -->
-    <aside class="w-64 bg-white/90 backdrop-blur border-r border-sky-100 shadow-sm flex flex-col justify-between p-5 hidden md:flex shrink-0 relative overflow-hidden">
+    <aside class="w-64 bg-white/90 backdrop-blur border-r border-sky-100 shadow-sm flex flex-col p-5 hidden md:flex shrink-0 sticky top-0 self-start h-screen overflow-y-auto overflow-x-hidden">
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -top-24 -right-16 w-64 h-64 rounded-full bg-sky-100/70 blur-3xl animate-blob"></div>
             <div class="absolute bottom-0 -left-20 w-56 h-56 rounded-full bg-amber-100/70 blur-3xl animate-blob" style="animation-delay: 3s"></div>

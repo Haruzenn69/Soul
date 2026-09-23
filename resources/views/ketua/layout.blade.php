@@ -124,7 +124,7 @@
     @php $namaEkskul = auth()->user()->siswa?->pendaftarans()->where('status', 'diterima')->first()?->ekskul->nama_ekskul ?? ''; @endphp
 
     <!-- SIDEBAR LEFT (collapsible, ala Claude) -->
-    <aside aria-label="Navigasi utama Ketua" id="sidebar-desktop" class="w-72 bg-white/90 backdrop-blur border-r border-sky-100 shadow-sm flex flex-col justify-between p-5 hidden md:flex shrink-0 relative overflow-hidden">
+    <aside aria-label="Navigasi utama Ketua" id="sidebar-desktop" class="w-72 bg-white/90 backdrop-blur border-r border-sky-100 shadow-sm flex flex-col justify-between p-5 hidden md:flex shrink-0 sticky top-0 self-start h-screen overflow-hidden">
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -top-24 -right-16 w-64 h-64 rounded-full bg-sky-100/70 blur-3xl animate-blob"></div>
             <div class="absolute bottom-0 -left-20 w-56 h-56 rounded-full bg-amber-100/70 blur-3xl animate-blob" style="animation-delay: 3s"></div>
@@ -137,7 +137,7 @@
             </svg>
         </button>
 
-        <div class="relative p-5 flex flex-col h-full">
+        <div class="relative p-5 flex flex-col h-full overflow-y-auto overflow-x-hidden">
             <!-- Logo SOUL -->
             <div class="flex items-center gap-3 mb-7 px-2 mt-1">
                 <div class="w-10 h-10 shrink-0 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-extrabold text-lg shadow-lg shadow-sky-300">
