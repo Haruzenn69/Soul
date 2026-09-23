@@ -77,7 +77,12 @@
                         <td class="py-3.5 px-2">
                             <div class="flex gap-2 justify-end items-center">
                                 @if ($user->role === 'admin' && auth()->user()->role !== 'admin')
-                                    <span class="text-[10px] text-gray-400 italic px-3">🔒 Dikelola Admin</span>
+                                    <span class="text-[10px] text-gray-400 italic px-3 flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>
+                                        </svg>
+                                        Dikelola Admin
+                                    </span>
                                 @else
                                     <a href="{{ route('kesiswaan.users.edit', $user) }}"
                                        class="px-3 py-1.5 bg-blue-50 text-theme-blue font-bold rounded-full hover:bg-blue-100 transition">Edit</a>
