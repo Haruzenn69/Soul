@@ -79,6 +79,7 @@
             opacity: 1;
             transform: translateY(-50%) translateX(0);
         }
+
     </style>
     @include('partials.responsive-tables')
 </head>

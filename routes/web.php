@@ -129,6 +129,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 // ============================================================
 Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')->group(function () {
     Route::get('/dashboard', [PembinaController::class, 'dashboard'])->name('dashboard');
+    Route::patch('/ekskuls/{ekskul}/pelatih', [PembinaController::class, 'updatePelatih'])->name('ekskul.pelatih');
     Route::get('/anggota', [PembinaController::class, 'anggota'])->name('anggota');
     Route::get('/pendaftaran', [PembinaController::class, 'pendaftaran'])->name('pendaftaran');
     Route::get('/laporan', [PembinaController::class, 'laporan'])->name('laporan.index');
@@ -154,6 +155,7 @@ Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name
     Route::resource('kegiatan', KegiatanController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
     Route::get('kegiatan/{kegiatan}/presensi', [PresensiController::class, 'create'])->name('presensi.create');
     Route::post('kegiatan/{kegiatan}/presensi', [PresensiController::class, 'store'])->name('presensi.store');
+    Route::get('rekap-absensi', [PresensiController::class, 'rekap'])->name('presensi.rekap');
     Route::resource('pendaftaran', PendaftaranController::class)->only(['index', 'show', 'update']);
     Route::resource('pengajuan-keluar', PengajuanKeluarController::class)->only(['index', 'show', 'update']);
     Route::get('anggota', [AnggotaController::class, 'index'])->name('anggota.index');

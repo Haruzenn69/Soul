@@ -19,7 +19,7 @@ return [
             'x' => 'TJKT',
             'xi' => 'TKJ',
             'xii' => 'TKJ',
-        ],
+        ], 
         'dkv' => [
             'x' => 'DKV',
             'xi' => 'DKV',

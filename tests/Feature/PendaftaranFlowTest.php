@@ -58,6 +58,21 @@ class PendaftaranFlowTest extends TestCase
         $this->assertSame($before, Pendaftaran::count());
     }
 
+    public function test_siswa_tidak_bisa_mendaftar_ke_ekskul_yang_pendaftarannya_ditutup(): void
+    {
+        $ekskul = $this->makeEkskul(['is_open_recruitment' => false]);
+        $siswa = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
+
+        $this->actingAs($siswa->user)
+            ->post('/siswa/daftar-ekskul', [
+                'ekskul_id' => $ekskul->id,
+                'alasan' => 'Saya ingin mengembangkan keterampilan dan menambah pengalaman.',
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseCount('pendaftarans', 0);
+    }
+
     public function test_alasan_iseng_ditolak_validasi(): void
     {
         $ekskul = $this->makeEkskul();
@@ -93,5 +108,24 @@ class PendaftaranFlowTest extends TestCase
             'tipe' => 'diterima',
             'judul' => 'Pendaftaran Diterima',
         ]);
+    }
+
+    public function test_pendaftaran_yang_sudah_diproses_tidak_bisa_diubah_lagi(): void
+    {
+        $ekskul = $this->makeEkskul();
+        $ketua = $this->makeKetua($ekskul);
+        $siswa = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
+        $pendaftaran = $this->daftarkan($siswa, $ekskul, Pendaftaran::STATUS_PENDING);
+
+        $this->actingAs($ketua['user'])
+            ->patch('/ketua/pendaftaran/'.$pendaftaran->id, ['status' => Pendaftaran::STATUS_DITERIMA])
+            ->assertRedirect();
+
+        $this->actingAs($ketua['user'])
+            ->patch('/ketua/pendaftaran/'.$pendaftaran->id, ['status' => Pendaftaran::STATUS_DITOLAK])
+            ->assertRedirect()
+            ->assertSessionHas('error');
+
+        $this->assertSame(Pendaftaran::STATUS_DITERIMA, $pendaftaran->fresh()->status);
     }
 }
