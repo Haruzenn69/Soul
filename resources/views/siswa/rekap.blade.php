@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Siswa - SOUL</title>
+    <title>Rekap Absensi - SOUL</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -74,6 +74,7 @@
             transform: translateY(-50%) translateX(0);
         }
     </style>
+    @include('partials.responsive-tables')
 </head>
 <body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased min-h-screen md:flex selection:bg-sky-100 selection:text-sky-700 overflow-x-hidden">
 
@@ -145,7 +146,8 @@
                 </div>
 
                 <div class="nav-item-wrap relative">
-                    <a href="{{ route('siswa.rekap') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
+                    <a href="{{ route('siswa.rekap') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold text-xs shadow-sm shadow-sky-100 transition-all">
+                        <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                         <span class="text-base flex items-center justify-center w-4 h-4 shrink-0">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -157,8 +159,7 @@
                 </div>
 
                 <div class="nav-item-wrap relative">
-                    <a href="{{ route('profile.edit') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold text-xs shadow-sm shadow-sky-100 transition-all">
-                        <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
+                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
                         <span class="text-base flex items-center justify-center w-4 h-4 shrink-0">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -233,14 +234,14 @@
                     </span>
                     Presensi & Kegiatan
                 </a>
-                <a href="{{ route('siswa.rekap') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
+                <a href="{{ route('siswa.rekap') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold text-xs shadow-sm shadow-sky-100 transition-all">
+                    <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                     <span class="text-base flex items-center justify-center w-4 h-4">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </span>
                     Rekap Absensi
                 </a>
-                <a href="{{ route('profile.edit') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold text-xs shadow-sm shadow-sky-100 transition-all">
-                    <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
+                <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
                     <span class="text-base flex items-center justify-center w-4 h-4">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                     </span>
@@ -285,16 +286,6 @@
                     <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-extrabold text-sm shadow-md shadow-sky-300">S</div>
                     <span class="font-extrabold text-sm tracking-tight text-slate-900">SOUL</span>
                 </div>
-
-                <!-- Search (Desktop) -->
-                <form method="GET" action="{{ route('siswa.katalog') }}" class="relative w-full max-w-md hidden sm:block">
-                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </span>
-                    <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari..." class="w-full pl-10 pr-4 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
-                </form>
             </div>
 
             <!-- KANAN: Info User + Notifikasi + Logout -->
@@ -323,230 +314,191 @@
         <main class="p-4 md:p-8 space-y-6 overflow-y-auto">
 
             <div class="animate-fade-up">
-                <h1 class="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900">Profile Saya</h1>
-                <p class="text-xs text-slate-400 mt-1 font-medium">Kelola informasi akun dan data diri kamu</p>
+                <h1 class="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900">Rekap Absensi</h1>
+                <p class="text-xs text-slate-400 mt-1 font-medium">Ringkasan kehadiranmu per bulan di {{ $ekskul->nama_ekskul ?? 'ekskul' }}</p>
             </div>
 
-            @if(session('success'))
-                <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-2xl shadow-sm animate-fade-up">
-                    {{ session('success') }}
+            <!-- Filter Bulan -->
+            <form method="GET" action="{{ route('siswa.rekap') }}" class="bg-white p-4 rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 flex flex-wrap items-center gap-3 animate-fade-up" style="animation-delay: .1s">
+                <span class="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Pilih Bulan
+                </span>
+                <select name="bulan" class="px-3 py-1.5 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+                    @foreach($availableMonths as $option)
+                        @php
+                            $optionLabel = \Carbon\Carbon::createFromFormat('Y-m', $option)->translatedFormat('F Y');
+                        @endphp
+                        <option value="{{ $option }}" {{ $bulan === $option ? 'selected' : '' }}>{{ $optionLabel }}</option>
+                    @endforeach
+                </select>
+                <button type="submit" class="px-4 py-1.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition-all hover:-translate-y-0.5">Tampilkan Rekap</button>
+                <span class="ml-auto text-[11px] font-semibold text-slate-400 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">{{ \Carbon\Carbon::createFromFormat('Y-m', $bulan)->translatedFormat('F Y') }}</span>
+            </form>
+
+            <!-- Hero Persentase Kehadiran -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200 animate-fade-up" style="animation-delay: .15s">
+                <div class="absolute inset-0 pointer-events-none">
+                    <div class="absolute -top-20 -right-10 w-72 h-72 rounded-full bg-amber-200/40 blur-3xl"></div>
+                    <div class="absolute -bottom-24 -left-10 w-64 h-64 rounded-full bg-white/10 blur-3xl"></div>
                 </div>
-            @endif
-
-            @if(session('error'))
-                <div class="p-4 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-2xl shadow-sm animate-fade-up">
-                    {{ session('error') }}
-                </div>
-            @endif
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                <!-- KOLOM KIRI: Foto Profile & Informasi Singkat -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 p-6 text-center animate-fade-up" style="animation-delay: .1s">
-                        <!-- Foto Profile -->
-                        <div class="relative inline-block">
-                            <div class="w-28 h-28 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-sky-100 to-blue-100 border-4 border-sky-300 flex items-center justify-center mx-auto overflow-hidden shadow-lg shadow-sky-200 animate-floaty">
-                                <span class="text-3xl md:text-4xl font-extrabold text-sky-600">
-                                    {{ strtoupper(substr($siswa->nama ?? auth()->user()->username ?? 'S', 0, 1)) }}
-                                </span>
-                            </div>
-                            <button class="absolute bottom-2 right-2 bg-gradient-to-br from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white p-1.5 rounded-full shadow-md shadow-sky-300 transition-all">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <h3 class="text-sm font-extrabold text-slate-900 mt-4">{{ $siswa->nama ?? auth()->user()->username }}</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">{{ $siswa->kelas->nama ?? 'Siswa' }}</p>
-
-                        <div class="mt-4 pt-4 border-t border-sky-50">
-                            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Bergabung sejak</p>
-                            <p class="text-xs font-bold text-slate-700 mt-1">{{ $siswa?->created_at ? \Carbon\Carbon::parse($siswa->created_at)->isoFormat('D MMMM Y') : '-' }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- KOLOM KANAN: Data Diri & Pengajuan Keluar -->
-                <div class="lg:col-span-2 space-y-6">
-
-                    <!-- Data Diri -->
-                    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .15s">
-                        <div class="px-6 py-5 border-b border-sky-50">
-                            <h2 class="text-sm font-extrabold text-slate-900">Data Diri</h2>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Informasi akun dan identitas kamu</p>
-                        </div>
-                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Nama Lengkap</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa->nama ?? '-' }}</p>
-                            </div>
-                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">NIS</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa->nis ?? '-' }}</p>
-                            </div>
-                            <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Kelas</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa->kelas->nama ?? '-' }}</p>
-                            </div>
-                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Jenis Kelamin</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ ucfirst($siswa->jenis_kelamin ?? '-') }}</p>
-                            </div>
-                            <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Username</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ auth()->user()->username ?? '-' }}</p>
-                            </div>
-                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Email</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ auth()->user()->email ?? '-' }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Informasi Ekskul -->
-                    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .2s">
-                        <div class="px-6 py-5 border-b border-sky-50">
-                            <h2 class="text-sm font-extrabold text-slate-900">Informasi Ekskul</h2>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Status keanggotaan ekstrakurikulermu</p>
-                        </div>
-                        <div class="p-6">
+                <div class="relative grid lg:grid-cols-3 gap-6 items-center">
+                    <div class="lg:col-span-2">
+                        <div class="flex items-center gap-2 flex-wrap">
                             @if($ekskul)
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100 flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center text-xs font-extrabold uppercase shadow-md shadow-sky-200 shrink-0">
-                                            {{ substr($ekskul->nama_ekskul, 0, 2) }}
-                                        </div>
-                                        <div>
-                                            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Nama Ekskul</p>
-                                            <p class="text-sm font-bold text-slate-800 mt-0.5">{{ $ekskul->nama_ekskul }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
-                                        <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Jabatan</p>
-                                        <p class="mt-1.5">
-                                            <span class="px-2.5 py-1 rounded-full text-xs font-bold {{ $siswa?->jabatan == 'ketua' ? 'bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 border border-amber-200' : 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 border border-sky-200' }}">
-                                                {{ ucfirst($siswa->jabatan ?? 'Anggota') }}
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
-                                        <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Status</p>
-                                        <p class="text-sm font-bold text-emerald-600 mt-1 flex items-center gap-1.5">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                            Aktif
-                                        </p>
-                                    </div>
-                                    <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
-                                        <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Pembina</p>
-                                        <p class="text-sm font-bold text-slate-800 mt-1">{{ $ekskul->pembina->nama ?? '-' }}</p>
-                                    </div>
-                                </div>
-                            @else
-                                <div class="text-center py-6">
-                                    <div class="mx-auto w-14 h-14 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-300 mb-3">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                        </svg>
-                                    </div>
-                                    <p class="text-xs font-semibold text-slate-500">Kamu belum terdaftar di ekskul manapun.</p>
-                                    <a href="{{ route('siswa.katalog') }}" class="inline-block mt-2 text-sky-600 text-xs font-bold hover:underline">Lihat Katalog Ekskul</a>
-                                </div>
+                                <span class="px-3 py-1 rounded-full bg-amber-300/30 backdrop-blur border border-amber-200/40 text-[10px] font-bold tracking-wide uppercase">{{ $ekskul->nama_ekskul }}</span>
                             @endif
+                            <span class="px-3 py-1 rounded-full bg-white/15 backdrop-blur border border-white/20 text-[10px] font-bold tracking-wide uppercase">{{ \Carbon\Carbon::createFromFormat('Y-m', $bulan)->translatedFormat('F Y') }}</span>
                         </div>
+                        <h2 class="text-2xl md:text-3xl font-extrabold mt-3 tracking-tight">Tingkat Kehadiran</h2>
+                        <p class="text-xs text-white/75 mt-1.5 max-w-lg leading-relaxed">
+                            Dari {{ $total }} kegiatan yang tercatat pada bulan ini, kamu hadir sebanyak {{ $hadir }} kali.
+                        </p>
+                        <div class="mt-5 h-3 rounded-full bg-white/20 backdrop-blur overflow-hidden">
+                            <div id="hero-bar" class="h-full rounded-full bg-gradient-to-r from-amber-300 to-yellow-400 transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                        <p class="text-[10px] text-white/70 mt-2 font-semibold">Persentase kehadiran dibanding seluruh kegiatan yang tercatat</p>
                     </div>
-
-                    <!-- Pengajuan Keluar Ekskul -->
-                    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .25s">
-                        <div class="px-6 py-5 flex items-center justify-between border-b border-sky-50">
-                            <div>
-                                <h2 class="text-sm font-extrabold text-slate-900">Pengajuan Keluar Ekskul</h2>
-                                <p class="text-[11px] text-slate-400 mt-0.5">Tindakan ini bersifat permanen</p>
-                            </div>
-                            <span class="text-[10px] font-bold text-amber-700 bg-gradient-to-r from-amber-100 to-yellow-100 border border-amber-200 px-3 py-1.5 rounded-full">Sakral</span>
-                        </div>
-
-                        <div class="p-6">
-                            @if($ekskul)
-                                <div class="p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl border border-amber-200 mb-4">
-                                    <p class="text-xs text-amber-700 leading-relaxed">
-                                        Pengajuan keluar dari ekskul bersifat permanen. Setelah dikeluarkan, kamu harus mendaftar ulang jika ingin bergabung kembali.
-                                    </p>
-                                </div>
-
-                                @php
-                                    $hasPendingPengajuan = isset($pengajuan) && $pengajuan->where('status', 'pending')->count() > 0;
-                                @endphp
-
-                                @if($hasPendingPengajuan)
-                                    <div class="p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl border border-amber-200 mb-4">
-                                        <p class="text-xs text-amber-800 font-semibold">
-                                            ⏳ Kamu sudah mengajukan permohonan keluar. Mohon tunggu verifikasi dan persetujuan dari ketua ekskul.
-                                        </p>
-                                    </div>
-                                @else
-                                    <form method="POST" action="{{ route('siswa.pengajuan-keluar.store') }}">
-                                        @csrf
-                                        <div class="space-y-4">
-                                            <div>
-                                                <label class="text-xs font-bold text-slate-700 block mb-1.5">
-                                                    Alasan Keluar <span class="text-red-500">*</span>
-                                                </label>
-                                                <textarea name="alasan" required rows="3"
-                                                    class="w-full p-3 bg-sky-50/60 border @error('alasan') border-red-300 @else border-sky-100 @enderror rounded-2xl text-xs text-slate-800 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all"
-                                                    placeholder="Tuliskan alasan kamu ingin keluar dari ekskul ini...">{{ old('alasan') }}</textarea>
-                                                <p class="text-[10px] text-slate-400 mt-1.5">Wajib diisi dengan alasan yang jelas dan masuk akal (minimal 10 karakter / 2 kata). Alasan kosong seperti "asd", "gatau", atau "malas" tidak diterima.</p>
-                                                @error('alasan')
-                                                    <p class="text-red-500 text-[10px] mt-1 font-bold">{{ $message }}</p>
-                                                @enderror
-                                            </div>
-                                            <button type="submit" class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-red-200 hover:-translate-y-0.5">
-                                                Ajukan Permohonan Keluar
-                                            </button>
-                                        </div>
-                                    </form>
-                                @endif
-
-                                <!-- Riwayat Pengajuan Keluar -->
-                                @if(isset($pengajuan) && count($pengajuan) > 0)
-                                    <div class="mt-6 pt-6 border-t border-sky-50">
-                                        <p class="text-xs font-bold text-slate-600 mb-3">Riwayat Pengajuan</p>
-                                        <div class="space-y-2">
-                                            @foreach($pengajuan as $item)
-                                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-amber-50 rounded-2xl border border-sky-100 flex items-center justify-between gap-3">
-                                                <div class="min-w-0">
-                                                    <p class="text-xs text-slate-600 truncate">{{ $item->alasan }}</p>
-                                                    <p class="text-[10px] text-slate-400 mt-0.5">{{ \Carbon\Carbon::parse($item->tanggal_pengajuan)->isoFormat('DD MMM Y') }}</p>
-                                                </div>
-                                                <span class="shrink-0 px-3 py-1 rounded-full text-[10px] font-bold border
-                                                    {{ $item->status == 'pending' ? 'bg-amber-100 text-amber-700 border-amber-200' : '' }}
-                                                    {{ $item->status == 'diterima' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : '' }}
-                                                    {{ $item->status == 'ditolak' ? 'bg-red-100 text-red-700 border-red-200' : '' }}">
-                                                    {{ ucfirst($item->status) }}
-                                                </span>
-                                            </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                @endif
-                            @else
-                                <div class="text-center py-6">
-                                    <p class="text-xs font-semibold text-slate-500">Kamu belum terdaftar di ekskul manapun.</p>
-                                </div>
-                            @endif
-                        </div>
+                    <div class="lg:col-span-1 text-center lg:text-right">
+                        <p class="text-5xl md:text-6xl font-extrabold tracking-tight">{{ $persentaseKehadiran }}<span class="text-2xl md:text-3xl opacity-80">%</span></p>
+                        <p class="text-[10px] text-white/70 font-semibold uppercase tracking-wider mt-2">{{ $total }} kegiatan tercatat</p>
                     </div>
-
                 </div>
+            </div>
+
+            <!-- Statistik Presensi -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                <!-- Card 1: Hadir -->
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 p-4 md:p-5 shadow-lg shadow-emerald-100/60 hover:-translate-y-1 transition-all duration-300 animate-fade-up" style="animation-delay: .2s">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Hadir</p>
+                            <h3 class="text-xl md:text-3xl font-extrabold text-emerald-600 mt-1 md:mt-1.5">{{ $hadir }}</h3>
+                        </div>
+                        <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white flex items-center justify-center text-sm md:text-base font-extrabold shadow-md shadow-emerald-200">H</div>
+                    </div>
+                    <p class="text-[9px] md:text-[11px] font-semibold text-emerald-700 mt-0.5 md:mt-1">Kegiatan</p>
+                </div>
+
+                <!-- Card 2: Izin -->
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-100 to-yellow-50 border border-amber-200 p-4 md:p-5 shadow-lg shadow-amber-100/60 hover:-translate-y-1 transition-all duration-300 animate-fade-up" style="animation-delay: .25s">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Izin</p>
+                            <h3 class="text-xl md:text-3xl font-extrabold text-amber-600 mt-1 md:mt-1.5">{{ $izin }}</h3>
+                        </div>
+                        <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 flex items-center justify-center text-sm md:text-base font-extrabold shadow-md shadow-amber-200">I</div>
+                    </div>
+                    <p class="text-[9px] md:text-[11px] font-semibold text-amber-700 mt-0.5 md:mt-1">Kegiatan</p>
+                </div>
+
+                <!-- Card 3: Sakit -->
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-rose-50 to-white border border-rose-100 p-4 md:p-5 shadow-lg shadow-rose-100/60 hover:-translate-y-1 transition-all duration-300 animate-fade-up" style="animation-delay: .3s">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Sakit</p>
+                            <h3 class="text-xl md:text-3xl font-extrabold text-red-600 mt-1 md:mt-1.5">{{ $sakit }}</h3>
+                        </div>
+                        <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-rose-400 to-red-500 text-white flex items-center justify-center text-sm md:text-base font-extrabold shadow-md shadow-rose-200">S</div>
+                    </div>
+                    <p class="text-[9px] md:text-[11px] font-semibold text-rose-700 mt-0.5 md:mt-1">Kegiatan</p>
+                </div>
+
+                <!-- Card 4: Alpha -->
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-4 md:p-5 shadow-lg shadow-sky-100/60 hover:-translate-y-1 transition-all duration-300 animate-fade-up" style="animation-delay: .35s">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Alpha</p>
+                            <h3 class="text-xl md:text-3xl font-extrabold text-sky-700 mt-1 md:mt-1.5">{{ $alpha }}</h3>
+                        </div>
+                        <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center text-sm md:text-base font-extrabold shadow-md shadow-sky-200">A</div>
+                    </div>
+                    <p class="text-[9px] md:text-[11px] font-semibold text-sky-600 mt-0.5 md:mt-1">Kegiatan</p>
+                </div>
+            </div>
+
+            <!-- Rincian Bulan Ini -->
+            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .4s">
+                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
+                    <div>
+                        <h2 class="text-sm font-extrabold text-slate-900">Rincian Kegiatan {{ \Carbon\Carbon::createFromFormat('Y-m', $bulan)->translatedFormat('F Y') }}</h2>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Detail kehadiran di setiap kegiatan ekskul bulan ini</p>
+                    </div>
+                    <span class="text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">Total {{ $total }} tercatat</span>
+                </div>
+
+                @if(count($kegiatans) > 0)
+                    <div class="divide-y divide-sky-50">
+                        @foreach($kegiatans->sortByDesc('tanggal_kegiatan') as $kegiatan)
+                            @php
+                                $presensi = $presensiPerKegiatan[$kegiatan->id] ?? null;
+                                $statusColors = [
+                                    'hadir' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                                    'izin' => 'bg-amber-100 text-amber-700 border-amber-200',
+                                    'sakit' => 'bg-red-100 text-red-700 border-red-200',
+                                    'alpha' => 'bg-sky-100 text-sky-700 border-sky-200'
+                                ];
+                                $statusLabels = [
+                                    'hadir' => 'Hadir',
+                                    'izin' => 'Izin',
+                                    'sakit' => 'Sakit',
+                                    'alpha' => 'Alpha'
+                                ];
+                                $dayNum = \Carbon\Carbon::parse($kegiatan->tanggal_kegiatan)->format('d');
+                                $dayMon = \Carbon\Carbon::parse($kegiatan->tanggal_kegiatan)->format('M');
+                            @endphp
+                            <div class="px-6 py-4 hover:bg-sky-50/50 transition-colors">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                                        <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex flex-col items-center justify-center shadow-sm shadow-sky-200">
+                                            <span class="text-xs font-extrabold leading-none">{{ $dayNum }}</span>
+                                            <span class="text-[7px] font-bold uppercase leading-tight opacity-80">{{ $dayMon }}</span>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="flex items-center gap-2 flex-wrap">
+                                                <h4 class="text-xs font-bold text-slate-800 truncate">{{ $kegiatan->materi ?? 'Kegiatan' }}</h4>
+                                                @if($presensi)
+                                                    <span class="inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold border {{ $statusColors[$presensi->status] ?? 'bg-slate-100 text-slate-600 border-slate-200' }}">
+                                                        {{ $statusLabels[$presensi->status] ?? $presensi->status }}
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold border bg-slate-100 text-slate-500 border-slate-200">Belum tercatat</span>
+                                                @endif
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-slate-500">
+                                                <span>{{ \Carbon\Carbon::parse($kegiatan->tanggal_kegiatan)->isoFormat('dddd, DD MMM Y') }}</span>
+                                                @if($kegiatan->ekskul)
+                                                    <span class="text-sky-600 font-semibold">· {{ $kegiatan->ekskul->nama_ekskul ?? '' }}</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @if($presensi && $presensi->created_at)
+                                        <div class="text-right text-[10px] text-slate-400 whitespace-nowrap shrink-0">
+                                            Dicatat {{ \Carbon\Carbon::parse($presensi->created_at)->isoFormat('DD MMM Y HH:mm') }}
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-12">
+                        <div class="mx-auto w-16 h-16 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-300 mb-3">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-500">Belum ada kegiatan di bulan ini</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Tidak ada kegiatan ekskul yang tercatat pada {{ \Carbon\Carbon::createFromFormat('Y-m', $bulan)->translatedFormat('F Y') }}</p>
+                    </div>
+                @endif
             </div>
 
         </main>
     </div>
-
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         function openSidebar() {
@@ -579,26 +531,14 @@
             }
         })();
 
+        // Animasi bar persentase kehadiran
         document.addEventListener('DOMContentLoaded', function() {
-            @if(session('success'))
-                Swal.fire({
-                    title: 'Berhasil!',
-                    text: '{{ session('success') }}',
-                    icon: 'success',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0EA5E9'
+            const bar = document.getElementById('hero-bar');
+            if (bar) {
+                requestAnimationFrame(() => {
+                    bar.style.width = '{{ $persentaseKehadiran }}%';
                 });
-            @endif
-
-            @if(session('error'))
-                Swal.fire({
-                    title: 'Gagal!',
-                    text: '{{ session('error') }}',
-                    icon: 'error',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#EF4444'
-                });
-            @endif
+            }
         });
     </script>
 
