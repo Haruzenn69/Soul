@@ -9,8 +9,11 @@
             <p class="text-xs text-gray-400 mt-1">Kelola daftar kelas per tingkat dan tahun ajaran.</p>
         </div>
         @if ($tahunAjarans->isEmpty())
-            <span class="px-4 py-2 bg-amber-50 text-amber-600 rounded-full text-[11px] font-bold">
-                ⚠ Jalankan seeder untuk membuat data tahun ajaran terlebih dahulu.
+            <span class="px-4 py-2 bg-amber-50 text-amber-600 rounded-full text-[11px] font-bold flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                </svg>
+                Jalankan seeder untuk membuat data tahun ajaran terlebih dahulu.
             </span>
         @else
             <button onclick="document.getElementById('modal-create').showModal()"

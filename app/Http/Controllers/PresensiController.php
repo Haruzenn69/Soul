@@ -6,9 +6,8 @@ use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Models\Kegiatan;
 use App\Models\Pendaftaran;
 use App\Models\Presensi;
+use App\Services\RekapAbsensiService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Validation\Rule;
 
 class PresensiController extends Controller
 {
@@ -62,40 +61,12 @@ class PresensiController extends Controller
 
     public function rekap(Request $request)
     {
-        $sekarang = now();
-        $tahun = $sekarang->year;
-        $bulanMaksimal = $sekarang->format('Y-m');
-        $bulanTersedia = collect(range(1, $sekarang->month))
-            ->map(fn (int $month) => sprintf('%04d-%02d', $tahun, $month))
-            ->all();
-        $bulanOptions = collect(range(1, 12))
-            ->map(fn (int $month) => sprintf('%04d-%02d', $tahun, $month))
-            ->all();
-
-        $validated = $request->validate([
-            'bulan' => ['nullable', Rule::in($bulanTersedia)],
-        ]);
-
-        $bulan = $validated['bulan'] ?? $bulanMaksimal;
-        $tanggalMulai = Carbon::createFromFormat('Y-m', $bulan)->startOfMonth()->toDateString();
-        $tanggalAkhir = Carbon::createFromFormat('Y-m', $bulan)->endOfMonth()->toDateString();
+        $service = app(RekapAbsensiService::class);
+        $bulan = $service->normalizeBulan($request->input('bulan'));
         $ekskul = $this->ekskul();
 
-        $kegiatans = $ekskul->kegiatans()
-            ->whereBetween('tanggal_kegiatan', [$tanggalMulai, $tanggalAkhir])
-            ->with('presensis')
-            ->get();
-        $kegiatanIds = $kegiatans->modelKeys();
+        $data = $service->rekap($ekskul, $bulan);
 
-        $anggotas = Pendaftaran::where('ekskul_id', $ekskul->id)
-            ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
-            ->with([
-                'siswa' => fn($q) => $q->orderBy('nama'),
-                'siswa.kelas',
-                'presensis' => fn($q) => $q->whereIn('kegiatan_id', $kegiatanIds),
-            ])
-            ->get();
-
-        return view('ketua.presensi.rekap', compact('ekskul', 'kegiatans', 'anggotas', 'bulan', 'bulanOptions', 'bulanMaksimal', 'tahun'));
+        return view('ketua.presensi.rekap', $data);
     }
 }

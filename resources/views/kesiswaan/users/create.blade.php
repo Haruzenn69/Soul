@@ -52,7 +52,12 @@
                     </select>
                 </div>
             </div>
-            <p class="text-[11px] text-gray-400 mt-2">💡 Siswa & Ketua sama-sama role "siswa" — bedanya hanya jabatan. Pilih jabatan "Ketua" agar diarahkan ke dashboard ketua.</p>
+            <p class="text-[11px] text-gray-400 mt-2 flex items-start gap-1.5">
+                <svg class="w-3.5 h-3.5 flex-shrink-0 mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M9.663 17h4.674M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.814 12.839a6 6 0 01-.789-1.736 5.045 5.045 0 019.696 0 6 6 0 01-.789 1.736m-8.118 0h8.118"/>
+                </svg>
+                <span>Siswa & Ketua sama-sama role "siswa" — bedanya hanya jabatan. Pilih jabatan "Ketua" agar diarahkan ke dashboard ketua.</span>
+            </p>
         </div>
 
         <!-- Data Siswa -->
@@ -111,7 +116,12 @@
                             </option>
                         @endforeach
                     </select>
-                    <p class="text-[10px] text-gray-400 mt-1">⚠ Ekskul yang sudah ada ketua tidak bisa dipilih.</p>
+                    <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                        </svg>
+                        Ekskul yang sudah ada ketua tidak bisa dipilih.
+                    </p>
                 </div>
             </div>
         </div>

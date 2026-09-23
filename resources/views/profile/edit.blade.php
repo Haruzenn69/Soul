@@ -1,9 +1,65 @@
 <!DOCTYPE html>
+@php
+    $psAuthUser = auth()->user();
+    $psIsKetua = $psAuthUser && $psAuthUser->siswa && $psAuthUser->siswa->jabatan === 'ketua';
+    $psIconSvg = [
+        'dashboard' => '<path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/><path d="M14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"/><path d="M4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z"/><path d="M14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>',
+        'calendar' => '<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>',
+        'clipboard-check' => '<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2v2H9V5zm1 8l2 2 4-4"/>',
+        'clipboard-list' => '<path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>',
+        'document' => '<path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>',
+        'bars' => '<path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>',
+        'users' => '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>',
+        'user' => '<path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>',
+        'logout' => '<path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>',
+        'lock' => '<rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>',
+        'columns' => '<path d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>',
+        'building' => '<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>',
+        'star' => '<path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>',
+        'chat' => '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>',
+        'help' => '<path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>',
+    ];
+    $psSidebar = $psIsKetua ? [
+        'title' => 'Menu Ketua',
+        'dash' => route('ketua.dashboard'),
+        'notif' => route('ketua.notifikasi'),
+        'items' => [
+            ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('ketua.dashboard'), 'is' => 'ketua.dashboard'],
+            ['icon' => 'calendar', 'label' => 'Kegiatan', 'url' => route('ketua.kegiatan.index'), 'is' => 'ketua.kegiatan.*'],
+            ['icon' => 'clipboard-check', 'label' => 'Rekap Absensi', 'url' => route('ketua.presensi.rekap'), 'is' => 'ketua.presensi.rekap'],
+            ['icon' => 'clipboard-list', 'label' => 'Pendaftaran', 'url' => route('ketua.pendaftaran.index'), 'is' => 'ketua.pendaftaran.*'],
+            ['icon' => 'users', 'label' => 'Kelola Anggota', 'url' => route('ketua.anggota.index'), 'is' => ['ketua.anggota.index', 'ketua.anggota.update-status']],
+            ['icon' => 'logout', 'label' => 'Pengajuan Keluar', 'url' => route('ketua.pengajuan-keluar.index'), 'is' => ['ketua.pengajuan-keluar.index', 'ketua.pengajuan-keluar.show', 'ketua.pengajuan-keluar.update']],
+            ['icon' => 'columns', 'label' => 'Laporan Bulanan', 'url' => route('ketua.laporan-bulanan.index'), 'is' => 'ketua.laporan-bulanan.*'],
+            ['icon' => 'building', 'label' => 'Profil Ekskul', 'url' => route('ketua.profil-ekskul.edit'), 'is' => 'ketua.profil-ekskul.*'],
+            ['icon' => 'star', 'label' => 'Prestasi', 'url' => route('ketua.prestasi.index'), 'is' => 'ketua.prestasi.*'],
+            ['icon' => 'chat', 'label' => 'Testimoni', 'url' => route('ketua.testimoni.index'), 'is' => 'ketua.testimoni.*'],
+            ['icon' => 'help', 'label' => 'FAQ', 'url' => route('ketua.faq.index'), 'is' => 'ketua.faq.*'],
+            ['icon' => 'user', 'label' => 'Profile', 'url' => route('profile.edit'), 'is' => 'profile.edit'],
+        ],
+        'more' => [],
+    ] : [
+        'title' => 'Menu Siswa',
+        'dash' => route('siswa.dashboard'),
+        'notif' => route('siswa.notifikasi'),
+        'items' => [
+            ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('siswa.dashboard'), 'is' => 'siswa.dashboard'],
+            ['icon' => 'calendar', 'label' => 'Presensi & Kegiatan', 'url' => route('siswa.presensi'), 'is' => 'siswa.presensi'],
+            ['icon' => 'bars', 'label' => 'Rekap Absensi', 'url' => route('siswa.rekap'), 'is' => 'siswa.rekap'],
+            ['icon' => 'user', 'label' => 'Profil Saya', 'url' => route('profile.edit'), 'is' => 'profile.edit'],
+            ['icon' => 'document', 'label' => 'Katalog Ekskul', 'url' => route('siswa.katalog'), 'is' => ['siswa.katalog', 'ekskul.detail']],
+        ],
+        'more' => [
+            ['label' => 'Daftar Ekskul', 'url' => route('siswa.daftar-ekskul'), 'is' => 'siswa.daftar-ekskul'],
+            ['label' => 'Ajukan Keluar', 'url' => route('siswa.pengajuan-keluar'), 'is' => ['siswa.pengajuan-keluar', 'siswa.pengajuan-keluar.store']],
+        ],
+    ];
+@endphp
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Siswa - SOUL</title>
+    <title>{{ $psIsKetua ? 'Profile Ketua - SOUL' : 'Profile Siswa - SOUL' }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -29,170 +85,17 @@
         .animate-fade-up { animation: fadeUp .6s cubic-bezier(.22,1,.36,1) both; }
         .animate-floaty { animation: floaty 5s ease-in-out infinite; }
         .animate-blob { animation: blob 10s ease-in-out infinite; }
-
-        /* SIDEBAR COLLAPSIBLE (sama seperti dashboard) */
-        #sidebar-desktop { transition: width .25s ease; }
-        #sidebar-desktop.collapsed { width: 4.5rem; }
-        #sidebar-desktop.collapsed .sidebar-label,
-        #sidebar-desktop.collapsed .sidebar-logo-text,
-        #sidebar-desktop.collapsed .sidebar-section-label,
-        #sidebar-desktop.collapsed .sidebar-user-info,
-        #sidebar-desktop.collapsed .sidebar-logout-text { display: none; }
-        #sidebar-desktop.collapsed nav a { justify-content: center; padding-left: 0; padding-right: 0; }
-        #sidebar-desktop.collapsed .sidebar-user-card { justify-content: center; }
-
-        /* TOOLTIP - muncul saat hover ikon, hanya saat sidebar collapsed */
-        .nav-tooltip {
-            position: absolute;
-            left: calc(100% + 10px);
-            top: 50%;
-            transform: translateY(-50%) translateX(-4px);
-            background: #0F172A;
-            color: #fff;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 6px 10px;
-            border-radius: 8px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .15s ease, transform .15s ease;
-            z-index: 60;
-            box-shadow: 0 8px 20px rgba(15,23,42,.25);
-        }
-        .nav-tooltip::before {
-            content: '';
-            position: absolute;
-            right: 100%;
-            top: 50%;
-            transform: translateY(-50%);
-            border: 5px solid transparent;
-            border-right-color: #0F172A;
-        }
-        #sidebar-desktop.collapsed .nav-item-wrap:hover .nav-tooltip {
-            opacity: 1;
-            transform: translateY(-50%) translateX(0);
-        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased min-h-screen md:flex selection:bg-sky-100 selection:text-sky-700 overflow-x-hidden">
-
-    <!-- SIDEBAR LEFT (collapsible, ala Claude) -->
-    <aside id="sidebar-desktop" class="w-64 hidden md:flex flex-col justify-between shrink-0 bg-white/90 backdrop-blur border-r border-sky-100 shadow-sm sticky top-0 self-start h-screen overflow-hidden">
-        <div class="absolute inset-0 pointer-events-none">
-            <div class="absolute -top-24 -right-16 w-64 h-64 rounded-full bg-sky-100/70 blur-3xl animate-blob"></div>
-            <div class="absolute bottom-0 -left-20 w-56 h-56 rounded-full bg-amber-100/70 blur-3xl animate-blob" style="animation-delay: 3s"></div>
-        </div>
-
-        <!-- Tombol geser buka/tutup -->
-        <button onclick="toggleDesktopSidebar()" class="absolute top-5 -right-3 z-20 w-6 h-6 rounded-full bg-white border border-sky-200 shadow-md flex items-center justify-center text-slate-400 hover:text-sky-600 hover:border-sky-300 transition-all">
-            <svg id="sidebar-toggle-icon" class="w-3.5 h-3.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
-            </svg>
-        </button>
-
-        <div class="relative p-5 flex flex-col h-full overflow-y-auto overflow-x-hidden">
-            <!-- Logo SOUL -->
-            <div class="flex items-center gap-3 mb-8 px-2 mt-1">
-                <div class="w-10 h-10 shrink-0 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-extrabold text-lg shadow-lg shadow-sky-300">
-                    SOUL
-                </div>
-                <div class="sidebar-logo-text">
-                    <h1 class="font-extrabold text-sm tracking-tight text-slate-900 leading-none">SOUL</h1>
-                    <span class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Ekskul Manager</span>
-                </div>
-            </div>
-
-            <div class="sidebar-section-label text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-2 px-3">Menu Utama</div>
-            <nav class="space-y-1.5">
-                <div class="nav-item-wrap relative">
-                    <a href="{{ route('siswa.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
-                        <span class="text-base flex items-center justify-center w-4 h-4 shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-                            </svg>
-                        </span>
-                        <span class="sidebar-label">Dashboard</span>
-                    </a>
-                    <span class="nav-tooltip">Dashboard</span>
-                </div>
-
-                <div class="nav-item-wrap relative">
-                    <a href="{{ route('siswa.katalog') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
-                        <span class="text-base flex items-center justify-center w-4 h-4 shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                            </svg>
-                        </span>
-                        <span class="sidebar-label">Katalog Ekskul</span>
-                    </a>
-                    <span class="nav-tooltip">Katalog Ekskul</span>
-                </div>
-
-                <div class="nav-item-wrap relative">
-                    <a href="{{ route('siswa.presensi') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
-                        <span class="text-base flex items-center justify-center w-4 h-4 shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                        </span>
-                        <span class="sidebar-label">Presensi & Kegiatan</span>
-                    </a>
-                    <span class="nav-tooltip">Presensi & Kegiatan</span>
-                </div>
-
-                <div class="nav-item-wrap relative">
-                    <a href="{{ route('siswa.rekap') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
-                        <span class="text-base flex items-center justify-center w-4 h-4 shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                        </span>
-                        <span class="sidebar-label">Rekap Absensi</span>
-                    </a>
-                    <span class="nav-tooltip">Rekap Absensi</span>
-                </div>
-
-                <div class="nav-item-wrap relative">
-                    <a href="{{ route('profile.edit') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold text-xs shadow-sm shadow-sky-100 transition-all">
-                        <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
-                        <span class="text-base flex items-center justify-center w-4 h-4 shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                            </svg>
-                        </span>
-                        <span class="sidebar-label">Profile</span>
-                    </a>
-                    <span class="nav-tooltip">Profile</span>
-                </div>
-            </nav>
-
-            <!-- User Profile Card Bottom -->
-            <div class="mt-auto pt-6">
-                <div class="nav-item-wrap relative">
-                    <div class="sidebar-user-card bg-gradient-to-r from-sky-50 to-amber-50 p-3 rounded-2xl flex items-center justify-between border border-sky-100 shadow-sm">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-9 h-9 shrink-0 rounded-full bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 font-extrabold flex items-center justify-center text-xs shadow-md shadow-amber-200">
-                                {{ strtoupper(substr($siswa->nama ?? auth()->user()->username ?? 'S', 0, 1)) }}
-                            </div>
-                            <div class="sidebar-user-info text-left">
-                                <h4 class="text-xs font-bold text-slate-800 leading-tight">{{ $siswa->nama ?? auth()->user()->username }}</h4>
-                                <p class="text-[10px] text-slate-400 font-medium">{{ $siswa->kelas->nama ?? 'Siswa' }}</p>
-                            </div>
-                        </div>
-                        <form method="POST" action="{{ route('logout') }}" class="sidebar-logout-text">
-                            @csrf
-                            <button type="submit" class="text-slate-400 hover:text-red-500 text-xs font-bold transition-colors">Keluar</button>
-                        </form>
-                    </div>
-                    <span class="nav-tooltip">{{ $siswa->nama ?? auth()->user()->username }} · Keluar</span>
-                </div>
-            </div>
-        </div>
-    </aside>
+<body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased min-h-screen md:flex selection:bg-sky-100 selection:text-sky-700 overflow-x-hidden">@include('partials.pill-sidebar', [
+    'psTitle' => $psSidebar['title'],
+    'psLogoBrand' => 'SOUL',
+    'psDashboardUrl' => $psSidebar['dash'],
+    'psNotifUrl' => $psSidebar['notif'],
+    'psProfileUrl' => route('profile.edit'),
+    'psItems' => $psSidebar['items'],
+    'psMore' => $psSidebar['more'],
+])
 
     <!-- MOBILE SIDEBAR OVERLAY -->
     <div id="sidebar-overlay" class="hidden fixed inset-0 z-40 bg-black/50 md:hidden" onclick="closeSidebar()"></div>
@@ -213,39 +116,25 @@
                 </button>
             </div>
 
-            <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-2 px-3">Menu Utama</div>
-            <nav class="space-y-1.5">
-                <a href="{{ route('siswa.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
-                    <span class="text-base flex items-center justify-center w-4 h-4">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-                    </span>
-                    Dashboard
-                </a>
-                <a href="{{ route('siswa.katalog') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
-                    <span class="text-base flex items-center justify-center w-4 h-4">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                    </span>
-                    Katalog Ekskul
-                </a>
-                <a href="{{ route('siswa.presensi') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
-                    <span class="text-base flex items-center justify-center w-4 h-4">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    </span>
-                    Presensi & Kegiatan
-                </a>
-                <a href="{{ route('siswa.rekap') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
-                    <span class="text-base flex items-center justify-center w-4 h-4">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    </span>
-                    Rekap Absensi
-                </a>
-                <a href="{{ route('profile.edit') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold text-xs shadow-sm shadow-sky-100 transition-all">
-                    <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
-                    <span class="text-base flex items-center justify-center w-4 h-4">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    </span>
-                    Profile
-                </a>
+<div class="flex items-center justify-between mb-2 px-3">
+                <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Menu utama</div>
+                <span class="text-[9px] font-semibold text-slate-300">{{ $psIsKetua ? 'PANEL KETUA' : 'PANEL SISWA' }}</span>
+            </div>
+            <nav aria-label="Menu utama mobile" class="space-y-1.5">
+                @foreach($psSidebar['items'] as $psMItem)
+                    @php $psMActive = request()->routeIs((array) $psMItem['is']); @endphp
+                    <a href="{{ $psMItem['url'] }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ $psMActive ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                        @if($psMActive)
+                            <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
+                        @endif
+                        <span class="text-base flex items-center justify-center w-4 h-4">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                {!! $psIconSvg[$psMItem['icon']] ?? '' !!}
+                            </svg>
+                        </span>
+                        {{ $psMItem['label'] }}
+                    </a>
+                @endforeach
             </nav>
 
             <div class="mt-auto pt-6">
@@ -269,7 +158,7 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <div class="w-full flex-1 flex flex-col min-w-0">
+    <div class="w-full flex-1 flex flex-col min-w-0 ps-page">
 
         <!-- TOP NAVBAR HEADER -->
         <header class="px-4 md:px-8 py-4 bg-white/70 backdrop-blur-lg border-b border-sky-100 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
@@ -286,7 +175,8 @@
                     <span class="font-extrabold text-sm tracking-tight text-slate-900">SOUL</span>
                 </div>
 
-                <!-- Search (Desktop) -->
+<!-- Search (Desktop) -->
+                @if(! $psIsKetua)
                 <form method="GET" action="{{ route('siswa.katalog') }}" class="relative w-full max-w-md hidden sm:block">
                     <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -295,14 +185,15 @@
                     </span>
                     <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari..." class="w-full pl-10 pr-4 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
                 </form>
+                @endif
             </div>
 
             <!-- KANAN: Info User + Notifikasi + Logout -->
             <div class="flex items-center gap-2 md:gap-3 shrink-0">
                 <div class="bg-sky-50 text-sky-700 border border-sky-100 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 hidden sm:block">
-                    <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Siswa
+                    <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> {{ $psIsKetua ? 'Ketua' : 'Siswa' }}
                 </div>
-                <a href="{{ route('siswa.notifikasi') }}" class="w-9 h-9 rounded-xl bg-white border border-sky-100 flex items-center justify-center text-xs relative text-slate-600 hover:bg-sky-50 hover:border-sky-200 transition-all shadow-sm">
+                <a href="{{ $psSidebar['notif'] }}" class="w-9 h-9 rounded-xl bg-white border border-sky-100 flex items-center justify-center text-xs relative text-slate-600 hover:bg-sky-50 hover:border-sky-200 transition-all shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                     </svg>
@@ -482,8 +373,8 @@
 
                                 @if($hasPendingPengajuan)
                                     <div class="p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl border border-amber-200 mb-4">
-                                        <p class="text-xs text-amber-800 font-semibold">
-                                            ⏳ Kamu sudah mengajukan permohonan keluar. Mohon tunggu verifikasi dan persetujuan dari ketua ekskul.
+<p class="text-xs text-amber-800 font-semibold">
+                                            &#10004;&#65039; Kamu sudah mengajukan permohonan keluar. Mohon tunggu verifikasi dan persetujuan dari ketua ekskul.
                                         </p>
                                     </div>
                                 @else
@@ -559,25 +450,6 @@
             document.getElementById('sidebar-overlay').classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
         }
-
-        // TOGGLE SIDEBAR DESKTOP (collapsible ala Claude)
-        function toggleDesktopSidebar() {
-            const sidebar = document.getElementById('sidebar-desktop');
-            const icon = document.getElementById('sidebar-toggle-icon');
-            const collapsed = sidebar.classList.toggle('collapsed');
-            icon.style.transform = collapsed ? 'rotate(180deg)' : 'rotate(0deg)';
-            localStorage.setItem('soul_sidebar_collapsed', collapsed ? '1' : '0');
-        }
-
-        // Terapkan status tersimpan saat halaman dimuat (tanpa animasi berkedip)
-        (function() {
-            if (localStorage.getItem('soul_sidebar_collapsed') === '1') {
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.getElementById('sidebar-desktop').classList.add('collapsed');
-                    document.getElementById('sidebar-toggle-icon').style.transform = 'rotate(180deg)';
-                });
-            }
-        })();
 
         document.addEventListener('DOMContentLoaded', function() {
             @if(session('success'))

@@ -144,7 +144,11 @@
                         @if($kegiatan->dokumentasi)
                             <img src="{{ asset('storage/' . $kegiatan->dokumentasi) }}" alt="{{ $kegiatan->materi }}" class="w-full h-40 object-cover">
                         @else
-                            <div class="w-full h-40 bg-theme-blue/10 flex items-center justify-center text-theme-blue text-3xl">📋</div>
+                            <div class="w-full h-40 bg-theme-blue/10 flex items-center justify-center text-theme-blue">
+                            <svg class="w-14 h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2v2H9V5zm1 8l2 2 4-4"/>
+                            </svg>
+                        </div>
                         @endif
                         <div class="p-5">
                             <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">{{ $kegiatan->tanggal_kegiatan->translatedFormat('d F Y') }}</p>
@@ -164,11 +168,21 @@
     @if($ekskul->prestasis->isNotEmpty())
     <section id="prestasi" class="max-w-5xl mx-auto px-6 py-20">
         <span class="text-[10px] font-bold text-theme-blue uppercase tracking-widest mb-2 inline-block">Prestasi</span>
-        <h2 class="text-2xl md:text-3xl font-bold mb-10">Kebanggaan Kami 🏆</h2>
+        <h2 class="text-2xl md:text-3xl font-bold mb-10 flex items-center gap-3">Kebanggaan Kami
+                        <svg class="w-7 h-7 md:w-8 md:h-8 text-theme-yellow shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M7 4h10v4a5 5 0 01-10 0V4z"/>
+                            <path d="M7 6H4v2a3 3 0 003 3M17 6h3v2a3 3 0 01-3 3m-5 4v5m-2.5 3h5a.5.5 0 00.5-.5v-2.5a.5.5 0 00-.5-.5h-5a.5.5 0 00-.5.5v2.5a.5.5 0 00.5.5z"/>
+                        </svg>
+                    </h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @foreach($ekskul->prestasis as $prestasi)
                 <div class="bg-theme-light rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition">
-                    <div class="text-3xl mb-3">🏆</div>
+                    <div class="flex items-center justify-center text-theme-blue mb-3">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M7 4h10v4a5 5 0 01-10 0V4z"/>
+                            <path d="M7 6H4v2a3 3 0 003 3M17 6h3v2a3 3 0 01-3 3m-5 4v5m-2.5 3h5a.5.5 0 00.5-.5v-2.5a.5.5 0 00-.5-.5h-5a.5.5 0 00-.5.5v2.5a.5.5 0 00.5.5z"/>
+                        </svg>
+                    </div>
                     <h3 class="font-bold text-base mb-1">{{ $prestasi->judul }}</h3>
                     @if($prestasi->kategori)
                         <p class="text-xs text-gray-500 mb-1">{{ $prestasi->kategori }}</p>
@@ -190,7 +204,12 @@
     <section id="galeri" class="bg-theme-light py-20">
         <div class="max-w-5xl mx-auto px-6">
             <span class="text-[10px] font-bold text-theme-blue uppercase tracking-widest mb-2 inline-block">Galeri</span>
-            <h2 class="text-2xl md:text-3xl font-bold mb-10">Momen Kami 📸</h2>
+            <h2 class="text-2xl md:text-3xl font-bold mb-10 flex items-center gap-3">Momen Kami
+                        <svg class="w-7 h-7 md:w-8 md:h-8 text-theme-blue shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                            <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 @foreach($galeris as $foto)
                     <img src="{{ asset('storage/' . $foto) }}" alt="Dokumentasi" class="w-full h-40 object-cover rounded-xl border border-gray-100 shadow-sm hover:scale-105 transition">
@@ -204,11 +223,21 @@
     @if($ekskul->testimoniss->isNotEmpty())
     <section id="testimoni" class="max-w-5xl mx-auto px-6 py-20">
         <span class="text-[10px] font-bold text-theme-blue uppercase tracking-widest mb-2 inline-block">Testimoni</span>
-        <h2 class="text-2xl md:text-3xl font-bold mb-10">Kata Mereka 💬</h2>
+        <h2 class="text-2xl md:text-3xl font-bold mb-10 flex items-center gap-3">Kata Mereka
+                        <svg class="w-7 h-7 md:w-8 md:h-8 text-theme-blue shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                    </h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @foreach($ekskul->testimoniss as $testimoni)
                 <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex flex-col">
-                    <div class="text-theme-yellow text-lg mb-2">★★★★★</div>
+                    <div class="text-theme-yellow text-lg mb-2 flex gap-0.5" aria-label="Rating 5 dari 5">
+                        @for($i = 0; $i < 5; $i++)
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                            </svg>
+                        @endfor
+                    </div>
                     <p class="text-xs text-gray-600 leading-relaxed flex-1 mb-4">&ldquo;{{ $testimoni->quote }}&rdquo;</p>
                     <div>
                         <p class="font-bold text-sm">{{ $testimoni->nama }}</p>

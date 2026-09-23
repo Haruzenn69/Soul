@@ -17,7 +17,12 @@
             @csrf
             @method('PATCH')
             <button type="submit" class="w-full sm:w-auto px-5 py-2.5 text-xs font-bold rounded-xl transition shadow-sm {{ $ekskul->is_open_recruitment ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border border-emerald-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200 border border-slate-200' }}">
-                {{ $ekskul->is_open_recruitment ? 'Dibuka ✓' : 'Ditutup' }}
+                {{ $ekskul->is_open_recruitment ? 'Dibuka' : 'Ditutup' }}
+                @if($ekskul->is_open_recruitment)
+                    <svg class="w-3.5 h-3.5 inline-block ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 13l4 4L19 7"/>
+                    </svg>
+                @endif
             </button>
         </form>
     </div>

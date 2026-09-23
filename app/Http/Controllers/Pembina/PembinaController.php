@@ -10,6 +10,7 @@ use App\Models\Pelatih;
 use App\Models\Pendaftaran;
 use App\Models\Presensi;
 use App\Services\NotifikasiService;
+use App\Services\RekapAbsensiService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -249,95 +250,35 @@ class PembinaController extends Controller
         $ekskuls = $this->getEkskuls();
         $ekskulIds = $ekskuls->pluck('id');
 
-        $bulan = $request->input('bulan', now()->format('Y-m'));
-        if (! preg_match('/^\d{4}-\d{2}$/', $bulan)) {
-            $bulan = now()->format('Y-m');
-        }
-
-        [$tahun, $bulanKe] = explode('-', $bulan);
+        $service = app(RekapAbsensiService::class);
+        $bulan = $service->normalizeBulan($request->input('bulan'));
 
         $ekskulFilter = $request->input('ekskul');
         $ekskulId = $ekskulFilter && $ekskulIds->contains($ekskulFilter)
             ? (int) $ekskulFilter
             : (int) $ekskuls->first()?->id;
 
-        $pendaftarans = $ekskulId
-            ? Pendaftaran::where('ekskul_id', $ekskulId)
-                ->where('status', Pendaftaran::STATUS_DITERIMA)
-                ->with(['siswa', 'siswa.kelas'])
-                ->get()
-            : collect();
+        $ekskul = $ekskuls->firstWhere('id', $ekskulId);
 
-        $pendaftaranIds = $pendaftarans->pluck('id');
-
-        $presensis = Presensi::whereIn('pendaftaran_id', $pendaftaranIds)
-            ->when($pendaftaranIds->isNotEmpty(), fn ($q) => $q->whereHas('kegiatan', fn ($k) => $k->whereYear('tanggal_kegiatan', (int) $tahun)->whereMonth('tanggal_kegiatan', (int) $bulanKe)))
-            ->with('kegiatan')
-            ->get();
-
-        $presensisByPendaftaran = $presensis->groupBy('pendaftaran_id');
-
-        $rekaps = $pendaftarans->map(function ($pendaftaran) use ($presensisByPendaftaran) {
-            $items = $presensisByPendaftaran->get($pendaftaran->id, collect());
-            $hadir = $items->where('status', Presensi::STATUS_HADIR)->count();
-            $izin = $items->where('status', Presensi::STATUS_IZIN)->count();
-            $sakit = $items->where('status', Presensi::STATUS_SAKIT)->count();
-            $alpha = $items->where('status', Presensi::STATUS_ALPHA)->count();
-            $total = $items->count();
-            $persentaseKehadiran = $total > 0 ? round(($hadir / $total) * 100, 1) : 0;
-
-            return (object) [
-                'pendaftaran' => $pendaftaran,
-                'hadir' => $hadir,
-                'izin' => $izin,
-                'sakit' => $sakit,
-                'alpha' => $alpha,
-                'total' => $total,
-                'persentaseKehadiran' => $persentaseKehadiran,
+        $rekap = $ekskul
+            ? $service->rekap($ekskul, $bulan)
+            : [
+                'ekskul' => null,
+                'bulan' => $bulan,
+                'kegiatans' => collect(),
+                'rows' => collect(),
+                'totalHadir' => 0,
+                'totalIzin' => 0,
+                'totalSakit' => 0,
+                'totalAlpha' => 0,
+                'availableMonths' => collect([now()->format('Y-m')]),
             ];
-        })->sortByDesc('persentaseKehadiran')->values();
 
-        $totalHadir = $presensis->where('status', Presensi::STATUS_HADIR)->count();
-        $totalIzin = $presensis->where('status', Presensi::STATUS_IZIN)->count();
-        $totalSakit = $presensis->where('status', Presensi::STATUS_SAKIT)->count();
-        $totalAlpha = $presensis->where('status', Presensi::STATUS_ALPHA)->count();
-
-        $kegiatans = $ekskulId
-            ? Kegiatan::where('ekskul_id', $ekskulId)
-                ->whereYear('tanggal_kegiatan', (int) $tahun)
-                ->whereMonth('tanggal_kegiatan', (int) $bulanKe)
-                ->with('presensis')
-                ->orderBy('tanggal_kegiatan', 'asc')
-                ->get()
-            : collect();
-
-        $availableMonths = Presensi::whereHas('pendaftaran', function ($q) use ($ekskulIds) {
-            $q->whereIn('ekskul_id', $ekskulIds);
-        })
-            ->whereHas('kegiatan')
-            ->with('kegiatan')
-            ->get()
-            ->map(fn ($p) => $p->kegiatan->tanggal_kegiatan->format('Y-m'))
-            ->unique()
-            ->sortDesc()
-            ->values();
-
-        if ($availableMonths->isEmpty()) {
-            $availableMonths = collect([now()->format('Y-m')]);
-        }
-
-        return view('pembina.rekap', compact(
-            'ekskuls',
-            'ekskulId',
-            'bulan',
-            'rekaps',
-            'totalHadir',
-            'totalIzin',
-            'totalSakit',
-            'totalAlpha',
-            'kegiatans',
-            'availableMonths',
-        ));
+        return view('pembina.rekap', array_merge($rekap, [
+            'ekskuls' => $ekskuls,
+            'ekskulId' => $ekskulId,
+            'bulan' => $bulan,
+        ]));
     }
 
     public function profile()
