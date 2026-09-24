@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Ekskul;
 use App\Models\Kegiatan;
 use App\Models\LaporanBulanan;
 use App\Models\Notifikasi;
@@ -253,6 +254,15 @@ class NotifikasiService
             'judul' => $disetujui ? 'Laporan Disetujui' : 'Laporan Ditolak',
             'pesan' => 'Laporan bulanan periode '.self::bulanLabel($laporan->bulan).' ekskul '.$laporan->ekskul->nama_ekskul.' telah ditinjau oleh pembina.',
             'tipe' => $disetujui ? 'diterima' : 'ditolak',
+        ]);
+    }
+
+    public static function penilaianDikirim(Ekskul $ekskul): void
+    {
+        self::untukKesiswaan([
+            'judul' => 'Laporan Penilaian Dikumpulkan',
+            'pesan' => 'Laporan penilaian ekstrakurikuler '.$ekskul->nama_ekskul.' sudah dikumpulkan, cek di laporan penilaian.',
+            'tipe' => 'info',
         ]);
     }
 
