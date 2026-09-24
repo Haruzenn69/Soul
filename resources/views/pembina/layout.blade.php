@@ -41,14 +41,15 @@
     'psDashboardUrl' => route('pembina.dashboard'),
     'psNotifUrl' => route('pembina.notifikasi'),
     'psProfileUrl' => route('pembina.profile'),
-'psItems' => [
+    'psItems' => [
         ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('pembina.dashboard'), 'is' => 'pembina.dashboard'],
         ['icon' => 'clipboard-check', 'label' => 'Penilaian', 'url' => route('pembina.penilaian'), 'is' => 'pembina.penilaian*'],
-['icon' => 'document', 'label' => 'Cetak Laporan', 'url' => route('pembina.laporan.index'), 'is' => 'pembina.laporan.*'],
+        ['icon' => 'document', 'label' => 'Cetak Laporan', 'url' => route('pembina.laporan.index'), 'is' => 'pembina.laporan.*'],
         ['icon' => 'bars', 'label' => 'Rekap Absensi', 'url' => route('pembina.rekap'), 'is' => 'pembina.rekap'],
         ['icon' => 'clipboard-list', 'label' => 'Pendaftaran', 'url' => route('pembina.pendaftaran'), 'is' => 'pembina.pendaftaran'],
         ['icon' => 'users', 'label' => 'Data Anggota', 'url' => route('pembina.anggota'), 'is' => 'pembina.anggota'],
         ['icon' => 'calendar', 'label' => 'Presensi', 'url' => route('pembina.presensi'), 'is' => 'pembina.presensi'],
+        ['icon' => 'chat', 'label' => 'Testimoni & FAQ', 'url' => route('pembina.testimoni.index'), 'is' => 'pembina.testimoni.*'],
     ],
     'psMore' => [],
 ])
@@ -87,8 +88,8 @@
                     @endif
                     <span class="text-base flex items-center justify-center w-4 h-4">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-                    </span>
-Dashboard
+</span>
+                    <span>Dashboard</span>
                 </a>
                 <a href="{{ route('pembina.penilaian') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.penilaian*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if(request()->routeIs('pembina.penilaian*'))
@@ -97,7 +98,7 @@ Dashboard
                     <span class="text-base flex items-center justify-center w-4 h-4">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2v2H9V5zm1 8l2 2 4-4"/></svg>
                     </span>
-                    Penilaian
+                    <span>Penilaian</span>
                 </a>
                 <a href="{{ route('pembina.anggota') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.anggota') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if(request()->routeIs('pembina.anggota'))
@@ -143,6 +144,15 @@ Dashboard
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </span>
                     Rekap Absensi
+                </a>
+                <a href="{{ route('pembina.testimoni.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.testimoni.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                    @if(request()->routeIs('pembina.testimoni.*'))
+                        <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
+                    @endif
+                    <span class="text-base flex items-center justify-center w-4 h-4">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    </span>
+                    Testimoni & FAQ
                 </a>
                 <a href="{{ route('pembina.profile') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.profile') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if(request()->routeIs('pembina.profile'))

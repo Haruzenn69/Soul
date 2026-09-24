@@ -16,6 +16,8 @@ class Pendaftaran extends Model
 
     public const STATUS_NONAKTIF = 'nonaktif';
 
+    public const STATUS_KELUAR = 'keluar';
+
     public const STATUS_PERINGATAN = 'peringatan';
 
     protected $fillable = [

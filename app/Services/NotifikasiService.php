@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Models\Ekskul;
+use App\Models\Faq;
 use App\Models\Kegiatan;
 use App\Models\LaporanBulanan;
 use App\Models\Notifikasi;
 use App\Models\Pendaftaran;
 use App\Models\PengajuanKeluar;
+use App\Models\Testimoni;
 use App\Models\User;
 use Carbon\Carbon;
 
@@ -263,6 +265,70 @@ class NotifikasiService
             'judul' => 'Laporan Penilaian Dikumpulkan',
             'pesan' => 'Laporan penilaian ekstrakurikuler '.$ekskul->nama_ekskul.' sudah dikumpulkan, cek di laporan penilaian.',
             'tipe' => 'info',
+        ]);
+    }
+
+    public static function testimoniDiajukan(Testimoni $testimoni): void
+    {
+        $ketua = $testimoni->ekskul->ketua();
+
+        if (! $ketua) {
+            return;
+        }
+
+        Notifikasi::create([
+            'siswa_id' => $ketua->id,
+            'judul' => 'Testimoni Baru Masuk',
+            'pesan' => "{$testimoni->nama} mengirim testimoni untuk ekskul {$testimoni->ekskul->nama_ekskul}. Silakan moderasi.",
+            'tipe' => 'info',
+        ]);
+    }
+
+    public static function testimoniDipublish(Testimoni $testimoni): void
+    {
+        $siswa = $testimoni->user?->siswa;
+
+        if (! $siswa) {
+            return;
+        }
+
+        Notifikasi::create([
+            'siswa_id' => $siswa->id,
+            'judul' => 'Testimoni Diterbitkan',
+            'pesan' => 'Testimoni kamu untuk ekskul '.$testimoni->ekskul->nama_ekskul.' telah disetujui dan tampil di katalog.',
+            'tipe' => 'diterima',
+        ]);
+    }
+
+    public static function faqDiajukan(Faq $faq): void
+    {
+        $ketua = $faq->ekskul->ketua();
+
+        if (! $ketua) {
+            return;
+        }
+
+        Notifikasi::create([
+            'siswa_id' => $ketua->id,
+            'judul' => 'Pertanyaan Baru dari Siswa',
+            'pesan' => 'Ada pertanyaan baru untuk ekskul '.$faq->ekskul->nama_ekskul.': "'.$faq->pertanyaan.'". Silakan tulis jawabannya.',
+            'tipe' => 'info',
+        ]);
+    }
+
+    public static function faqTerjawab(Faq $faq): void
+    {
+        $siswa = $faq->user?->siswa;
+
+        if (! $siswa) {
+            return;
+        }
+
+        Notifikasi::create([
+            'siswa_id' => $siswa->id,
+            'judul' => 'Pertanyaan Kamu Terjawab',
+            'pesan' => 'Pertanyaan kamu untuk ekskul '.$faq->ekskul->nama_ekskul.' sudah dijawab dan tampil di halaman katalog.',
+            'tipe' => 'diterima',
         ]);
     }
 

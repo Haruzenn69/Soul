@@ -175,6 +175,8 @@
                                             <span class="px-2 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Aktif</span>
                                         @elseif($item->status === 'nonaktif')
                                             <span class="px-2 py-1 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">Nonaktif</span>
+                                        @elseif($item->status === 'keluar')
+                                            <span class="px-2 py-1 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">Keluar</span>
                                         @else
                                             <span class="px-2 py-1 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 border border-amber-200">{{ ucfirst($item->status) }}</span>
                                         @endif
@@ -259,13 +261,11 @@
                     </div>
                 @endif
             </div>
-        </div>
 
-        <!-- RIGHT COLUMN -->
-        <div class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             <!-- PELATIH EKSRUL -->
-            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .22s">
+            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .25s">
                 <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
                     <div>
                         <h2 class="text-sm font-extrabold text-slate-900">Pelatih Ekskul</h2>
@@ -306,6 +306,126 @@
                         <p class="text-[11px] text-slate-400 mt-1">Hubungi kesiswaan untuk mendapatkan binaan ekskul</p>
                     </div>
                 @endforelse
+            </div>
+
+            <!-- LAPORAN BULANAN -->
+            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .3s">
+                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
+                    <div>
+                        <h2 class="text-sm font-extrabold text-slate-900">Laporan Bulanan</h2>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Draft laporan ekskul</p>
+                    </div>
+                    <a href="{{ route('pembina.laporan.index') }}" class="text-xs font-bold text-sky-600 hover:underline flex items-center gap-1">
+                        Cetak
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+
+                <div class="p-5">
+                    @forelse($laporanDraft ?? [] as $laporan)
+                        <div class="p-3.5 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl border border-amber-100 flex items-center justify-between mb-3 gap-3 hover:border-amber-200 transition">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 flex items-center justify-center text-xs font-extrabold shadow-md shadow-amber-200 shrink-0">
+                                    {{ \Carbon\Carbon::createFromFormat('Y-m', $laporan->bulan)->format('m') }}
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-xs font-bold text-slate-800 truncate">{{ \Carbon\Carbon::createFromFormat('Y-m', $laporan->bulan)->translatedFormat('F Y') }}</h4>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">{{ $laporan->ekskul->nama_ekskul ?? 'Ekskul' }}</p>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 text-[10px] font-bold rounded-full border border-amber-200 shrink-0">Draft</span>
+                        </div>
+                    @empty
+                        <div class="text-center py-8">
+                            <div class="mx-auto w-16 h-16 rounded-2xl bg-sky-50 flex items-center justify-center text-sky-300 border border-sky-100">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                </svg>
+                            </div>
+                            <p class="text-xs font-semibold text-slate-500 mt-3">Belum ada laporan</p>
+                            <p class="text-[11px] text-slate-400 mt-1">Laporan bulanan akan muncul di sini</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="space-y-6">
+
+            <!-- MODERASI TESTIMONI & FAQ -->
+            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .2s">
+                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
+                    <div>
+                        <h2 class="text-sm font-extrabold text-slate-900">Testimoni & FAQ</h2>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Moderasi kontribusi siswa</p>
+                    </div>
+                    <span class="text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">Moderasi</span>
+                </div>
+
+                <div class="p-5 grid grid-cols-2 gap-3">
+                    <a href="{{ route('pembina.testimoni.index') }}" class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-xl border border-sky-100 hover:border-sky-300 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-slate-600">Testimoni</span>
+                            @if($testimoniPendingCount > 0)
+                                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                            @endif
+                        </div>
+                        <p class="text-2xl font-extrabold text-sky-700 mt-1">{{ $testimoniPendingCount }}</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">{{ $testimoniPendingCount > 0 ? 'menunggu persetujuan' : 'tidak ada antrian' }}</p>
+                    </a>
+                    <a href="{{ route('pembina.faq.index') }}" class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-xl border border-amber-100 hover:border-amber-300 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-slate-600">FAQ</span>
+                            @if($faqPendingCount > 0)
+                                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                            @endif
+                        </div>
+                        <p class="text-2xl font-extrabold text-amber-600 mt-1">{{ $faqPendingCount }}</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">{{ $faqPendingCount > 0 ? 'menunggu jawaban' : 'tidak ada antrian' }}</p>
+                    </a>
+                </div>
+
+                @if($ekskuls->isNotEmpty())
+                <div class="px-5 pb-5 space-y-4">
+                    <form action="{{ route('pembina.testimoni.store') }}" method="POST" class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-xl border border-sky-100 space-y-2.5">
+                        @csrf
+                        <p class="text-[11px] font-bold text-slate-700">Tambah Testimoni</p>
+                        <select name="ekskul_id" required
+                            class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition">
+                            @foreach($ekskuls as $ex)
+                                <option value="{{ $ex->id }}">{{ $ex->nama_ekskul }}</option>
+                            @endforeach
+                        </select>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" name="nama" required placeholder="Nama"
+                                class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition">
+                            <input type="text" name="kelas" placeholder="Kelas (opsional)"
+                                class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition">
+                        </div>
+                        <textarea name="quote" rows="2" required placeholder="Isi testimoni..."
+                            class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition"></textarea>
+                        <button type="submit" class="px-3.5 py-2 bg-sky-600 hover:bg-sky-700 text-white text-[10px] font-bold rounded-xl transition">Simpan Testimoni</button>
+                    </form>
+
+                    <form action="{{ route('pembina.faq.store') }}" method="POST" class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-xl border border-amber-100 space-y-2.5">
+                        @csrf
+                        <p class="text-[11px] font-bold text-slate-700">Tambah FAQ</p>
+                        <select name="ekskul_id" required
+                            class="w-full px-3 py-2 bg-white border border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 transition">
+                            @foreach($ekskuls as $ex)
+                                <option value="{{ $ex->id }}">{{ $ex->nama_ekskul }}</option>
+                            @endforeach
+                        </select>
+                        <input type="text" name="pertanyaan" required placeholder="Pertanyaan umum..."
+                            class="w-full px-3 py-2 bg-white border border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 transition">
+                        <textarea name="jawaban" rows="2" required placeholder="Jawaban..."
+                            class="w-full px-3 py-2 bg-white border border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 transition"></textarea>
+                        <button type="submit" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-xl transition">Simpan FAQ</button>
+                    </form>
+                </div>
+                @endif
             </div>
 
             <!-- PENDAFTARAN SISWA -->
@@ -351,47 +471,7 @@
                 @endif
             </div>
 
-            <!-- LAPORAN BULANAN -->
-            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .3s">
-                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
-                    <div>
-                        <h2 class="text-sm font-extrabold text-slate-900">Laporan Bulanan</h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Draft laporan ekskul</p>
-                    </div>
-                    <a href="{{ route('pembina.laporan.index') }}" class="text-xs font-bold text-sky-600 hover:underline flex items-center gap-1">
-                        Cetak
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                    </a>
-                </div>
-
-                <div class="p-5">
-                    @forelse($laporanDraft ?? [] as $laporan)
-                        <div class="p-3.5 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl border border-amber-100 flex items-center justify-between mb-3 gap-3 hover:border-amber-200 transition">
-                            <div class="flex items-center gap-3 min-w-0">
-                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 flex items-center justify-center text-xs font-extrabold shadow-md shadow-amber-200 shrink-0">
-                                    {{ \Carbon\Carbon::createFromFormat('Y-m', $laporan->bulan)->format('m') }}
-                                </div>
-                                <div class="min-w-0">
-                                    <h4 class="text-xs font-bold text-slate-800 truncate">{{ \Carbon\Carbon::createFromFormat('Y-m', $laporan->bulan)->translatedFormat('F Y') }}</h4>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">{{ $laporan->ekskul->nama_ekskul ?? 'Ekskul' }}</p>
-                                </div>
-                            </div>
-                            <span class="px-2.5 py-1 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 text-[10px] font-bold rounded-full border border-amber-200 shrink-0">Draft</span>
-                        </div>
-                    @empty
-                        <div class="text-center py-8">
-                            <div class="mx-auto w-16 h-16 rounded-2xl bg-sky-50 flex items-center justify-center text-sky-300 border border-sky-100">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                                </svg>
-                            </div>
-                            <p class="text-xs font-semibold text-slate-500 mt-3">Belum ada laporan</p>
-                            <p class="text-[11px] text-slate-400 mt-1">Laporan bulanan akan muncul di sini</p>
-                        </div>
-                    @endforelse
-                </div>
             </div>
-        </div>
 
     </div>
 @endsection

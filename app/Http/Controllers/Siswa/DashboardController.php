@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Siswa;
 use App\Http\Controllers\Controller;
 use App\Models\Pendaftaran;
 use App\Models\Presensi;
+use App\Models\Testimoni;
 
 class DashboardController extends Controller
 {
@@ -18,8 +19,19 @@ class DashboardController extends Controller
 
         $isWarned = $pendaftaran && $pendaftaran->status === Pendaftaran::STATUS_PERINGATAN;
 
-        $statusTerakhir = $siswa ? $siswa->pendaftarans()->latest('tanggal_daftar')->first() : null;
-        $isNonaktif = $siswa && $statusTerakhir && $statusTerakhir->status === Pendaftaran::STATUS_NONAKTIF && ! $pendaftaran;
+        $statusTerakhir = $siswa ? $siswa->pendaftarans()->with('ekskul')->latest('tanggal_daftar')->first() : null;
+
+        $nonaktifStatus = null;
+        if ($siswa && $statusTerakhir && ! $pendaftaran) {
+            if ($statusTerakhir->status === Pendaftaran::STATUS_NONAKTIF) {
+                $nonaktifStatus = 'nonaktif';
+            } elseif ($statusTerakhir->status === Pendaftaran::STATUS_KELUAR) {
+                $nonaktifStatus = 'keluar';
+            }
+        }
+
+        $isNonaktif = $nonaktifStatus !== null;
+        $ekskulTerakhir = $isNonaktif ? $statusTerakhir->ekskul : null;
 
         $kegiatanMendatang = $ekskul
         ? $ekskul->kegiatans()->whereDate('tanggal_kegiatan', '>=', today())->orderBy('tanggal_kegiatan', 'asc')->get()
@@ -31,6 +43,13 @@ class DashboardController extends Controller
 
         $unreadNotifCount = $siswa ? $siswa->notifikasis()->where('is_read', false)->count() : 0;
 
-        return view('siswa.dashboard', compact('siswa', 'ekskul', 'kegiatanMendatang', 'totalHadir', 'unreadNotifCount', 'isWarned', 'isNonaktif'));
+        $hasSubmittedTestimoni = $ekskul
+            ? $ekskul->testimoniss()
+                ->where('user_id', auth()->id())
+                ->whereIn('status', [Testimoni::STATUS_PENDING, Testimoni::STATUS_APPROVED])
+                ->exists()
+            : false;
+
+        return view('siswa.dashboard', compact('siswa', 'ekskul', 'kegiatanMendatang', 'totalHadir', 'unreadNotifCount', 'isWarned', 'isNonaktif', 'nonaktifStatus', 'ekskulTerakhir', 'hasSubmittedTestimoni'));
     }
 }
