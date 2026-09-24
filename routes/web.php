@@ -14,8 +14,10 @@ use App\Http\Controllers\Ketua\DashboardController as KetuaDashboardController;
 use App\Http\Controllers\Ketua\NotifikasiController as KetuaNotifikasiController;
 use App\Http\Controllers\LaporanBulananController;
 use App\Http\Controllers\NotifikasiController;
+use App\Http\Controllers\Pembina\FaqController as PembinaFaqController;
 use App\Http\Controllers\Pembina\NotifikasiController as PembinaNotifikasiController;
 use App\Http\Controllers\Pembina\PembinaController;
+use App\Http\Controllers\Pembina\TestimoniController as PembinaTestimoniController;
 use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\PengajuanKeluarController;
 use App\Http\Controllers\PresensiController;
@@ -53,6 +55,11 @@ Route::get('/storage/{path}', function (string $path) {
 Route::get('/', [HomeController::class, 'landing'])->name('siswa.landing');
 
 Route::get('/ekskul/{ekskul}', [EkskulCatalogController::class, 'show'])->name('ekskul.detail');
+
+Route::middleware(['auth', 'throttle:5,1'])->group(function () {
+    Route::post('/ekskul/{ekskul}/testimoni', [EkskulCatalogController::class, 'storeTestimoni'])->name('ekskul.testimoni.store');
+    Route::post('/ekskul/{ekskul}/faq', [EkskulCatalogController::class, 'storeFaq'])->name('ekskul.faq.store');
+});
 
 Route::get('/dashboard', [HomeController::class, 'dashboard'])->middleware('auth')->name('dashboard');
 
@@ -138,7 +145,15 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::post('/laporan/{laporanBulanan}/approve', [PembinaController::class, 'laporanApprove'])->name('laporan.approve');
     Route::post('/laporan/{laporanBulanan}/reject', [PembinaController::class, 'laporanReject'])->name('laporan.reject');
     Route::get('/presensi', [PembinaController::class, 'presensi'])->name('presensi');
-    Route::get('/rekap-absensi', [PembinaController::class, 'rekap'])->name('rekap');
+    Route::get('/testimoni', [PembinaTestimoniController::class, 'index'])->name('testimoni.index');
+    Route::post('/testimoni', [PembinaTestimoniController::class, 'store'])->name('testimoni.store');
+    Route::patch('/testimoni/{testimoni}/approve', [PembinaTestimoniController::class, 'approve'])->name('testimoni.approve');
+    Route::patch('/testimoni/{testimoni}/reject', [PembinaTestimoniController::class, 'reject'])->name('testimoni.reject');
+    Route::delete('/testimoni/{testimoni}', [PembinaTestimoniController::class, 'destroy'])->name('testimoni.destroy');
+    Route::get('/faq', [PembinaFaqController::class, 'index'])->name('faq.index');
+    Route::post('/faq', [PembinaFaqController::class, 'store'])->name('faq.store');
+    Route::patch('/faq/{faq}/answer', [PembinaFaqController::class, 'answer'])->name('faq.answer');
+    Route::delete('/faq/{faq}', [PembinaFaqController::class, 'destroy'])->name('faq.destroy');
     Route::get('/profile', [PembinaController::class, 'profile'])->name('profile');
 
     Route::get('/notifikasi', [PembinaNotifikasiController::class, 'index'])->name('notifikasi');
@@ -168,9 +183,12 @@ Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name
     Route::delete('prestasi/{prestasi}', [PrestasiController::class, 'destroy'])->name('prestasi.destroy');
     Route::get('testimoni', [TestimoniController::class, 'index'])->name('testimoni.index');
     Route::post('testimoni', [TestimoniController::class, 'store'])->name('testimoni.store');
+    Route::patch('testimoni/{testimoni}/approve', [TestimoniController::class, 'approve'])->name('testimoni.approve');
+    Route::patch('testimoni/{testimoni}/reject', [TestimoniController::class, 'reject'])->name('testimoni.reject');
     Route::delete('testimoni/{testimoni}', [TestimoniController::class, 'destroy'])->name('testimoni.destroy');
     Route::get('faq', [FaqController::class, 'index'])->name('faq.index');
     Route::post('faq', [FaqController::class, 'store'])->name('faq.store');
+    Route::patch('faq/{faq}/answer', [FaqController::class, 'answer'])->name('faq.answer');
     Route::delete('faq/{faq}', [FaqController::class, 'destroy'])->name('faq.destroy');
     Route::resource('laporan-bulanan', LaporanBulananController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update']);
     Route::get('laporan-bulanan/{laporan_bulanan}/download-pdf', [LaporanBulananController::class, 'downloadPdf'])->name('laporan-bulanan.download-pdf');

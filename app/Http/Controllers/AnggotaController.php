@@ -15,7 +15,7 @@ class AnggotaController extends Controller
     {
         $ekskul = $this->ekskul();
         $anggotas = Pendaftaran::where('ekskul_id', $ekskul->id)
-            ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_NONAKTIF, Pendaftaran::STATUS_PERINGATAN])
+            ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_NONAKTIF, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_KELUAR])
             ->when($request->filled('cari'), function ($query) use ($request) {
                 $cari = $request->input('cari');
                 $query->whereHas('siswa', fn ($s) => $s->where('nama', 'like', "%{$cari}%")->orWhere('nis', 'like', "%{$cari}%"));
@@ -27,8 +27,9 @@ class AnggotaController extends Controller
 
         $peringatanCount = $anggotas->where('status', 'peringatan')->count();
         $nonaktifCount = $anggotas->where('status', 'nonaktif')->count();
+        $keluarCount = $anggotas->where('status', 'keluar')->count();
 
-        return view('ketua.anggota.index', compact('anggotas', 'peringatanCount', 'nonaktifCount'));
+        return view('ketua.anggota.index', compact('anggotas', 'peringatanCount', 'nonaktifCount', 'keluarCount'));
     }
 
     public function updateStatus(Request $request, Pendaftaran $pendaftaran)
@@ -88,6 +89,7 @@ class AnggotaController extends Controller
             Pendaftaran::STATUS_DITERIMA => 'Aktif',
             Pendaftaran::STATUS_PERINGATAN => 'Peringatan',
             Pendaftaran::STATUS_NONAKTIF => 'Nonaktif',
+            Pendaftaran::STATUS_KELUAR => 'Keluar',
             default => $status,
         };
     }

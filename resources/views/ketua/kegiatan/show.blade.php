@@ -111,7 +111,7 @@
         </div>
         <div class="mt-5 pt-5 border-t border-sky-100 flex flex-col sm:flex-row gap-2">
             <a href="{{ route('ketua.kegiatan.edit', $kegiatan) }}" class="px-5 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-bold rounded-xl transition text-center">Edit kegiatan</a>
-            <form action="{{ route('ketua.kegiatan.destroy', $kegiatan) }}" method="POST" onsubmit="return confirm('Yakin hapus kegiatan ini?');">
+            <form action="{{ route('ketua.kegiatan.destroy', $kegiatan) }}" method="POST" onsubmit="return confirm('{{ $kegiatan->presensis->count() > 0 ? "Kegiatan ini sudah diisi presensi (".$kegiatan->presensis->count()." orang). Menghapus kegiatan juga akan menghapus data presensinya! Yakin hapus?" : "Yakin hapus kegiatan ini?" }}');">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="w-full px-5 py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-bold rounded-xl transition">Hapus kegiatan</button>

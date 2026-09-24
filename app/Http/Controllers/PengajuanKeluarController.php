@@ -56,7 +56,7 @@ class PengajuanKeluarController extends Controller
                 Pendaftaran::where('siswa_id', $pengajuanKeluar->siswa_id)
                     ->where('ekskul_id', $pengajuanKeluar->ekskul_id)
                     ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
-                    ->update(['status' => Pendaftaran::STATUS_NONAKTIF]);
+                    ->update(['status' => Pendaftaran::STATUS_KELUAR]);
 
                 NotifikasiService::pengajuanKeluarDiterima($pengajuanKeluar);
             } else {

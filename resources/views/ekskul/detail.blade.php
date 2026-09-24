@@ -251,6 +251,28 @@
     </section>
     @endif
 
+    @auth
+        @if(auth()->user()->role !== 'kesiswaan')
+            <section class="max-w-2xl mx-auto px-6">
+                @if($hasSubmittedTestimoni)
+                    <p class="text-xs text-gray-500 text-center bg-theme-light border border-gray-100 rounded-2xl px-6 py-4">✅ Kamu sudah mengirim testimoni untuk ekskul ini.</p>
+                @else
+                    <form method="POST" action="{{ route('ekskul.testimoni.store', $ekskul) }}" class="bg-theme-light rounded-2xl border border-gray-100 p-6 shadow-sm">
+                        @csrf
+                        <h3 class="font-bold text-sm mb-3">Bagikan pengalamanmu ✨</h3>
+                        @error('quote')
+                            <p class="text-rose-500 text-xs mb-2">{{ $message }}</p>
+                        @enderror
+                        <textarea name="quote" rows="3" required maxlength="2000" placeholder="Tulis testimoni singkatmu untuk ekskul ini..."
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 text-xs focus:outline-none focus:border-theme-blue"></textarea>
+                        <button type="submit" class="mt-3 px-5 py-2.5 bg-theme-blue hover:bg-theme-darkBlue text-white text-xs font-bold rounded-full transition">Kirim Testimoni</button>
+                        <p class="text-[10px] text-gray-400 mt-2">Nama & kelas diambil dari akunmu. Menunggu persetujuan ketua sebelum tampil.</p>
+                    </form>
+                @endif
+            </section>
+        @endif
+    @endauth
+
     <!-- 8. FAQ -->
     @if($ekskul->faqs->isNotEmpty())
     <section id="faq" class="bg-theme-light py-20">
@@ -271,6 +293,24 @@
         </div>
     </section>
     @endif
+
+    @auth
+        @if(auth()->user()->role !== 'kesiswaan')
+        <section class="max-w-3xl mx-auto px-6 pt-10">
+            <form method="POST" action="{{ route('ekskul.faq.store', $ekskul) }}" class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                @csrf
+                <h3 class="font-bold text-sm mb-3">Masih penasaran? Tanyakan ke ketua 💬</h3>
+                @error('pertanyaan')
+                    <p class="text-rose-500 text-xs mb-2">{{ $message }}</p>
+                @enderror
+                <input type="text" name="pertanyaan" required maxlength="255" placeholder="Tulis pertanyaanmu tentang ekskul ini..."
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 text-xs focus:outline-none focus:border-theme-blue">
+                <button type="submit" class="mt-3 px-5 py-2.5 bg-theme-dark hover:bg-gray-800 text-white text-xs font-bold rounded-full transition">Ajukan Pertanyaan</button>
+                <p class="text-[10px] text-gray-400 mt-2">Pertanyaanmu akan dijawab ketua ekskul dan tampil jika dijawab.</p>
+            </form>
+        </section>
+        @endif
+    @endauth
 
     <!-- 9. CTA -->
     <section class="bg-theme-dark text-white py-20 text-center">

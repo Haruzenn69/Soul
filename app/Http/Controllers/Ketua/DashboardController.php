@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Ketua;
 
 use App\Http\Controllers\Controller;
+use App\Models\Faq;
 use App\Models\Pendaftaran;
+use App\Models\Testimoni;
 
 class DashboardController extends Controller
 {
@@ -25,6 +27,8 @@ class DashboardController extends Controller
                     'Kelas 11',
                     'Kelas 12',
                 ], 'data' => [0, 0, 0]],
+                'testimoniPendingCount' => 0,
+                'faqPendingCount' => 0,
             ]);
         }
 
@@ -79,6 +83,8 @@ class DashboardController extends Controller
             'chartKegiatan' => $chartKegiatan,
             'chartKelas' => $chartKelas,
             'kegiatanBulanIni' => $kegiatanBulanIni,
+            'testimoniPendingCount' => $ekskul->testimoniss()->where('status', Testimoni::STATUS_PENDING)->count(),
+            'faqPendingCount' => $ekskul->faqs()->where('status', Faq::STATUS_PENDING)->count(),
         ]);
     }
 }
