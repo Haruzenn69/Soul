@@ -46,6 +46,20 @@
     }
     $psNama = $psUser?->siswa?->nama ?: ($psUser?->pembina?->nama ?: ($psUser?->username ?: 'Pengguna'));
     $psSubU = $psRole;
+
+    // Suntik menu "Nilai" untuk siswa & ketua tepat setelah Dashboard
+    $psItems = $psItems ?? [];
+    $psNilaiItem = null;
+    if (($psUser->role ?? null) === 'siswa') {
+        $psIsKetua = str_contains(strtolower((string) $psTitle), 'ketua') || request()->routeIs('ketua.*');
+        $psNilaiItem = [
+            'icon' => 'clipboard-check',
+            'label' => 'Nilai',
+            'url' => $psIsKetua ? route('ketua.nilai') : route('siswa.nilai'),
+            'is' => ['siswa.nilai', 'ketua.nilai'],
+        ];
+        array_splice($psItems, 1, 0, [$psNilaiItem]);
+    }
 @endphp
 
 <style>
@@ -543,3 +557,31 @@
         }
     })();
 </script>
+
+@if (($psUser->role ?? null) === 'siswa')
+<script>
+    (function () {
+        var sidebar = document.getElementById('sidebar-mobile');
+        if (!sidebar) return;
+        var nav = sidebar.querySelector('nav');
+        if (!nav) return;
+        if (nav.querySelector('a[data-ps-nilai]')) return;
+        var dash = nav.querySelector('a');
+        if (!dash || dash.closest('details')) return;
+        var url = @json(request()->routeIs('ketua.*') || str_contains(strtolower((string) $psTitle), 'ketua') ? route('ketua.nilai') : route('siswa.nilai'));
+        var active = @json(request()->routeIs(['siswa.nilai', 'ketua.nilai']));
+        var a = document.createElement('a');
+        a.href = url;
+        a.setAttribute('data-ps-nilai', '1');
+        a.className = 'relative flex items-center gap-3 px-3.5 py-2.5 text-xs rounded-xl transition-all ' + (active ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 font-medium');
+        var html = '';
+        if (active) {
+            html += '<span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>';
+        }
+        html += '<span class="text-base flex items-center justify-center w-4 h-4"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2v2H9V5zm1 8l2 2 4-4"/></svg></span>';
+        html += '<span>Nilai</span>';
+        a.innerHTML = html;
+        dash.after(a);
+    })();
+</script>
+@endif
