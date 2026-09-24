@@ -106,6 +106,9 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
     // 3. PRESENSI & KEGIATAN
     Route::get('/presensi', [SiswaPresensiController::class, 'index'])->name('presensi');
 
+    // 3b. REKAP ABSENSI PER BULAN
+    Route::get('/rekap-absensi', [SiswaPresensiController::class, 'rekap'])->name('rekap');
+
     // 4. PROFILE SISWA
     Route::get('/profile', [SiswaProfilController::class, 'edit'])->name('profile.edit');
 

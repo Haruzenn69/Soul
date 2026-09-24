@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
 use App\Models\Presensi;
+use App\Services\RekapAbsensiService;
 use Illuminate\Http\Request;
 
 class PresensiController extends Controller
@@ -28,5 +29,40 @@ class PresensiController extends Controller
             : collect();
 
         return view('siswa.presensi', compact('presensis', 'siswa'));
+    }
+
+    public function rekap(Request $request)
+    {
+        $user = auth()->user();
+        $siswa = $user->siswa;
+
+        $pendaftaran = $siswa ? $siswa->activePendaftaran() : null;
+        $ekskul = $pendaftaran?->ekskul;
+
+        $service = app(RekapAbsensiService::class);
+        $bulan = $service->normalizeBulan($request->input('bulan'));
+
+        $data = $ekskul ? $service->rekap($ekskul, $bulan) : [
+            'ekskul' => null,
+            'bulan' => $bulan,
+            'kegiatans' => collect(),
+            'rows' => collect(),
+            'totalHadir' => 0,
+            'totalIzin' => 0,
+            'totalSakit' => 0,
+            'totalAlpha' => 0,
+            'availableMonths' => collect([now()->format('Y-m')]),
+        ];
+
+        $rekapSiswa = $data['rows']->firstWhere('pendaftaran.id', $pendaftaran?->id);
+
+        $unreadNotifCount = $siswa ? $siswa->notifikasis()->where('is_read', false)->count() : 0;
+
+        return view('siswa.rekap', array_merge($data, [
+            'siswa' => $siswa,
+            'pendaftaran' => $pendaftaran,
+            'rekapSiswa' => $rekapSiswa,
+            'unreadNotifCount' => $unreadNotifCount,
+        ]));
     }
 }

@@ -32,52 +32,6 @@
 
         /* Sidebar mobile selalu overlay, jangan dipaksa jadi relative (split layar) */
         #sidebar-mobile { position: fixed; }
-
-        /* SIDEBAR COLLAPSIBLE */
-        #sidebar-desktop { transition: width .25s ease; }
-        #sidebar-desktop.collapsed { width: 4.5rem; }
-        #sidebar-desktop.collapsed .sidebar-label,
-        #sidebar-desktop.collapsed .sidebar-logo-text,
-        #sidebar-desktop.collapsed .sidebar-section-label,
-        #sidebar-desktop.collapsed .sidebar-user-info,
-        #sidebar-desktop.collapsed .sidebar-logout-text { display: none; }
-        #sidebar-desktop.collapsed nav a { justify-content: center; padding-left: 0; padding-right: 0; }
-        #sidebar-desktop.collapsed .sidebar-user-card { justify-content: center; }
-        #sidebar-desktop.collapsed nav a .text-base,
-        #sidebar-desktop.collapsed .sidebar-user-card .w-9 { margin: 0 auto; }
-
-        /* TOOLTIP - muncul saat hover ikon, hanya saat sidebar collapsed */
-        .nav-tooltip {
-            position: absolute;
-            left: calc(100% + 10px);
-            top: 50%;
-            transform: translateY(-50%) translateX(-4px);
-            background: #0F172A;
-            color: #fff;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 6px 10px;
-            border-radius: 8px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .15s ease, transform .15s ease;
-            z-index: 60;
-            box-shadow: 0 8px 20px rgba(15,23,42,.25);
-        }
-        .nav-tooltip::before {
-            content: '';
-            position: absolute;
-            right: 100%;
-            top: 50%;
-            transform: translateY(-50%);
-            border: 5px solid transparent;
-            border-right-color: #0F172A;
-        }
-        #sidebar-desktop.collapsed .nav-item-wrap:hover .nav-tooltip {
-            opacity: 1;
-            transform: translateY(-50%) translateX(0);
-        }
     </style>
     @include('partials.responsive-tables')
 </head>
@@ -358,7 +312,7 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <div class="w-full flex-1 flex flex-col min-w-0">
+    <div class="w-full flex-1 flex flex-col min-w-0 ps-page">
 
         <!-- TOP NAVBAR HEADER -->
         <header class="px-4 md:px-8 py-4 bg-white/70 backdrop-blur-lg border-b border-sky-100 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
@@ -437,25 +391,6 @@
             document.getElementById('sidebar-overlay').classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
         }
-
-        // TOGGLE SIDEBAR DESKTOP (collapsible ala Claude)
-        function toggleDesktopSidebar() {
-            const sidebar = document.getElementById('sidebar-desktop');
-            const icon = document.getElementById('sidebar-toggle-icon');
-            const collapsed = sidebar.classList.toggle('collapsed');
-            icon.style.transform = collapsed ? 'rotate(180deg)' : 'rotate(0deg)';
-            localStorage.setItem('soul_sidebar_collapsed', collapsed ? '1' : '0');
-        }
-
-        // Terapkan status tersimpan saat halaman dimuat (tanpa animasi berkedip)
-        (function() {
-            if (localStorage.getItem('soul_sidebar_collapsed') === '1') {
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.getElementById('sidebar-desktop').classList.add('collapsed');
-                    document.getElementById('sidebar-toggle-icon').style.transform = 'rotate(180deg)';
-                });
-            }
-        })();
     </script>
 </body>
 </html>

@@ -11,6 +11,7 @@ use App\Models\Pelatih;
 use App\Models\Pendaftaran;
 use App\Models\Testimoni;
 use App\Services\NotifikasiService;
+use App\Services\RekapAbsensiService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -251,6 +252,42 @@ class PembinaController extends Controller
             ->get();
 
         return view('pembina.presensi', compact('kegiatans'));
+    }
+
+    public function rekap(Request $request)
+    {
+        $ekskuls = $this->getEkskuls();
+        $ekskulIds = $ekskuls->pluck('id');
+
+        $service = app(RekapAbsensiService::class);
+        $bulan = $service->normalizeBulan($request->input('bulan'));
+
+        $ekskulFilter = $request->input('ekskul');
+        $ekskulId = $ekskulFilter && $ekskulIds->contains($ekskulFilter)
+            ? (int) $ekskulFilter
+            : (int) $ekskuls->first()?->id;
+
+        $ekskul = $ekskuls->firstWhere('id', $ekskulId);
+
+        $rekap = $ekskul
+            ? $service->rekap($ekskul, $bulan)
+            : [
+                'ekskul' => null,
+                'bulan' => $bulan,
+                'kegiatans' => collect(),
+                'rows' => collect(),
+                'totalHadir' => 0,
+                'totalIzin' => 0,
+                'totalSakit' => 0,
+                'totalAlpha' => 0,
+                'availableMonths' => collect([now()->format('Y-m')]),
+            ];
+
+        return view('pembina.rekap', array_merge($rekap, [
+            'ekskuls' => $ekskuls,
+            'ekskulId' => $ekskulId,
+            'bulan' => $bulan,
+        ]));
     }
 
     public function profile()

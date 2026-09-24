@@ -34,187 +34,24 @@
         /* Sidebar mobile selalu overlay, jangan dipaksa jadi relative (split layar) */
         #sidebar-mobile { position: fixed; }
 
-        /* SIDEBAR COLLAPSIBLE */
-        #sidebar-desktop { transition: width .25s ease; }
-        #sidebar-desktop.collapsed { width: 4.5rem; }
-        #sidebar-desktop.collapsed .sidebar-label,
-        #sidebar-desktop.collapsed .sidebar-logo-text,
-        #sidebar-desktop.collapsed .sidebar-section-label,
-        #sidebar-desktop.collapsed .sidebar-user-info,
-        #sidebar-desktop.collapsed .sidebar-logout-text { display: none; }
-        #sidebar-desktop.collapsed nav a { justify-content: center; padding-left: 0; padding-right: 0; }
-        #sidebar-desktop.collapsed .sidebar-user-card { justify-content: center; }
-        #sidebar-desktop.collapsed nav a .text-base,
-        #sidebar-desktop.collapsed .sidebar-user-card .w-9 { margin: 0 auto; }
-
-        /* TOOLTIP - muncul saat hover ikon, hanya saat sidebar collapsed */
-        .nav-tooltip {
-            position: absolute;
-            left: calc(100% + 10px);
-            top: 50%;
-            transform: translateY(-50%) translateX(-4px);
-            background: #0F172A;
-            color: #fff;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 6px 10px;
-            border-radius: 8px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .15s ease, transform .15s ease;
-            z-index: 60;
-            box-shadow: 0 8px 20px rgba(15,23,42,.25);
-        }
-        .nav-tooltip::before {
-            content: '';
-            position: absolute;
-            right: 100%;
-            top: 50%;
-            transform: translateY(-50%);
-            border: 5px solid transparent;
-            border-right-color: #0F172A;
-        }
-        #sidebar-desktop.collapsed .nav-item-wrap:hover .nav-tooltip {
-            opacity: 1;
-            transform: translateY(-50%) translateX(0);
-        }
-
     </style>
     @include('partials.responsive-tables')
 </head>
-<body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased flex min-h-screen overflow-x-hidden selection:bg-sky-100 selection:text-sky-700">
-
-    <!-- SIDEBAR LEFT (collapsible, ala Claude) -->
-    <aside id="sidebar-desktop" class="w-64 hidden md:flex flex-col justify-between shrink-0 bg-white/90 backdrop-blur border-r border-sky-100 shadow-sm sticky top-0 self-start h-screen overflow-hidden">
-        <div class="absolute inset-0 pointer-events-none">
-            <div class="absolute -top-24 -right-16 w-64 h-64 rounded-full bg-sky-100/70 blur-3xl animate-blob"></div>
-            <div class="absolute bottom-0 -left-20 w-56 h-56 rounded-full bg-amber-100/70 blur-3xl animate-blob" style="animation-delay: 3s"></div>
-        </div>
-
-        <!-- Tombol geser buka/tutup -->
-        <button onclick="toggleDesktopSidebar()" class="absolute top-5 -right-3 z-20 w-6 h-6 rounded-full bg-white border border-sky-200 shadow-md flex items-center justify-center text-slate-400 hover:text-sky-600 hover:border-sky-300 transition-all">
-            <svg id="sidebar-toggle-icon" class="w-3.5 h-3.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
-            </svg>
-        </button>
-
-        <div class="relative p-5 flex flex-col h-full overflow-y-auto overflow-x-hidden">
-            <!-- Logo SOUL -->
-            <div class="flex items-center gap-3 mb-8 px-2 mt-1">
-                <div class="w-10 h-10 shrink-0 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-extrabold text-lg shadow-lg shadow-sky-300">
-                    SOUL
-                </div>
-                <div class="sidebar-logo-text">
-                    <h1 class="font-extrabold text-sm tracking-tight text-slate-900 leading-none">SOUL</h1>
-                    <span class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Panel Kesiswaan</span>
-                </div>
-            </div>
-
-            <div class="sidebar-section-label text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-2 px-3">Menu Utama</div>
-            <nav class="space-y-1.5">
-                <div class="nav-item-wrap relative">
-                    <a href="{{ route('kesiswaan.dashboard') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('kesiswaan.dashboard') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
-                        @if(request()->routeIs('kesiswaan.dashboard'))
-                            <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
-                        @endif
-                        <span class="text-base flex items-center justify-center w-4 h-4 shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-                            </svg>
-                        </span>
-                        <span class="sidebar-label">Dashboard</span>
-                    </a>
-                    <span class="nav-tooltip">Dashboard</span>
-                </div>
-
-                <div class="nav-item-wrap relative">
-                    <a href="{{ route('kesiswaan.users.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('kesiswaan.users.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
-                        @if(request()->routeIs('kesiswaan.users.*'))
-                            <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
-                        @endif
-                        <span class="text-base flex items-center justify-center w-4 h-4 shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                            </svg>
-                        </span>
-                        <span class="sidebar-label">Akun Pengguna</span>
-                    </a>
-                    <span class="nav-tooltip">Akun Pengguna</span>
-                </div>
-
-                <div class="nav-item-wrap relative">
-                    <a href="{{ route('kesiswaan.ekskuls.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('kesiswaan.ekskuls.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
-                        @if(request()->routeIs('kesiswaan.ekskuls.*'))
-                            <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
-                        @endif
-                        <span class="text-base flex items-center justify-center w-4 h-4 shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                            </svg>
-                        </span>
-                        <span class="sidebar-label">Data Ekskul</span>
-                    </a>
-                    <span class="nav-tooltip">Data Ekskul</span>
-                </div>
-
-                <div class="nav-item-wrap relative">
-                    <a href="{{ route('kesiswaan.kelas.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('kesiswaan.kelas.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
-                        @if(request()->routeIs('kesiswaan.kelas.*'))
-                            <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
-                        @endif
-                        <span class="text-base flex items-center justify-center w-4 h-4 shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                            </svg>
-                        </span>
-                        <span class="sidebar-label">Data Kelas</span>
-                    </a>
-                    <span class="nav-tooltip">Data Kelas</span>
-                </div>
-
-                <div class="nav-item-wrap relative">
-                    <a href="{{ route('kesiswaan.profile') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('kesiswaan.profile') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
-                        @if(request()->routeIs('kesiswaan.profile'))
-                            <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
-                        @endif
-                        <span class="text-base flex items-center justify-center w-4 h-4 shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                            </svg>
-                        </span>
-                        <span class="sidebar-label">Profile</span>
-                    </a>
-                    <span class="nav-tooltip">Profile</span>
-                </div>
-            </nav>
-
-            <!-- User Profile Card Bottom -->
-            <div class="mt-auto pt-6">
-                <div class="nav-item-wrap relative">
-                    <div class="sidebar-user-card bg-gradient-to-r from-sky-50 to-amber-50 p-3 rounded-2xl flex items-center justify-between border border-sky-100 shadow-sm">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-9 h-9 shrink-0 rounded-full bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 font-extrabold flex items-center justify-center text-xs shadow-md shadow-amber-200">
-                                {{ strtoupper(substr(auth()->user()->username ?? 'K', 0, 1)) }}
-                            </div>
-                            <div class="sidebar-user-info text-left">
-                                <h4 class="text-xs font-bold text-slate-800 leading-tight">{{ auth()->user()->username }}</h4>
-                                <p class="text-[10px] text-slate-400 font-medium">Staf Kesiswaan</p>
-                            </div>
-                        </div>
-                        <form action="{{ route('logout') }}" method="POST" class="sidebar-logout-text">
-                            @csrf
-                            <button type="submit" class="text-slate-400 hover:text-red-500 text-xs font-bold transition-colors">Keluar</button>
-                        </form>
-                    </div>
-                    <span class="nav-tooltip">{{ auth()->user()->username }} · Keluar</span>
-                </div>
-            </div>
-        </div>
-    </aside>
+<body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased flex min-h-screen overflow-x-hidden selection:bg-sky-100 selection:text-sky-700">@include('partials.pill-sidebar', [
+    'psTitle' => 'Menu Kesiswaan',
+    'psLogoBrand' => 'SOUL',
+    'psDashboardUrl' => route('kesiswaan.dashboard'),
+    'psNotifUrl' => route('kesiswaan.notifikasi'),
+    'psProfileUrl' => route('kesiswaan.profile'),
+    'psItems' => [
+        ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('kesiswaan.dashboard'), 'is' => 'kesiswaan.dashboard'],
+        ['icon' => 'users', 'label' => 'Akun Pengguna', 'url' => route('kesiswaan.users.index'), 'is' => 'kesiswaan.users.*'],
+        ['icon' => 'building', 'label' => 'Data Ekskul', 'url' => route('kesiswaan.ekskuls.index'), 'is' => 'kesiswaan.ekskuls.*'],
+        ['icon' => 'document', 'label' => 'Data Kelas', 'url' => route('kesiswaan.kelas.index'), 'is' => 'kesiswaan.kelas.*'],
+        ['icon' => 'user', 'label' => 'Profile', 'url' => route('kesiswaan.profile'), 'is' => 'kesiswaan.profile'],
+    ],
+    'psMore' => [],
+])
 
     <!-- MOBILE SIDEBAR OVERLAY -->
     <div id="sidebar-overlay" class="hidden fixed inset-0 z-40 bg-slate-900/50 md:hidden" onclick="closeSidebar()"></div>
@@ -312,7 +149,7 @@
     </div>
 
     <!-- MAIN CONTENT CONTAINER -->
-    <div class="w-full flex-1 flex flex-col min-w-0">
+    <div class="w-full flex-1 flex flex-col min-w-0 ps-page">
 
         <!-- TOP NAVBAR HEADER -->
         <header class="px-4 md:px-8 py-4 bg-white/70 backdrop-blur-lg border-b border-sky-100 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
@@ -389,25 +226,6 @@
             document.getElementById('sidebar-overlay').classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
         }
-
-        // TOGGLE SIDEBAR DESKTOP (collapsible ala Claude)
-        function toggleDesktopSidebar() {
-            const sidebar = document.getElementById('sidebar-desktop');
-            const icon = document.getElementById('sidebar-toggle-icon');
-            const collapsed = sidebar.classList.toggle('collapsed');
-            icon.style.transform = collapsed ? 'rotate(180deg)' : 'rotate(0deg)';
-            localStorage.setItem('soul_sidebar_collapsed', collapsed ? '1' : '0');
-        }
-
-        // Terapkan status tersimpan saat halaman dimuat (tanpa animasi berkedip)
-        (function() {
-            if (localStorage.getItem('soul_sidebar_collapsed') === '1') {
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.getElementById('sidebar-desktop').classList.add('collapsed');
-                    document.getElementById('sidebar-toggle-icon').style.transform = 'rotate(180deg)';
-                });
-            }
-        })();
     </script>
 
     @yield('scripts')

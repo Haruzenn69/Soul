@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Katalog Ekskul - SOUL</title>
+    <title>Rekap Absensi - SOUL</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -78,8 +78,7 @@
                     </span>
                     Dashboard
                 </a>
-                <a href="{{ route('siswa.katalog') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold text-xs shadow-sm shadow-sky-100 transition-all">
-                    <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
+                <a href="{{ route('siswa.katalog') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
                     <span class="text-base flex items-center justify-center w-4 h-4">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                     </span>
@@ -91,7 +90,8 @@
                     </span>
                     Presensi & Kegiatan
                 </a>
-                <a href="{{ route('siswa.rekap') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
+                <a href="{{ route('siswa.rekap') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold text-xs shadow-sm shadow-sky-100 transition-all">
+                    <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                     <span class="text-base flex items-center justify-center w-4 h-4">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </span>
@@ -142,16 +142,6 @@
                     <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-extrabold text-sm shadow-md shadow-sky-300">S</div>
                     <span class="font-extrabold text-sm tracking-tight text-slate-900">SOUL</span>
                 </div>
-
-                <!-- Search (Desktop) -->
-                <form method="GET" action="{{ route('siswa.katalog') }}" class="relative w-full max-w-md hidden sm:block">
-                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </span>
-                    <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari ekskul..." class="w-full pl-10 pr-4 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
-                </form>
             </div>
 
             <!-- KANAN: Info User + Notifikasi + Logout -->
@@ -179,92 +169,131 @@
         <!-- MAIN PAGE CONTENT -->
         <main class="p-4 md:p-8 space-y-6 overflow-y-auto">
 
-            <!-- Header dengan Tombol Daftar -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 animate-fade-up">
-                <div>
-                    <h1 class="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900">Katalog Ekskul</h1>
-                    <p class="text-xs text-slate-400 mt-1 font-medium">Temukan ekskul yang sesuai dengan minatmu</p>
-                </div>
-                @if(!$isRegistered && !$isPending)
-                    <a href="{{ route('siswa.daftar-ekskul') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-xs rounded-2xl shadow-lg shadow-sky-200 transition-all hover:-translate-y-0.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
-                        Daftar Ekskul
-                    </a>
-                @elseif($isPending)
-                    <span class="px-4 py-2.5 bg-amber-50 text-amber-700 text-xs font-bold rounded-2xl border border-amber-200 flex items-center gap-1.5 shadow-sm">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                        Menunggu Verifikasi
-                    </span>
-                @else
-                    <span class="px-4 py-2.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-2xl border border-emerald-200 shadow-sm">
-                        Sudah Terdaftar
-                    </span>
-                @endif
+            @php
+                $rk = $rekapSiswa ?? null;
+                $hadir = $rk?->hadir ?? 0;
+                $izin = $rk?->izin ?? 0;
+                $sakit = $rk?->sakit ?? 0;
+                $alpha = $rk?->alpha ?? 0;
+                $total = $rk?->total ?? 0;
+                $persentaseKehadiran = $rk?->persentaseKehadiran ?? 0;
+            @endphp
+
+            <div class="animate-fade-up">
+                <h1 class="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900">Rekap Absensi</h1>
+                <p class="text-xs text-slate-400 mt-1 font-medium">Ringkasan kehadiranmu per bulan di {{ $ekskul->nama_ekskul ?? 'ekskul' }}</p>
             </div>
 
-            <!-- Filter -->
-            <div class="flex gap-2 flex-wrap animate-fade-up" style="animation-delay: .1s">
-                <button class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200">Semua</button>
-                <button class="px-4 py-2 bg-white text-slate-600 text-xs font-bold rounded-xl border border-sky-100 shadow-sm hover:bg-sky-50 transition-all">Olahraga</button>
-                <button class="px-4 py-2 bg-white text-slate-600 text-xs font-bold rounded-xl border border-sky-100 shadow-sm hover:bg-sky-50 transition-all">Seni</button>
-                <button class="px-4 py-2 bg-white text-slate-600 text-xs font-bold rounded-xl border border-sky-100 shadow-sm hover:bg-sky-50 transition-all">Akademik</button>
-            </div>
+            <!-- Filter Bulan -->
+            <form method="GET" action="{{ route('siswa.rekap') }}" class="bg-white p-4 rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 flex flex-wrap items-center gap-3 animate-fade-up" style="animation-delay: .1s">
+                <span class="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Pilih Bulan
+                </span>
+                <select name="bulan" class="px-3 py-1.5 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+                    @foreach($availableMonths as $option)
+                        @php
+                            $optionLabel = \Carbon\Carbon::createFromFormat('Y-m', $option)->translatedFormat('F Y');
+                        @endphp
+                        <option value="{{ $option }}" {{ $bulan === $option ? 'selected' : '' }}>{{ $optionLabel }}</option>
+                    @endforeach
+                </select>
+                <button type="submit" class="px-4 py-1.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition-all hover:-translate-y-0.5">Tampilkan Rekap</button>
+                <span class="ml-auto text-[11px] font-semibold text-slate-400 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">{{ \Carbon\Carbon::createFromFormat('Y-m', $bulan)->translatedFormat('F Y') }}</span>
+            </form>
 
-            <!-- Daftar Ekskul -->
-            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 lg:gap-5">
-                @forelse($ekskuls as $index => $ekskul)
-                <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 p-4 md:p-5 hover:shadow-xl hover:-translate-y-1 hover:border-sky-200 transition-all duration-300 animate-fade-up" style="animation-delay: {{ $index * 0.05 }}s">
-                    <div class="flex items-center gap-2 md:gap-3 mb-3">
-                        <div class="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-white font-extrabold flex items-center justify-center text-[10px] md:text-sm shadow-lg shadow-sky-200 uppercase">
-                            {{ substr($ekskul->nama_ekskul, 0, 2) }}
+            <!-- Hero Persentase Kehadiran -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200 animate-fade-up" style="animation-delay: .15s">
+                <div class="absolute inset-0 pointer-events-none">
+                    <div class="absolute -top-20 -right-10 w-72 h-72 rounded-full bg-amber-200/40 blur-3xl"></div>
+                    <div class="absolute -bottom-24 -left-10 w-64 h-64 rounded-full bg-white/10 blur-3xl"></div>
+                </div>
+                <div class="relative grid lg:grid-cols-3 gap-6 items-center">
+                    <div class="lg:col-span-2">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            @if($ekskul)
+                                <span class="px-3 py-1 rounded-full bg-amber-300/30 backdrop-blur border border-amber-200/40 text-[10px] font-bold tracking-wide uppercase">{{ $ekskul->nama_ekskul }}</span>
+                            @endif
+                            <span class="px-3 py-1 rounded-full bg-white/15 backdrop-blur border border-white/20 text-[10px] font-bold tracking-wide uppercase">{{ \Carbon\Carbon::createFromFormat('Y-m', $bulan)->translatedFormat('F Y') }}</span>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-xs md:text-sm font-extrabold text-slate-900 truncate">{{ $ekskul->nama_ekskul }}</h3>
-                            <p class="text-[9px] md:text-[10px] text-slate-400 truncate font-medium">Pembina: {{ $ekskul->pembina->nama ?? '-' }}</p>
+                        <h2 class="text-2xl md:text-3xl font-extrabold mt-3 tracking-tight">Tingkat Kehadiran</h2>
+                        <p class="text-xs text-white/75 mt-1.5 max-w-lg leading-relaxed">
+                            Dari {{ $total }} kegiatan yang tercatat pada bulan ini, kamu hadir sebanyak {{ $hadir }} kali.
+                        </p>
+                        <div class="mt-5 h-3 rounded-full bg-white/20 backdrop-blur overflow-hidden">
+                            <div id="hero-bar" class="h-full rounded-full bg-gradient-to-r from-amber-300 to-yellow-400 transition-all duration-1000" style="width: 0%"></div>
                         </div>
+                        <p class="text-[10px] text-white/70 mt-2 font-semibold">Persentase kehadiran dibanding seluruh kegiatan yang tercatat</p>
                     </div>
-                    <p class="text-[10px] md:text-xs text-slate-600 mb-3 line-clamp-2 leading-relaxed">{{ $ekskul->deskripsi ?? 'Deskripsi belum tersedia' }}</p>
-
-                    @if($ekskul->is_open_recruitment)
-                        <div class="mb-3">
-                            <span class="text-[9px] md:text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full">Buka Pendaftaran</span>
-                            <p class="text-[9px] md:text-[10px] text-slate-400 mt-1.5 font-medium">{{ $ekskul->jadwal ?? 'Jadwal belum diatur' }}</p>
-                        </div>
-                        <a href="{{ route('siswa.form-daftar', $ekskul->id) }}" class="block w-full py-2 md:py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-[10px] md:text-xs font-bold rounded-xl transition-all shadow-md shadow-sky-200 text-center hover:-translate-y-0.5">
-                            Daftar Sekarang
-                        </a>
-                    @else
-                        <div class="mb-3">
-                            <span class="text-[9px] md:text-[10px] font-bold text-red-500 bg-red-50 border border-red-100 px-2 py-1 rounded-full">Tidak Membuka Pendaftaran</span>
-                            <p class="text-[9px] md:text-[10px] text-slate-400 mt-1.5 font-medium">{{ $ekskul->jadwal ?? 'Jadwal belum diatur' }}</p>
-                        </div>
-                        <button class="w-full py-2 md:py-2.5 bg-slate-100 text-slate-400 text-[10px] md:text-xs font-bold rounded-xl cursor-not-allowed border border-slate-100" disabled>
-                            Tidak Tersedia
-                        </button>
-                    @endif
-
-                    <div class="mt-3 pt-3 border-t border-sky-50">
-                        <a href="{{ route('ekskul.detail', $ekskul) }}" class="text-sky-600 text-[10px] md:text-xs font-bold hover:underline flex items-center gap-1">
-                            Lihat Detail
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </a>
+                    <div class="lg:col-span-1 text-center lg:text-right">
+                        <p class="text-5xl md:text-6xl font-extrabold tracking-tight">{{ $persentaseKehadiran }}<span class="text-2xl md:text-3xl opacity-80">%</span></p>
+                        <p class="text-[10px] text-white/70 font-semibold uppercase tracking-wider mt-2">{{ $total }} kegiatan tercatat</p>
                     </div>
                 </div>
-                @empty
-                <div class="col-span-2 lg:col-span-3 bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center py-12">
-                    <div class="mx-auto w-16 h-16 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-300 mb-3">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                        </svg>
-                    </div>
-                    <p class="text-xs font-semibold text-slate-500">Belum ada ekskul yang tersedia.</p>
-                </div>
-                @endforelse
             </div>
+
+            <!-- Statistik Presensi -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                <!-- Card 1: Hadir -->
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 p-4 md:p-5 shadow-lg shadow-emerald-100/60 hover:-translate-y-1 transition-all duration-300 animate-fade-up" style="animation-delay: .2s">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Hadir</p>
+                            <h3 class="text-xl md:text-3xl font-extrabold text-emerald-600 mt-1 md:mt-1.5">{{ $hadir }}</h3>
+                        </div>
+                        <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white flex items-center justify-center text-sm md:text-base font-extrabold shadow-md shadow-emerald-200">H</div>
+                    </div>
+                    <p class="text-[9px] md:text-[11px] font-semibold text-emerald-700 mt-0.5 md:mt-1">Kegiatan</p>
+                </div>
+
+                <!-- Card 2: Izin -->
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-100 to-yellow-50 border border-amber-200 p-4 md:p-5 shadow-lg shadow-amber-100/60 hover:-translate-y-1 transition-all duration-300 animate-fade-up" style="animation-delay: .25s">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Izin</p>
+                            <h3 class="text-xl md:text-3xl font-extrabold text-amber-600 mt-1 md:mt-1.5">{{ $izin }}</h3>
+                        </div>
+                        <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 flex items-center justify-center text-sm md:text-base font-extrabold shadow-md shadow-amber-200">I</div>
+                    </div>
+                    <p class="text-[9px] md:text-[11px] font-semibold text-amber-700 mt-0.5 md:mt-1">Kegiatan</p>
+                </div>
+
+                <!-- Card 3: Sakit -->
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-rose-50 to-white border border-rose-100 p-4 md:p-5 shadow-lg shadow-rose-100/60 hover:-translate-y-1 transition-all duration-300 animate-fade-up" style="animation-delay: .3s">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Sakit</p>
+                            <h3 class="text-xl md:text-3xl font-extrabold text-red-600 mt-1 md:mt-1.5">{{ $sakit }}</h3>
+                        </div>
+                        <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-rose-400 to-red-500 text-white flex items-center justify-center text-sm md:text-base font-extrabold shadow-md shadow-rose-200">S</div>
+                    </div>
+                    <p class="text-[9px] md:text-[11px] font-semibold text-rose-700 mt-0.5 md:mt-1">Kegiatan</p>
+                </div>
+
+                <!-- Card 4: Alpha -->
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-4 md:p-5 shadow-lg shadow-sky-100/60 hover:-translate-y-1 transition-all duration-300 animate-fade-up" style="animation-delay: .35s">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Alpha</p>
+                            <h3 class="text-xl md:text-3xl font-extrabold text-sky-700 mt-1 md:mt-1.5">{{ $alpha }}</h3>
+                        </div>
+                        <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center text-sm md:text-base font-extrabold shadow-md shadow-sky-200">A</div>
+                    </div>
+                    <p class="text-[9px] md:text-[11px] font-semibold text-sky-600 mt-0.5 md:mt-1">Kegiatan</p>
+                </div>
+            </div>
+
+            <!-- Matriks Kehadiran (sama dengan yang dilihat ketua & pembina) -->
+            @include('partials.rekap-matriks', [
+                'rows' => $rekapSiswa ? collect([$rekapSiswa]) : collect(),
+                'matriksTitle' => 'Matriks Kehadiran',
+                'matriksSubtitle' => $rekapSiswa
+                    ? 'Rekap kehadiranmu &middot; '.$kegiatans->count().' kegiatan'
+                    : 'Belum ada rekap pada bulan ini',
+                'emptyText' => 'Belum ada rekap kehadiranmu pada bulan ini.',
+            ])
 
         </main>
     </div>
@@ -280,6 +309,16 @@
             document.getElementById('sidebar-overlay').classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
         }
+
+        // Animasi bar persentase kehadiran
+        document.addEventListener('DOMContentLoaded', function() {
+            const bar = document.getElementById('hero-bar');
+            if (bar) {
+                requestAnimationFrame(() => {
+                    bar.style.width = '{{ $persentaseKehadiran }}%';
+                });
+            }
+        });
     </script>
 
 </body>
