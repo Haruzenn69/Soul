@@ -370,15 +370,20 @@
                     <a href="{{ route('siswa.notifikasi') }}" class="shrink-0 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-semibold rounded-lg transition">Lihat Notifikasi</a>
                 </div>
             @elseif(isset($isNonaktif) && $isNonaktif)
-                <div class="p-4 rounded-2xl border bg-red-50 border-red-200 flex items-start gap-3">
+                @php
+                    $teksNonaktif = $nonaktifStatus === 'keluar'
+                        ? ['Kamu telah keluar dari ekskul', 'Permohonan keluar kamu dari ekskul '.($ekskulTerakhir->nama_ekskul ?? '').' telah disetujui. Status keanggotaanmu sudah tidak aktif. Hubungi ketua ekskul jika ini kurang tepat.', 'bg-red-50 border-red-200', 'text-red-800', 'text-red-700']
+                        : ['Kamu dinonaktifkan dari ekskul', 'Status keanggotaanmu saat ini nonaktif. Hubungi ketua ekskul jika ini kurang tepat.', 'bg-red-50 border-red-200', 'text-red-800', 'text-red-700'];
+                @endphp
+                <div class="p-4 rounded-2xl border {{ $teksNonaktif[2] }} flex items-start gap-3">
                     <div class="mt-0.5 text-red-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <p class="text-sm font-bold text-red-800">Kamu dinonaktifkan dari ekskul</p>
-                        <p class="text-xs mt-1 text-red-700">Status keanggotaanmu saat ini nonaktif. Hubungi ketua ekskul jika ini kurang tepat.</p>
+                        <p class="text-sm font-bold {{ $teksNonaktif[3] }}">{{ $teksNonaktif[0] }}</p>
+                        <p class="text-xs mt-1 {{ $teksNonaktif[4] }}">{{ $teksNonaktif[1] }}</p>
                     </div>
                     <a href="{{ route('siswa.notifikasi') }}" class="shrink-0 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-[11px] font-semibold rounded-lg transition">Lihat Notifikasi</a>
                 </div>
@@ -741,6 +746,39 @@
                             @endif
                         </div>
                     </div>
+
+                    {{-- TESTIMONI & TANYA KE KETUA --}}
+                    @if($ekskul)
+                    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .35s">
+                        <div class="px-6 py-5 border-b border-sky-50">
+                            <h2 class="text-sm font-extrabold text-slate-900">Beri Testimoni & Tanya</h2>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Suaramu untuk ekskul {{ $ekskul->nama_ekskul }}</p>
+                        </div>
+                        <div class="p-5 space-y-5">
+                            @if($hasSubmittedTestimoni)
+                                <p class="text-[11px] text-slate-500 bg-sky-50 border border-sky-100 rounded-xl px-4 py-3">✅ Kamu sudah mengirim testimoni. Menunggu persetujuan ketua / sudah tampil di katalog.</p>
+                            @else
+                                <form method="POST" action="{{ route('ekskul.testimoni.store', $ekskul) }}" class="space-y-2.5">
+                                    @csrf
+                                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Testimoni</label>
+                                    <textarea name="quote" rows="2" required maxlength="2000" placeholder="Tulis pengalamanmu di {{ $ekskul->nama_ekskul }}..."
+                                        class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition"></textarea>
+                                    @error('quote') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 transition">Kirim Testimoni</button>
+                                </form>
+                            @endif
+
+                            <form method="POST" action="{{ route('ekskul.faq.store', $ekskul) }}" class="space-y-2.5 pt-4 border-t border-slate-100">
+                                @csrf
+                                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pertanyaan ke Ketua</label>
+                                <input type="text" name="pertanyaan" required maxlength="255" placeholder="Tulis pertanyaanmu..."
+                                    class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                @error('pertanyaan') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-amber-300 to-yellow-400 hover:from-amber-400 hover:to-yellow-500 text-amber-900 font-bold text-xs rounded-xl shadow-lg shadow-amber-200 transition">Tanyakan ke Ketua</button>
+                            </form>
+                        </div>
+                    </div>
+                    @endif
 
                 </div>
 

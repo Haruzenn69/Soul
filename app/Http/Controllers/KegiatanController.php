@@ -110,7 +110,6 @@ class KegiatanController extends Controller
     public function destroy(Kegiatan $kegiatan)
     {
         $this->ensureEkskul($kegiatan);
-        abort_if($kegiatan->presensis()->exists(), 422, 'Kegiatan yang sudah diisi presensinya tidak dapat dihapus.');
 
         if ($kegiatan->dokumentasi) {
             Storage::disk('public')->delete($kegiatan->dokumentasi);

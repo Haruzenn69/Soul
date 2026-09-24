@@ -22,6 +22,7 @@
             <option value="diterima" {{ request('status') === 'diterima' ? 'selected' : '' }}>Aktif</option>
             <option value="peringatan" {{ request('status') === 'peringatan' ? 'selected' : '' }}>Peringatan</option>
             <option value="nonaktif" {{ request('status') === 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+            <option value="keluar" {{ request('status') === 'keluar' ? 'selected' : '' }}>Keluar</option>
         </select>
         <button type="submit" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition-all hover:-translate-y-0.5">Filter</button>
     </form>
@@ -35,7 +36,7 @@
             </span>
             Status Keanggotaan
         </p>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px]">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-[11px]">
             <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200"></span>
                 <span class="text-slate-500"><strong class="text-emerald-600">Aktif</strong> — anggota yang masih bergabung & mengikuti ekskul.</span>
@@ -46,7 +47,11 @@
             </div>
             <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-sm shadow-rose-200"></span>
-                <span class="text-slate-500"><strong class="text-rose-500">Nonaktif</strong> ({{ $nonaktifCount }}) — anggota yang dinonaktifkan dari ekskul.</span>
+                <span class="text-slate-500"><strong class="text-rose-500">Nonaktif</strong> ({{ $nonaktifCount }}) — anggota yang dinonaktifkan oleh ketua.</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-slate-400 shadow-sm shadow-slate-200"></span>
+                <span class="text-slate-500"><strong class="text-slate-600">Keluar</strong> ({{ $keluarCount }}) — anggota yang mengajukan keluar dan disetujui.</span>
             </div>
         </div>
     </div>
@@ -69,7 +74,7 @@
                     @php
                         $isSelf = $anggota->siswa_id === (auth()->user()->siswa->id ?? null);
                     @endphp
-                    <tr class="hover:bg-sky-50/50 transition {{ $anggota->status === 'nonaktif' ? 'opacity-60' : '' }}">
+                    <tr class="hover:bg-sky-50/50 transition {{ in_array($anggota->status, ['nonaktif', 'keluar']) ? 'opacity-60' : '' }}">
                         <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap text-slate-500">{{ $loop->iteration }}</td>
                         <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap text-slate-600">{{ $anggota->siswa->nis }}</td>
                         <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap text-slate-800">
@@ -91,6 +96,11 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86l-8.24 14a2 2 0 001.73 3h16.44a2 2 0 001.73-3l-8.24-14a2 2 0 00-3.42 0z"/>
                                     </svg>
                                     Peringatan
+                                </span>
+                            @elseif($anggota->status === 'keluar')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-semibold rounded-full">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                    Keluar
                                 </span>
                             @else
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-600 border border-rose-200 text-[10px] font-semibold rounded-full">

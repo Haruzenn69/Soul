@@ -190,6 +190,21 @@
                 </div>
 
                 <div class="nav-item-wrap relative">
+                    <a href="{{ route('pembina.testimoni.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.testimoni.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                        @if(request()->routeIs('pembina.testimoni.*'))
+                            <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
+                        @endif
+                        <span class="text-base flex items-center justify-center w-4 h-4 shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                        </span>
+                        <span class="sidebar-label">Testimoni & FAQ</span>
+                    </a>
+                    <span class="nav-tooltip">Testimoni & FAQ</span>
+                </div>
+
+                <div class="nav-item-wrap relative">
                     <a href="{{ route('pembina.profile') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.profile') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                         @if(request()->routeIs('pembina.profile'))
                             <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
@@ -301,6 +316,15 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     </span>
                     Presensi
+                </a>
+                <a href="{{ route('pembina.testimoni.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.testimoni.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                    @if(request()->routeIs('pembina.testimoni.*'))
+                        <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
+                    @endif
+                    <span class="text-base flex items-center justify-center w-4 h-4">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    </span>
+                    Testimoni & FAQ
                 </a>
                 <a href="{{ route('pembina.profile') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.profile') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if(request()->routeIs('pembina.profile'))

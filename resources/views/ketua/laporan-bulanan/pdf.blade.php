@@ -245,7 +245,7 @@
         if ($laporan->dokumentasi) {
             $dokumentasiPaths[] = $laporan->dokumentasi;
         }
-        foreach ($laporan->dokumentasi_kegiatan ?? [] as $dk) {
+        foreach ($dokumentasiKegiatan ?? $laporan->dokumentasi_kegiatan ?? [] as $dk) {
             $dokumentasiPaths[] = $dk;
         }
     @endphp
@@ -255,7 +255,7 @@
         <div class="dokumentasi">
             @foreach($dokumentasiPaths as $dokDoc)
                 @php
-                    $imgPath = public_path('storage/' . $dokDoc);
+                    $imgPath = storage_path('app/public/' . $dokDoc);
                     $imgExists = file_exists($imgPath);
                 @endphp
                 @if($imgExists)

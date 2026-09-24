@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Pembina;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ekskul;
+use App\Models\Faq;
 use App\Models\Kegiatan;
 use App\Models\LaporanBulanan;
 use App\Models\Pelatih;
 use App\Models\Pendaftaran;
+use App\Models\Testimoni;
 use App\Services\NotifikasiService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -41,7 +43,7 @@ class PembinaController extends Controller
         $ekskulIds = $ekskuls->pluck('id');
 
         $anggota = Pendaftaran::whereIn('ekskul_id', $ekskulIds)
-            ->whereIn('status', ['diterima', 'nonaktif'])
+            ->whereIn('status', ['diterima', 'nonaktif', 'keluar'])
             ->with(['siswa', 'siswa.kelas'])
             ->latest('tanggal_daftar')
             ->get();
@@ -66,7 +68,15 @@ class PembinaController extends Controller
 
         $pelatihs = Pelatih::orderBy('nama')->get();
 
-        return view('pembina.dashboard', compact('ekskul', 'ekskuls', 'pelatihs', 'anggota', 'anggotaAktifCount', 'pendaftaranPending', 'kegiatanMendatang', 'laporanDraft'));
+        $testimoniPendingCount = Testimoni::whereIn('ekskul_id', $ekskulIds)
+            ->where('status', Testimoni::STATUS_PENDING)
+            ->count();
+
+        $faqPendingCount = Faq::whereIn('ekskul_id', $ekskulIds)
+            ->where('status', Faq::STATUS_PENDING)
+            ->count();
+
+        return view('pembina.dashboard', compact('ekskul', 'ekskuls', 'pelatihs', 'anggota', 'anggotaAktifCount', 'pendaftaranPending', 'kegiatanMendatang', 'laporanDraft', 'testimoniPendingCount', 'faqPendingCount'));
     }
 
     public function updatePelatih(Request $request, Ekskul $ekskul)
@@ -121,7 +131,7 @@ class PembinaController extends Controller
             ->latest('tanggal_daftar');
 
         $status = $request->input('status');
-        if (in_array($status, ['pending', 'diterima', 'ditolak', 'nonaktif'])) {
+        if (in_array($status, ['pending', 'diterima', 'ditolak', 'nonaktif', 'keluar'])) {
             $query->where('status', $status);
         }
 

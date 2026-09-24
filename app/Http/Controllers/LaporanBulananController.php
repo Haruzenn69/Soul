@@ -243,7 +243,21 @@ class LaporanBulananController extends Controller
 
         $ekskul = $laporan_bulanan->ekskul;
         $kelas = $this->generateKelas($ekskul);
-        $pdf = Pdf::loadView('ketua.laporan-bulanan.pdf', ['laporan' => $laporan_bulanan, 'kelas' => $kelas]);
+
+        $dokumentasiKegiatan = Kegiatan::where('ekskul_id', $ekskul->id)
+            ->whereYear('tanggal_kegiatan', substr($laporan_bulanan->bulan, 0, 4))
+            ->whereMonth('tanggal_kegiatan', substr($laporan_bulanan->bulan, 5, 2))
+            ->whereNotNull('dokumentasi')
+            ->orderBy('tanggal_kegiatan')
+            ->pluck('dokumentasi')
+            ->values()
+            ->toArray();
+
+        $pdf = Pdf::loadView('ketua.laporan-bulanan.pdf', [
+            'laporan' => $laporan_bulanan,
+            'kelas' => $kelas,
+            'dokumentasiKegiatan' => $dokumentasiKegiatan,
+        ]);
         $filename = 'laporan-'.str_replace('/', '-', $laporan_bulanan->bulan).'-'.($ekskul->nama_ekskul ?? 'ekskul').'.pdf';
 
         return $pdf->download($filename);
