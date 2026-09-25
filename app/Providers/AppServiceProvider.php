@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL; // 1. Tambahkan import ini
@@ -27,6 +29,13 @@ class AppServiceProvider extends ServiceProvider
         }
 
         \Carbon\Carbon::setLocale(config('app.locale', 'id'));
+
+        // Auto-migrate: jalankan migration tertunda dari request web pertama
+        // agar update via upload file di DirectAdmin langsung aktif tanpa terminal.
+        if (filter_var(config('app.auto_migrate'), FILTER_VALIDATE_BOOL)
+            && ! $this->app->runningInConsole()) {
+            $this->runPendingMigrations();
+        }
 
         // Data bersama untuk seluruh view pembina (pembina + unread notifikasi)
         View::composer('pembina.*', function (\Illuminate\View\View $view) {
@@ -60,5 +69,37 @@ class AppServiceProvider extends ServiceProvider
             $unreadNotifCount = $user ? \App\Models\Notifikasi::where('user_id', $user->id)->where('is_read', false)->count() : 0;
             $view->with('unreadNotifCount', $unreadNotifCount);
         });
+    }
+
+    private function runPendingMigrations(): void
+    {
+        try {
+            $lock = Cache::lock('auto-migrate', 120);
+
+            if (! $lock->get()) {
+                return;
+            }
+
+            try {
+                $migrator = $this->app['migrator'];
+                $migrator->setConnection($this->app['db']->getDefaultConnection());
+                $migrator->repository()->ensureRepository();
+
+                $files = $migrator->getMigrationFiles([$this->app->databasePath('migrations')]);
+                $ran = $migrator->repository()->getRan();
+
+                $hasPending = collect($files)
+                    ->keys()
+                    ->contains(fn ($name) => ! in_array($name, $ran, true));
+
+                if ($hasPending) {
+                    Artisan::call('migrate', ['--force' => true]);
+                }
+            } finally {
+                $lock->release();
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 }
