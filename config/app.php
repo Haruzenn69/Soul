@@ -123,4 +123,17 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Auto Migrate
+    |--------------------------------------------------------------------------
+    |
+    | Jalankan migration secara otomatis pada request web pertama ketika ada
+    | file migration baru (untuk hosting tanpa SSH/terminal seperti DirectAdmin).
+    | Set AUTO_MIGRATE=false di .env bila ingin mematikan otomatisasi ini.
+    |
+    */
+
+    'auto_migrate' => env('AUTO_MIGRATE', app()->environment('production')),
+
 ];
