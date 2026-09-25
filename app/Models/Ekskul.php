@@ -72,6 +72,11 @@ class Ekskul extends Model
         return $this->hasMany(Faq::class);
     }
 
+    public function galeris(): HasMany
+    {
+        return $this->hasMany(EkskulGaleri::class)->latest();
+    }
+
     public function ketua(): ?Siswa
     {
         return $this->pendaftarans()
