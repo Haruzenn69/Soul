@@ -20,10 +20,11 @@ class EkskulCatalogController extends Controller
             'testimoniss' => fn($q) => $q->where('status', Testimoni::STATUS_APPROVED),
             'faqs' => fn($q) => $q->where('status', Faq::STATUS_ANSWERED),
             'pendaftarans' => fn($q) => $q->whereIn('status', ['diterima', 'peringatan']),
+            'galeris',
         ]);
 
         $totalAnggota = $ekskul->pendaftarans->count();
-        $galeris = $ekskul->kegiatans->pluck('dokumentasi')->filter()->values();
+        $galeris = $ekskul->galeris->pluck('foto');
 
         $hasSubmittedTestimoni = auth()->check()
             ? $ekskul->testimoniss()

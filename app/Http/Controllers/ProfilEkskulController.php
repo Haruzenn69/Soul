@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\KetuaEkskul;
+use App\Models\EkskulGaleri;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProfilEkskulController extends Controller
 {
@@ -11,7 +13,7 @@ class ProfilEkskulController extends Controller
 
     public function edit()
     {
-        $ekskul = $this->ekskul();
+        $ekskul = $this->ekskul()->load('galeris');
 
         return view('ketua.profil-ekskul.edit', compact('ekskul'));
     }
@@ -59,5 +61,35 @@ class ProfilEkskulController extends Controller
         $status = $ekskul->is_open_recruitment ? 'dibuka' : 'ditutup';
 
         return back()->with('success', "Pendaftaran ekskul telah {$status}.");
+    }
+
+    public function storeGaleri(Request $request)
+    {
+        $ekskul = $this->ekskul();
+
+        $validated = $request->validate([
+            'foto' => ['required', 'array', 'max:10'],
+            'foto.*' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'caption' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        foreach ($validated['foto'] as $file) {
+            $ekskul->galeris()->create([
+                'foto' => $file->store('ekskul/galeri', 'public'),
+                'caption' => $validated['caption'] ?? null,
+            ]);
+        }
+
+        return back()->with('success', 'Foto galeri berhasil ditambahkan.');
+    }
+
+    public function destroyGaleri(EkskulGaleri $galeri)
+    {
+        $this->ensureEkskul($galeri);
+
+        Storage::disk('public')->delete($galeri->foto);
+        $galeri->delete();
+
+        return back()->with('success', 'Foto galeri berhasil dihapus.');
     }
 }
