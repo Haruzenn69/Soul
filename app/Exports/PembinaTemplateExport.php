@@ -14,7 +14,7 @@ class PembinaTemplateExport implements FromArray, WithColumnFormatting, WithColu
 {
     public function headings(): array
     {
-        return ['NIP', 'Nama'];
+        return ['NIP', 'Username', 'Nama'];
     }
 
     public function array(): array
@@ -27,6 +27,7 @@ class PembinaTemplateExport implements FromArray, WithColumnFormatting, WithColu
         return [
             'A' => NumberFormat::FORMAT_TEXT,
             'B' => NumberFormat::FORMAT_TEXT,
+            'C' => NumberFormat::FORMAT_TEXT,
         ];
     }
 
@@ -34,7 +35,8 @@ class PembinaTemplateExport implements FromArray, WithColumnFormatting, WithColu
     {
         return [
             'A' => 26,
-            'B' => 30,
+            'B' => 24,
+            'C' => 30,
         ];
     }
 

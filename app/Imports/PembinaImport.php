@@ -26,6 +26,7 @@ class PembinaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHead
             'nip' => [
                 'required',
                 'string',
+                'regex:/^\\d+$/',
                 function (string $attribute, $value, $fail): void {
                     $nip = trim((string) $value);
 
@@ -42,6 +43,18 @@ class PembinaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHead
                     $this->seenNip[$nip] = true;
                 },
             ],
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                'distinct',
+                'different:nip',
+                function (string $attribute, $value, $fail): void {
+                    if (User::where('username', trim((string) $value))->exists()) {
+                        $fail('Username '.trim((string) $value).' sudah digunakan.');
+                    }
+                },
+            ],
             'nama' => ['required', 'string', 'max:255'],
         ];
     }
@@ -50,6 +63,7 @@ class PembinaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHead
     {
         return [
             'nip' => trim((string) ($row['nip'] ?? '')),
+            'username' => trim((string) ($row['username'] ?? '')),
             'nama' => trim((string) ($row['nama'] ?? '')),
         ];
     }
@@ -59,7 +73,7 @@ class PembinaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHead
         $this->count++;
 
         $user = User::create([
-            'username' => $row['nip'],
+            'username' => $row['username'],
             'email' => null,
             'password' => Hash::make('password'),
             'role' => 'pembina',

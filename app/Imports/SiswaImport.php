@@ -28,6 +28,7 @@ class SiswaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHeadin
             'nis' => [
                 'required',
                 'string',
+                'regex:/^\\d+$/',
                 function (string $attribute, $value, $fail): void {
                     $nis = trim((string) $value);
 
