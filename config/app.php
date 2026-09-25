@@ -134,6 +134,6 @@ return [
     |
     */
 
-    'auto_migrate' => env('AUTO_MIGRATE', app()->environment('production')),
+    'auto_migrate' => env('AUTO_MIGRATE', env('APP_ENV', 'production') === 'production'),
 
 ];
