@@ -91,5 +91,49 @@
             </div>
         </form>
     </div>
+
+    <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl">
+        <div class="mb-4 flex justify-between items-center">
+            <div>
+                <h3 class="text-sm font-bold text-slate-800">Galeri Momen</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">Upload banyak foto yang tampil di katalog ekskul.</p>
+            </div>
+            <span class="text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">{{ $ekskul->galeris->count() }} Foto</span>
+        </div>
+
+        @if($ekskul->galeris->isNotEmpty())
+            <div class="grid grid-cols-3 md:grid-cols-4 gap-3 mb-5">
+                @foreach($ekskul->galeris as $galeri)
+                    <div class="group relative rounded-2xl overflow-hidden border border-sky-100">
+                        <img src="{{ asset('storage/' . $galeri->foto) }}" alt="Dokumentasi" class="w-full h-24 object-cover">
+                        <form action="{{ route('ketua.profil-ekskul.galeri-destroy', $galeri) }}" method="POST" onsubmit="return confirm('Hapus foto ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="absolute inset-0 flex items-center justify-center bg-black/60 text-white opacity-0 group-hover:opacity-100 transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="text-center py-8 bg-sky-50/50 rounded-2xl border border-dashed border-sky-200 mb-5">
+                <svg class="w-10 h-10 text-sky-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <p class="text-xs font-semibold text-slate-500 mt-2">Belum ada foto galeri</p>
+                <p class="text-[11px] text-slate-400 mt-1">Unggah foto kegiatan ekskulmu di sini.</p>
+            </div>
+        @endif
+
+        <form action="{{ route('ketua.profil-ekskul.galeri-store') }}" method="POST" enctype="multipart/form-data" class="space-y-3">
+            @csrf
+            <label class="block text-xs font-bold text-slate-700 mb-1">Tambah Foto</label>
+            <input type="file" name="foto[]" multiple accept="image/*" required
+                class="w-full px-4 py-2.5 rounded-2xl bg-sky-50/50 border border-sky-100 text-xs focus:outline-none focus:bg-white focus:border-sky-400 transition file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-sky-100 file:text-sky-700 hover:file:bg-sky-200">
+            <input type="text" name="caption" placeholder="Keterangan foto (opsional)"
+                class="w-full px-4 py-2.5 rounded-2xl bg-sky-50/50 border border-sky-100 text-xs focus:outline-none focus:bg-white focus:border-sky-400 transition">
+            @error('foto') <p class="text-rose-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+            <button type="submit" class="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl transition">Upload Foto</button>
+        </form>
+    </div>
 </div>
 @endsection

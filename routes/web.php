@@ -196,6 +196,8 @@ Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name
     Route::get('profil-ekskul', [ProfilEkskulController::class, 'edit'])->name('profil-ekskul.edit');
     Route::patch('profil-ekskul', [ProfilEkskulController::class, 'update'])->name('profil-ekskul.update');
     Route::patch('profil-ekskul/toggle-recruitment', [ProfilEkskulController::class, 'toggleRecruitment'])->name('profil-ekskul.toggle-recruitment');
+    Route::post('profil-ekskul/galeri', [ProfilEkskulController::class, 'storeGaleri'])->name('profil-ekskul.galeri-store');
+    Route::delete('profil-ekskul/galeri/{galeri}', [ProfilEkskulController::class, 'destroyGaleri'])->name('profil-ekskul.galeri-destroy');
     Route::get('prestasi', [PrestasiController::class, 'index'])->name('prestasi.index');
     Route::post('prestasi', [PrestasiController::class, 'store'])->name('prestasi.store');
     Route::delete('prestasi/{prestasi}', [PrestasiController::class, 'destroy'])->name('prestasi.destroy');
