@@ -11,7 +11,7 @@ class Pelatih extends Model
         'nama',
         'jenis_kelamin',
         'no_hp',
-        'status'
+        'status',
     ];
 
     public function ekskuls(): HasMany

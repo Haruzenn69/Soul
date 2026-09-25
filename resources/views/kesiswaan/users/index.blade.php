@@ -8,10 +8,16 @@
             <h1 class="text-2xl font-extrabold text-theme-dark">Akun Pengguna</h1>
             <p class="text-xs text-gray-400 mt-1">Buat, ubah role, reset password, dan hapus akun. Password default: <span class="font-bold text-theme-dark">password</span></p>
         </div>
-        <a href="{{ route('kesiswaan.users.create') }}"
-           class="px-6 py-3 bg-theme-blue hover:bg-theme-darkBlue text-white font-bold text-xs rounded-full shadow-lg shadow-blue-500/20 transition flex items-center gap-2 shrink-0">
-            <span>+</span> Buat Akun
-        </a>
+        <div class="flex gap-2 shrink-0 items-center">
+            <a href="{{ route('kesiswaan.users.import-area') }}"
+               class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-full shadow-lg shadow-emerald-500/20 transition flex items-center gap-2">
+                <span>⬆</span> Import Excel
+            </a>
+            <a href="{{ route('kesiswaan.users.create') }}"
+               class="px-6 py-3 bg-theme-blue hover:bg-theme-darkBlue text-white font-bold text-xs rounded-full shadow-lg shadow-blue-500/20 transition flex items-center gap-2 shrink-0">
+                <span>+</span> Buat Akun
+            </a>
+        </div>
     </div>
 
     <!-- Filter -->

@@ -72,4 +72,9 @@ class Siswa extends Model
     {
         return $this->jabatan === 'ketua';
     }
+
+    public function isProfileComplete(): bool
+    {
+        return filled($this->nama) && filled($this->kelas_id) && filled($this->jenis_kelamin);
+    }
 }

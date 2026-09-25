@@ -28,10 +28,29 @@ class User extends Authenticatable
         return $this->hasOne(Pembina::class);
     }
 
+    public function needsProfileCompletion(): bool
+    {
+        if ($this->role === 'siswa') {
+            return ! ($this->siswa?->isProfileComplete() ?? false);
+        }
+
+        if ($this->role === 'pembina') {
+            return ! ($this->pembina?->isProfileComplete() ?? false);
+        }
+
+        return false;
+    }
+
+    public function needsOnboarding(): bool
+    {
+        return $this->role !== 'admin' && $this->role !== 'kesiswaan' && is_null($this->onboarding_completed_at);
+    }
+
     protected $fillable = [
         'username',
         'email',
         'password',
         'role',
+        'onboarding_completed_at',
     ];
 }

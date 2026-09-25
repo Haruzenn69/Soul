@@ -15,6 +15,8 @@ use App\Services\RekapAbsensiService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class PembinaController extends Controller
 {
@@ -293,6 +295,43 @@ class PembinaController extends Controller
     public function profile()
     {
         return view('pembina.profile');
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $pembina = auth()->user()?->pembina;
+
+        abort_unless($pembina, 404);
+
+        $validated = $request->validate([
+            'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore(auth()->id())],
+        ], [
+            'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah dipakai akun lain.',
+        ]);
+
+        $user = auth()->user();
+
+        DB::transaction(function () use ($pembina, $user, $validated) {
+            $pembina->update([
+                'jenis_kelamin' => $validated['jenis_kelamin'],
+            ]);
+
+            if (filled($validated['email']) && $validated['email'] !== $user->email) {
+                $user->update([
+                    'email' => $validated['email'],
+                    'email_verified_at' => null,
+                ]);
+            }
+
+            if ($pembina->isProfileComplete()) {
+                $user->update(['onboarding_completed_at' => $user->onboarding_completed_at ?? now()]);
+            }
+        });
+
+        return redirect()->route('pembina.profile')->with('success', 'Profil berhasil diperbarui.');
     }
 
     private function generateKelas(Ekskul $ekskul)

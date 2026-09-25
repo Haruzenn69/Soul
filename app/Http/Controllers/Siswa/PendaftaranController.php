@@ -18,6 +18,10 @@ class PendaftaranController extends Controller
         $user = auth()->user();
         $siswa = $user->siswa;
 
+        if ($siswa && ! $siswa->isProfileComplete()) {
+            return redirect()->route('siswa.profile.edit')->with('error', 'Lengkapi data diri (nama, kelas, jenis kelamin) terlebih dahulu sebelum mendaftar ekskul.');
+        }
+
         $pendaftaran = $siswa ? $siswa->activePendaftaran() : null;
         if ($pendaftaran) {
             return redirect()->route('siswa.dashboard')->with('error', 'Kamu sudah terdaftar di ekskul.');
@@ -42,6 +46,10 @@ class PendaftaranController extends Controller
     {
         $user = auth()->user();
         $siswa = $user->siswa;
+
+        if ($siswa && ! $siswa->isProfileComplete()) {
+            return redirect()->route('siswa.profile.edit')->with('error', 'Lengkapi data diri (nama, kelas, jenis kelamin) terlebih dahulu sebelum mendaftar ekskul.');
+        }
 
         if ($siswa?->activePendaftaran()) {
             return redirect()->route('siswa.dashboard')->with('error', 'Kamu sudah terdaftar di ekskul.');
@@ -75,6 +83,10 @@ class PendaftaranController extends Controller
             return redirect()->back()->with('error', 'Kamu sudah mengajukan pendaftaran. Tunggu verifikasi dari ketua ekskul.');
         }
 
+        if (! $siswa?->isProfileComplete()) {
+            return redirect()->route('siswa.profile.edit')->with('error', 'Lengkapi data diri (nama, kelas, jenis kelamin) terlebih dahulu sebelum mendaftar ekskul.');
+        }
+
         $validated = $request->validate([
             'ekskul_id' => ['required', 'exists:ekskuls,id'],
             'alasan' => ['required', 'string', 'max:1000', new AlasanValid],
@@ -92,7 +104,7 @@ class PendaftaranController extends Controller
 
             $ekskul = Ekskul::query()->whereKey($validated['ekskul_id'])->firstOrFail();
             if (! $ekskul->status || ! $ekskul->is_open_recruitment) {
-                return null;
+                abort(422, 'Pendaftaran ekskul ini sedang ditutup.');
             }
 
             if ($siswa->activePendaftaran() || $siswa->pendingPendaftaran()) {

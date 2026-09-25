@@ -71,10 +71,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/onboarding/complete', [OnboardingController::class, 'complete'])->name('onboarding.complete');
 });
 
 Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('kesiswaan.')->group(function () {
     Route::get('/dashboard', [KesiswaanDashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('users/import', [UserController::class, 'importPage'])->name('users.import-area');
+    Route::get('users/template-siswa', [UserController::class, 'templateSiswa'])->name('users.template-siswa');
+    Route::get('users/template-pembina', [UserController::class, 'templatePembina'])->name('users.template-pembina');
+    Route::post('users/import', [UserController::class, 'import'])->name('users.import');
 
     Route::resource('users', UserController::class)->except(['show']);
     Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])
@@ -118,6 +124,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 
     // 4. PROFILE SISWA
     Route::get('/profile', [SiswaProfilController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile/update-data', [SiswaProfilController::class, 'update'])->name('profile.update-data');
 
     // 5. HALAMAN DAFTAR EKSKUL (LIST CARD)
     Route::get('/daftar-ekskul', [SiswaPendaftaranController::class, 'daftar'])->name('daftar-ekskul');
@@ -166,6 +173,7 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::patch('/faq/{faq}/answer', [PembinaFaqController::class, 'answer'])->name('faq.answer');
     Route::delete('/faq/{faq}', [PembinaFaqController::class, 'destroy'])->name('faq.destroy');
     Route::get('/profile', [PembinaController::class, 'profile'])->name('profile');
+    Route::post('/profile/update', [PembinaController::class, 'updateProfile'])->name('profile.update');
 
     Route::get('/penilaian', [PembinaPenilaianController::class, 'index'])->name('penilaian');
     Route::post('/penilaian', [PembinaPenilaianController::class, 'store'])->name('penilaian.store');
