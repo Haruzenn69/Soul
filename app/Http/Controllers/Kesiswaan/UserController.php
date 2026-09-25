@@ -85,18 +85,59 @@ class UserController extends Controller
         $jenis = $validated['jenis'] === 'siswa' ? 'siswa' : 'pembina';
 
         $errors = collect($import->failures())
-            ->map(fn (Failure $failure) => 'Baris '.$failure->row().': '.implode(' | ', $failure->errors()))
+            ->map(function (Failure $failure) use ($jenis) {
+                $messages = collect($failure->errors())->map(function (string $error) use ($jenis) {
+                    if (str_contains(strtolower($error), 'the nip field is required')) {
+                        return 'Kolom NIP kosong atau tidak ditemukan. Pastikan jenis akun Pembina dipilih dan gunakan template Pembina.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the nip field format is invalid')) {
+                        return 'NIP hanya boleh berisi angka. Periksa kembali kolom NIP pada file.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the nis field is required')) {
+                        return 'Kolom NIS kosong atau tidak ditemukan. Pastikan jenis akun Siswa dipilih dan gunakan template Siswa.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the nis field format is invalid')) {
+                        return 'NIS hanya boleh berisi angka. Periksa kembali kolom NIS pada file.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the nama field is required')) {
+                        return 'Kolom Nama wajib diisi.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the username field is required')) {
+                        return 'Kolom Username wajib diisi. Username digunakan untuk login dan harus berbeda dari NIP.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the username and nip must be different')) {
+                        return 'Username harus berbeda dari NIP. Isi username login pada kolom Username.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the jabatan field is required')) {
+                        return 'Kolom Jabatan wajib diisi dengan "siswa" atau "ketua".';
+                    }
+
+                    if (str_contains(strtolower($error), 'the jabatan field')) {
+                        return 'Jabatan tidak valid. Isi dengan "siswa" atau "ketua".';
+                    }
+
+                    return $error;
+                });
+
+                return 'Baris '.$failure->row().': '.$messages->implode(' ');
+            })
             ->values()
             ->all();
 
         if ($count === 0) {
-            $message = 'Tidak ada akun yang berhasil diimport. Periksa kembali isi file.';
+            $message = 'Tidak ada akun yang berhasil diimport. Periksa kecocokan jenis akun dengan template dan lengkapi kolom yang ditandai di bawah.';
 
-            if ($errors) {
-                $message .= ' '.implode(' ', $errors);
-            }
-
-            return back()->with('error', $message)->with('import_errors', $errors);
+            return back()
+                ->with('error', $message)
+                ->with('import_errors', $errors)
+                ->with('import_jenis', $jenis);
         }
 
         $message = "Berhasil import {$count} akun {$jenis}. Password default semua akun: password.";
