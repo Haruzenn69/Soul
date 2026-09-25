@@ -321,6 +321,32 @@
                 </div>
             @endif
 
+            @php $profilLengkap = $siswa && $siswa->isProfileComplete(); @endphp
+
+            @if($errors->any())
+                <div class="p-4 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-2xl shadow-sm animate-fade-up">
+                    <ul class="list-disc list-inside space-y-1">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if(!$profilLengkap)
+                <div class="p-5 rounded-3xl border-2 border-dashed border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 shadow-sm animate-fade-up flex items-start gap-4">
+                    <div class="w-11 h-11 shrink-0 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-500 text-white flex items-center justify-center shadow-md shadow-amber-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-sm font-extrabold text-amber-900">Lengkapi Data Diri Kamu</h2>
+                        <p class="text-xs text-amber-700 mt-1 leading-relaxed">Nama dan kelas ditetapkan oleh kesiswaan. Lengkapi <b>jenis kelamin</b> (dan email bila ada) pada form di bawah agar bisa <b>mendaftar ekskul</b>.</p>
+                    </div>
+                </div>
+            @endif
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 <!-- KOLOM KIRI: Foto Profile & Informasi Singkat -->
@@ -353,6 +379,55 @@
 
                 <!-- KOLOM KANAN: Data Diri & Pengajuan Keluar -->
                 <div class="lg:col-span-2 space-y-6">
+
+                    <!-- UBAH / LENGKAPI DATA PRIBADI -->
+                    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .12s">
+                        <div class="px-6 py-5 border-b border-sky-50">
+                            <h2 class="text-sm font-extrabold text-slate-900">{{ $profilLengkap ? 'Ubah Data Pribadi' : 'Lengkapi Data Pribadi' }}</h2>
+                            <p class="text-[11px] text-slate-400 mt-0.5">{{ $profilLengkap ? 'Perbarui informasi identitas diri kamu' : 'Wajib diisi agar bisa mendaftar ekskul' }}</p>
+                        </div>
+                        <form method="POST" action="{{ route('siswa.profile.update-data') }}" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            @csrf
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>
+                                <div class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs text-slate-700 font-bold">
+                                    {{ $siswa->nama ?? '-' }}
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-1.5">Ditetapkan oleh kesiswaan.</p>
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Kelas</label>
+                                <div class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs text-slate-700 font-bold">
+                                    {{ $siswa?->kelas?->nama ?? '-' }}
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-1.5">Ditetapkan oleh kesiswaan.</p>
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Jenis Kelamin <span class="text-red-500">*</span></label>
+                                <select name="jenis_kelamin" required
+                                        class="w-full px-4 py-2.5 bg-sky-50/60 border @error('jenis_kelamin') border-red-300 @else border-sky-100 @enderror rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                    <option value="" {{ !$siswa?->jenis_kelamin ? 'selected' : '' }} disabled>Pilih...</option>
+                                    <option value="laki-laki" {{ old('jenis_kelamin', $siswa?->jenis_kelamin) === 'laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                    <option value="perempuan" {{ old('jenis_kelamin', $siswa?->jenis_kelamin) === 'perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Email (opsional)</label>
+                                <input type="email" name="email" value="{{ old('email', auth()->user()->email ?? '') }}" placeholder="contoh@email.com"
+                                       class="w-full px-4 py-2.5 bg-sky-50/60 border @error('email') border-red-300 @else border-sky-100 @enderror rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                <p class="text-[10px] text-slate-400 mt-1.5">Email tidak wajib. Hanya untuk notifikasi & fitur lupa password.</p>
+                            </div>
+                            <div class="md:col-span-2 flex items-center gap-3 pt-1">
+                                <button type="submit"
+                                        class="px-6 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition hover:-translate-y-0.5">
+                                    {{ $profilLengkap ? 'Simpan Perubahan' : 'Simpan & Lanjutkan' }}
+                                </button>
+                                @if(!$profilLengkap)
+                                    <span class="text-[11px] text-slate-400">Data ini dibutuhkan untuk mendaftar ekskul.</span>
+                                @endif
+                            </div>
+                        </form>
+                    </div>
 
                     <!-- Data Diri -->
                     <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .15s">

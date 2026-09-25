@@ -147,7 +147,7 @@
                 </div>
 
                 <div class="nav-item-wrap relative">
-                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
+<a href="{{ route('profile.edit') }}" data-onboarding-profile class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
                         <span class="text-base flex items-center justify-center w-4 h-4 shrink-0">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -834,6 +834,8 @@
             @endif
         });
     </script>
+
+    @include('partials.onboarding')
 
 </body>
 </html>

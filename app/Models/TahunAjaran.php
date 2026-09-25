@@ -9,7 +9,7 @@ class TahunAjaran extends Model
 {
     protected $fillable = [
         'nama',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [

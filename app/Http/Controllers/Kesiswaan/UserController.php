@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers\Kesiswaan;
 
+use App\Exports\PembinaTemplateExport;
+use App\Exports\SiswaTemplateExport;
 use App\Http\Controllers\Controller;
+use App\Imports\PembinaImport;
+use App\Imports\SiswaImport;
 use App\Models\Ekskul;
 use App\Models\Kelas;
 use App\Models\Pembina;
@@ -15,6 +19,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\Failure;
 
 class UserController extends Controller
 {
@@ -36,6 +42,73 @@ class UserController extends Controller
             ->withQueryString();
 
         return view('kesiswaan.users.index', compact('users'));
+    }
+
+    public function templateSiswa()
+    {
+        return Excel::download(new SiswaTemplateExport, 'template-akun-siswa.xlsx');
+    }
+
+    public function templatePembina()
+    {
+        return Excel::download(new PembinaTemplateExport, 'template-akun-pembina.xlsx');
+    }
+
+    public function importPage(): View
+    {
+        $kelas = Kelas::with('tahunAjaran')->orderBy('nama')->get();
+
+        return view('kesiswaan.users.import', compact('kelas'));
+    }
+
+    public function import(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'jenis' => ['required', 'in:siswa,pembina'],
+            'kelas_id' => ['required_if:jenis,siswa', 'nullable', 'integer', 'exists:kelas,id'],
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv'],
+        ], [
+            'jenis.required' => 'Pilih jenis akun (siswa/pembina) terlebih dahulu.',
+            'kelas_id.required' => 'Pilih kelas untuk akun siswa.',
+            'kelas_id.exists' => 'Kelas yang dipilih tidak valid.',
+            'file.required' => 'File excel wajib diunggah.',
+            'file.mimes' => 'File harus berupa .xlsx, .xls, atau .csv.',
+        ]);
+
+        $import = $validated['jenis'] === 'siswa'
+            ? new SiswaImport((int) $validated['kelas_id'])
+            : new PembinaImport;
+
+        Excel::import($import, $request->file('file'));
+
+        $count = $import->getCount();
+        $jenis = $validated['jenis'] === 'siswa' ? 'siswa' : 'pembina';
+
+        $errors = collect($import->failures())
+            ->map(fn (Failure $failure) => 'Baris '.$failure->row().': '.implode(' | ', $failure->errors()))
+            ->values()
+            ->all();
+
+        if ($count === 0) {
+            $message = 'Tidak ada akun yang berhasil diimport. Periksa kembali isi file.';
+
+            if ($errors) {
+                $message .= ' '.implode(' ', $errors);
+            }
+
+            return back()->with('error', $message)->with('import_errors', $errors);
+        }
+
+        $message = "Berhasil import {$count} akun {$jenis}. Password default semua akun: password.";
+
+        if ($errors) {
+            $message .= ' Sebagian baris dilewati karena tidak valid:';
+        }
+
+        return back()
+            ->with('success', $message)
+            ->with('import_errors', $errors)
+            ->with('import_jenis', $jenis);
     }
 
     public function create(): View

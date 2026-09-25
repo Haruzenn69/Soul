@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Kelas;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +25,9 @@ class ProfileController extends Controller
         $ekskul = $pendaftaran ? $pendaftaran->ekskul : null;
         $pengajuan = $siswa ? $siswa->pengajuanKeluars()->latest('tanggal_pengajuan')->get() : collect();
 
-        return view('profile.edit', compact('siswa', 'ekskul', 'pengajuan'));
+        $kelas = Kelas::with('tahunAjaran')->orderBy('nama')->get();
+
+        return view('profile.edit', compact('siswa', 'ekskul', 'pengajuan', 'kelas'));
     }
 
     /**

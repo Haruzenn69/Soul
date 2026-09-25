@@ -528,6 +528,8 @@
 
     @stack('scripts')
 
+    @include('partials.onboarding')
+
     <script>
         let sidebarTrigger = null;
 

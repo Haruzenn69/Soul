@@ -190,7 +190,7 @@
                 </div>
 
                 <div class="nav-item-wrap relative">
-                    <a href="{{ route('pembina.profile') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.profile') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+<a href="{{ route('pembina.profile') }}" data-onboarding-profile class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.profile') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                         @if(request()->routeIs('pembina.profile'))
                             <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                         @endif
@@ -433,5 +433,7 @@
             }
         })();
     </script>
+
+    @include('partials.onboarding')
 </body>
 </html>

@@ -21,7 +21,7 @@ class NotifikasiController extends Controller
     {
         abort_unless($notifikasi->user_id === auth()->id(), 403);
 
-        if (!$notifikasi->is_read) {
+        if (! $notifikasi->is_read) {
             $notifikasi->update(['is_read' => true]);
         }
 

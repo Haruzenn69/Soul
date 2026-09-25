@@ -14,6 +14,7 @@ use App\Http\Controllers\Ketua\DashboardController as KetuaDashboardController;
 use App\Http\Controllers\Ketua\NotifikasiController as KetuaNotifikasiController;
 use App\Http\Controllers\LaporanBulananController;
 use App\Http\Controllers\NotifikasiController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\Pembina\NotifikasiController as PembinaNotifikasiController;
 use App\Http\Controllers\Pembina\PembinaController;
 use App\Http\Controllers\PendaftaranController;
@@ -61,10 +62,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/onboarding/complete', [OnboardingController::class, 'complete'])->name('onboarding.complete');
 });
 
 Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('kesiswaan.')->group(function () {
     Route::get('/dashboard', [KesiswaanDashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('users/import', [UserController::class, 'importPage'])->name('users.import-area');
+    Route::get('users/template-siswa', [UserController::class, 'templateSiswa'])->name('users.template-siswa');
+    Route::get('users/template-pembina', [UserController::class, 'templatePembina'])->name('users.template-pembina');
+    Route::post('users/import', [UserController::class, 'import'])->name('users.import');
 
     Route::resource('users', UserController::class)->except(['show']);
     Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])
@@ -101,6 +108,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 
     // 4. PROFILE SISWA
     Route::get('/profile', [SiswaProfilController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile/update-data', [SiswaProfilController::class, 'update'])->name('profile.update-data');
 
     // 5. HALAMAN DAFTAR EKSKUL (LIST CARD)
     Route::get('/daftar-ekskul', [SiswaPendaftaranController::class, 'daftar'])->name('daftar-ekskul');
@@ -136,6 +144,7 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::post('/laporan/{laporanBulanan}/reject', [PembinaController::class, 'laporanReject'])->name('laporan.reject');
     Route::get('/presensi', [PembinaController::class, 'presensi'])->name('presensi');
     Route::get('/profile', [PembinaController::class, 'profile'])->name('profile');
+    Route::post('/profile/update', [PembinaController::class, 'updateProfile'])->name('profile.update');
 
     Route::get('/notifikasi', [PembinaNotifikasiController::class, 'index'])->name('notifikasi');
     Route::post('/notifikasi/{notifikasi}/read', [PembinaNotifikasiController::class, 'read'])->name('notifikasi.read');
