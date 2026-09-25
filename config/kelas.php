@@ -19,7 +19,7 @@ return [
             'x' => 'TJKT',
             'xi' => 'TKJ',
             'xii' => 'TKJ',
-        ], 
+        ],
         'dkv' => [
             'x' => 'DKV',
             'xi' => 'DKV',
@@ -30,12 +30,12 @@ return [
             'xi' => 'BR',
             'xii' => 'BR',
         ],
-        'AK' => [
+        'ak' => [
             'x' => 'AKL',
             'xi' => 'AK',
             'xii' => 'AK',
         ],
-        'MP' => [
+        'mp' => [
             'x' => 'MPLB',
             'xi' => 'MLOG',
             'xii' => 'MLOG',

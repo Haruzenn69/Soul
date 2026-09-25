@@ -9,8 +9,11 @@
             <p class="text-xs text-gray-400 mt-1">Kelola daftar kelas per tingkat dan tahun ajaran.</p>
         </div>
         @if ($tahunAjarans->isEmpty())
-            <span class="px-4 py-2 bg-amber-50 text-amber-600 rounded-full text-[11px] font-bold">
-                ⚠ Jalankan seeder untuk membuat data tahun ajaran terlebih dahulu.
+            <span class="px-4 py-2 bg-amber-50 text-amber-600 rounded-full text-[11px] font-bold flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                </svg>
+                Jalankan seeder untuk membuat data tahun ajaran terlebih dahulu.
             </span>
         @else
             <button onclick="document.getElementById('modal-create').showModal()"
@@ -19,6 +22,27 @@
             </button>
         @endif
     </div>
+
+    <!-- Pesan -->
+    @if (session('success'))
+        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-2xl shadow-sm">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="p-4 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-2xl shadow-sm">
+            {{ session('error') }}
+        </div>
+    @endif
+    @if ($errors->any())
+        <div class="p-4 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-2xl shadow-sm">
+            <ul class="list-disc list-inside space-y-1">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <!-- Filter -->
     <form method="GET" action="{{ route('kesiswaan.kelas.index') }}" class="flex flex-wrap gap-3 items-center bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
@@ -286,5 +310,17 @@
             updatePreview(form);
             document.getElementById('modal-edit').showModal();
         }
+
+        (function restoreCreateForm() {
+            const form = document.querySelector('#modal-create form');
+            const oldTingkat = @json(old('tingkat'));
+            if (!oldTingkat) return;
+            form.querySelector('[name=tingkat]').value = oldTingkat;
+            fillJurusan(form.querySelector('[name=jurusan]'), oldTingkat, @json(old('jurusan')));
+            if (@json(old('rombel'))) form.querySelector('[name=rombel]').value = @json(old('rombel'));
+            if (@json(old('tahun_ajaran_id'))) form.querySelector('[name=tahun_ajaran_id]').value = @json(old('tahun_ajaran_id'));
+            updatePreview(form);
+            document.getElementById('modal-create').showModal();
+        })();
     </script>
 @endsection

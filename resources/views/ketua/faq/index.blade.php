@@ -9,6 +9,12 @@
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Kelola FAQ</h1>
             <p class="text-xs text-slate-400 mt-1">Tambah dan kelola pertanyaan umum ekskul</p>
         </div>
+        @if($pendingCount > 0)
+            <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-100 text-amber-700 border border-amber-200 rounded-full text-[11px] font-bold shrink-0">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                {{ $pendingCount }} menunggu jawaban
+            </span>
+        @endif
     </div>
 
     <!-- Add Form Card -->
@@ -41,6 +47,7 @@
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Pertanyaan</th>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Jawaban</th>
+                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Status</th>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Aksi</th>
                 </tr>
             </thead>
@@ -48,8 +55,32 @@
                 @forelse($faqs as $faq)
                     <tr class="hover:bg-sky-50/50 transition">
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $loop->iteration }}</td>
-                        <td class="px-4 md:px-6 py-3.5 font-medium max-w-sm whitespace-nowrap">{{ $faq->pertanyaan }}</td>
-                        <td class="px-4 md:px-6 py-3.5 max-w-md">{{ $faq->jawaban }}</td>
+                        <td class="px-4 md:px-6 py-3.5 font-medium max-w-sm leading-relaxed">{{ $faq->pertanyaan }}</td>
+                        <td class="px-4 md:px-6 py-3.5 max-w-md">
+                            @if($faq->status === 'pending')
+                                <form action="{{ route('ketua.faq.answer', $faq) }}" method="POST" class="space-y-2">
+                                    @csrf
+                                    @method('PATCH')
+                                    <textarea name="jawaban" rows="3" required placeholder="Tulis jawaban lalu terbitkan..."
+                                        class="w-full px-3 py-2 bg-amber-50/50 border border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100 transition"></textarea>
+                                    @error('jawaban') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                                    <button type="submit" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border border-emerald-200 rounded-xl text-[10px] font-bold transition">Terbitkan Jawaban</button>
+                                </form>
+                            @else
+                                <p class="text-slate-600 leading-relaxed">{{ $faq->jawaban }}</p>
+                            @endif
+                        </td>
+                        <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
+                            @if($faq->status === 'pending')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Menunggu
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-bold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Ditampilkan
+                                </span>
+                            @endif
+                        </td>
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
                             <form action="{{ route('ketua.faq.destroy', $faq) }}" method="POST" class="inline" onsubmit="return confirm('Hapus FAQ ini?')">
                                 @csrf
@@ -60,7 +91,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="px-4 md:px-6 py-10 text-center text-slate-400">Belum ada FAQ. Tambahkan pertanyaan yang sering ditanyakan siswa.</td>
+                        <td colspan="5" class="px-4 md:px-6 py-10 text-center text-slate-400">Belum ada FAQ. Tambahkan pertanyaan yang sering ditanyakan siswa.</td>
                     </tr>
                 @endforelse
             </tbody>

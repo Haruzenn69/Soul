@@ -29,53 +29,10 @@
         .animate-fade-up { animation: fadeUp .6s cubic-bezier(.22,1,.36,1) both; }
         .animate-floaty { animation: floaty 5s ease-in-out infinite; }
         .animate-blob { animation: blob 10s ease-in-out infinite; }
-
-        /* SIDEBAR COLLAPSIBLE */
-        #sidebar-desktop { transition: width .25s ease; }
-        #sidebar-desktop.collapsed { width: 4.5rem; }
-        #sidebar-desktop.collapsed .sidebar-label,
-        #sidebar-desktop.collapsed .sidebar-logo-text,
-        #sidebar-desktop.collapsed .sidebar-section-label,
-        #sidebar-desktop.collapsed .sidebar-user-info,
-        #sidebar-desktop.collapsed .sidebar-logout-text { display: none; }
-        #sidebar-desktop.collapsed nav a { justify-content: center; padding-left: 0; padding-right: 0; }
-        #sidebar-desktop.collapsed .sidebar-user-card { justify-content: center; }
-
-        /* TOOLTIP - muncul saat hover ikon, hanya saat sidebar collapsed */
-        .nav-tooltip {
-            position: absolute;
-            left: calc(100% + 10px);
-            top: 50%;
-            transform: translateY(-50%) translateX(-4px);
-            background: #0F172A;
-            color: #fff;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 6px 10px;
-            border-radius: 8px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .15s ease, transform .15s ease;
-            z-index: 60;
-            box-shadow: 0 8px 20px rgba(15,23,42,.25);
-        }
-        .nav-tooltip::before {
-            content: '';
-            position: absolute;
-            right: 100%;
-            top: 50%;
-            transform: translateY(-50%);
-            border: 5px solid transparent;
-            border-right-color: #0F172A;
-        }
-        #sidebar-desktop.collapsed .nav-item-wrap:hover .nav-tooltip {
-            opacity: 1;
-            transform: translateY(-50%) translateX(0);
-        }
     </style>
     @include('partials.responsive-tables')
 </head>
+<<<<<<< HEAD
 <body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased min-h-screen md:flex selection:bg-sky-100 selection:text-sky-700 overflow-x-hidden">
 
     <!-- SIDEBAR LEFT (collapsible, ala Claude) -->
@@ -182,6 +139,26 @@
             </div>
         </div>
     </aside>
+=======
+<body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased min-h-screen md:flex selection:bg-sky-100 selection:text-sky-700 overflow-x-hidden">@include('partials.pill-sidebar', [
+    'psTitle' => 'Menu Siswa',
+    'psLogoBrand' => 'SOUL',
+    'psDashboardUrl' => route('siswa.dashboard'),
+    'psNotifUrl' => route('siswa.notifikasi'),
+    'psProfileUrl' => route('profile.edit'),
+    'psItems' => [
+        ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('siswa.dashboard'), 'is' => 'siswa.dashboard'],
+        ['icon' => 'calendar', 'label' => 'Presensi & Kegiatan', 'url' => route('siswa.presensi'), 'is' => 'siswa.presensi'],
+        ['icon' => 'bars', 'label' => 'Rekap Absensi', 'url' => route('siswa.rekap'), 'is' => 'siswa.rekap'],
+        ['icon' => 'user', 'label' => 'Profil Saya', 'url' => route('profile.edit'), 'is' => 'profile.edit'],
+['icon' => 'document', 'label' => 'Katalog Ekskul', 'url' => route('siswa.katalog'), 'is' => ['siswa.katalog', 'ekskul.detail']],
+    ],
+    'psMore' => [
+        ['label' => 'Daftar Ekskul', 'url' => route('siswa.daftar-ekskul'), 'is' => 'siswa.daftar-ekskul'],
+        ['label' => 'Ajukan Keluar', 'url' => route('siswa.pengajuan-keluar'), 'is' => ['siswa.pengajuan-keluar', 'siswa.pengajuan-keluar.store']],
+    ],
+])
+>>>>>>> 5df87fc43a54f06e9ef3943ab9537459814dc98e
 
     <!-- MOBILE SIDEBAR OVERLAY -->
     <div id="sidebar-overlay" class="hidden fixed inset-0 z-40 bg-black/50 md:hidden" onclick="closeSidebar()"></div>
@@ -223,6 +200,12 @@
                     </span>
                     Presensi & Kegiatan
                 </a>
+                <a href="{{ route('siswa.rekap') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
+                    <span class="text-base flex items-center justify-center w-4 h-4">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </span>
+                    Rekap Absensi
+                </a>
                 <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
                     <span class="text-base flex items-center justify-center w-4 h-4">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
@@ -252,7 +235,7 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <div class="w-full flex-1 flex flex-col min-w-0">
+    <div class="w-full flex-1 flex flex-col min-w-0 ps-page">
 
         <!-- TOP NAVBAR HEADER -->
         <header class="px-4 md:px-8 py-4 bg-white/70 backdrop-blur-lg border-b border-sky-100 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
@@ -370,15 +353,20 @@
                     <a href="{{ route('siswa.notifikasi') }}" class="shrink-0 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-semibold rounded-lg transition">Lihat Notifikasi</a>
                 </div>
             @elseif(isset($isNonaktif) && $isNonaktif)
-                <div class="p-4 rounded-2xl border bg-red-50 border-red-200 flex items-start gap-3">
+                @php
+                    $teksNonaktif = $nonaktifStatus === 'keluar'
+                        ? ['Kamu telah keluar dari ekskul', 'Permohonan keluar kamu dari ekskul '.($ekskulTerakhir->nama_ekskul ?? '').' telah disetujui. Status keanggotaanmu sudah tidak aktif. Hubungi ketua ekskul jika ini kurang tepat.', 'bg-red-50 border-red-200', 'text-red-800', 'text-red-700']
+                        : ['Kamu dinonaktifkan dari ekskul', 'Status keanggotaanmu saat ini nonaktif. Hubungi ketua ekskul jika ini kurang tepat.', 'bg-red-50 border-red-200', 'text-red-800', 'text-red-700'];
+                @endphp
+                <div class="p-4 rounded-2xl border {{ $teksNonaktif[2] }} flex items-start gap-3">
                     <div class="mt-0.5 text-red-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <p class="text-sm font-bold text-red-800">Kamu dinonaktifkan dari ekskul</p>
-                        <p class="text-xs mt-1 text-red-700">Status keanggotaanmu saat ini nonaktif. Hubungi ketua ekskul jika ini kurang tepat.</p>
+                        <p class="text-sm font-bold {{ $teksNonaktif[3] }}">{{ $teksNonaktif[0] }}</p>
+                        <p class="text-xs mt-1 {{ $teksNonaktif[4] }}">{{ $teksNonaktif[1] }}</p>
                     </div>
                     <a href="{{ route('siswa.notifikasi') }}" class="shrink-0 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-[11px] font-semibold rounded-lg transition">Lihat Notifikasi</a>
                 </div>
@@ -408,7 +396,7 @@
                             Halo, {{ $siswa->nama ?? auth()->user()->username }}!
                         </h1>
                         <p class="text-sm text-white/85 mt-1.5 font-medium">
-                            {{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }} · Semester Ganjil 2026/2027
+                            {{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }} &middot; Semester Ganjil 2026/2027
                         </p>
                         <p class="text-xs text-white/70 mt-3 max-w-lg leading-relaxed">
                             Selamat datang kembali di SOUL. Yuk pantau ekskul, kehadiran, dan agenda kegiatanmu di bawah ini!
@@ -742,6 +730,39 @@
                         </div>
                     </div>
 
+                    {{-- TESTIMONI & TANYA KE KETUA --}}
+                    @if($ekskul)
+                    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .35s">
+                        <div class="px-6 py-5 border-b border-sky-50">
+                            <h2 class="text-sm font-extrabold text-slate-900">Beri Testimoni & Tanya</h2>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Suaramu untuk ekskul {{ $ekskul->nama_ekskul }}</p>
+                        </div>
+                        <div class="p-5 space-y-5">
+                            @if($hasSubmittedTestimoni)
+                                <p class="text-[11px] text-slate-500 bg-sky-50 border border-sky-100 rounded-xl px-4 py-3">✅ Kamu sudah mengirim testimoni. Menunggu persetujuan ketua / sudah tampil di katalog.</p>
+                            @else
+                                <form method="POST" action="{{ route('ekskul.testimoni.store', $ekskul) }}" class="space-y-2.5">
+                                    @csrf
+                                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Testimoni</label>
+                                    <textarea name="quote" rows="2" required maxlength="2000" placeholder="Tulis pengalamanmu di {{ $ekskul->nama_ekskul }}..."
+                                        class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition"></textarea>
+                                    @error('quote') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 transition">Kirim Testimoni</button>
+                                </form>
+                            @endif
+
+                            <form method="POST" action="{{ route('ekskul.faq.store', $ekskul) }}" class="space-y-2.5 pt-4 border-t border-slate-100">
+                                @csrf
+                                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pertanyaan ke Ketua</label>
+                                <input type="text" name="pertanyaan" required maxlength="255" placeholder="Tulis pertanyaanmu..."
+                                    class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                @error('pertanyaan') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-amber-300 to-yellow-400 hover:from-amber-400 hover:to-yellow-500 text-amber-900 font-bold text-xs rounded-xl shadow-lg shadow-amber-200 transition">Tanyakan ke Ketua</button>
+                            </form>
+                        </div>
+                    </div>
+                    @endif
+
                 </div>
 
             </div>
@@ -763,25 +784,6 @@
             document.getElementById('sidebar-overlay').classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
         }
-
-        // TOGGLE SIDEBAR DESKTOP (collapsible ala Claude)
-        function toggleDesktopSidebar() {
-            const sidebar = document.getElementById('sidebar-desktop');
-            const icon = document.getElementById('sidebar-toggle-icon');
-            const collapsed = sidebar.classList.toggle('collapsed');
-            icon.style.transform = collapsed ? 'rotate(180deg)' : 'rotate(0deg)';
-            localStorage.setItem('soul_sidebar_collapsed', collapsed ? '1' : '0');
-        }
-
-        // Terapkan status tersimpan saat halaman dimuat (tanpa animasi berkedip)
-        (function() {
-            if (localStorage.getItem('soul_sidebar_collapsed') === '1') {
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.getElementById('sidebar-desktop').classList.add('collapsed');
-                    document.getElementById('sidebar-toggle-icon').style.transform = 'rotate(180deg)';
-                });
-            }
-        })();
     </script>
 
     <script>

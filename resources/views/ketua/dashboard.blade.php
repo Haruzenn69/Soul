@@ -163,6 +163,78 @@
                     </div>
                 </div>
             </div>
+
+            @if($ekskul)
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- TESTIMONI -->
+                <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .25s">
+                    <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
+                        <div>
+                            <h2 class="text-sm font-extrabold text-slate-900">Testimoni</h2>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Moderasi kontribusi siswa</p>
+                        </div>
+                        <span class="text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">{{ $testimoniPendingCount }} Pending</span>
+                    </div>
+
+                    <div class="p-5 space-y-3">
+                        <a href="{{ route('ketua.testimoni.index') }}" class="flex items-center justify-between gap-3 p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-xl border border-sky-100 hover:border-sky-300 transition">
+                            <span>
+                                <span class="block text-2xl font-extrabold text-sky-700 leading-none">{{ $testimoniPendingCount }}</span>
+                                <span class="block text-[10px] text-slate-400 mt-1">{{ $testimoniPendingCount > 0 ? 'menunggu persetujuan' : 'tidak ada antrian' }}</span>
+                            </span>
+                            <span class="text-[11px] font-bold text-sky-600">Kelola</span>
+                        </a>
+
+                        <form action="{{ route('ketua.testimoni.store') }}" method="POST" class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-xl border border-sky-100 space-y-2.5">
+                            @csrf
+                            <p class="text-[11px] font-bold text-slate-700">Tambah Testimoni</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" name="nama" required placeholder="Nama"
+                                    class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition">
+                                <input type="text" name="kelas" placeholder="Kelas (opsional)"
+                                    class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition">
+                            </div>
+                            <textarea name="quote" rows="2" required placeholder="Isi testimoni..."
+                                class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition"></textarea>
+                            <button type="submit" class="px-3.5 py-2 bg-sky-600 hover:bg-sky-700 text-white text-[10px] font-bold rounded-xl transition">Simpan Testimoni</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- FAQ -->
+                <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .3s">
+                    <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
+                        <div>
+                            <h2 class="text-sm font-extrabold text-slate-900">FAQ</h2>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Moderasi kontribusi siswa</p>
+                        </div>
+                        <span class="text-[11px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-3 py-1.5 rounded-full">{{ $faqPendingCount }} Pending</span>
+                    </div>
+
+                    <div class="p-5 space-y-3">
+                        <a href="{{ route('ketua.faq.index') }}" class="flex items-center justify-between gap-3 p-3.5 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl border border-amber-100 hover:border-amber-300 transition">
+                            <span>
+                                <span class="block text-2xl font-extrabold text-amber-600 leading-none">{{ $faqPendingCount }}</span>
+                                <span class="block text-[10px] text-slate-400 mt-1">{{ $faqPendingCount > 0 ? 'menunggu jawaban' : 'tidak ada antrian' }}</span>
+                            </span>
+                            <span class="text-[11px] font-bold text-amber-600">Kelola</span>
+                        </a>
+
+                        <form action="{{ route('ketua.faq.store') }}" method="POST" class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-xl border border-amber-100 space-y-2.5">
+                            @csrf
+                            <p class="text-[11px] font-bold text-slate-700">Tambah FAQ</p>
+                            <input type="text" name="pertanyaan" required placeholder="Pertanyaan umum..."
+                                class="w-full px-3 py-2 bg-white border border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 transition">
+                            <textarea name="jawaban" rows="2" required placeholder="Jawaban..."
+                                class="w-full px-3 py-2 bg-white border border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 transition"></textarea>
+                            <button type="submit" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-xl transition">Simpan FAQ</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+            @endif
         </div>
 
         <!-- RIGHT COLUMN -->

@@ -59,7 +59,9 @@ class PendaftaranController extends Controller
             return redirect()->route('siswa.dashboard')->with('error', 'Kamu sudah mengajukan pendaftaran. Tunggu verifikasi dari ketua ekskul.');
         }
 
-        abort_unless($ekskul->status && $ekskul->is_open_recruitment, 403, 'Pendaftaran untuk ekskul ini sedang ditutup.');
+        if (! $ekskul->status || ! $ekskul->is_open_recruitment) {
+            return redirect()->route('siswa.daftar-ekskul')->with('error', 'Pendaftaran ekskul ini sedang ditutup.');
+        }
 
         $ekskul->load('pembina');
 
@@ -68,10 +70,18 @@ class PendaftaranController extends Controller
 
     public function store(Request $request)
     {
-        $siswaId = auth()->user()->siswa?->id;
-        abort_unless($siswaId, 403);
+        $user = auth()->user();
+        $siswa = $user->siswa;
 
-        $siswa = Siswa::find($siswaId);
+        abort_unless($siswa, 403, 'Profil siswa belum tersedia. Hubungi kesiswaan.');
+
+        if ($siswa->activePendaftaran()) {
+            return redirect()->back()->with('error', 'Kamu sudah terdaftar di ekskul.');
+        }
+
+        if ($siswa->pendingPendaftaran()) {
+            return redirect()->back()->with('error', 'Kamu sudah mengajukan pendaftaran. Tunggu verifikasi dari ketua ekskul.');
+        }
 
         if (! $siswa?->isProfileComplete()) {
             return redirect()->route('siswa.profile.edit')->with('error', 'Lengkapi data diri (nama, kelas, jenis kelamin) terlebih dahulu sebelum mendaftar ekskul.');
@@ -87,38 +97,38 @@ class PendaftaranController extends Controller
             'alasan.max' => 'Alasan bergabung maksimal 1000 karakter.',
         ]);
 
-        $pendaftaran = DB::transaction(function () use ($siswaId, $validated) {
-            $siswa = Siswa::query()->lockForUpdate()->findOrFail($siswaId);
-            $ekskul = Ekskul::query()
-                ->whereKey($validated['ekskul_id'])
-                ->where('status', true)
-                ->where('is_open_recruitment', true)
-                ->first();
+        $pendaftaran = DB::transaction(function () use ($siswa, $validated) {
+            // Serialize submissions for this student so concurrent requests
+            // cannot both pass the active/pending enrollment checks.
+            Siswa::whereKey($siswa->id)->lockForUpdate()->firstOrFail();
 
-            if (! $ekskul) {
-                abort(422, 'Ekskul tidak tersedia atau pendaftarannya telah ditutup.');
+            $ekskul = Ekskul::query()->whereKey($validated['ekskul_id'])->firstOrFail();
+            if (! $ekskul->status || ! $ekskul->is_open_recruitment) {
+                abort(422, 'Pendaftaran ekskul ini sedang ditutup.');
             }
 
-            if ($siswa->activePendaftaran()) {
-                abort(422, 'Kamu sudah terdaftar di ekskul.');
+            if ($siswa->activePendaftaran() || $siswa->pendingPendaftaran()) {
+                return false;
             }
 
-            if ($siswa->pendingPendaftaran()) {
-                abort(422, 'Kamu sudah mengajukan pendaftaran. Tunggu verifikasi dari ketua ekskul.');
-            }
-
-            $pendaftaran = Pendaftaran::create([
+            return Pendaftaran::create([
                 'siswa_id' => $siswa->id,
                 'ekskul_id' => $ekskul->id,
                 'tanggal_daftar' => now()->toDateString(),
                 'status' => Pendaftaran::STATUS_PENDING,
                 'alasan' => $validated['alasan'],
             ]);
-
-            NotifikasiService::pendaftaranMasuk($pendaftaran);
-
-            return $pendaftaran;
         });
+
+        if ($pendaftaran === null) {
+            return redirect()->back()->with('error', 'Pendaftaran ekskul ini sedang ditutup.');
+        }
+
+        if ($pendaftaran === false) {
+            return redirect()->back()->with('error', 'Kamu sudah mengajukan pendaftaran atau terdaftar di ekskul.');
+        }
+
+        NotifikasiService::pendaftaranMasuk($pendaftaran);
 
         return redirect()->route('siswa.dashboard')->with('success', 'Pendaftaran kamu telah terkirim kepada ketua ekskul. Silakan menunggu konfirmasi dari ketua ekskul.');
     }

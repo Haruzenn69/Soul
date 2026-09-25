@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Pembina;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ekskul;
+use App\Models\Faq;
 use App\Models\Kegiatan;
 use App\Models\LaporanBulanan;
 use App\Models\Pelatih;
 use App\Models\Pendaftaran;
+use App\Models\Testimoni;
 use App\Services\NotifikasiService;
+use App\Services\RekapAbsensiService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -43,7 +46,7 @@ class PembinaController extends Controller
         $ekskulIds = $ekskuls->pluck('id');
 
         $anggota = Pendaftaran::whereIn('ekskul_id', $ekskulIds)
-            ->whereIn('status', ['diterima', 'nonaktif'])
+            ->whereIn('status', ['diterima', 'nonaktif', 'keluar'])
             ->with(['siswa', 'siswa.kelas'])
             ->latest('tanggal_daftar')
             ->get();
@@ -68,7 +71,15 @@ class PembinaController extends Controller
 
         $pelatihs = Pelatih::orderBy('nama')->get();
 
-        return view('pembina.dashboard', compact('ekskul', 'ekskuls', 'pelatihs', 'anggota', 'anggotaAktifCount', 'pendaftaranPending', 'kegiatanMendatang', 'laporanDraft'));
+        $testimoniPendingCount = Testimoni::whereIn('ekskul_id', $ekskulIds)
+            ->where('status', Testimoni::STATUS_PENDING)
+            ->count();
+
+        $faqPendingCount = Faq::whereIn('ekskul_id', $ekskulIds)
+            ->where('status', Faq::STATUS_PENDING)
+            ->count();
+
+        return view('pembina.dashboard', compact('ekskul', 'ekskuls', 'pelatihs', 'anggota', 'anggotaAktifCount', 'pendaftaranPending', 'kegiatanMendatang', 'laporanDraft', 'testimoniPendingCount', 'faqPendingCount'));
     }
 
     public function updatePelatih(Request $request, Ekskul $ekskul)
@@ -123,7 +134,7 @@ class PembinaController extends Controller
             ->latest('tanggal_daftar');
 
         $status = $request->input('status');
-        if (in_array($status, ['pending', 'diterima', 'ditolak', 'nonaktif'])) {
+        if (in_array($status, ['pending', 'diterima', 'ditolak', 'nonaktif', 'keluar'])) {
             $query->where('status', $status);
         }
 
@@ -243,6 +254,42 @@ class PembinaController extends Controller
             ->get();
 
         return view('pembina.presensi', compact('kegiatans'));
+    }
+
+    public function rekap(Request $request)
+    {
+        $ekskuls = $this->getEkskuls();
+        $ekskulIds = $ekskuls->pluck('id');
+
+        $service = app(RekapAbsensiService::class);
+        $bulan = $service->normalizeBulan($request->input('bulan'));
+
+        $ekskulFilter = $request->input('ekskul');
+        $ekskulId = $ekskulFilter && $ekskulIds->contains($ekskulFilter)
+            ? (int) $ekskulFilter
+            : (int) $ekskuls->first()?->id;
+
+        $ekskul = $ekskuls->firstWhere('id', $ekskulId);
+
+        $rekap = $ekskul
+            ? $service->rekap($ekskul, $bulan)
+            : [
+                'ekskul' => null,
+                'bulan' => $bulan,
+                'kegiatans' => collect(),
+                'rows' => collect(),
+                'totalHadir' => 0,
+                'totalIzin' => 0,
+                'totalSakit' => 0,
+                'totalAlpha' => 0,
+                'availableMonths' => collect([now()->format('Y-m')]),
+            ];
+
+        return view('pembina.rekap', array_merge($rekap, [
+            'ekskuls' => $ekskuls,
+            'ekskulId' => $ekskulId,
+            'bulan' => $bulan,
+        ]));
     }
 
     public function profile()

@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Models\Kegiatan;
 use App\Models\Pendaftaran;
 use App\Models\Presensi;
+use App\Services\RekapAbsensiService;
 use Illuminate\Http\Request;
 
 class PresensiController extends Controller
@@ -43,9 +44,10 @@ class PresensiController extends Controller
 
         $milikEkskul = Pendaftaran::whereIn('id', $pendaftaranIds)
             ->where('ekskul_id', $kegiatan->ekskul_id)
+            ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
             ->count();
 
-        abort_unless($milikEkskul === $pendaftaranIds->count(), 422, 'Presensi hanya bisa diisi untuk anggota ekskul kegiatan ini.');
+        abort_unless($milikEkskul === $pendaftaranIds->unique()->count(), 422, 'Presensi hanya bisa diisi untuk anggota aktif ekskul kegiatan ini.');
 
         foreach ($validated['presensi'] as $item) {
             Presensi::updateOrCreate(
@@ -55,5 +57,16 @@ class PresensiController extends Controller
         }
 
         return redirect()->route('ketua.kegiatan.show', $kegiatan)->with('success', 'Presensi berhasil disimpan.');
+    }
+
+    public function rekap(Request $request)
+    {
+        $service = app(RekapAbsensiService::class);
+        $bulan = $service->normalizeBulan($request->input('bulan'));
+        $ekskul = $this->ekskul();
+
+        $data = $service->rekap($ekskul, $bulan);
+
+        return view('ketua.presensi.rekap', $data);
     }
 }

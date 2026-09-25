@@ -43,7 +43,7 @@
             </div>
             <select name="status" class="px-3 py-2 bg-sky-50/60 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
                 <option value="">Semua Status</option>
-                @foreach(['pending' => 'Pending', 'diterima' => 'Diterima', 'ditolak' => 'Ditolak', 'nonaktif' => 'Nonaktif'] as $val => $label)
+                @foreach(['pending' => 'Pending', 'diterima' => 'Diterima', 'ditolak' => 'Ditolak', 'nonaktif' => 'Nonaktif', 'keluar' => 'Keluar'] as $val => $label)
                     <option value="{{ $val }}" @selected(request('status') == $val)>{{ $label }}</option>
                 @endforeach
             </select>

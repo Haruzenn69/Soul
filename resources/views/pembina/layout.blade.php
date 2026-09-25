@@ -32,55 +32,10 @@
 
         /* Sidebar mobile selalu overlay, jangan dipaksa jadi relative (split layar) */
         #sidebar-mobile { position: fixed; }
-
-        /* SIDEBAR COLLAPSIBLE */
-        #sidebar-desktop { transition: width .25s ease; }
-        #sidebar-desktop.collapsed { width: 4.5rem; }
-        #sidebar-desktop.collapsed .sidebar-label,
-        #sidebar-desktop.collapsed .sidebar-logo-text,
-        #sidebar-desktop.collapsed .sidebar-section-label,
-        #sidebar-desktop.collapsed .sidebar-user-info,
-        #sidebar-desktop.collapsed .sidebar-logout-text { display: none; }
-        #sidebar-desktop.collapsed nav a { justify-content: center; padding-left: 0; padding-right: 0; }
-        #sidebar-desktop.collapsed .sidebar-user-card { justify-content: center; }
-        #sidebar-desktop.collapsed nav a .text-base,
-        #sidebar-desktop.collapsed .sidebar-user-card .w-9 { margin: 0 auto; }
-
-        /* TOOLTIP - muncul saat hover ikon, hanya saat sidebar collapsed */
-        .nav-tooltip {
-            position: absolute;
-            left: calc(100% + 10px);
-            top: 50%;
-            transform: translateY(-50%) translateX(-4px);
-            background: #0F172A;
-            color: #fff;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 6px 10px;
-            border-radius: 8px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .15s ease, transform .15s ease;
-            z-index: 60;
-            box-shadow: 0 8px 20px rgba(15,23,42,.25);
-        }
-        .nav-tooltip::before {
-            content: '';
-            position: absolute;
-            right: 100%;
-            top: 50%;
-            transform: translateY(-50%);
-            border: 5px solid transparent;
-            border-right-color: #0F172A;
-        }
-        #sidebar-desktop.collapsed .nav-item-wrap:hover .nav-tooltip {
-            opacity: 1;
-            transform: translateY(-50%) translateX(0);
-        }
     </style>
     @include('partials.responsive-tables')
 </head>
+<<<<<<< HEAD
 <body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased flex min-h-screen overflow-x-hidden selection:bg-sky-100 selection:text-sky-700">
 
     <!-- SIDEBAR LEFT (collapsible, ala Claude) -->
@@ -228,6 +183,26 @@
             </div>
         </div>
     </aside>
+=======
+<body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased flex min-h-screen overflow-x-hidden selection:bg-sky-100 selection:text-sky-700">@include('partials.pill-sidebar', [
+    'psTitle' => 'Menu Pembina',
+    'psLogoBrand' => 'SOUL',
+    'psDashboardUrl' => route('pembina.dashboard'),
+    'psNotifUrl' => route('pembina.notifikasi'),
+    'psProfileUrl' => route('pembina.profile'),
+    'psItems' => [
+        ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('pembina.dashboard'), 'is' => 'pembina.dashboard'],
+        ['icon' => 'clipboard-check', 'label' => 'Penilaian', 'url' => route('pembina.penilaian'), 'is' => 'pembina.penilaian*'],
+        ['icon' => 'document', 'label' => 'Cetak Laporan', 'url' => route('pembina.laporan.index'), 'is' => 'pembina.laporan.*'],
+        ['icon' => 'bars', 'label' => 'Rekap Absensi', 'url' => route('pembina.rekap'), 'is' => 'pembina.rekap'],
+        ['icon' => 'clipboard-list', 'label' => 'Pendaftaran', 'url' => route('pembina.pendaftaran'), 'is' => 'pembina.pendaftaran'],
+        ['icon' => 'users', 'label' => 'Data Anggota', 'url' => route('pembina.anggota'), 'is' => 'pembina.anggota'],
+        ['icon' => 'calendar', 'label' => 'Presensi', 'url' => route('pembina.presensi'), 'is' => 'pembina.presensi'],
+        ['icon' => 'chat', 'label' => 'Testimoni & FAQ', 'url' => route('pembina.testimoni.index'), 'is' => 'pembina.testimoni.*'],
+    ],
+    'psMore' => [],
+])
+>>>>>>> 5df87fc43a54f06e9ef3943ab9537459814dc98e
 
     <!-- MOBILE SIDEBAR OVERLAY -->
     <div id="sidebar-overlay" class="hidden fixed inset-0 z-40 bg-slate-900/50 md:hidden" onclick="closeSidebar()"></div>
@@ -263,8 +238,17 @@
                     @endif
                     <span class="text-base flex items-center justify-center w-4 h-4">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ route('pembina.penilaian') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.penilaian*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                    @if(request()->routeIs('pembina.penilaian*'))
+                        <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
+                    @endif
+                    <span class="text-base flex items-center justify-center w-4 h-4">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2v2H9V5zm1 8l2 2 4-4"/></svg>
                     </span>
-                    Dashboard
+                    <span>Penilaian</span>
                 </a>
                 <a href="{{ route('pembina.anggota') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.anggota') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if(request()->routeIs('pembina.anggota'))
@@ -302,6 +286,24 @@
                     </span>
                     Presensi
                 </a>
+                <a href="{{ route('pembina.rekap') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.rekap') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                    @if(request()->routeIs('pembina.rekap'))
+                        <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
+                    @endif
+                    <span class="text-base flex items-center justify-center w-4 h-4">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </span>
+                    Rekap Absensi
+                </a>
+                <a href="{{ route('pembina.testimoni.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.testimoni.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                    @if(request()->routeIs('pembina.testimoni.*'))
+                        <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
+                    @endif
+                    <span class="text-base flex items-center justify-center w-4 h-4">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    </span>
+                    Testimoni & FAQ
+                </a>
                 <a href="{{ route('pembina.profile') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('pembina.profile') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if(request()->routeIs('pembina.profile'))
                         <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
@@ -334,7 +336,7 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <div class="w-full flex-1 flex flex-col min-w-0">
+    <div class="w-full flex-1 flex flex-col min-w-0 ps-page">
 
         <!-- TOP NAVBAR HEADER -->
         <header class="px-4 md:px-8 py-4 bg-white/70 backdrop-blur-lg border-b border-sky-100 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
@@ -413,25 +415,6 @@
             document.getElementById('sidebar-overlay').classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
         }
-
-        // TOGGLE SIDEBAR DESKTOP (collapsible ala Claude)
-        function toggleDesktopSidebar() {
-            const sidebar = document.getElementById('sidebar-desktop');
-            const icon = document.getElementById('sidebar-toggle-icon');
-            const collapsed = sidebar.classList.toggle('collapsed');
-            icon.style.transform = collapsed ? 'rotate(180deg)' : 'rotate(0deg)';
-            localStorage.setItem('soul_sidebar_collapsed', collapsed ? '1' : '0');
-        }
-
-        // Terapkan status tersimpan saat halaman dimuat (tanpa animasi berkedip)
-        (function() {
-            if (localStorage.getItem('soul_sidebar_collapsed') === '1') {
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.getElementById('sidebar-desktop').classList.add('collapsed');
-                    document.getElementById('sidebar-toggle-icon').style.transform = 'rotate(180deg)';
-                });
-            }
-        })();
     </script>
 
     @include('partials.onboarding')

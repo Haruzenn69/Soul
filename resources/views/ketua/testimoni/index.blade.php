@@ -9,6 +9,12 @@
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Kelola Testimoni</h1>
             <p class="text-xs text-slate-400 mt-1">Tambah dan kelola testimoni ekskul</p>
         </div>
+        @if($pendingCount > 0)
+            <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-100 text-amber-700 border border-amber-200 rounded-full text-[11px] font-bold shrink-0">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                {{ $pendingCount }} menunggu persetujuan
+            </span>
+        @endif
     </div>
 
     <!-- Add Form Card -->
@@ -49,6 +55,7 @@
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Nama</th>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Kelas</th>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Testimoni</th>
+                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Status</th>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Aksi</th>
                 </tr>
             </thead>
@@ -58,8 +65,41 @@
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $loop->iteration }}</td>
                         <td class="px-4 md:px-6 py-3.5 font-medium whitespace-nowrap">{{ $testimoni->nama }}</td>
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $testimoni->kelas ?? '-' }}</td>
-                        <td class="px-4 md:px-6 py-3.5 max-w-md">{{ $testimoni->quote }}</td>
+                        <td class="px-4 md:px-6 py-3.5 max-w-md">
+                            @if($testimoni->status === 'pending')
+                                <p class="text-slate-500">{{ $testimoni->quote }}</p>
+                            @else
+                                {{ $testimoni->quote }}
+                            @endif
+                        </td>
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
+                            @if($testimoni->status === 'pending')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Menunggu
+                                </span>
+                            @elseif($testimoni->status === 'approved')
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-bold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Ditampilkan
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-100 text-rose-700 border border-rose-200 rounded-full text-[10px] font-bold">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Ditolak
+                                </span>
+                            @endif
+                        </td>
+                        <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
+                            @if($testimoni->status === 'pending')
+                                <form action="{{ route('ketua.testimoni.approve', $testimoni) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border border-emerald-200 rounded-xl text-[10px] font-bold transition">Terima</button>
+                                </form>
+                                <form action="{{ route('ketua.testimoni.reject', $testimoni) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 rounded-xl text-[10px] font-bold transition">Tolak</button>
+                                </form>
+                            @endif
                             <form action="{{ route('ketua.testimoni.destroy', $testimoni) }}" method="POST" class="inline" onsubmit="return confirm('Hapus testimoni ini?')">
                                 @csrf
                                 @method('DELETE')
@@ -69,7 +109,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-4 md:px-6 py-10 text-center text-slate-400">Belum ada testimoni. Tambahkan suara anggota melalui form di atas.</td>
+                        <td colspan="6" class="px-4 md:px-6 py-10 text-center text-slate-400">Belum ada testimoni. Tambahkan suara anggota melalui form di atas.</td>
                     </tr>
                 @endforelse
             </tbody>
