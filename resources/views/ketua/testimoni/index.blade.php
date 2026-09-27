@@ -24,19 +24,19 @@
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Nama</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama</label>
                     <input type="text" name="nama" value="{{ old('nama') }}" required placeholder="Contoh: Aulia"
                         class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                     @error('nama') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Kelas</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Kelas</label>
                     <input type="text" name="kelas" value="{{ old('kelas') }}" placeholder="Contoh: 11 IPA 2"
                         class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                 </div>
             </div>
             <div>
-                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Isi Testimoni</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">Isi Testimoni</label>
                 <textarea name="quote" rows="4" required placeholder='"Awalnya saya ikut karena penasaran, tapi akhirnya dapat banyak teman dan pengalaman baru."'
                     class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('quote') }}</textarea>
                 @error('quote') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
@@ -74,15 +74,15 @@
                         </td>
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
                             @if($testimoni->status === 'pending')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 text-amber-700 border border-amber-200 rounded-full text-xs font-bold">
                                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Menunggu
                                 </span>
                             @elseif($testimoni->status === 'approved')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-bold">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full text-xs font-bold">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Ditampilkan
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-100 text-rose-700 border border-rose-200 rounded-full text-[10px] font-bold">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-100 text-rose-700 border border-rose-200 rounded-full text-xs font-bold">
                                     <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Ditolak
                                 </span>
                             @endif
@@ -92,18 +92,18 @@
                                 <form action="{{ route('ketua.testimoni.approve', $testimoni) }}" method="POST" class="inline">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border border-emerald-200 rounded-xl text-[10px] font-bold transition">Terima</button>
+                                    <button type="submit" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold transition">Terima</button>
                                 </form>
                                 <form action="{{ route('ketua.testimoni.reject', $testimoni) }}" method="POST" class="inline">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 rounded-xl text-[10px] font-bold transition">Tolak</button>
+                                    <button type="submit" class="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition">Tolak</button>
                                 </form>
                             @endif
                             <form action="{{ route('ketua.testimoni.destroy', $testimoni) }}" method="POST" class="inline" onsubmit="return confirm('Hapus testimoni ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 rounded-xl text-[10px] font-bold transition">Hapus</button>
+                                <button type="submit" class="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition">Hapus</button>
                             </form>
                         </td>
                     </tr>

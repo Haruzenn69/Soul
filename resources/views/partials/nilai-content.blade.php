@@ -8,7 +8,7 @@
     ];
 @endphp
 
-<div class="bg-[#F8FAFC] -mx-4 md:-mx-8 px-4 md:px-8 py-6 md:py-8 min-h-[calc(100vh-5rem)] space-y-6 animate-fade-up">
+<div class="bg-slate-50 -mx-4 md:-mx-8 px-4 md:px-8 py-6 md:py-8 min-h-[calc(100vh-5rem)] space-y-6 animate-fade-up">
     <div>
         <h1 class="text-lg md:text-2xl font-extrabold text-slate-900">Nilai Ekskul</h1>
         <p class="text-xs text-slate-400 mt-0.5">Nilai akhir kamu pada periode berjalan</p>

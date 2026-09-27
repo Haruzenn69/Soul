@@ -6,13 +6,13 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
                 <a href="{{ route('kesiswaan.laporan-penilaian.index') }}"
-                   class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-400 hover:text-blue-600 transition mb-2">
+                   class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-blue-600 transition mb-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
                     Kembali ke Laporan Penilaian
                 </a>
-                <h1 class="text-lg md:text-2xl font-extrabold text-slate-900">{{ $ekskul->nama_ekskul }}</h1>
+                <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">{{ $ekskul->nama_ekskul }}</h1>
                 <p class="text-xs text-slate-400 mt-0.5">
                     Pembina {{ $ekskul->pembina?->nama ?? '-' }} &middot; Pelatih {{ $ekskul->pelatih?->nama ?? '-' }}
                     &middot; Periode <span class="font-semibold text-blue-600">{{ $periode }}</span>
@@ -31,20 +31,20 @@
 
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-4">
-                <p class="text-2xl font-extrabold text-slate-900">{{ $summary['totalAnggota'] }}</p>
-                <p class="text-[11px] font-bold text-slate-400 mt-0.5">Total Anggota</p>
+                <p class="text-xl md:text-2xl font-extrabold text-slate-900">{{ $summary['totalAnggota'] }}</p>
+                <p class="text-xs font-bold text-slate-400 mt-0.5">Total Anggota</p>
             </div>
             <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-4">
-                <p class="text-2xl font-extrabold text-amber-600">{{ $summary['sudahDinilai'] }}</p>
-                <p class="text-[11px] font-bold text-slate-400 mt-0.5">Sudah Dinilai</p>
+                <p class="text-xl md:text-2xl font-extrabold text-amber-600">{{ $summary['sudahDinilai'] }}</p>
+                <p class="text-xs font-bold text-slate-400 mt-0.5">Sudah Dinilai</p>
             </div>
             <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-4">
-                <p class="text-2xl font-extrabold text-blue-600">{{ number_format((float) $summary['rataAkhir'], 1) }}</p>
-                <p class="text-[11px] font-bold text-slate-400 mt-0.5">Rata-rata Nilai</p>
+                <p class="text-xl md:text-2xl font-extrabold text-blue-600">{{ number_format((float) $summary['rataAkhir'], 1) }}</p>
+                <p class="text-xs font-bold text-slate-400 mt-0.5">Rata-rata Nilai</p>
             </div>
             <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-4">
-                <p class="text-2xl font-extrabold text-emerald-600">{{ number_format((float) $summary['tertinggi'], 1) }}</p>
-                <p class="text-[11px] font-bold text-slate-400 mt-0.5">Nilai Tertinggi</p>
+                <p class="text-xl md:text-2xl font-extrabold text-emerald-600">{{ number_format((float) $summary['tertinggi'], 1) }}</p>
+                <p class="text-xs font-bold text-slate-400 mt-0.5">Nilai Tertinggi</p>
             </div>
         </div>
 
@@ -67,9 +67,9 @@
                 <div class="p-4 md:p-5 border-b border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                         <h3 class="text-sm font-bold text-slate-900">Daftar Nilai Anggota</h3>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Nilai sudah terkunci sejak dikirim pembina.</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Nilai sudah terkunci sejak dikirim pembina.</p>
                     </div>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-lg border border-emerald-200">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
@@ -78,7 +78,7 @@
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs min-w-[980px]">
-                        <thead class="bg-slate-50/80 text-[10px] uppercase tracking-wider text-slate-400">
+                        <thead class="bg-slate-50/80 text-xs uppercase tracking-wider text-slate-400">
                             <tr>
                                 <th class="px-4 py-3 font-bold">#</th>
                                 <th class="px-4 py-3 font-bold">Anggota</th>
@@ -103,16 +103,16 @@
                                             </div>
                                             <div class="min-w-0">
                                                 <p class="font-bold text-slate-900 leading-tight truncate">{{ $row->siswa?->nama }}</p>
-                                                <p class="text-[10px] text-slate-400">{{ $row->siswa?->nis }} &middot; {{ $row->kelas }}</p>
+                                                <p class="text-xs text-slate-400">{{ $row->siswa?->nis }} &middot; {{ $row->kelas }}</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-4 py-3 text-center text-slate-700 font-semibold">
                                         {{ $row->total_pertemuan }}
-                                        <span class="block text-[9px] text-slate-400 font-medium">H:{{ $row->total_hadir }} I:{{ $row->total_izin }} S:{{ $row->total_sakit }} A:{{ $row->total_alpha }}</span>
+                                        <span class="block text-xs text-slate-400 font-medium">H:{{ $row->total_hadir }} I:{{ $row->total_izin }} S:{{ $row->total_sakit }} A:{{ $row->total_alpha }}</span>
                                     </td>
                                     <td class="px-4 py-3 text-center">
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold {{ $row->persentase_kehadiran >= 70 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200' }}">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold {{ $row->persentase_kehadiran >= 70 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200' }}">
                                             {{ number_format((float) $row->persentase_kehadiran, 1) }}%
                                         </span>
                                     </td>
@@ -125,7 +125,7 @@
                                             {{ $row->predikat }}
                                         </span>
                                     </td>
-                                    <td class="px-4 py-3 text-[11px] text-slate-600 max-w-[200px]">{{ $row->catatan }}</td>
+                                    <td class="px-4 py-3 text-xs text-slate-600 max-w-[200px]">{{ $row->catatan }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -135,7 +135,7 @@
 
             <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-4 md:p-5">
                 <h3 class="text-xs font-bold text-slate-900 mb-3">Bobot Komponen</h3>
-                <div class="flex flex-wrap gap-2 text-[11px] font-bold">
+                <div class="flex flex-wrap gap-2 text-xs font-bold">
                     <span class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-100">Kehadiran 30%</span>
                     <span class="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 border border-amber-100">Sikap 25%</span>
                     <span class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100">Keaktifan 25%</span>

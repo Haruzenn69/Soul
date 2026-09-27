@@ -63,7 +63,7 @@
                 <div class="mt-2.5 flex justify-end">
                     <form method="POST" action="{{ route('ketua.notifikasi.read', $notif) }}">
                         @csrf
-                        <button type="submit" class="text-[10px] font-semibold text-sky-600 hover:text-sky-700 px-2.5 py-1.5 bg-white border border-sky-200 rounded-lg">Tandai dibaca</button>
+                        <button type="submit" class="text-xs font-semibold text-sky-600 hover:text-sky-700 px-2.5 py-1.5 bg-white border border-sky-200 rounded-lg">Tandai dibaca</button>
                     </form>
                 </div>
                 @endif

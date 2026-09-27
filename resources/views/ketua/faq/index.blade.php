@@ -23,13 +23,13 @@
         <form action="{{ route('ketua.faq.store') }}" method="POST" class="space-y-5">
             @csrf
             <div>
-                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Pertanyaan</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">Pertanyaan</label>
                 <input type="text" name="pertanyaan" value="{{ old('pertanyaan') }}" required placeholder="Contoh: Apakah harus punya pengalaman sebelumnya?"
                     class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                 @error('pertanyaan') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
             </div>
             <div>
-                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Jawaban</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">Jawaban</label>
                 <textarea name="jawaban" rows="3" required placeholder="Jawaban..."
                     class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('jawaban') }}</textarea>
                 @error('jawaban') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
@@ -64,7 +64,7 @@
                                     <textarea name="jawaban" rows="3" required placeholder="Tulis jawaban lalu terbitkan..."
                                         class="w-full px-3 py-2 bg-amber-50/50 border border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100 transition"></textarea>
                                     @error('jawaban') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
-                                    <button type="submit" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border border-emerald-200 rounded-xl text-[10px] font-bold transition">Terbitkan Jawaban</button>
+                                    <button type="submit" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-bold transition">Terbitkan Jawaban</button>
                                 </form>
                             @else
                                 <p class="text-slate-600 leading-relaxed">{{ $faq->jawaban }}</p>
@@ -72,11 +72,11 @@
                         </td>
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
                             @if($faq->status === 'pending')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 text-amber-700 border border-amber-200 rounded-full text-[10px] font-bold">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 text-amber-700 border border-amber-200 rounded-full text-xs font-bold">
                                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Menunggu
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-bold">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full text-xs font-bold">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Ditampilkan
                                 </span>
                             @endif
@@ -85,7 +85,7 @@
                             <form action="{{ route('ketua.faq.destroy', $faq) }}" method="POST" class="inline" onsubmit="return confirm('Hapus FAQ ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 rounded-xl text-[10px] font-bold transition">Hapus</button>
+                                <button type="submit" class="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition">Hapus</button>
                             </form>
                         </td>
                     </tr>

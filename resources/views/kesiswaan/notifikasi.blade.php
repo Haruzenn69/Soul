@@ -4,7 +4,7 @@
 @section('content')
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 animate-fade-up">
         <div>
-            <h1 class="text-lg md:text-xl font-extrabold text-slate-900">Notifikasi</h1>
+            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Notifikasi</h1>
             <p class="text-xs text-slate-400 mt-0.5">Pemberitahuan terkait data kesiswaan</p>
         </div>
         @if($notifikasis->isNotEmpty())
@@ -20,16 +20,16 @@
     <!-- RINGKASAN STATISTIK -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
         <div class="bg-white p-3.5 md:p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .1s">
-            <p class="text-lg md:text-2xl font-extrabold text-slate-900">{{ $notifikasis->count() }}</p>
-            <p class="text-[10px] md:text-[11px] font-bold text-slate-400">Total</p>
+            <p class="text-xl md:text-2xl font-extrabold text-slate-900">{{ $notifikasis->count() }}</p>
+            <p class="text-xs font-bold text-slate-400">Total</p>
         </div>
         <div class="bg-white p-3.5 md:p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .2s">
-            <p class="text-lg md:text-2xl font-extrabold text-amber-600">{{ $notifikasis->where('is_read', false)->count() }}</p>
-            <p class="text-[10px] md:text-[11px] font-bold text-slate-400">Belum Dibaca</p>
+            <p class="text-xl md:text-2xl font-extrabold text-amber-600">{{ $notifikasis->where('is_read', false)->count() }}</p>
+            <p class="text-xs font-bold text-slate-400">Belum Dibaca</p>
         </div>
         <div class="bg-white p-3.5 md:p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .3s">
-            <p class="text-lg md:text-2xl font-extrabold text-emerald-600">{{ $notifikasis->where('tipe', 'diterima')->count() }}</p>
-            <p class="text-[10px] md:text-[11px] font-bold text-slate-400">Masuk</p>
+            <p class="text-xl md:text-2xl font-extrabold text-emerald-600">{{ $notifikasis->where('tipe', 'diterima')->count() }}</p>
+            <p class="text-xs font-bold text-slate-400">Masuk</p>
         </div>
     </div>
 
@@ -56,14 +56,14 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between gap-2">
                             <h3 class="text-xs md:text-sm font-bold text-slate-900 leading-snug truncate min-w-0">{{ $notif->judul }}</h3>
-                            <span class="text-[10px] text-slate-400 shrink-0 whitespace-nowrap">{{ $notif->created_at->diffForHumans() }}</span>
+                            <span class="text-xs text-slate-400 shrink-0 whitespace-nowrap">{{ $notif->created_at->diffForHumans() }}</span>
                         </div>
-                        <p class="text-[11px] md:text-xs text-slate-600 mt-2 leading-relaxed">{{ $notif->pesan }}</p>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">{{ $notif->pesan }}</p>
                         @if(!$notif->is_read)
                             <div class="mt-2.5 flex justify-end">
                                 <form method="POST" action="{{ route('kesiswaan.notifikasi.read', $notif) }}" class="w-full sm:w-auto">
                                     @csrf
-                                    <button type="submit" class="text-[10px] font-semibold text-sky-600 hover:text-sky-700 px-3 py-1.5 bg-white border border-sky-200 rounded-lg w-full sm:w-auto text-center shadow-sm">
+                                    <button type="submit" class="text-xs font-semibold text-sky-600 hover:text-sky-700 px-3 py-1.5 bg-white border border-sky-200 rounded-lg w-full sm:w-auto text-center shadow-sm">
                                         Tandai dibaca
                                     </button>
                                 </form>

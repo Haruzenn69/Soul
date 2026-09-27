@@ -4,7 +4,7 @@
 
 @section('content')
     <div>
-        <h1 class="text-2xl font-extrabold text-theme-dark">Edit Akun: {{ $user->username }}</h1>
+        <h1 class="text-xl md:text-2xl font-extrabold text-theme-dark">Edit Akun: {{ $user->username }}</h1>
         <p class="text-xs text-gray-400 mt-1">Ubah data login atau ganti role akun ini.</p>
     </div>
 
@@ -28,17 +28,17 @@
             <h2 class="text-sm font-extrabold text-theme-dark mb-4">Data Login</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Username</label>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Username</label>
                     <input type="text" name="username" value="{{ old('username', $user->username) }}" required
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Email</label>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Email</label>
                     <input type="email" name="email" value="{{ old('email', $user->email) }}" required
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Role</label>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Role</label>
                     <select name="role" id="role" required onchange="toggleRoleFields()"
                             class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
                         @php
@@ -60,17 +60,17 @@
             <h2 class="text-sm font-extrabold text-theme-dark mb-4">Data Siswa</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">NIS</label>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">NIS</label>
                     <input type="text" name="nis" value="{{ old('nis', $user->siswa?->nis) }}"
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>
                     <input type="text" name="nama" value="{{ old('nama', $user->siswa?->nama) }}"
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Kelas</label>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Kelas</label>
                     <select name="kelas_id"
                             class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
                         <option value="">Pilih kelas...</option>
@@ -82,7 +82,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Jenis Kelamin</label>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Jenis Kelamin</label>
                     <select name="jenis_kelamin"
                             class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
                         <option value="" {{ !old('jenis_kelamin', $user->siswa?->jenis_kelamin) ? 'selected' : '' }} disabled>Pilih...</option>
@@ -91,7 +91,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Jabatan</label>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Jabatan</label>
                     <select name="jabatan" id="jabatan"
                             class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
                         @foreach (['siswa' => 'Siswa', 'ketua' => 'Ketua Ekskul'] as $value => $label)
@@ -103,7 +103,7 @@
                     $currentEkskulId = $user->siswa?->pendaftarans->first()?->ekskul_id;
                 @endphp
                 <div id="field-ekskul" class="hidden">
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Ekskul</label>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Ekskul</label>
                     <select name="ekskul_id"
                             class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
                         <option value="">Pilih ekskul...</option>
@@ -114,7 +114,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                    <p class="text-xs text-gray-400 mt-1 flex items-center gap-1">
                         <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
                         </svg>
@@ -129,17 +129,17 @@
             <h2 class="text-sm font-extrabold text-theme-dark mb-4">Data Pembina</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">NIP</label>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">NIP</label>
                     <input type="text" name="nip" value="{{ old('nip', $user->pembina?->nip) }}"
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>
                     <input type="text" name="pembina_nama" value="{{ old('pembina_nama', $user->pembina?->nama) }}"
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Jenis Kelamin</label>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Jenis Kelamin</label>
                     <select name="pembina_jenis_kelamin"
                             class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
                         <option value="" {{ !old('pembina_jenis_kelamin', $user->pembina?->jenis_kelamin) ? 'selected' : '' }} disabled>Pilih...</option>
