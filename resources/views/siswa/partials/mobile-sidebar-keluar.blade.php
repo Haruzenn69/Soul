@@ -29,6 +29,12 @@
                 </span>
                 Dashboard
             </a>
+            <a href="{{ route('siswa.nilai') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
+                <span class="flex items-center justify-center w-4 h-4">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5v2h6V5m-5 8l2 2 4-4"/></svg>
+                </span>
+                Nilai
+            </a>
             <a href="{{ route('siswa.katalog') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
                 <span class="flex items-center justify-center w-4 h-4">
                     <img src="{{ asset('images/catalog.png') }}" alt="Katalog Icon" class="w-full h-full object-contain">

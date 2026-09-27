@@ -19,23 +19,23 @@
     <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 space-y-5">
         <div class="grid gap-5 sm:grid-cols-2">
             <div>
-                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal kegiatan</p>
+                <p class="text-xs font-bold text-slate-500 mb-1">Tanggal kegiatan</p>
                 <p class="font-semibold text-sm text-slate-800">{{ $kegiatan->tanggal_kegiatan->isoFormat('dddd, D MMMM Y') }}</p>
             </div>
             <div>
-                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nama kegiatan</p>
+                <p class="text-xs font-bold text-slate-500 mb-1">Nama kegiatan</p>
                 <p class="font-semibold text-sm text-slate-800">{{ $kegiatan->materi }}</p>
             </div>
         </div>
         @if($kegiatan->deskripsi)
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Deskripsi</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Deskripsi</p>
             <p class="font-medium text-sm whitespace-pre-line">{{ $kegiatan->deskripsi }}</p>
         </div>
         @endif
         @if($kegiatan->dokumentasi)
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Dokumentasi</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Dokumentasi</p>
             <img src="{{ asset('storage/' . $kegiatan->dokumentasi) }}" alt="Dokumentasi Kegiatan" class="mt-2 max-w-sm rounded-2xl border border-sky-100 shadow-sm">
         </div>
         @endif
@@ -53,7 +53,7 @@
                 <h3 class="text-sm font-bold text-slate-800">Rekap presensi</h3>
                 <p class="text-[10px] text-slate-400 mt-1">Ringkasan status kehadiran anggota.</p>
             </div>
-            <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="text-[11px] font-bold text-sky-600 hover:text-sky-800 transition">Perbarui presensi</a>
+            <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="text-xs font-bold text-sky-600 hover:text-sky-800 transition">Perbarui presensi</a>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
             <div class="p-3 rounded-2xl bg-green-50 border border-green-100 text-center">
@@ -91,13 +91,13 @@
                         <td class="px-4 py-3 whitespace-nowrap">{{ $presensi->pendaftaran->siswa->nama ?? '-' }}</td>
                         <td class="px-4 py-3 whitespace-nowrap">
                             @if($presensi->status === 'hadir')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Hadir</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Hadir</span>
                             @elseif($presensi->status === 'sakit')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 border border-amber-200">Sakit</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200">Sakit</span>
                             @elseif($presensi->status === 'izin')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-sky-100 text-sky-700 border border-sky-200">Izin</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-700 border border-sky-200">Izin</span>
                             @else
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">Alpha</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">Alpha</span>
                             @endif
                         </td>
                     </tr>

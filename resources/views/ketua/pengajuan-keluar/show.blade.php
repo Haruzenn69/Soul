@@ -16,26 +16,26 @@
     <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl space-y-5">
         <div class="grid gap-5 sm:grid-cols-2">
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal Pengajuan</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Tanggal Pengajuan</p>
             <p class="font-medium text-sm">{{ $pengajuanKeluar->tanggal_pengajuan->format('d/m/Y') }}</p>
         </div>
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nama</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Nama</p>
             <p class="font-medium text-sm">{{ $pengajuanKeluar->siswa->nama }}</p>
         </div>
         </div>
         <div class="p-4 bg-sky-50/60 border border-sky-100 rounded-2xl">
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Alasan pengajuan</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Alasan pengajuan</p>
             <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{{ $pengajuanKeluar->alasan }}</p>
         </div>
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Status</p>
             @if($pengajuanKeluar->status === 'pending')
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 border border-amber-200">Pending</span>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200">Pending</span>
             @elseif($pengajuanKeluar->status === 'diterima')
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Diterima</span>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Diterima</span>
             @else
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">Ditolak</span>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">Ditolak</span>
             @endif
         </div>
 

@@ -61,7 +61,7 @@
                 </div>
 
                 <!-- floating stat card overlapping bottom edge -->
-                <div class="absolute -bottom-10 left-3 right-3 grid grid-cols-3 gap-2 bg-white rounded-2xl shadow-xl shadow-sky-900/10 p-3">
+                <div class="absolute -bottom-10 left-3 right-3 z-10 grid grid-cols-3 gap-2 bg-white rounded-2xl shadow-xl shadow-sky-900/10 p-3">
                     <div class="text-center border-r border-slate-100 pr-1">
                         <p class="text-base font-extrabold text-sky-700 leading-none">{{ $ekskul ? 1 : 0 }}</p>
                         <p class="text-[9px] text-slate-400 font-semibold mt-1">Ekskul</p>
@@ -79,7 +79,7 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="relative mt-6 pt-5 border-t border-white/15 grid grid-cols-3 gap-3">
+        <div class="relative mt-6 pt-5 border-t border-white/15 grid grid-cols-1 sm:grid-cols-3 gap-3">
             <a href="{{ route('pembina.anggota') }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
@@ -113,19 +113,19 @@
     {{-- STATS CARDS - MOBILE/TABLET --}}
     <div class="grid grid-cols-3 gap-3 lg:hidden">
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-3 md:p-5 shadow-md shadow-sky-100 animate-fade-up" style="animation-delay: .1s">
-            <p class="text-[8px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Ekskul Dibina</p>
+            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Ekskul Dibina</p>
             <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $ekskul ? 1 : 0 }}</h3>
-            <p class="text-[9px] md:text-[11px] font-semibold {{ $ekskul ? 'text-emerald-600' : 'text-amber-600' }} mt-0.5 md:mt-1">{{ $ekskul ? 'Aktif' : 'Belum' }}</p>
+            <p class="text-[11px] font-semibold {{ $ekskul ? 'text-emerald-600' : 'text-amber-600' }} mt-0.5 md:mt-1">{{ $ekskul ? 'Aktif' : 'Belum' }}</p>
         </div>
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 to-yellow-50 border border-amber-200 p-3 md:p-5 shadow-md shadow-amber-100 animate-fade-up" style="animation-delay: .2s">
-            <p class="text-[8px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Anggota Aktif</p>
+            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Anggota Aktif</p>
             <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-amber-600">{{ $anggotaAktifCount ?? 0 }}</h3>
-            <p class="text-[9px] md:text-[11px] font-semibold text-amber-700 mt-0.5 md:mt-1">Siswa</p>
+            <p class="text-[11px] font-semibold text-amber-700 mt-0.5 md:mt-1">Siswa</p>
         </div>
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-3 md:p-5 shadow-md shadow-sky-100 animate-fade-up" style="animation-delay: .3s">
-            <p class="text-[8px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Pendaftaran</p>
+            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Pendaftaran</p>
             <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ count($pendaftaranPending ?? []) }}</h3>
-            <p class="text-[9px] md:text-[11px] font-semibold text-sky-600 mt-0.5 md:mt-1">Menunggu</p>
+            <p class="text-[11px] font-semibold text-sky-600 mt-0.5 md:mt-1">Menunggu</p>
         </div>
     </div>
 
