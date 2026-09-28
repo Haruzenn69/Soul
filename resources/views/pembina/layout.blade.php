@@ -24,13 +24,20 @@
     'psProfileUrl' => route('pembina.profile'),
     'psItems' => [
         ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('pembina.dashboard'), 'is' => 'pembina.dashboard'],
-        ['icon' => 'clipboard-check', 'label' => 'Penilaian', 'url' => route('pembina.penilaian'), 'is' => 'pembina.penilaian*'],
-        ['icon' => 'document', 'label' => 'Cetak Laporan', 'url' => route('pembina.laporan.index'), 'is' => 'pembina.laporan.*'],
-        ['icon' => 'bars', 'label' => 'Rekap Absensi', 'url' => route('pembina.rekap'), 'is' => 'pembina.rekap'],
-        ['icon' => 'clipboard-list', 'label' => 'Pendaftaran', 'url' => route('pembina.pendaftaran'), 'is' => 'pembina.pendaftaran'],
-        ['icon' => 'users', 'label' => 'Data Anggota', 'url' => route('pembina.anggota'), 'is' => 'pembina.anggota'],
+        ['icon' => 'users', 'label' => 'Keanggotaan', 'children' => [
+            ['icon' => 'clipboard-list', 'label' => 'Pendaftaran', 'url' => route('pembina.pendaftaran'), 'is' => 'pembina.pendaftaran'],
+            ['icon' => 'users', 'label' => 'Data Anggota', 'url' => route('pembina.anggota'), 'is' => 'pembina.anggota'],
+        ]],
         ['icon' => 'calendar', 'label' => 'Presensi', 'url' => route('pembina.presensi'), 'is' => 'pembina.presensi'],
-        ['icon' => 'chat', 'label' => 'Testimoni & FAQ', 'url' => route('pembina.testimoni.index'), 'is' => 'pembina.testimoni.*'],
+        ['icon' => 'clipboard-check', 'label' => 'Penilaian & Laporan', 'children' => [
+            ['icon' => 'clipboard-check', 'label' => 'Penilaian', 'url' => route('pembina.penilaian'), 'is' => 'pembina.penilaian*'],
+            ['icon' => 'bars', 'label' => 'Rekap Absensi', 'url' => route('pembina.rekap'), 'is' => 'pembina.rekap'],
+            ['icon' => 'document', 'label' => 'Laporan Bulanan', 'url' => route('pembina.laporan.index'), 'is' => 'pembina.laporan.*'],
+        ]],
+        ['icon' => 'chat', 'label' => 'Kelola Konten', 'children' => [
+            ['icon' => 'chat', 'label' => 'Testimoni', 'url' => route('pembina.testimoni.index'), 'is' => 'pembina.testimoni.*'],
+            ['icon' => 'help', 'label' => 'FAQ', 'url' => route('pembina.faq.index'), 'is' => 'pembina.faq.*'],
+        ]],
         ['icon' => 'user', 'label' => 'Profil', 'url' => route('pembina.profile'), 'is' => 'pembina.profile'],
     ],
     'psMore' => [],
