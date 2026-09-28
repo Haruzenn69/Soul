@@ -86,24 +86,24 @@
                         <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap text-slate-600">{{ $anggota->siswa->kelas->nama ?? '-' }}</td>
                         <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap">
                             @if($anggota->status === 'diterima')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-semibold rounded-full">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-full">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                     Aktif
                                 </span>
                             @elseif($anggota->status === 'peringatan')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 border border-amber-200 text-[10px] font-semibold rounded-full">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 border border-amber-200 text-xs font-semibold rounded-full">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86l-8.24 14a2 2 0 001.73 3h16.44a2 2 0 001.73-3l-8.24-14a2 2 0 00-3.42 0z"/>
                                     </svg>
                                     Peringatan
                                 </span>
                             @elseif($anggota->status === 'keluar')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-semibold rounded-full">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold rounded-full">
                                     <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
                                     Keluar
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-600 border border-rose-200 text-[10px] font-semibold rounded-full">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-600 border border-rose-200 text-xs font-semibold rounded-full">
                                     <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                                     Nonaktif
                                 </span>
@@ -119,7 +119,7 @@
                                             onsubmit="return confirm('Beri peringatan kepada {{ addslashes($anggota->siswa->nama) }}? Siswa akan menerima alert peringatan di akunnya. Status tetap aktif.');">
                                             @csrf @method('PATCH')
                                             <input type="hidden" name="status" value="peringatan">
-                                            <button type="submit" class="inline-flex items-center gap-1 px-2.5 md:px-3 py-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 border border-amber-200 font-semibold rounded-full hover:from-amber-200 hover:to-yellow-200 transition text-[10px] md:text-[11px]">
+                                            <button type="submit" class="inline-flex items-center gap-1 px-2.5 md:px-3 py-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 border border-amber-200 font-semibold rounded-full hover:from-amber-200 hover:to-yellow-200 transition text-xs">
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86l-8.24 14a2 2 0 001.73 3h16.44a2 2 0 001.73-3l-8.24-14a2 2 0 00-3.42 0z"/>
                                                 </svg>
@@ -130,25 +130,25 @@
                                             onsubmit="return confirm('Nonaktifkan {{ addslashes($anggota->siswa->nama) }}? Siswa tidak akan terhitung anggota aktif ekskul.');">
                                             @csrf @method('PATCH')
                                             <input type="hidden" name="status" value="nonaktif">
-                                            <button type="submit" class="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 text-[10px] font-semibold rounded-full transition">Nonaktifkan</button>
+                                            <button type="submit" class="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 text-xs font-semibold rounded-full transition">Nonaktifkan</button>
                                         </form>
                                     @elseif($anggota->status === 'peringatan')
                                         <form action="{{ route('ketua.anggota.update-status', $anggota) }}" method="POST">
                                             @csrf @method('PATCH')
                                             <input type="hidden" name="status" value="diterima">
-                                            <button type="submit" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border border-emerald-200 text-[10px] font-semibold rounded-full transition">Aktifkan</button>
+                                            <button type="submit" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-full transition">Aktifkan</button>
                                         </form>
                                         <form action="{{ route('ketua.anggota.update-status', $anggota) }}" method="POST"
                                             onsubmit="return confirm('Nonaktifkan {{ addslashes($anggota->siswa->nama) }}? Siswa tidak akan terhitung anggota aktif ekskul.');">
                                             @csrf @method('PATCH')
                                             <input type="hidden" name="status" value="nonaktif">
-                                            <button type="submit" class="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 text-[10px] font-semibold rounded-full transition">Nonaktifkan</button>
+                                            <button type="submit" class="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 text-xs font-semibold rounded-full transition">Nonaktifkan</button>
                                         </form>
                                     @else
                                         <form action="{{ route('ketua.anggota.update-status', $anggota) }}" method="POST">
                                             @csrf @method('PATCH')
                                             <input type="hidden" name="status" value="diterima">
-                                            <button type="submit" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border border-emerald-200 text-[10px] font-semibold rounded-full transition">Aktifkan</button>
+                                            <button type="submit" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-full transition">Aktifkan</button>
                                         </form>
                                     @endif
                                 </div>

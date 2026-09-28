@@ -21,46 +21,46 @@
     <!-- Detail Card -->
     <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-3xl space-y-5">
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Bulan</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Bulan</p>
             <p class="font-medium text-sm">{{ $laporan->bulan }}</p>
         </div>
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Status</p>
             @if($laporan->status === 'draft')
-                <span class="inline-flex items-center px-2.5 py-1 bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-semibold rounded-full">Draft</span>
+                <span class="inline-flex items-center px-2.5 py-1 bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold rounded-full">Draft</span>
             @elseif($laporan->status === 'menunggu')
-                <span class="inline-flex items-center px-2.5 py-1 bg-sky-100 text-sky-700 border border-sky-200 text-[10px] font-semibold rounded-full">Menunggu Pembina</span>
+                <span class="inline-flex items-center px-2.5 py-1 bg-sky-100 text-sky-700 border border-sky-200 text-xs font-semibold rounded-full">Menunggu Pembina</span>
             @elseif($laporan->status === 'disetujui')
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Disetujui</span>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Disetujui</span>
             @else
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-700 border border-rose-200">Ditolak</span>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700 border border-rose-200">Ditolak</span>
             @endif
         </div>
 
         @if($laporan->materi_kegiatan)
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Materi dan Kegiatan</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Materi dan Kegiatan</p>
             <p class="font-medium text-sm whitespace-pre-line">{{ $laporan->materi_kegiatan }}</p>
         </div>
         @endif
 
         @if($laporan->tujuan)
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tujuan Kegiatan</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Tujuan Kegiatan</p>
             <p class="font-medium text-sm whitespace-pre-line">{{ $laporan->tujuan }}</p>
         </div>
         @endif
 
         @if($laporan->kehadiran)
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kehadiran Peserta</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Kehadiran Peserta</p>
             <p class="font-medium text-sm whitespace-pre-line">{{ $laporan->kehadiran }}</p>
         </div>
         @endif
 
         @if($laporan->evaluasi_keberhasilan || $laporan->evaluasi_kendala || $laporan->evaluasi_solusi)
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Evaluasi Kegiatan</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Evaluasi Kegiatan</p>
             @if($laporan->evaluasi_keberhasilan)
                 <p class="font-medium text-sm mt-2"><span class="font-bold">Keberhasilan:</span> {{ $laporan->evaluasi_keberhasilan }}</p>
             @endif
@@ -74,7 +74,7 @@
         @endif
 
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Dokumentasi</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Dokumentasi</p>
             @php
                 $dokPaths = [];
                 if ($laporan->dokumentasi) {
@@ -97,7 +97,7 @@
 
         @if($laporan->catatan_pembina)
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Catatan Pembina</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Catatan Pembina</p>
             <p class="font-medium text-sm whitespace-pre-line">{{ $laporan->catatan_pembina }}</p>
         </div>
         @endif

@@ -17,12 +17,12 @@
     @foreach ($statusList as $status)
         @php [$bg, $letter, $label] = $statusBadge[$status]; @endphp
         <span class="flex items-center gap-1.5 text-[11px] font-semibold text-slate-600">
-            <span class="w-5 h-5 rounded-md {{ $bg }} flex items-center justify-center text-[10px] font-extrabold">{{ $letter }}</span>
+            <span class="attendance-status attendance-status--{{ $status }} w-5 h-5 rounded-md {{ $bg }} flex items-center justify-center text-[10px] font-extrabold">{{ $letter }}</span>
             {{ $label }}
         </span>
     @endforeach
     <span class="flex items-center gap-1.5 text-[11px] font-semibold text-slate-600">
-        <span class="w-5 h-5 rounded-md bg-slate-100 text-slate-400 flex items-center justify-center text-[10px] font-extrabold">–</span>
+        <span class="attendance-status attendance-status--unmarked w-5 h-5 rounded-md bg-slate-100 text-slate-400 flex items-center justify-center text-[10px] font-extrabold">–</span>
         Belum diabsen
     </span>
 </div>
@@ -81,7 +81,7 @@
                                 [$bg, $letter] = $statusBadge[$status];
                             @endphp
                             <td class="px-2.5 py-3 text-center" title="{{ $kegiatan->materi }} · {{ $statusBadge[$status][2] }}">
-                                <span class="w-6 h-6 inline-flex items-center justify-center rounded-md {{ $bg }} text-[10px] font-extrabold">{{ $letter }}</span>
+                                <span class="attendance-status attendance-status--{{ $status ?? 'unmarked' }} w-6 h-6 inline-flex items-center justify-center rounded-md {{ $bg }} text-[10px] font-extrabold">{{ $letter }}</span>
                             </td>
                         @empty
                             <td class="px-3 py-3 text-center text-slate-300">–</td>

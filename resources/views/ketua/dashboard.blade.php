@@ -62,25 +62,25 @@
                 </div>
 
                 <!-- floating stat card overlapping bottom edge -->
-                <div class="absolute -bottom-10 left-3 right-3 grid grid-cols-3 gap-2 bg-white rounded-2xl shadow-xl shadow-sky-900/10 p-3">
+                <div class="absolute -bottom-10 left-3 right-3 z-10 grid grid-cols-3 gap-2 bg-white rounded-2xl shadow-xl shadow-sky-900/10 p-3">
                     <div class="text-center border-r border-slate-100 pr-1">
                         <p class="text-base font-extrabold text-sky-700 leading-none">{{ $totalAnggota }}</p>
-                        <p class="text-[9px] text-slate-400 font-semibold mt-1">Anggota</p>
+                        <p class="text-[11px] text-slate-400 font-semibold mt-1">Anggota</p>
                     </div>
                     <div class="text-center border-r border-slate-100 px-1">
                         <p class="text-base font-extrabold text-amber-600 leading-none">{{ $pendingCount }}</p>
-                        <p class="text-[9px] text-slate-400 font-semibold mt-1">Pendaftaran</p>
+                        <p class="text-[11px] text-slate-400 font-semibold mt-1">Pendaftaran</p>
                     </div>
                     <div class="text-center pl-1">
                         <p class="text-base font-extrabold text-sky-700 leading-none">{{ $kegiatanBulanIni ?? 0 }}</p>
-                        <p class="text-[9px] text-slate-400 font-semibold mt-1">Kegiatan</p>
+                        <p class="text-[11px] text-slate-400 font-semibold mt-1">Kegiatan</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="relative mt-6 pt-5 border-t border-white/15 grid grid-cols-3 gap-3">
+        <div class="relative mt-6 pt-5 border-t border-white/15 grid grid-cols-1 sm:grid-cols-3 gap-3">
             <a href="{{ route('ketua.anggota.index') }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
@@ -114,19 +114,19 @@
     {{-- STATS CARDS - MOBILE/TABLET --}}
     <div class="grid grid-cols-3 gap-3 lg:hidden">
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-3 md:p-5 shadow-md shadow-sky-100 animate-fade-up" style="animation-delay: .1s">
-            <p class="text-[8px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Anggota Aktif</p>
+            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Anggota Aktif</p>
             <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $totalAnggota }}</h3>
-            <p class="text-[9px] md:text-[11px] font-semibold {{ $totalAnggota ? 'text-emerald-600' : 'text-amber-600' }} mt-0.5 md:mt-1">{{ $totalAnggota ? 'Terdaftar' : 'Belum' }}</p>
+            <p class="text-[11px] font-semibold {{ $totalAnggota ? 'text-emerald-600' : 'text-amber-600' }} mt-0.5 md:mt-1">{{ $totalAnggota ? 'Terdaftar' : 'Belum' }}</p>
         </div>
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 to-yellow-50 border border-amber-200 p-3 md:p-5 shadow-md shadow-amber-100 animate-fade-up" style="animation-delay: .2s">
-            <p class="text-[8px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Pendaftaran</p>
+            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Pendaftaran</p>
             <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-amber-600">{{ $pendingCount }}</h3>
-            <p class="text-[9px] md:text-[11px] font-semibold text-amber-700 mt-0.5 md:mt-1">Menunggu</p>
+            <p class="text-[11px] font-semibold text-amber-700 mt-0.5 md:mt-1">Menunggu</p>
         </div>
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-3 md:p-5 shadow-md shadow-sky-100 animate-fade-up" style="animation-delay: .3s">
-            <p class="text-[8px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Kegiatan</p>
+            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Kegiatan</p>
             <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $kegiatanBulanIni ?? 0 }}</h3>
-            <p class="text-[9px] md:text-[11px] font-semibold text-sky-600 mt-0.5 md:mt-1">Bulan Ini</p>
+            <p class="text-[11px] font-semibold text-sky-600 mt-0.5 md:mt-1">Bulan Ini</p>
         </div>
     </div>
 
@@ -139,7 +139,7 @@
                 <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
                     <div>
                         <h2 class="text-sm font-extrabold text-slate-900">Tren Kehadiran Pertemuan</h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Statistik kehadiran anggota pada 6 pertemuan terbaru</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Statistik kehadiran anggota pada 6 pertemuan terbaru</p>
                     </div>
                     <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center shadow-md shadow-sky-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,7 +172,7 @@
                     <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
                         <div>
                             <h2 class="text-sm font-extrabold text-slate-900">Testimoni</h2>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Moderasi kontribusi siswa</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Moderasi kontribusi siswa</p>
                         </div>
                         <span class="text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">{{ $testimoniPendingCount }} Pending</span>
                     </div>
@@ -197,7 +197,7 @@
                             </div>
                             <textarea name="quote" rows="2" required placeholder="Isi testimoni..."
                                 class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition"></textarea>
-                            <button type="submit" class="px-3.5 py-2 bg-sky-600 hover:bg-sky-700 text-white text-[10px] font-bold rounded-xl transition">Simpan Testimoni</button>
+                            <button type="submit" class="px-3.5 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl transition">Simpan Testimoni</button>
                         </form>
                     </div>
                 </div>
@@ -207,7 +207,7 @@
                     <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
                         <div>
                             <h2 class="text-sm font-extrabold text-slate-900">FAQ</h2>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Moderasi kontribusi siswa</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Moderasi kontribusi siswa</p>
                         </div>
                         <span class="text-[11px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-3 py-1.5 rounded-full">{{ $faqPendingCount }} Pending</span>
                     </div>
@@ -228,7 +228,7 @@
                                 class="w-full px-3 py-2 bg-white border border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 transition">
                             <textarea name="jawaban" rows="2" required placeholder="Jawaban..."
                                 class="w-full px-3 py-2 bg-white border border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 transition"></textarea>
-                            <button type="submit" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-xl transition">Simpan FAQ</button>
+                            <button type="submit" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition">Simpan FAQ</button>
                         </form>
                     </div>
                 </div>
@@ -245,7 +245,7 @@
                 <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
                     <div>
                         <h2 class="text-sm font-extrabold text-slate-900">Distribusi Anggota</h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Komposisi berdasarkan tingkat kelas</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Komposisi berdasarkan tingkat kelas</p>
                     </div>
                     <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 flex items-center justify-center shadow-md shadow-amber-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -275,9 +275,9 @@
                 <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
                     <div>
                         <h2 class="text-sm font-extrabold text-slate-900">Yang perlu kamu cek</h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Aksi cepat untuk tugas yang menunggu</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Aksi cepat untuk tugas yang menunggu</p>
                     </div>
-                    <span class="text-[11px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-3 py-1.5 rounded-full">{{ $pendingCount + $pengajuanCount }} Tertunda</span>
+                    <span class="inline-flex min-w-[88px] items-center justify-center whitespace-nowrap text-[11px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-3 py-1.5 rounded-full">{{ $pendingCount + $pengajuanCount }} Tertunda</span>
                 </div>
 
                 <div class="p-5 space-y-3">
@@ -317,6 +317,23 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const attendanceCanvas = document.getElementById('attendanceTrendChart');
+        function getChartColors() {
+            const isDark = document.documentElement.classList.contains('dark-mode') || document.documentElement.classList.contains('dark');
+            return {
+                isDark: isDark,
+                gridColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#F1F5F9',
+                tickColor: isDark ? '#94a3b8' : '#64748b',
+                legendColor: isDark ? '#cbd5e1' : '#475569',
+                tooltipBg: isDark ? '#1e293b' : '#0F172A',
+                doughnutBorder: isDark ? '#1f1f1f' : '#FFFFFF',
+            };
+        }
+
+        let attendanceChart = null;
+        let classChart = null;
+
+        const themeColors = getChartColors();
+
         if (attendanceCanvas) {
             const labels = @json($chartKegiatan['labels'] ?? []);
             const dataHadir = @json($chartKegiatan['hadir'] ?? []);
@@ -324,7 +341,7 @@
             const dataSakit = @json($chartKegiatan['sakit'] ?? []);
             const dataAlpha = @json($chartKegiatan['alpha'] ?? []);
 
-            new Chart(attendanceCanvas, {
+            attendanceChart = new Chart(attendanceCanvas, {
                 type: 'line',
                 data: {
                     labels: labels,
@@ -392,11 +409,12 @@
                                 usePointStyle: true,
                                 pointStyle: 'circle',
                                 font: { size: 11, weight: '500' },
+                                color: themeColors.legendColor,
                                 padding: 12
                             }
                         },
                         tooltip: {
-                            backgroundColor: '#0F172A',
+                            backgroundColor: themeColors.tooltipBg,
                             titleFont: { size: 12, weight: 'bold' },
                             bodyFont: { size: 11 },
                             padding: 10,
@@ -410,16 +428,16 @@
                                 stepSize: 1,
                                 precision: 0,
                                 font: { size: 10 },
-                                color: '#94A3B8'
+                                color: themeColors.tickColor
                             },
                             grid: {
-                                color: '#F1F5F9'
+                                color: themeColors.gridColor
                             }
                         },
                         x: {
                             ticks: {
                                 font: { size: 10 },
-                                color: '#94A3B8'
+                                color: themeColors.tickColor
                             },
                             grid: {
                                 display: false
@@ -435,14 +453,14 @@
             const classLabels = @json($chartKelas['labels'] ?? []);
             const classData = @json($chartKelas['data'] ?? []);
 
-            new Chart(classCanvas, {
+            classChart = new Chart(classCanvas, {
                 type: 'doughnut',
                 data: {
                     labels: classLabels,
                     datasets: [{
                         data: classData,
                         backgroundColor: ['#0EA5E9', '#FACC15', '#2563EB'],
-                        borderColor: '#FFFFFF',
+                        borderColor: themeColors.doughnutBorder,
                         borderWidth: 3,
                         hoverOffset: 6
                     }]
@@ -460,11 +478,12 @@
                                 usePointStyle: true,
                                 pointStyle: 'circle',
                                 padding: 14,
-                                font: { size: 11, weight: '500' }
+                                font: { size: 11, weight: '500' },
+                                color: themeColors.legendColor
                             }
                         },
                         tooltip: {
-                            backgroundColor: '#0F172A',
+                            backgroundColor: themeColors.tooltipBg,
                             titleFont: { size: 12, weight: 'bold' },
                             bodyFont: { size: 11 },
                             padding: 10,
@@ -482,6 +501,41 @@
                 }
             });
         }
+
+        function updateKetuaCharts() {
+            const c = getChartColors();
+            if (attendanceChart) {
+                if (attendanceChart.options.scales?.y) {
+                    attendanceChart.options.scales.y.grid.color = c.gridColor;
+                    attendanceChart.options.scales.y.ticks.color = c.tickColor;
+                }
+                if (attendanceChart.options.scales?.x) {
+                    attendanceChart.options.scales.x.ticks.color = c.tickColor;
+                }
+                if (attendanceChart.options.plugins?.legend?.labels) {
+                    attendanceChart.options.plugins.legend.labels.color = c.legendColor;
+                }
+                if (attendanceChart.options.plugins?.tooltip) {
+                    attendanceChart.options.plugins.tooltip.backgroundColor = c.tooltipBg;
+                }
+                attendanceChart.update('none');
+            }
+
+            if (classChart) {
+                if (classChart.data.datasets?.[0]) {
+                    classChart.data.datasets[0].borderColor = c.doughnutBorder;
+                }
+                if (classChart.options.plugins?.legend?.labels) {
+                    classChart.options.plugins.legend.labels.color = c.legendColor;
+                }
+                if (classChart.options.plugins?.tooltip) {
+                    classChart.options.plugins.tooltip.backgroundColor = c.tooltipBg;
+                }
+                classChart.update('none');
+            }
+        }
+
+        window.addEventListener('soul-theme-change', updateKetuaCharts);
     });
 </script>
 @endpush

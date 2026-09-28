@@ -123,4 +123,30 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Auto Migrate
+    |--------------------------------------------------------------------------
+    |
+    | Jalankan migration secara otomatis pada request web pertama ketika ada
+    | file migration baru (untuk hosting tanpa SSH/terminal seperti DirectAdmin).
+    | Set AUTO_MIGRATE=false di .env bila ingin mematikan otomatisasi ini.
+    |
+    */
+
+    'auto_migrate' => env('AUTO_MIGRATE', env('APP_ENV', 'production') === 'production'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Web Database Reset
+    |--------------------------------------------------------------------------
+    |
+    | The public/migrate-fresh.php endpoint is disabled unless explicitly
+    | enabled and protected by a secret token in the environment.
+    |
+    */
+
+    'migrate_fresh_enabled' => env('MIGRATE_FRESH_ENABLED', false),
+    'migrate_fresh_token' => env('MIGRATE_FRESH_TOKEN'),
+
 ];

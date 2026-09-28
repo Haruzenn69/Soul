@@ -357,6 +357,7 @@
             .accessibility-btn { width: 40px; height: 40px; bottom: 16px; left: 16px; }
         }
     </style>
+    @include('partials.theme-mode-head')
 </head>
 <body>
 

@@ -1982,6 +1982,12 @@
             color: #ef4444;
             animation: heartbeat 1.5s ease-in-out infinite;
         }
+        .footer-heart svg {
+            width: 1rem;
+            height: 1rem;
+            display: inline-block;
+            vertical-align: -0.125em;
+        }
         @keyframes heartbeat {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.2); }

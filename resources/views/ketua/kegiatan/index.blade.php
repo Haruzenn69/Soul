@@ -47,7 +47,7 @@
                             </td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap font-medium text-slate-800">{{ $kegiatan->materi }}</td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-sky-100 text-sky-700 border border-sky-200">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-700 border border-sky-200">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                                     </svg>
@@ -56,20 +56,20 @@
                             </td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap">
                                 <div class="flex items-center gap-1.5 md:gap-2">
-                                    <a href="{{ route('ketua.kegiatan.show', $kegiatan) }}" class="card-detail-link inline-flex items-center gap-1 px-2.5 md:px-3 py-1.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 font-semibold rounded-full hover:from-sky-200 hover:to-blue-200 transition text-[10px] md:text-[11px]">
+                                    <a href="{{ route('ketua.kegiatan.show', $kegiatan) }}" class="card-detail-link inline-flex items-center gap-1 px-2.5 md:px-3 py-1.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 font-semibold rounded-full hover:from-sky-200 hover:to-blue-200 transition text-xs">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                         </svg>
                                         Detail
                                     </a>
-                                    <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="inline-flex items-center gap-1 px-2.5 md:px-3 py-1.5 bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 font-semibold rounded-full hover:from-emerald-200 hover:to-teal-200 transition text-[10px] md:text-[11px]">
+                                    <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="inline-flex items-center gap-1 px-2.5 md:px-3 py-1.5 bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 font-semibold rounded-full hover:from-emerald-200 hover:to-teal-200 transition text-xs">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                         Absensi
                                     </a>
-                                    <a href="{{ route('ketua.kegiatan.edit', $kegiatan) }}" class="inline-flex items-center gap-1 px-2.5 md:px-3 py-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 font-semibold rounded-full hover:from-amber-200 hover:to-yellow-200 transition text-[10px] md:text-[11px]">
+                                    <a href="{{ route('ketua.kegiatan.edit', $kegiatan) }}" class="inline-flex items-center gap-1 px-2.5 md:px-3 py-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 font-semibold rounded-full hover:from-amber-200 hover:to-yellow-200 transition text-xs">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.5-9.5a2.121 2.121 0 013 3L12 16l-4 1 1-4 8.5-8.5z"/>
                                         </svg>

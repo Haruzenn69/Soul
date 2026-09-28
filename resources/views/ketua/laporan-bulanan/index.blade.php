@@ -40,20 +40,20 @@
                         </td>
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
                             @if($laporan->status === 'draft')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">Draft</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">Draft</span>
                             @elseif($laporan->status === 'menunggu')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-sky-100 text-sky-700 border border-sky-200">Menunggu Pembina</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-700 border border-sky-200">Menunggu Pembina</span>
                             @elseif($laporan->status === 'disetujui')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Disetujui</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Disetujui</span>
                             @else
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-700 border border-rose-200">Ditolak</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700 border border-rose-200">Ditolak</span>
                             @endif
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-2">
-                                <a href="{{ route('ketua.laporan-bulanan.show', $laporan) }}" class="card-detail-link px-3 py-1.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 font-bold rounded-xl hover:from-sky-200 hover:to-blue-200 transition text-[10px]">Detail</a>
+                                <a href="{{ route('ketua.laporan-bulanan.show', $laporan) }}" class="card-detail-link px-3 py-1.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 font-bold rounded-xl hover:from-sky-200 hover:to-blue-200 transition text-xs">Detail</a>
                                 @if(in_array($laporan->status, ['draft', 'ditolak']))
-                                    <a href="{{ route('ketua.laporan-bulanan.edit', $laporan) }}" class="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold rounded-xl transition text-[10px]">Edit</a>
+                                    <a href="{{ route('ketua.laporan-bulanan.edit', $laporan) }}" class="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold rounded-xl transition text-xs">Edit</a>
                                 @endif
                             </div>
                         </td>

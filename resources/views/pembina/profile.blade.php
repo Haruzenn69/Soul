@@ -24,7 +24,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- KOLOM KIRI: Foto & Info Singkat -->
         <div class="lg:col-span-1">
-            <div class="bg-white p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .1s">
+            <div class="h-full bg-white p-6 rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .1s">
                 <div class="w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-sky-100 to-blue-100 border-4 border-sky-300 flex items-center justify-center shadow-lg shadow-sky-200">
                     <span class="text-3xl font-extrabold text-sky-600 uppercase">{{ strtoupper(substr($pembina->nama ?? 'P', 0, 1)) }}</span>
                 </div>
@@ -74,9 +74,12 @@
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
 
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
             <!-- Data Diri -->
-            <div class="bg-white p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 animate-fade-up" style="animation-delay: .15s">
+            <div class="h-full bg-white p-6 rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 animate-fade-up" style="animation-delay: .15s">
                 <h2 class="text-sm font-extrabold text-slate-900 mb-4">Data Diri</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-xl border border-sky-100">
@@ -103,7 +106,7 @@
             </div>
 
             <!-- Ekskul yang Dibina -->
-            <div class="bg-white p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 animate-fade-up" style="animation-delay: .2s">
+            <div class="h-full bg-white p-6 rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 animate-fade-up" style="animation-delay: .2s">
                 <h2 class="text-sm font-extrabold text-slate-900 mb-4">Ekskul yang Dibina</h2>
                 @php
                     $ekskuls = $pembina ? $pembina->ekskuls()->get() : collect();
@@ -130,7 +133,6 @@
                         <p class="text-sm">Belum ada ekskul yang anda bina.</p>
                     </div>
                 @endif
-            </div>
         </div>
     </div>
 @endsection

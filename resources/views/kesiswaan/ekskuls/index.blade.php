@@ -5,11 +5,11 @@
 @section('content')
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h1 class="text-2xl font-extrabold text-theme-dark">Data Ekskul</h1>
+            <h1 class="text-xl md:text-2xl font-extrabold text-theme-dark">Data Ekskul</h1>
             <p class="text-xs text-gray-400 mt-1">Kelola ekstrakurikuler beserta pembinanya.</p>
         </div>
         @if ($pembinas->isEmpty())
-            <span class="px-4 py-2 bg-amber-50 text-amber-600 rounded-full text-[11px] font-bold flex items-center gap-1.5">
+            <span class="px-4 py-2 bg-amber-50 text-amber-600 rounded-full text-xs font-bold flex items-center gap-1.5">
                 <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
                 </svg>
@@ -39,17 +39,17 @@
                         <div class="w-11 h-11 rounded-2xl bg-theme-blue text-white font-extrabold flex items-center justify-center text-xs shadow-md shadow-blue-500/20 uppercase shrink-0">
                             {{ substr($ekskul->nama_ekskul, 0, 2) }}
                         </div>
-                        <span class="px-3 py-1 rounded-full font-bold text-[10px] {{ $ekskul->is_open_recruitment ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-400' }}">
+                        <span class="{{ $ekskul->is_open_recruitment ? 'recruitment-open-badge' : '' }} px-3 py-1 rounded-full font-bold text-xs {{ $ekskul->is_open_recruitment ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-gray-100 text-gray-400' }}">
                             {{ $ekskul->is_open_recruitment ? '● Buka Pendaftaran' : '○ Tutup' }}
                         </span>
                     </div>
                     <h2 class="text-sm font-extrabold text-theme-dark">{{ $ekskul->nama_ekskul }}</h2>
                     @if (!$ekskul->status)
-                        <span class="px-3 py-1 rounded-full bg-red-50 text-red-500 font-bold text-[10px]">Nonaktif</span>
+                        <span class="px-3 py-1 rounded-full bg-red-50 text-red-500 font-bold text-xs">Nonaktif</span>
                     @endif
-                    <p class="text-[11px] text-gray-400 mt-1 line-clamp-2">{{ $ekskul->deskripsi ?? 'Tanpa deskripsi' }}</p>
+                    <p class="text-xs text-gray-400 mt-1 line-clamp-2">{{ $ekskul->deskripsi ?? 'Tanpa deskripsi' }}</p>
 
-                    <div class="mt-4 space-y-1.5 text-[11px]">
+                    <div class="mt-4 space-y-1.5 text-xs">
                         <p class="text-gray-500"> Pembina: <span class="font-bold text-theme-dark">{{ $ekskul->pembina?->nama ?? '-' }}</span></p>
                         <p class="text-gray-500"> Pelatih: <span class="font-bold text-theme-dark">{{ $ekskul->pelatih?->nama ?? '-' }}</span></p>
                         <p class="text-gray-500"> {{ $ekskul->jadwal ?? 'Jadwal belum diatur' }}</p>
@@ -64,12 +64,12 @@
                         "deskripsi" => $ekskul->deskripsi,
                         "jadwal" => $ekskul->jadwal,
                     ]) }})' 
-                            class="flex-1 px-3 py-2 bg-blue-50 text-theme-blue font-bold rounded-full hover:bg-blue-100 transition text-[11px]">Edit</button>
+                            class="flex-1 px-3 py-2 bg-blue-50 text-theme-blue font-bold rounded-full hover:bg-blue-100 transition text-xs">Edit</button>
                     <form action="{{ route('kesiswaan.ekskuls.destroy', $ekskul) }}" method="POST" class="flex-1"
                           onsubmit="return confirm('{{ $ekskul->status ? 'Nonaktifkan ekskul ' . $ekskul->nama_ekskul . '?' : 'Aktifkan ekskul ' . $ekskul->nama_ekskul . '?' }}')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="w-full px-3 py-2 bg-red-50 text-red-500 font-bold rounded-full hover:bg-red-100 transition text-[11px]">{{ $ekskul->status ? 'Nonaktifkan' : 'Aktifkan' }}</button>
+                        <button type="submit" class="w-full px-3 py-2 bg-red-50 text-red-500 font-bold rounded-full hover:bg-red-100 transition text-xs">{{ $ekskul->status ? 'Nonaktifkan' : 'Aktifkan' }}</button>
                     </form>
                 </div>
             </div>
