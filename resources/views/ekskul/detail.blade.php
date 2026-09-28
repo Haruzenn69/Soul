@@ -4,144 +4,144 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $ekskul->nama_ekskul }} - SOUL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Figtree', 'Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        bg: '#0e0e27',
+                        fg: '#f0f0f5',
+                        primary: '#00d4aa',
+                        secondary: '#ff6b9d',
+                        card: '#1b1b3b',
+                        muted: '#6b7280',
+                        surface: '#16162a',
+                    }
+                }
+            }
+        }
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('partials.theme-mode-head')
 </head>
-<body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased selection:bg-sky-100 selection:text-sky-700 overflow-x-hidden">
+<body class="bg-bg fg-fg antialiased">
 
     <!-- NAVBAR -->
-    <header class="sticky top-0 z-50 border-b border-sky-100 bg-white/80 backdrop-blur-md px-6 md:px-8 py-4 flex items-center justify-between">
+    <header class="px-6 md:px-8 py-4 flex items-center justify-between border-b border-border sticky top-0 bg-bg/80 backdrop-blur-md z-50">
         <a href="/" class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-sky-200">S</div>
-            <span class="font-extrabold tracking-tight text-lg text-slate-800 uppercase">SOUL</span>
+            <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">S</div>
+            <span class="font-extrabold tracking-tight text-lg fg uppercase">SOUL</span>
         </a>
         <div class="flex items-center gap-3">
             @auth
-                <a href="{{ route('dashboard') }}" class="px-5 py-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-semibold rounded-full shadow-md shadow-sky-200 transition">Dashboard</a>
+                <a href="{{ route('dashboard') }}" class="px-5 py-2 bg-primary hover:bg-secondary/20 text-primary fg text-xs font-semibold rounded-full transition">Dashboard</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button class="px-5 py-2 bg-white border border-sky-200 hover:bg-sky-50 text-slate-600 text-xs font-semibold rounded-full transition">Logout</button>
+                    <button class="px-5 py-2 bg-card/50 hover:bg-card/70 fg text-xs font-semibold rounded-full transition">Logout</button>
                 </form>
             @else
-                <a href="{{ route('login') }}" class="px-5 py-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-semibold rounded-full shadow-md shadow-sky-200 transition">Masuk &rarr;</a>
+                <a href="{{ route('login') }}" class="px-5 py-2 bg-card/50 hover:bg-card/70 fg text-xs font-semibold rounded-full transition">Masuk &rarr;</a>
             @endauth
         </div>
     </header>
 
     @if(session('success'))
-        <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 text-xs font-medium text-center">
+        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-medium rounded text-center">
             {{ session('success') }}
         </div>
     @endif
 
     <!-- 1. HERO -->
-    <section class="relative overflow-hidden bg-slate-900 text-white">
+    <section class="relative overflow-hidden py-24 md:py-32">
         @if($ekskul->cover)
-            <img src="{{ asset('storage/' . $ekskul->cover) }}" alt="{{ $ekskul->nama_ekskul }}" class="absolute inset-0 w-full h-full object-cover opacity-40">
+            <img src="{{ asset('storage/' . $ekskul->cover) }}" alt="{{ $ekskul->nama_ekskul }}" class="absolute inset-0 w-full h-full object-cover">
         @else
-            <div class="absolute inset-0 bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600"></div>
+            <div class="absolute inset-0 bg-bg"></div>
         @endif
-        <div class="relative z-10 max-w-5xl mx-auto px-6 py-24 text-center animate-fade-up">
-            <div class="flex justify-center mb-6">
-                @if($ekskul->logo)
-                    <img src="{{ asset('storage/' . $ekskul->logo) }}" alt="Logo {{ $ekskul->nama_ekskul }}" class="w-20 h-20 object-contain rounded-2xl bg-white/90 p-2 shadow-lg shadow-sky-900/10">
-                @else
-                    <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 flex items-center justify-center text-2xl font-extrabold shadow-lg shadow-amber-200">
-                        {{ substr($ekskul->nama_ekskul, 0, 1) }}
-                    </div>
-                @endif
-            </div>
-            <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-3">{{ $ekskul->nama_ekskul }}</h1>
-            @if($ekskul->tagline)
-                <p class="text-amber-300 font-semibold text-sm md:text-base mb-4">{{ $ekskul->tagline }}</p>
+        <div class="relative z-10 max-w-6xl mx-auto px-6 py-16 text-center">
+            @if($ekskul->logo)
+                <img src="{{ asset('storage/' . $ekskul->logo) }}" alt="Logo {{ $ekskul->nama_ekskul }}" class="w-24 h-24 mx-auto mb-6 object-contain border-primary/50">
+            @else
+                <div class="w-24 h-24 mx-auto mb-6 rounded-xl bg-primary/10 border border-primary/50 flex items-center justify-center text-primary font-extrabold text-4xl">
+                    {{ substr($ekskul->nama_ekskul, 0, 1) }}
+                </div>
             @endif
-            <p class="text-sm text-white/85 max-w-xl mx-auto mb-8">{{ $ekskul->deskripsi }}</p>
-            <div class="flex flex-wrap justify-center gap-3">
-                <a href="{{ route('siswa.form-daftar', $ekskul) }}" class="px-7 py-3 bg-gradient-to-r from-amber-300 to-yellow-400 hover:from-amber-400 hover:to-yellow-500 text-amber-900 text-xs font-bold rounded-full transition shadow-lg shadow-amber-200 {{ $ekskul->is_open_recruitment ? '' : 'opacity-50 pointer-events-none' }}">
-                    {{ $ekskul->is_open_recruitment ? 'Gabung Ekskul' : 'Pendaftaran Ditutup' }}
-                </a>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 fg">{{ $ekskul->nama_ekskul }}</h1>
+            @if($ekskul->tagline)
+                <p class="text-primary/80 font-medium text-sm mb-8 max-w-xl mx-auto">{{ $ekskul->tagline }}</p>
+            @endif
+            <p class="text-muted/60 text-sm mb-8 max-w-xl mx-auto leading-relaxed">{{ $ekskul->deskripsi }}</p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center sm:gap-4">
+                @if($ekskul->is_open_recruitment)
+                    <a href="{{ route('siswa.form-daftar', $ekskul) }}" class="px-8 py-3 bg-primary text-bg font-bold rounded-full text-sm tracking-wider hover:opacity-90 transition">
+                        Gabung Ekskul
+                    </a>
+                @else
+                    <span class="px-8 py-3 bg-card/50 text-muted/50 font-bold rounded-full text-sm tracking-wider disabled opacity-50 pointer-events-none">
+                        Pendaftaran Ditutup
+                    </span>
+                @endif
             </div>
         </div>
     </section>
 
     <!-- 2. QUICK INFO -->
-    <section class="max-w-5xl mx-auto px-6 -mt-8 relative z-20 animate-fade-up">
-        <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-sky-100">
-            <div class="p-5 text-center">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Jadwal</p>
-                <p class="text-xs font-semibold">{{ $ekskul->jadwal ?? '-' }}</p>
-            </div>
-            <div class="p-5 text-center">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Anggota</p>
-                <p class="text-xs font-semibold">{{ $totalAnggota }} Anggota</p>
-            </div>
-            <div class="p-5 text-center">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Pembina</p>
-                <p class="text-xs font-semibold">{{ $ekskul->pembina->nama ?? '-' }}</p>
-            </div>
-            <div class="p-5 text-center">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Pelatih</p>
-                <p class="text-xs font-semibold">{{ $ekskul->pelatih->nama ?? '-' }}</p>
+    <section class="py-12 md:py-16 border-t border-border/20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-card border border-border p-6">
+                    <p class="text-sm font-medium uppercase tracking-wider mb-2 fg/60">Jadwal</p>
+                    <p class="text-2xl font-bold fg">{{ $ekskul->jadwal ?? '-' }}</p>
+                </div>
+                <div class="bg-card border border-border p-6">
+                    <p class="text-sm font-medium uppercase tracking-wider mb-2 fg/60">Anggota</p>
+                    <p class="text-2xl font-bold fg">{{ $totalAnggota }} Anggota</p>
+                </div>
+                <div class="bg-card border border-border p-6">
+                    <p class="text-sm font-medium uppercase tracking-wider mb-2 fg/60">Pembina</p>
+                    <p class="text-xl font-bold fg">{{ $ekskul->pembina->nama ?? '-' }}</p>
+                </div>
+                <div class="bg-card border border-border p-6">
+                    <p class="text-sm font-medium uppercase tracking-wider mb-2 fg/60">Pelatih</p>
+                    <p class="text-xl font-bold fg">{{ $ekskul->pelatih->nama ?? '-' }}</p>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- 3. TENTANG -->
     @if($ekskul->tujuan || $ekskul->deskripsi)
-    <section id="tentang" class="max-w-5xl mx-auto px-6 py-20">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
-                <span class="text-[10px] font-bold text-sky-600 uppercase tracking-widest mb-2 inline-block">Tentang Kami</span>
-                <h2 class="text-2xl md:text-3xl font-bold mb-4 text-slate-800">Kami berkenalan dulu, yuk!</h2>
-                <p class="text-xs md:text-sm text-slate-500 leading-relaxed mb-4">{{ $ekskul->deskripsi }}</p>
-                @if($ekskul->tujuan)
-                    <p class="text-xs md:text-sm text-slate-500 leading-relaxed">{{ $ekskul->tujuan }}</p>
-                @endif
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-gradient-to-br from-sky-50 to-amber-50 rounded-3xl p-6 text-center border border-sky-100 shadow-md shadow-sky-100/60">
-                    <p class="text-2xl md:text-3xl font-extrabold text-sky-600">{{ $totalAnggota }}+</p>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Anggota Aktif</p>
-                </div>
-                <div class="bg-gradient-to-br from-sky-50 to-amber-50 rounded-3xl p-6 text-center border border-sky-100 shadow-md shadow-sky-100/60">
-                    <p class="text-2xl md:text-3xl font-extrabold text-amber-500">{{ $ekskul->prestasis->count() }}</p>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Prestasi</p>
-                </div>
-                <div class="bg-gradient-to-br from-sky-50 to-amber-50 rounded-3xl p-6 text-center border border-sky-100 shadow-md shadow-sky-100/60 col-span-2">
-                    <p class="text-xs md:text-sm font-extrabold text-slate-800">{{ $ekskul->kegiatans->count() }}</p>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Kegiatan Terlaksana</p>
-                </div>
-            </div>
+    <section id="tentang" class="py-16 md:py-20 border-b border-border/20">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-6 fg">Kami berkenalan dulu, yuk!</h2>
+            <p class="text-muted/60 text-lg mb-6 leading-relaxed">{{ $ekskul->deskripsi }}</p>
+            @if($ekskul->tujuan)
+                <p class="text-muted/60 text-base mb-4 leading-relaxed">{{ $ekskul->tujuan }}</p>
+            @endif
         </div>
     </section>
     @endif
 
     <!-- 4. KEGIATAN -->
     @if($ekskul->kegiatans->isNotEmpty())
-    <section id="kegiatan" class="bg-sky-50/60 py-20">
-        <div class="max-w-5xl mx-auto px-6">
-            <span class="text-[10px] font-bold text-sky-600 uppercase tracking-widest mb-2 inline-block">Kegiatan Kami</span>
-            <h2 class="text-2xl md:text-3xl font-bold mb-10 text-slate-800">Apa yang Kami Lakukan?</h2>
+    <section id="kegiatan" class="py-16 md:py-20 border-b border-border/20">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-6 fg">Apa yang Kami Lakukan?</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 @foreach($ekskul->kegiatans as $kegiatan)
-                    <div class="bg-white rounded-3xl border border-sky-100 overflow-hidden shadow-md shadow-sky-100/60 hover:-translate-y-1 hover:shadow-lg transition-all">
-                        @if($kegiatan->dokumentasi)
-                            <img src="{{ asset('storage/' . $kegiatan->dokumentasi) }}" alt="{{ $kegiatan->materi }}" class="w-full h-40 object-cover">
-                        @else
-                            <div class="w-full h-40 bg-sky-100 flex items-center justify-center text-sky-500">
-                            <svg class="w-14 h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2v2H9V5zm1 8l2 2 4-4"/>
-                            </svg>
-                        </div>
-                        @endif
-                        <div class="p-5">
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">{{ $kegiatan->tanggal_kegiatan->translatedFormat('d F Y') }}</p>
-                            <h3 class="font-bold text-sm mb-2 text-slate-800">{{ $kegiatan->materi }}</h3>
-                            @if($kegiatan->deskripsi)
-                                <p class="text-xs text-slate-500 leading-relaxed">{{ \Illuminate\Support\Str::limit($kegiatan->deskripsi, 90) }}</p>
-                            @endif
-                        </div>
+                <div class="bg-card border border-border p-6 hover:border-primary transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold fg">{{ $kegiatan->materi }}</h3>
+                        <p class="text-sm fg/60">{{ $kegiatan->tanggal_kegiatan->translatedFormat('d F Y') }}</p>
                     </div>
+                    @if($kegiatan->deskripsi)
+                        <p class="text-muted/60 text-sm leading-relaxed">{{ \Illuminate\Support\Str::limit($kegiatan->deskripsi, 100) }}</p>
+                    @endif
+                </div>
                 @endforeach
             </div>
         </div>
@@ -150,53 +150,37 @@
 
     <!-- 5. PRESTASI -->
     @if($ekskul->prestasis->isNotEmpty())
-    <section id="prestasi" class="max-w-5xl mx-auto px-6 py-20">
-        <span class="text-[10px] font-bold text-sky-600 uppercase tracking-widest mb-2 inline-block">Prestasi</span>
-        <h2 class="text-2xl md:text-3xl font-bold mb-10 flex items-center gap-3 text-slate-800">Kebanggaan Kami
-                        <svg class="w-7 h-7 md:w-8 md:h-8 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M7 4h10v4a5 5 0 01-10 0V4z"/>
-                            <path d="M7 6H4v2a3 3 0 003 3M17 6h3v2a3 3 0 01-3 3m-5 4v5m-2.5 3h5a.5.5 0 00.5-.5v-2.5a.5.5 0 00-.5-.5h-5a.5.5 0 00-.5.5v2.5a.5.5 0 00.5.5z"/>
-                        </svg>
-                    </h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            @foreach($ekskul->prestasis as $prestasi)
-                <div class="bg-white rounded-3xl border border-sky-100 p-6 shadow-md shadow-sky-100/60 hover:-translate-y-1 hover:shadow-lg transition-all">
-                    <div class="flex items-center justify-center text-sky-500 mb-3">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M7 4h10v4a5 5 0 01-10 0V4z"/>
-                            <path d="M7 6H4v2a3 3 0 003 3M17 6h3v2a3 3 0 01-3 3m-5 4v5m-2.5 3h5a.5.5 0 00.5-.5v-2.5a.5.5 0 00-.5-.5h-5a.5.5 0 00-.5.5v2.5a.5.5 0 00.5.5z"/>
-                        </svg>
+    <section id="prestasi" class="py-16 md:py-20 border-b border-border/20">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-6 fg">Kebanggaan Kami</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                @foreach($ekskul->prestasis as $prestasi)
+                <div class="bg-card border border-border p-6 hover:border-primary transition">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-bold fg">{{ $prestasi->judul }}</h3>
+                        <p class="text-sm fg/60">{{ $prestasi->tahun ?? '-' }}</p>
                     </div>
-                    <h3 class="font-bold text-base mb-1 text-slate-800">{{ $prestasi->judul }}</h3>
                     @if($prestasi->kategori)
-                        <p class="text-xs text-slate-500 mb-1">{{ $prestasi->kategori }}</p>
-                    @endif
-                    @if($prestasi->tahun)
-                        <p class="text-[10px] text-amber-500 font-bold">{{ $prestasi->tahun }}</p>
+                        <p class="text-muted/60 text-xs">{{ $prestasi->kategori }}</p>
                     @endif
                     @if($prestasi->foto)
-                        <img src="{{ asset('storage/' . $prestasi->foto) }}" alt="{{ $prestasi->judul }}" class="mt-4 w-full h-28 object-cover rounded-xl">
+                        <img src="{{ asset('storage/' . $prestasi->foto) }}" alt="{{ $prestasi->judul }}" class="mt-4 w-full h-32 object-cover rounded border-border/20">
                     @endif
                 </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
     </section>
     @endif
 
     <!-- 6. GALERI -->
     @if($galeris->isNotEmpty())
-    <section id="galeri" class="bg-sky-50/60 py-20">
-        <div class="max-w-5xl mx-auto px-6">
-            <span class="text-[10px] font-bold text-sky-600 uppercase tracking-widest mb-2 inline-block">Galeri</span>
-            <h2 class="text-2xl md:text-3xl font-bold mb-10 flex items-center gap-3 text-slate-800">Momen Kami
-                        <svg class="w-7 h-7 md:w-8 md:h-8 text-sky-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                            <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                    </h2>
+    <section id="galeri" class="py-16 md:py-20 bg-card border-t border-border/20">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-6 fg">Momen Kami</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 @foreach($galeris as $foto)
-                    <img src="{{ asset('storage/' . $foto) }}" alt="Dokumentasi" class="w-full h-40 object-cover rounded-2xl border border-sky-100 shadow-md shadow-sky-100/60 hover:scale-[1.03] transition">
+                    <img src="{{ asset('storage/' . $foto) }}" alt="Dokumentasi" class="h-40 object-cover rounded border-border/20 transition">
                 @endforeach
             </div>
         </div>
@@ -205,88 +189,38 @@
 
     <!-- 7. TESTIMONI -->
     @if($ekskul->testimoniss->isNotEmpty())
-    <section id="testimoni" class="max-w-5xl mx-auto px-6 py-20">
-        <span class="text-[10px] font-bold text-sky-600 uppercase tracking-widest mb-2 inline-block">Testimoni</span>
-        <h2 class="text-2xl md:text-3xl font-bold mb-10 flex items-center gap-3 text-slate-800">Kata Mereka
-                        <svg class="w-7 h-7 md:w-8 md:h-8 text-sky-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                        </svg>
-                    </h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            @foreach($ekskul->testimoniss as $testimoni)
-                <div class="bg-white rounded-3xl border border-sky-100 p-6 shadow-md shadow-sky-100/60 flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all">
-                    <div class="text-amber-400 text-lg mb-2 flex gap-0.5" aria-label="Rating 5 dari 5">
-                        @for($i = 0; $i < 5; $i++)
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                            </svg>
-                        @endfor
-                    </div>
-                    <p class="text-xs text-slate-500 leading-relaxed flex-1 mb-4">&ldquo;{{ $testimoni->quote }}&rdquo;</p>
-                    <div>
-                        <p class="font-bold text-sm text-slate-800">{{ $testimoni->nama }}</p>
+    <section id="testimoni" class="py-16 md:py-20 border-b border-border/20">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-6 fg">Kata Mereka</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                @foreach($ekskul->testimoniss as $testimoni)
+                    <div class="bg-card border border-border p-6 flex flex-col">
+                        <p class="text-primary/80 text-lg mb-4 flex gap-0.5" aria-label="Rating">{{ str_repeat('<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>', 5); }}</p>
+                        <p class="text-muted/60 flex-1 mb-4 leading-relaxed">&ldquo;{{ $testimoni->quote }}&rdquo;</p>
+                        <div class="text-primary font-bold text-sm mb-2">{{ $testimoni->nama }}</div>
                         @if($testimoni->kelas)
-                            <p class="text-[10px] text-slate-400">{{ $testimoni->kelas }}</p>
+                            <p class="text-muted/60 text-xs">{{ $testimoni->kelas }}</p>
                         @endif
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
     </section>
     @endif
 
-    @auth
-        @if(auth()->user()->role !== 'kesiswaan')
-            <div class="max-w-5xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-6 items-start pb-16">
-                <section>
-                    @if($hasSubmittedTestimoni)
-                        <p class="text-xs text-slate-500 text-center bg-white border border-sky-100 shadow-md shadow-sky-100/60 rounded-3xl px-6 py-4">✅ Kamu sudah mengirim testimoni untuk ekskul ini.</p>
-                    @else
-                        <form method="POST" action="{{ route('ekskul.testimoni.store', $ekskul) }}" class="bg-white rounded-3xl border border-sky-100 p-6 shadow-md shadow-sky-100/60">
-                            @csrf
-                            <h3 class="font-bold text-sm mb-3 text-slate-800">Bagikan pengalamanmu ✨</h3>
-                            @error('quote')
-                                <p class="text-rose-500 text-xs mb-2">{{ $message }}</p>
-                            @enderror
-                            <textarea name="quote" rows="3" required maxlength="2000" placeholder="Tulis testimoni singkatmu untuk ekskul ini..."
-                                class="w-full px-4 py-3 rounded-xl border border-sky-100 text-xs focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100"></textarea>
-                            <button type="submit" class="mt-3 px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-full shadow-md shadow-sky-200 transition">Kirim Testimoni</button>
-                            <p class="text-[10px] text-slate-400 mt-2">Nama & kelas diambil dari akunmu. Menunggu persetujuan ketua sebelum tampil.</p>
-                        </form>
-                    @endif
-                </section>
-
-                <section>
-                    <form method="POST" action="{{ route('ekskul.faq.store', $ekskul) }}" class="bg-white rounded-3xl border border-sky-100 p-6 shadow-md shadow-sky-100/60">
-                        @csrf
-                        <h3 class="font-bold text-sm mb-3 text-slate-800">Masih penasaran? Tanyakan ke ketua 💬</h3>
-                        @error('pertanyaan')
-                            <p class="text-rose-500 text-xs mb-2">{{ $message }}</p>
-                        @enderror
-                        <input type="text" name="pertanyaan" required maxlength="255" placeholder="Tulis pertanyaanmu tentang ekskul ini..."
-                            class="w-full px-4 py-3 rounded-xl border border-sky-100 text-xs focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100">
-                        <button type="submit" class="mt-3 px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-full shadow-md shadow-sky-200 transition">Ajukan Pertanyaan</button>
-                        <p class="text-[10px] text-slate-400 mt-2">Pertanyaanmu akan dijawab ketua ekskul dan tampil jika dijawab.</p>
-                    </form>
-                </section>
-            </div>
-        @endif
-    @endauth
-
     <!-- 8. FAQ -->
     @if($ekskul->faqs->isNotEmpty())
-    <section id="faq" class="bg-sky-50/60 py-20">
-        <div class="max-w-3xl mx-auto px-6">
-            <span class="text-[10px] font-bold text-sky-600 uppercase tracking-widest mb-2 inline-block">FAQ</span>
-            <h2 class="text-2xl md:text-3xl font-bold mb-10 text-slate-800">Pertanyaan yang Sering Ditanyakan</h2>
+    <section id="faq" class="py-16 md:py-20 bg-card border-b border-border/20">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-6 fg">Pertanyaan yang Sering Ditanyakan</h2>
             <div class="space-y-4">
                 @foreach($ekskul->faqs as $faq)
-                    <details class="bg-white rounded-3xl border border-sky-100 shadow-md shadow-sky-100/60 overflow-hidden group">
-                        <summary class="px-6 py-4 font-bold text-sm cursor-pointer flex items-center justify-between list-none text-slate-800">
+                    <details class="bg-card border border-border p-6 overflow-hidden">
+                        <summary class="px-6 py-4 font-bold text-sm cursor-pointer flex items-center justify-between">
                             {{ $faq->pertanyaan }}
-                            <span class="text-sky-600 text-lg transition group-open:rotate-45">+</span>
+                            <span class="text-primary/80 text-lg transition">+</span>
                         </summary>
-                        <p class="px-6 pb-4 text-xs text-slate-500 leading-relaxed">{{ $faq->jawaban }}</p>
+                        <p class="px-6 pb-4 text-muted/60 leading-relaxed">{{ $faq->jawaban }}</p>
                     </details>
                 @endforeach
             </div>
@@ -294,20 +228,72 @@
     </section>
     @endif
 
-    <!-- 9. CTA -->
-    <section class="bg-slate-900 text-white py-20 text-center">
-        <h2 class="text-2xl md:text-3xl font-extrabold mb-4">Tertarik Bergabung?</h2>
-        <p class="text-xs md:text-sm text-slate-300 max-w-md mx-auto mb-8">
-            Temukan teman baru, kembangkan bakatmu, dan jadi bagian dari keluarga {{ $ekskul->nama_ekskul }}.
-        </p>
-        <a href="{{ route('siswa.form-daftar', $ekskul) }}" class="inline-block px-8 py-3 bg-gradient-to-r from-amber-300 to-yellow-400 hover:from-amber-400 hover:to-yellow-500 text-amber-900 text-xs font-bold rounded-full shadow-lg shadow-amber-200 transition {{ $ekskul->is_open_recruitment ? '' : 'opacity-50 pointer-events-none' }}">
-            {{ $ekskul->is_open_recruitment ? 'Daftar Sekarang &rarr;' : 'Pendaftaran Ditutup' }}
-        </a>
+    <!-- 9. TESTIMONI & FAQ FORM -->
+    @auth
+        @if(auth()->user()->role !== 'kesiswaan')
+        <section class="py-16 md:py-20 max-w-2xl mx-auto px-6">
+            @if($hasSubmittedTestimoni)
+                <p class="text-muted/50 text-center">✅ Kamu sudah mengirim testimoni untuk ekskul ini.</p>
+            @else
+                <form method="POST" action="{{ route('ekskul.testimoni.store', $ekskul) }}" class="bg-card border border-border p-6">
+                    @csrf
+                    <h3 class="font-bold text-sm mb-3">Bagikan pengalamanmu</h3>
+                    @error('quote')
+                        <p class="text-primary/80 text-xs mb-2">{{ $message }}</p>
+                    @enderror
+                    <textarea name="quote" rows="3" required maxlength="2000" placeholder="Tulis testimoni singkatmu untuk ekskul ini..."
+                        class="w-full px-4 py-3 rounded border border-muted/50 text-sm focus:outline-none focus:border-primary mb-4"></textarea>
+                    <button type="submit" class="w-full py-3 bg-primary text-bg font-bold rounded-full text-sm transition">Kirim Testimoni</button>
+                    <p class="text-muted/60 text-xs">Nama & kelas diambil dari akunmu. Menunggu persetujuan ketua sebelum tampil.</p>
+                </form>
+            @endif
+        </section>
+        @endif
+    @endauth
+
+    <!-- 10. FAQ FORM -->
+    @auth
+        @if(auth()->user()->role !== 'kesiswaan')
+        <section class="py-16 md:py-20 max-w-3xl mx-auto px-6">
+            <form method="POST" action="{{ route('ekskul.faq.store', $ekskul) }}" class="bg-card border border-border p-6">
+                @csrf
+                <h3 class="font-bold text-sm mb-3">Masih penasaran? Tanyakan ke ketua</h3>
+                @error('pertanyaan')
+                    <p class="text-primary/80 text-xs mb-2">{{ $message }}</p>
+                @enderror
+                <input type="text" name="pertanyaan" required maxlength="255" placeholder="Tulis pertanyaanmu tentang ekskul ini..."
+                    class="w-full px-4 py-3 rounded border border-muted/50 text-sm focus:outline-none focus:border-primary mb-4">
+                <button type="submit" class="w-full py-3 bg-primary/20 text-primary fg font-bold rounded-full text-sm transition">Ajukan Pertanyaan</button>
+                <p class="text-muted/60 text-xs">Pertanyaanmu akan dijawab ketua ekskul dan tampil jika dijawab.</p>
+            </form>
+        </section>
+        @endif
+    @endauth
+
+    <!-- CTA -->
+    <section class="py-24 md:py-32 bg-primary/10">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 fg">Tertarik Bergabung?</h2>
+            <p class="text-muted/60 text-lg max-w-xl mx-auto mb-8 leading-relaxed">
+                Temukan teman baru, kembangkan bakatmu, dan jadi bagian dari keluarga {{ $ekskul->nama_ekskul }}.
+            </p>
+            @if($ekskul->is_open_recruitment)
+                <a href="{{ route('siswa.form-daftar', $ekskul) }}" class="px-10 py-3 bg-primary text-bg font-bold rounded-full text-sm tracking-wider hover:opacity-90 transition">
+                    Gabung Ekskul
+                </a>
+            @else
+                <span class="px-10 py-3 bg-card/50 text-muted/50 font-bold rounded-full text-sm tracking-wider disabled opacity-50 pointer-events-none">
+                    Pendaftaran Ditutup
+                </span>
+            @endif
+        </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="bg-slate-900 border-t border-white/10 py-10 text-center text-white text-xs">
-        <p>&copy; 2026 SOUL. All rights reserved.</p>
+    <footer class="py-12 bg-bg border-t border-border/20">
+        <div class="max-w-7xl mx-auto px-6 text-center text-muted/50 text-xs">
+            <p>&copy; 2026 SOUL. All rights reserved.</p>
+        </div>
     </footer>
 
 </body>
