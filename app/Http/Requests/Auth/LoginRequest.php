@@ -2,6 +2,9 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\Pembina;
+use App\Models\Siswa;
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -28,7 +31,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'email' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string'],
         ];
     }
@@ -42,15 +45,37 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        // Cek apakah inputan berupa Email atau Username
-        $loginType = filter_var($this->input('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $identifier = $this->input('email');
+        $password = $this->input('password');
+        $remember = $this->boolean('remember');
 
-        $credentials = [
-            $loginType => $this->input('email'),
-            'password' => $this->input('password'),
-        ];
+        $attempted = false;
 
-        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
+        // 1. Coba sebagai email jika formatnya valid
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            $attempted = Auth::attempt(['email' => $identifier, 'password' => $password], $remember);
+        }
+
+        // 2. Coba sebagai username
+        if (! $attempted) {
+            $attempted = Auth::attempt(['username' => $identifier, 'password' => $password], $remember);
+        }
+
+        // 3. Coba sebagai NIS (siswa) atau NIP (pembina)
+        if (! $attempted) {
+            $userId = Siswa::query()->where('nis', $identifier)->value('user_id')
+                ?? Pembina::query()->where('nip', $identifier)->value('user_id');
+
+            if ($userId) {
+                $user = User::find($userId);
+
+                if ($user) {
+                    $attempted = Auth::attempt(['username' => $user->username, 'password' => $password], $remember);
+                }
+            }
+        }
+
+        if (! $attempted) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

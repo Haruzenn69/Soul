@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -7,30 +7,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>[x-cloak] { display: none !important; }</style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif']
-                    },
-                    colors: {
-                        theme: { blue: '#2563EB', darkBlue: '#1D4ED8', yellow: '#FACC15', dark: '#0F172A', lightBg: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.theme-mode-head')
     <style>
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes blob { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(24px, -18px) scale(1.08); } 66% { transform: translate(-16px, 12px) scale(.94); } }
-        .animate-fade-up { animation: fadeUp .6s cubic-bezier(.22,1,.36,1) both; }
-        .animate-floaty { animation: floaty 5s ease-in-out infinite; }
-        .animate-blob { animation: blob 10s ease-in-out infinite; }
 
         /* Sidebar mobile selalu overlay, jangan dipaksa jadi relative (split layar) */
         #sidebar-mobile { position: fixed; }
@@ -48,6 +27,28 @@
         }
         #sidebar-mobile nav > a:hover {
             transform: translateX(2px);
+        }
+        #sidebar-mobile nav > a[href*="profil-ekskul"],
+        #sidebar-mobile nav > a[href*="prestasi"],
+        #sidebar-mobile nav > a[href*="testimoni"],
+        #sidebar-mobile nav > a[href*="faq"] {
+            display: none;
+        }
+        #sidebar-mobile nav > a[href*="kegiatan"],
+        #sidebar-mobile nav > a[href*="rekap-absensi"],
+        #sidebar-mobile nav > a[href*="presensi/rekap"],
+        #sidebar-mobile nav > a[href*="laporan-bulanan"],
+        #sidebar-mobile nav > a[href*="pendaftaran"],
+        #sidebar-mobile nav > a[href*="anggota"],
+        #sidebar-mobile nav > a[href*="pengajuan-keluar"] {
+            display: none !important;
+        }
+        #sidebar-mobile .legacy-katalog-link {
+            display: none !important;
+        }
+        #sidebar-mobile .legacy-membership-link,
+        #sidebar-mobile .legacy-activity-link {
+            display: none !important;
         }
         #sidebar-mobile {
             animation: sidebarIn .22s cubic-bezier(.22,1,.36,1);
@@ -72,16 +73,22 @@
     'psProfileUrl' => route('profile.edit'),
 'psItems' => [
         ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('ketua.dashboard'), 'is' => 'ketua.dashboard'],
-        ['icon' => 'calendar', 'label' => 'Kegiatan', 'url' => route('ketua.kegiatan.index'), 'is' => 'ketua.kegiatan.*'],
-        ['icon' => 'clipboard-check', 'label' => 'Rekap Absensi', 'url' => route('ketua.presensi.rekap'), 'is' => 'ketua.presensi.rekap'],
-        ['icon' => 'clipboard-list', 'label' => 'Pendaftaran', 'url' => route('ketua.pendaftaran.index'), 'is' => 'ketua.pendaftaran.*'],
-        ['icon' => 'users', 'label' => 'Kelola Anggota', 'url' => route('ketua.anggota.index'), 'is' => ['ketua.anggota.index', 'ketua.anggota.update-status']],
-        ['icon' => 'logout', 'label' => 'Pengajuan Keluar', 'url' => route('ketua.pengajuan-keluar.index'), 'is' => ['ketua.pengajuan-keluar.index', 'ketua.pengajuan-keluar.show', 'ketua.pengajuan-keluar.update']],
-        ['icon' => 'columns', 'label' => 'Laporan Bulanan', 'url' => route('ketua.laporan-bulanan.index'), 'is' => 'ketua.laporan-bulanan.*'],
-        ['icon' => 'building', 'label' => 'Profil Ekskul', 'url' => route('ketua.profil-ekskul.edit'), 'is' => 'ketua.profil-ekskul.*'],
-        ['icon' => 'star', 'label' => 'Prestasi', 'url' => route('ketua.prestasi.index'), 'is' => 'ketua.prestasi.*'],
-        ['icon' => 'chat', 'label' => 'Testimoni', 'url' => route('ketua.testimoni.index'), 'is' => 'ketua.testimoni.*'],
-        ['icon' => 'help', 'label' => 'FAQ', 'url' => route('ketua.faq.index'), 'is' => 'ketua.faq.*'],
+        ['icon' => 'users', 'label' => 'Keanggotaan', 'children' => [
+            ['icon' => 'users', 'label' => 'Kelola Anggota', 'url' => route('ketua.anggota.index'), 'is' => ['ketua.anggota.index', 'ketua.anggota.update-status']],
+            ['icon' => 'clipboard-list', 'label' => 'Pendaftaran', 'url' => route('ketua.pendaftaran.index'), 'is' => 'ketua.pendaftaran.*'],
+            ['icon' => 'logout', 'label' => 'Pengajuan Keluar', 'url' => route('ketua.pengajuan-keluar.index'), 'is' => ['ketua.pengajuan-keluar.index', 'ketua.pengajuan-keluar.show', 'ketua.pengajuan-keluar.update']],
+        ]],
+        ['icon' => 'calendar', 'label' => 'Kegiatan', 'children' => [
+            ['icon' => 'calendar', 'label' => 'Kegiatan', 'url' => route('ketua.kegiatan.index'), 'is' => 'ketua.kegiatan.*'],
+            ['icon' => 'clipboard-check', 'label' => 'Rekap Absensi', 'url' => route('ketua.presensi.rekap'), 'is' => 'ketua.presensi.rekap'],
+            ['icon' => 'columns', 'label' => 'Laporan Bulanan', 'url' => route('ketua.laporan-bulanan.index'), 'is' => 'ketua.laporan-bulanan.*'],
+        ]],
+        ['icon' => 'building', 'label' => 'Kelola Katalog', 'children' => [
+            ['icon' => 'building', 'label' => 'Profil Ekskul', 'url' => route('ketua.profil-ekskul.edit'), 'is' => 'ketua.profil-ekskul.*'],
+            ['icon' => 'star', 'label' => 'Prestasi', 'url' => route('ketua.prestasi.index'), 'is' => 'ketua.prestasi.*'],
+            ['icon' => 'chat', 'label' => 'Testimoni', 'url' => route('ketua.testimoni.index'), 'is' => 'ketua.testimoni.*'],
+            ['icon' => 'help', 'label' => 'FAQ', 'url' => route('ketua.faq.index'), 'is' => 'ketua.faq.*'],
+        ]],
         ['icon' => 'user', 'label' => 'Profile', 'url' => route('profile.edit'), 'is' => 'profile.edit'],
     ],
     'psMore' => [],
@@ -100,7 +107,7 @@
         <div class="relative h-full flex flex-col overflow-y-auto">
             <div class="flex items-center justify-between mb-6 mt-1 px-2">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-extrabold text-lg shadow-lg shadow-sky-300">
+                    <div class="w-10 h-10 shrink-0 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-extrabold text-xs shadow-lg shadow-sky-300">
                         SOUL
                     </div>
                     <div>
@@ -127,6 +134,63 @@
                     </span>
                     Dashboard
                 </a>
+                <a href="{{ route('ketua.nilai') }}" data-ps-nilai aria-current="{{ request()->routeIs('ketua.nilai') ? 'page' : 'false' }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.nilai') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                    @if (request()->routeIs('ketua.nilai'))
+                        <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
+                    @endif
+                    <span class="text-base flex items-center justify-center w-4 h-4">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5v2h6V5m-5 8l2 2 4-4"/>
+                        </svg>
+                    </span>
+                    Nilai
+                </a>
+                @php
+                    $keanggotaanAktif = request()->routeIs('ketua.anggota.*', 'ketua.pendaftaran.*', 'ketua.pengajuan-keluar.*');
+                    $kegiatanAktif = request()->routeIs('ketua.kegiatan.*', 'ketua.presensi.rekap', 'ketua.laporan-bulanan.*');
+                @endphp
+                <details class="group" {{ $keanggotaanAktif ? 'open' : '' }}>
+                    <summary class="relative flex items-center gap-3 px-3.5 py-2.5 {{ $keanggotaanAktif ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all cursor-pointer list-none">
+                        <span class="text-base flex items-center justify-center w-4 h-4"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/></svg></span>
+                        Keanggotaan
+                        <svg class="w-4 h-4 ml-auto transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
+                    </summary>
+                    <div class="ml-7 pl-4 mt-1 space-y-1 border-l border-sky-100">
+                        <a href="{{ route('ketua.anggota.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs {{ request()->routeIs('ketua.anggota.*') ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-500 hover:bg-sky-50' }}">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                            Kelola Anggota
+                        </a>
+                        <a href="{{ route('ketua.pendaftaran.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs {{ request()->routeIs('ketua.pendaftaran.*') ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-500 hover:bg-sky-50' }}">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z"/></svg>
+                            Pendaftaran
+                        </a>
+                        <a href="{{ route('ketua.pengajuan-keluar.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs {{ request()->routeIs('ketua.pengajuan-keluar.*') ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-500 hover:bg-sky-50' }}">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                            Pengajuan Keluar
+                        </a>
+                    </div>
+                </details>
+                <details class="group" {{ $kegiatanAktif ? 'open' : '' }}>
+                    <summary class="relative flex items-center gap-3 px-3.5 py-2.5 {{ $kegiatanAktif ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all cursor-pointer list-none">
+                        <span class="text-base flex items-center justify-center w-4 h-4"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></span>
+                        Kegiatan
+                        <svg class="w-4 h-4 ml-auto transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
+                    </summary>
+                    <div class="ml-7 pl-4 mt-1 space-y-1 border-l border-sky-100">
+                        <a href="{{ route('ketua.kegiatan.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs {{ request()->routeIs('ketua.kegiatan.*') ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-500 hover:bg-sky-50' }}">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7V3m8 4V3M5 11h14M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            Kegiatan
+                        </a>
+                        <a href="{{ route('ketua.presensi.rekap') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs {{ request()->routeIs('ketua.presensi.rekap') ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-500 hover:bg-sky-50' }}">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5v2h6V5m-5 8l2 2 4-4"/></svg>
+                            Rekap Absensi
+                        </a>
+                        <a href="{{ route('ketua.laporan-bulanan.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs {{ request()->routeIs('ketua.laporan-bulanan.*') ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-500 hover:bg-sky-50' }}">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z"/></svg>
+                            Laporan Bulanan
+                        </a>
+                    </div>
+                </details>
                 <a href="{{ route('ketua.kegiatan.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.kegiatan.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if (request()->routeIs('ketua.kegiatan.*'))
                         <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
@@ -173,26 +237,67 @@
                     Kelola Anggota
                 </a>
 
-                <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-1 mt-4 px-3">Kelola Katalog</div>
-                <a href="{{ route('ketua.profil-ekskul.edit') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.profil-ekskul.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                @php $katalogAktif = request()->routeIs('ketua.profil-ekskul.*', 'ketua.prestasi.*', 'ketua.testimoni.*', 'ketua.faq.*'); @endphp
+                <details class="group" {{ $katalogAktif ? 'open' : '' }}>
+                    <summary class="relative flex items-center gap-3 px-3.5 py-2.5 {{ $katalogAktif ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all cursor-pointer list-none">
+                        <span class="text-base flex items-center justify-center w-4 h-4">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/>
+                                <path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01"/>
+                            </svg>
+                        </span>
+                        Kelola Katalog
+                        <svg class="w-4 h-4 ml-auto transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
+                    </summary>
+                    <div class="ml-7 pl-4 mt-1 space-y-1 border-l border-sky-100">
+                        <a href="{{ route('ketua.profil-ekskul.edit') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs {{ request()->routeIs('ketua.profil-ekskul.*') ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/><path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01"/></svg>
+                            Profil Ekskul
+                        </a>
+                        <a href="{{ route('ketua.prestasi.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs {{ request()->routeIs('ketua.prestasi.*') ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8m-4-4v4M7 4h10v5a5 5 0 01-10 0V4z"/><path d="M7 6H4v2a4 4 0 004 4m9-6h3v2a4 4 0 01-4 4"/></svg>
+                            Prestasi
+                        </a>
+                        <a href="{{ route('ketua.testimoni.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs {{ request()->routeIs('ketua.testimoni.*') ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                            Testimoni
+                        </a>
+                        <a href="{{ route('ketua.faq.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs {{ request()->routeIs('ketua.faq.*') ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3m.1 4h.01"/></svg>
+                            FAQ
+                        </a>
+                    </div>
+                </details>
+                <a href="{{ route('profile.edit') }}" aria-current="{{ request()->routeIs('profile.edit') ? 'page' : 'false' }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('profile.edit') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                    @if (request()->routeIs('profile.edit'))
+                        <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
+                    @endif
+                    <span class="text-base flex items-center justify-center w-4 h-4">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </span>
+                    Profile
+                </a>
+                <a href="{{ route('ketua.profil-ekskul.edit') }}" class="legacy-katalog-link relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.profil-ekskul.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     <span class="text-base flex items-center justify-center w-4 h-4">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                     </span>
                     Profil Ekskul
                 </a>
-                <a href="{{ route('ketua.prestasi.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.prestasi.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                <a href="{{ route('ketua.prestasi.index') }}" class="legacy-katalog-link relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.prestasi.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     <span class="text-base flex items-center justify-center w-4 h-4">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                     </span>
                     Prestasi
                 </a>
-                <a href="{{ route('ketua.testimoni.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.testimoni.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                <a href="{{ route('ketua.testimoni.index') }}" class="legacy-katalog-link relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.testimoni.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     <span class="text-base flex items-center justify-center w-4 h-4">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                     </span>
                     Testimoni
                 </a>
-                <a href="{{ route('ketua.faq.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.faq.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                <a href="{{ route('ketua.faq.index') }}" class="legacy-katalog-link relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.faq.*') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     <span class="text-base flex items-center justify-center w-4 h-4">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </span>
@@ -298,6 +403,8 @@
 
     @stack('scripts')
 
+    @include('partials.onboarding')
+
     <script>
         let sidebarTrigger = null;
 
@@ -319,6 +426,16 @@
 
         document.querySelectorAll('#sidebar-mobile a').forEach((link) => {
             link.addEventListener('click', closeSidebar);
+        });
+
+        document.querySelector('#sidebar-mobile nav')?.addEventListener('click', (event) => {
+            const summary = event.target.closest('summary');
+            const activeGroup = summary?.parentElement;
+            if (!(activeGroup instanceof HTMLDetailsElement)) return;
+
+            document.querySelectorAll('#sidebar-mobile nav details[open]').forEach((group) => {
+                if (group !== activeGroup) group.removeAttribute('open');
+            });
         });
 
         document.addEventListener('keydown', (event) => {

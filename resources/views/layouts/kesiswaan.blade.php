@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -8,28 +8,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif']
-                    },
-                    colors: {
-                        theme: { blue: '#2563EB', darkBlue: '#1D4ED8', yellow: '#FACC15', dark: '#0F172A', lightBg: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.theme-mode-head')
     <style>
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes blob { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(24px, -18px) scale(1.08); } 66% { transform: translate(-16px, 12px) scale(.94); } }
-        .animate-fade-up { animation: fadeUp .6s cubic-bezier(.22,1,.36,1) both; }
-        .animate-floaty { animation: floaty 5s ease-in-out infinite; }
-        .animate-blob { animation: blob 10s ease-in-out infinite; }
 
         /* Sidebar mobile selalu overlay, jangan dipaksa jadi relative (split layar) */
         #sidebar-mobile { position: fixed; }
@@ -72,7 +53,7 @@
                     </div>
                     <div>
                         <h1 class="font-extrabold text-sm tracking-tight text-slate-900 leading-none">SOUL</h1>
-                        <span class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Panel Kesiswaan</span>
+                        <span class="text-xs text-slate-400 font-semibold tracking-wider uppercase">Panel Kesiswaan</span>
                     </div>
                 </div>
                 <button onclick="closeSidebar()" class="w-8 h-8 rounded-full bg-slate-50 border border-sky-100 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors">
@@ -80,7 +61,7 @@
                 </button>
             </div>
 
-            <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-2 px-3">Menu Utama</div>
+            <div class="text-xs font-bold text-slate-400 tracking-wider uppercase mb-2 px-3">Menu Utama</div>
             <nav class="space-y-1.5">
                 <a href="{{ route('kesiswaan.dashboard') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('kesiswaan.dashboard') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if(request()->routeIs('kesiswaan.dashboard'))
@@ -134,7 +115,7 @@
                     <span class="text-base flex items-center justify-center w-4 h-4">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                     </span>
-                    Profile
+                    Profil
                 </a>
             </nav>
         </div>
@@ -147,7 +128,7 @@
                     </div>
                     <div class="text-left">
                         <h4 class="text-xs font-bold text-slate-800 leading-tight">{{ auth()->user()->username }}</h4>
-                        <p class="text-[10px] text-slate-400 font-medium">Staf Kesiswaan</p>
+                        <p class="text-xs text-slate-400 font-medium">Staf Kesiswaan</p>
                     </div>
                 </div>
                 <form action="{{ route('logout') }}" method="POST">

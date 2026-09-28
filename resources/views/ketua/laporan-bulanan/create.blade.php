@@ -13,7 +13,7 @@
 
     <!-- Form Card -->
     <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl space-y-5">
-        <form action="{{ route('ketua.laporan-bulanan.store') }}" method="POST">
+        <form action="{{ route('ketua.laporan-bulanan.store') }}" method="POST" class="space-y-4">
             @csrf
 
             <div class="mb-4 p-4 bg-sky-50/70 rounded-2xl border border-sky-100">
@@ -21,38 +21,38 @@
                 <p class="text-[11px] text-sky-600 mt-1">Laporan dibuat untuk <strong>{{ now()->translatedFormat('F Y') }}</strong> (bulan berjalan).</p>
             </div>
 
-            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+            <div class="p-4 bg-sky-50/60 rounded-2xl border border-sky-100">
                 <p class="text-[11px] text-sky-600 font-medium">Materi kegiatan akan digenerate otomatis berdasarkan data kegiatan yang tercatat di bulan tersebut.</p>
             </div>
 
             <div>
-                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tujuan Kegiatan</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">Tujuan Kegiatan</label>
                 <textarea name="tujuan" rows="4" placeholder="Contoh: Mengembangkan kemampuan bermain alat musik..."
                     class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('tujuan') }}</textarea>
             </div>
 
-            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+            <div class="p-4 bg-sky-50/60 rounded-2xl border border-sky-100">
                 <p class="text-[11px] text-sky-600 font-medium">Kehadiran peserta akan digenerate otomatis berdasarkan data presensi kegiatan bulan tersebut.</p>
             </div>
 
-            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+            <div class="p-4 bg-sky-50/60 rounded-2xl border border-sky-100">
                 <p class="text-[11px] text-sky-600 font-medium">Dokumentasi akan diambil otomatis dari dokumentasi kegiatan di bulan tersebut.</p>
             </div>
 
             <div>
-                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Evaluasi - Keberhasilan</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">Evaluasi - Keberhasilan</label>
                 <textarea name="evaluasi_keberhasilan" rows="3" placeholder="Contoh: Siswa telah mampu bermain bersama dengan koordinasi yang baik..."
                     class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('evaluasi_keberhasilan') }}</textarea>
             </div>
 
             <div>
-                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Evaluasi - Kendala</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">Evaluasi - Kendala</label>
                 <textarea name="evaluasi_kendala" rows="3" placeholder="Contoh: Masih terdapat permasalahan dalam pengaturan sound..."
                     class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('evaluasi_kendala') }}</textarea>
             </div>
 
             <div>
-                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Evaluasi - Solusi / Tindak Lanjut</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">Evaluasi - Solusi / Tindak Lanjut</label>
                 <textarea name="evaluasi_solusi" rows="3" placeholder="Contoh: Akan dilaksanakan pelatihan dasar mengenai pengaturan sound..."
                     class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('evaluasi_solusi') }}</textarea>
             </div>

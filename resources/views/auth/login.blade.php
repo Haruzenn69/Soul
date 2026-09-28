@@ -357,6 +357,7 @@
             .accessibility-btn { width: 40px; height: 40px; bottom: 16px; left: 16px; }
         }
     </style>
+    @include('partials.theme-mode-head')
 </head>
 <body>
 
@@ -450,8 +451,8 @@
                     @csrf
 
                     <div class="form-group">
-                        <label class="form-label" for="email">Email<span class="required">*</span></label>
-                        <input class="form-control" id="email" type="text" name="email" value="{{ old('email') }}" placeholder="Masukkan email atau no. handphone" required autofocus>
+                        <label class="form-label" for="email">NIS / NIP<span class="required">*</span></label>
+                        <input class="form-control" id="email" type="text" name="email" value="{{ old('email') }}" placeholder="Masukkan NIS atau NIP" required autofocus>
                     </div>
 
                     <div class="form-group">

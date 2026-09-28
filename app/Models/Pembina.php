@@ -30,4 +30,9 @@ class Pembina extends Model
     {
         return $this->hasMany(Notifikasi::class);
     }
+
+    public function isProfileComplete(): bool
+    {
+        return filled($this->nama) && filled($this->jenis_kelamin);
+    }
 }

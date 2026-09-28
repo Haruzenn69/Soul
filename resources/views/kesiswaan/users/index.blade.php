@@ -5,13 +5,19 @@
 @section('content')
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h1 class="text-2xl font-extrabold text-theme-dark">Akun Pengguna</h1>
+            <h1 class="text-xl md:text-2xl font-extrabold text-theme-dark">Akun Pengguna</h1>
             <p class="text-xs text-gray-400 mt-1">Buat, ubah role, reset password, dan hapus akun. Password default: <span class="font-bold text-theme-dark">password</span></p>
         </div>
-        <a href="{{ route('kesiswaan.users.create') }}"
-           class="px-6 py-3 bg-theme-blue hover:bg-theme-darkBlue text-white font-bold text-xs rounded-full shadow-lg shadow-blue-500/20 transition flex items-center gap-2 shrink-0">
-            <span>+</span> Buat Akun
-        </a>
+        <div class="flex gap-2 shrink-0 items-center">
+            <a href="{{ route('kesiswaan.users.import-area') }}"
+               class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-full shadow-lg shadow-emerald-500/20 transition flex items-center gap-2">
+                <span>⬆</span> Import Excel
+            </a>
+            <a href="{{ route('kesiswaan.users.create') }}"
+               class="px-6 py-3 bg-theme-blue hover:bg-theme-darkBlue text-white font-bold text-xs rounded-full shadow-lg shadow-blue-500/20 transition flex items-center gap-2 shrink-0">
+                <span>+</span> Buat Akun
+            </a>
+        </div>
     </div>
 
     <!-- Filter -->
@@ -31,7 +37,7 @@
     <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm overflow-x-auto">
         <table class="card-table w-full text-left">
             <thead>
-                <tr class="text-[11px] font-bold text-gray-400 tracking-wider uppercase border-b border-gray-100">
+                <tr class="text-xs font-bold text-gray-400 tracking-wider uppercase border-b border-gray-100">
                     <th class="py-3 px-2">Pengguna</th>
                     <th class="py-3 px-2">Username</th>
                     <th class="py-3 px-2">Email</th>
@@ -45,7 +51,7 @@
                     <tr class="hover:bg-gray-50/60 transition text-xs">
                         <td class="py-3.5 px-2">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full {{ $user->role === 'pembina' ? 'bg-theme-blue' : ($user->role === 'kesiswaan' ? 'bg-theme-yellow' : 'bg-emerald-500') }} text-white font-bold flex items-center justify-center text-[10px] uppercase shrink-0">
+                                <div class="w-8 h-8 rounded-full {{ $user->role === 'pembina' ? 'bg-theme-blue' : ($user->role === 'kesiswaan' ? 'bg-theme-yellow' : 'bg-emerald-500') }} text-white font-bold flex items-center justify-center text-xs uppercase shrink-0">
                                     {{ substr($user->username, 0, 2) }}
                                 </div>
                                 <span class="font-bold">{{ $user->siswa?->nama ?? $user->pembina?->nama ?? '-' }}</span>
@@ -53,17 +59,19 @@
                         </td>
                         <td class="py-3.5 px-2 font-medium">{{ $user->username }}</td>
                         <td class="py-3.5 px-2 text-gray-500">{{ $user->email }}</td>
-                        <td class="py-3.5 px-2">
-                            <span class="px-3 py-1 rounded-full font-bold text-[11px]
+                        <td class="py-3.5 px-2 whitespace-nowrap">
+                            <div class="flex items-center gap-1.5">
+                                <span class="px-2.5 py-1 rounded-full font-bold text-xs
                                 {{ $user->role === 'admin' ? 'bg-purple-50 text-purple-600' : '' }}
                                 {{ $user->role === 'kesiswaan' ? 'bg-yellow-50 text-yellow-600' : '' }}
                                 {{ $user->role === 'pembina' ? 'bg-blue-50 text-theme-blue' : '' }}
                                 {{ $user->role === 'siswa' ? 'bg-emerald-50 text-emerald-600' : '' }}">
-                                {{ ucfirst($user->role) }}
-                            </span>
-                            @if ($user->role === 'siswa' && $user->siswa?->jabatan === 'ketua')
-                                <span class="ml-1 px-3 py-1 rounded-full font-bold text-[11px] bg-theme-dark text-theme-yellow">Ketua</span>
-                            @endif
+                                    {{ ucfirst($user->role) }}
+                                </span>
+                                @if ($user->role === 'siswa' && $user->siswa?->jabatan === 'ketua')
+                                    <span class="px-2.5 py-1 rounded-full font-bold text-xs bg-theme-dark text-theme-yellow">Ketua</span>
+                                @endif
+                            </div>
                         </td>
                         <td class="py-3.5 px-2 text-gray-400">
                             @if ($user->siswa)
@@ -77,7 +85,7 @@
                         <td class="py-3.5 px-2">
                             <div class="flex gap-2 justify-end items-center">
                                 @if ($user->role === 'admin' && auth()->user()->role !== 'admin')
-                                    <span class="text-[10px] text-gray-400 italic px-3 flex items-center gap-1.5">
+                                    <span class="text-xs text-gray-400 italic px-3 flex items-center gap-1.5">
                                         <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                             <rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>
                                         </svg>

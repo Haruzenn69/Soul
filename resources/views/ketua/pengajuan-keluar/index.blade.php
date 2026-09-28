@@ -34,15 +34,15 @@
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap max-w-xs truncate">{{ Str::limit($pengajuan->alasan, 30) }}</td>
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
                             @if($pengajuan->status === 'pending')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 border border-amber-200">Pending</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200">Pending</span>
                             @elseif($pengajuan->status === 'diterima')
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Diterima</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Diterima</span>
                             @else
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">Ditolak</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">Ditolak</span>
                             @endif
                         </td>
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
-                            <a href="{{ route('ketua.pengajuan-keluar.show', $pengajuan) }}" class="card-detail-link inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 font-semibold rounded-xl hover:from-sky-200 hover:to-blue-200 transition text-[10px] md:text-[11px]">Detail</a>
+                            <a href="{{ route('ketua.pengajuan-keluar.show', $pengajuan) }}" class="card-detail-link inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 font-semibold rounded-xl hover:from-sky-200 hover:to-blue-200 transition text-xs">Detail</a>
                         </td>
                     </tr>
                 @empty

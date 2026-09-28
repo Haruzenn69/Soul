@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers\Kesiswaan;
 
+use App\Exports\PembinaTemplateExport;
+use App\Exports\SiswaTemplateExport;
 use App\Http\Controllers\Controller;
+use App\Imports\PembinaImport;
+use App\Imports\SiswaImport;
 use App\Models\Ekskul;
 use App\Models\Kelas;
 use App\Models\Pembina;
@@ -15,6 +19,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\Failure;
 
 class UserController extends Controller
 {
@@ -36,6 +42,114 @@ class UserController extends Controller
             ->withQueryString();
 
         return view('kesiswaan.users.index', compact('users'));
+    }
+
+    public function templateSiswa()
+    {
+        return Excel::download(new SiswaTemplateExport, 'template-akun-siswa.xlsx');
+    }
+
+    public function templatePembina()
+    {
+        return Excel::download(new PembinaTemplateExport, 'template-akun-pembina.xlsx');
+    }
+
+    public function importPage(): View
+    {
+        $kelas = Kelas::with('tahunAjaran')->orderBy('nama')->get();
+
+        return view('kesiswaan.users.import', compact('kelas'));
+    }
+
+    public function import(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'jenis' => ['required', 'in:siswa,pembina'],
+            'kelas_id' => ['required_if:jenis,siswa', 'nullable', 'integer', 'exists:kelas,id'],
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv'],
+        ], [
+            'jenis.required' => 'Pilih jenis akun (siswa/pembina) terlebih dahulu.',
+            'kelas_id.required' => 'Pilih kelas untuk akun siswa.',
+            'kelas_id.exists' => 'Kelas yang dipilih tidak valid.',
+            'file.required' => 'File excel wajib diunggah.',
+            'file.mimes' => 'File harus berupa .xlsx, .xls, atau .csv.',
+        ]);
+
+        $import = $validated['jenis'] === 'siswa'
+            ? new SiswaImport((int) $validated['kelas_id'])
+            : new PembinaImport;
+
+        Excel::import($import, $request->file('file'));
+
+        $count = $import->getCount();
+        $jenis = $validated['jenis'] === 'siswa' ? 'siswa' : 'pembina';
+
+        $errors = collect($import->failures())
+            ->map(function (Failure $failure) use ($jenis) {
+                $messages = collect($failure->errors())->map(function (string $error) use ($jenis) {
+                    if (str_contains(strtolower($error), 'the nip field is required')) {
+                        return 'Kolom NIP kosong atau tidak ditemukan. Pastikan jenis akun Pembina dipilih dan gunakan template Pembina.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the nip field format is invalid')) {
+                        return 'NIP hanya boleh berisi angka. Periksa kembali kolom NIP pada file.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the nis field is required')) {
+                        return 'Kolom NIS kosong atau tidak ditemukan. Pastikan jenis akun Siswa dipilih dan gunakan template Siswa.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the nis field format is invalid')) {
+                        return 'NIS hanya boleh berisi angka. Periksa kembali kolom NIS pada file.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the nama field is required')) {
+                        return 'Kolom Nama wajib diisi.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the username field is required')) {
+                        return 'Kolom Username wajib diisi. Username digunakan untuk login dan harus berbeda dari NIP.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the username and nip must be different')) {
+                        return 'Username harus berbeda dari NIP. Isi username login pada kolom Username.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the jabatan field is required')) {
+                        return 'Kolom Jabatan wajib diisi dengan "siswa" atau "ketua".';
+                    }
+
+                    if (str_contains(strtolower($error), 'the jabatan field')) {
+                        return 'Jabatan tidak valid. Isi dengan "siswa" atau "ketua".';
+                    }
+
+                    return $error;
+                });
+
+                return 'Baris '.$failure->row().': '.$messages->implode(' ');
+            })
+            ->values()
+            ->all();
+
+        if ($count === 0) {
+            $message = 'Tidak ada akun yang berhasil diimport. Periksa kecocokan jenis akun dengan template dan lengkapi kolom yang ditandai di bawah.';
+
+            return back()
+                ->with('error', $message)
+                ->with('import_errors', $errors)
+                ->with('import_jenis', $jenis);
+        }
+
+        $message = "Berhasil import {$count} akun {$jenis}. Password default semua akun: password.";
+
+        if ($errors) {
+            $message .= ' Sebagian baris dilewati karena tidak valid:';
+        }
+
+        return back()
+            ->with('success', $message)
+            ->with('import_errors', $errors)
+            ->with('import_jenis', $jenis);
     }
 
     public function create(): View

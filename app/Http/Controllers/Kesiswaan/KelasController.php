@@ -8,6 +8,7 @@ use App\Models\TahunAjaran;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class KelasController extends Controller
@@ -86,8 +87,8 @@ class KelasController extends Controller
     private function validatedData(Request $request): array
     {
         return Validator::make($request->all(), [
-            'tingkat' => ['required', 'in:x,xi,xii'],
-            'jurusan' => ['required', 'in:rpl,tkj,dkv'],
+            'tingkat' => ['required', 'in:'.implode(',', array_keys(config('kelas.tingkat')))],
+            'jurusan' => ['required', Rule::in(array_keys(config('kelas.jurusan')))],
             'rombel' => ['required', 'integer', 'min:1'],
             'tahun_ajaran_id' => ['required', 'exists:tahun_ajarans,id'],
         ])->validate();

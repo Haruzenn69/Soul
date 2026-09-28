@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -7,28 +7,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif']
-                    },
-                    colors: {
-                        theme: { blue: '#2563EB', darkBlue: '#1D4ED8', yellow: '#FACC15', dark: '#0F172A', lightBg: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.theme-mode-head')
     <style>
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes blob { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(24px, -18px) scale(1.08); } 66% { transform: translate(-16px, 12px) scale(.94); } }
-        .animate-fade-up { animation: fadeUp .6s cubic-bezier(.22,1,.36,1) both; }
-        .animate-floaty { animation: floaty 5s ease-in-out infinite; }
-        .animate-blob { animation: blob 10s ease-in-out infinite; }
 
         /* Sidebar mobile selalu overlay, jangan dipaksa jadi relative (split layar) */
         #sidebar-mobile { position: fixed; }
@@ -50,11 +31,12 @@
         ['icon' => 'users', 'label' => 'Data Anggota', 'url' => route('pembina.anggota'), 'is' => 'pembina.anggota'],
         ['icon' => 'calendar', 'label' => 'Presensi', 'url' => route('pembina.presensi'), 'is' => 'pembina.presensi'],
         ['icon' => 'chat', 'label' => 'Testimoni & FAQ', 'url' => route('pembina.testimoni.index'), 'is' => 'pembina.testimoni.*'],
+        ['icon' => 'user', 'label' => 'Profil', 'url' => route('pembina.profile'), 'is' => 'pembina.profile'],
     ],
     'psMore' => [],
 ])
 
-    <!-- MOBILE SIDEBAR OVERLAY -->
+<!-- MOBILE SIDEBAR OVERLAY -->
     <div id="sidebar-overlay" class="hidden fixed inset-0 z-40 bg-slate-900/50 md:hidden" onclick="closeSidebar()"></div>
 
     <!-- MOBILE SIDEBAR -->
@@ -161,7 +143,7 @@
                     <span class="text-base flex items-center justify-center w-4 h-4">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                     </span>
-                    Profile
+                    Profil
                 </a>
             </nav>
         </div>
@@ -266,5 +248,7 @@
             document.body.classList.remove('overflow-hidden');
         }
     </script>
+
+    @include('partials.onboarding')
 </body>
 </html>

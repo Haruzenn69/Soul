@@ -15,8 +15,8 @@
             <!-- TEXT + CTA -->
             <div class="lg:col-span-3">
                 <div class="flex items-center gap-2 mb-3 flex-wrap">
-                    <span class="px-3 py-1 rounded-full bg-white/15 backdrop-blur border border-white/20 text-[10px] font-bold tracking-wide uppercase">Dashboard Kesiswaan</span>
-                    <span class="px-3 py-1 rounded-full bg-amber-300/30 backdrop-blur border border-amber-200/40 text-[10px] font-bold tracking-wide uppercase flex items-center gap-1.5">
+                    <span class="px-3 py-1 rounded-full bg-white/15 backdrop-blur border border-white/20 text-xs font-bold tracking-wide uppercase">Dashboard Kesiswaan</span>
+                    <span class="px-3 py-1 rounded-full bg-amber-300/30 backdrop-blur border border-amber-200/40 text-xs font-bold tracking-wide uppercase flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse"></span>
                         {{ $ekskulBuka }} Ekskul Buka
                     </span>
@@ -60,32 +60,32 @@
                 </div>
 
                 <!-- floating stat card overlapping bottom edge -->
-                <div class="absolute -bottom-10 left-3 right-3 grid grid-cols-3 gap-2 bg-white rounded-2xl shadow-xl shadow-sky-900/10 p-3">
+                <div class="absolute -bottom-10 left-3 right-3 z-10 grid grid-cols-3 gap-2 bg-white rounded-2xl shadow-xl shadow-sky-900/10 p-3">
                     <div class="text-center border-r border-slate-100 pr-1">
                         <p class="text-base font-extrabold text-sky-700 leading-none">{{ $totalUsers }}</p>
-                        <p class="text-[9px] text-slate-400 font-semibold mt-1">Akun</p>
+                        <p class="text-xs text-slate-400 font-semibold mt-1">Akun</p>
                     </div>
                     <div class="text-center border-r border-slate-100 px-1">
                         <p class="text-base font-extrabold text-amber-600 leading-none">{{ $totalSiswa }}</p>
-                        <p class="text-[9px] text-slate-400 font-semibold mt-1">Siswa</p>
+                        <p class="text-xs text-slate-400 font-semibold mt-1">Siswa</p>
                     </div>
                     <div class="text-center pl-1">
                         <p class="text-base font-extrabold text-sky-700 leading-none">{{ $totalEkskul }}</p>
-                        <p class="text-[9px] text-slate-400 font-semibold mt-1">Ekskul</p>
+                        <p class="text-xs text-slate-400 font-semibold mt-1">Ekskul</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="relative mt-6 pt-5 border-t border-white/15 grid grid-cols-3 gap-3">
+        <div class="relative mt-6 pt-5 border-t border-white/15 grid grid-cols-1 sm:grid-cols-3 gap-3">
             <a href="{{ route('kesiswaan.users.index') }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                 </div>
                 <div class="text-left">
                     <p class="text-xs font-bold leading-none">Akun</p>
-                    <p class="text-[10px] text-white/70 mt-1 leading-none">Kelola Pengguna</p>
+                    <p class="text-xs text-white/70 mt-1 leading-none">Kelola Pengguna</p>
                 </div>
             </a>
             <a href="{{ route('kesiswaan.ekskuls.index') }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
@@ -94,7 +94,7 @@
                 </div>
                 <div class="text-left">
                     <p class="text-xs font-bold leading-none">Ekskul</p>
-                    <p class="text-[10px] text-white/70 mt-1 leading-none">Data Ekskul</p>
+                    <p class="text-xs text-white/70 mt-1 leading-none">Data Ekskul</p>
                 </div>
             </a>
             <a href="{{ route('kesiswaan.kelas.index') }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
@@ -103,7 +103,7 @@
                 </div>
                 <div class="text-left">
                     <p class="text-xs font-bold leading-none">Kelas</p>
-                    <p class="text-[10px] text-white/70 mt-1 leading-none">Data Kelas</p>
+                    <p class="text-xs text-white/70 mt-1 leading-none">Data Kelas</p>
                 </div>
             </a>
         </div>
@@ -112,19 +112,19 @@
     {{-- STATS CARDS - MOBILE/TABLET --}}
     <div class="grid grid-cols-3 gap-3 lg:hidden">
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-3 md:p-5 shadow-md shadow-sky-100 animate-fade-up" style="animation-delay: .1s">
-            <p class="text-[8px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Akun Pengguna</p>
+            <p class="text-xs font-bold text-slate-400 tracking-wider uppercase">Akun Pengguna</p>
             <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $totalUsers }}</h3>
-            <p class="text-[9px] md:text-[11px] font-semibold text-sky-600 mt-0.5 md:mt-1">Semua role</p>
+            <p class="text-xs font-semibold text-sky-600 mt-0.5 md:mt-1">Semua role</p>
         </div>
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 to-yellow-50 border border-amber-200 p-3 md:p-5 shadow-md shadow-amber-100 animate-fade-up" style="animation-delay: .2s">
-            <p class="text-[8px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Siswa</p>
+            <p class="text-xs font-bold text-slate-400 tracking-wider uppercase">Siswa</p>
             <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-amber-600">{{ $totalSiswa }}</h3>
-            <p class="text-[9px] md:text-[11px] font-semibold text-amber-700 mt-0.5 md:mt-1">Terdaftar</p>
+            <p class="text-xs font-semibold text-amber-700 mt-0.5 md:mt-1">Terdaftar</p>
         </div>
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-3 md:p-5 shadow-md shadow-sky-100 animate-fade-up" style="animation-delay: .3s">
-            <p class="text-[8px] md:text-[10px] font-bold text-slate-400 tracking-wider uppercase">Ekskul</p>
+            <p class="text-xs font-bold text-slate-400 tracking-wider uppercase">Ekskul</p>
             <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $totalEkskul }}</h3>
-            <p class="text-[9px] md:text-[11px] font-semibold text-sky-600 mt-0.5 md:mt-1">{{ $ekskulBuka }} buka</p>
+            <p class="text-xs font-semibold text-sky-600 mt-0.5 md:mt-1">{{ $ekskulBuka }} buka</p>
         </div>
     </div>
 
@@ -133,9 +133,9 @@
         <div class="flex items-center justify-between">
             <div>
                 <h2 class="text-sm md:text-base font-extrabold text-slate-900 tracking-tight">Grafik Pembuatan</h2>
-                <p class="text-[10px] md:text-xs text-slate-500 font-medium mt-0.5">Tren 6 bulan terakhir</p>
+                <p class="text-xs text-slate-500 font-medium mt-0.5">Tren 6 bulan terakhir</p>
             </div>
-            <span class="text-[10px] md:text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3 py-1.5 rounded-lg hidden sm:inline-flex items-center gap-1.5">
+            <span class="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3 py-1.5 rounded-lg hidden sm:inline-flex items-center gap-1.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span> Live dari database
             </span>
         </div>
@@ -146,7 +146,7 @@
                 <div class="flex items-center justify-between mb-3 md:mb-4">
                     <div>
                         <h3 class="text-xs md:text-sm font-extrabold text-slate-900">Pembuatan Akun</h3>
-                        <p class="text-[10px] md:text-[11px] text-slate-400 font-medium mt-0.5">Semua role pengguna</p>
+                        <p class="text-xs text-slate-400 font-medium mt-0.5">Semua role pengguna</p>
                     </div>
                     <span class="text-2xl md:text-3xl font-extrabold text-sky-600">{{ $totalUsers }}</span>
                 </div>
@@ -161,7 +161,7 @@
                     <div class="flex items-center justify-between mb-2 md:mb-3">
                         <div>
                             <h3 class="text-xs md:text-sm font-extrabold text-slate-900">Pembuatan Kelas</h3>
-                            <p class="text-[10px] md:text-[11px] text-slate-400 font-medium mt-0.5">Semua tingkat</p>
+                            <p class="text-xs text-slate-400 font-medium mt-0.5">Semua tingkat</p>
                         </div>
                         <span class="text-xl md:text-2xl font-extrabold text-amber-500">{{ $totalKelas }}</span>
                     </div>
@@ -175,7 +175,7 @@
                     <div class="flex items-center justify-between mb-2 md:mb-3">
                         <div>
                             <h3 class="text-xs md:text-sm font-extrabold text-slate-900">Pembuatan Ekskul</h3>
-                            <p class="text-[10px] md:text-[11px] text-slate-400 font-medium mt-0.5">Ekstrakurikuler</p>
+                            <p class="text-xs text-slate-400 font-medium mt-0.5">Ekstrakurikuler</p>
                         </div>
                         <span class="text-xl md:text-2xl font-extrabold text-emerald-500">{{ $totalEkskul }}</span>
                     </div>
@@ -191,13 +191,13 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3 md:mb-4">
                 <div>
                     <h3 class="text-xs md:text-sm font-extrabold text-slate-900">Status Pendaftaran Ekskul</h3>
-                    <p class="text-[10px] md:text-[11px] text-slate-400 font-medium mt-0.5">Ekskul mana yang sedang membuka atau menutup pendaftaran</p>
+                    <p class="text-xs text-slate-400 font-medium mt-0.5">Ekskul mana yang sedang membuka atau menutup pendaftaran</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {{ $ekskulStatus->get(1, 0) }} Terbuka
                     </span>
-                    <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg">
                         <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> {{ $ekskulStatus->get(0, 0) }} Tertutup
                     </span>
                 </div>
@@ -219,11 +219,11 @@
                     <ul class="space-y-2">
                         @forelse($ekskulBukaList as $ekskul)
                             <li class="flex items-center justify-between gap-2 bg-white rounded-lg border border-emerald-100 px-3 py-2">
-                                <span class="truncate text-[11px] md:text-xs font-semibold text-slate-700">{{ $ekskul->nama_ekskul }}</span>
-                                <span class="shrink-0 text-[9px] md:text-[10px] font-bold text-emerald-600 bg-emerald-100/80 px-2 py-0.5 rounded-full">Terbuka</span>
+                                <span class="truncate text-xs font-semibold text-slate-700">{{ $ekskul->nama_ekskul }}</span>
+                                <span class="shrink-0 text-xs font-bold text-emerald-600 bg-emerald-100/80 px-2 py-0.5 rounded-full">Terbuka</span>
                             </li>
                         @empty
-                            <li class="text-[11px] text-slate-400 font-medium py-2">Belum ada ekskul yang membuka pendaftaran.</li>
+                            <li class="text-xs text-slate-400 font-medium py-2">Belum ada ekskul yang membuka pendaftaran.</li>
                         @endforelse
                     </ul>
                 </div>
@@ -240,11 +240,11 @@
                     <ul class="space-y-2">
                         @forelse($ekskulTutupList as $ekskul)
                             <li class="flex items-center justify-between gap-2 bg-white rounded-lg border border-slate-200 px-3 py-2">
-                                <span class="truncate text-[11px] md:text-xs font-semibold text-slate-600">{{ $ekskul->nama_ekskul }}</span>
-                                <span class="shrink-0 text-[9px] md:text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Tertutup</span>
+                                <span class="truncate text-xs font-semibold text-slate-600">{{ $ekskul->nama_ekskul }}</span>
+                                <span class="shrink-0 text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Tertutup</span>
                             </li>
                         @empty
-                            <li class="text-[11px] text-slate-400 font-medium py-2">Belum ada ekskul yang menutup pendaftaran.</li>
+                            <li class="text-xs text-slate-400 font-medium py-2">Belum ada ekskul yang menutup pendaftaran.</li>
                         @endforelse
                     </ul>
                 </div>
@@ -263,9 +263,9 @@
                 <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
                     <div>
                         <h2 class="text-sm font-extrabold text-slate-900">Kelola Akun Pengguna</h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Buat akun, atur peranan, dan reset kata sandi</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Buat akun, atur peranan, dan reset kata sandi</p>
                     </div>
-                    <span class="text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">{{ $totalUsers }} Akun</span>
+                    <span class="text-xs font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">{{ $totalUsers }} Akun</span>
                 </div>
 
                 <div class="p-6">
@@ -293,7 +293,7 @@
                                 </svg>
                                 <div>
                                     <p class="text-lg font-extrabold leading-none">{{ $totalUsers }}</p>
-                                    <p class="text-[10px] text-amber-200 font-semibold">Total Akun</p>
+                                    <p class="text-xs text-amber-200 font-semibold">Total Akun</p>
                                 </div>
                             </div>
                         </div>
@@ -311,7 +311,7 @@
                     </div>
 
                     <div class="mt-4 p-4 rounded-2xl border border-dashed border-sky-200 text-center bg-sky-50/50">
-                        <p class="text-[11px] text-slate-500 leading-relaxed">Akun baru dibuat dengan kata sandi default <span class="font-bold text-slate-700">"password"</span> yang bisa di-reset dari halaman daftar akun.</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Akun baru dibuat dengan kata sandi default <span class="font-bold text-slate-700">"password"</span> yang bisa di-reset dari halaman daftar akun.</p>
                     </div>
                 </div>
             </div>
@@ -321,9 +321,9 @@
                 <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
                     <div>
                         <h2 class="text-sm font-extrabold text-slate-900">Modul Pengelolaan</h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Akses cepat ke seluruh data master</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Akses cepat ke seluruh data master</p>
                     </div>
-                    <span class="text-[11px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-3 py-1.5 rounded-full">{{ $ekskulBuka }} Buka Pendaftaran</span>
+                    <span class="text-xs font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-3 py-1.5 rounded-full">{{ $ekskulBuka }} Buka Pendaftaran</span>
                 </div>
 
                 <div class="p-5">
@@ -334,10 +334,10 @@
                             </div>
                             <div class="min-w-0">
                                 <h4 class="text-xs font-bold text-slate-800">Data Ekskul</h4>
-                                <p class="text-[10px] text-slate-400 mt-0.5">Pengaturan data ekstrakurikuler beserta penetapan pembina</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Pengaturan data ekstrakurikuler beserta penetapan pembina</p>
                             </div>
                         </div>
-                        <span class="px-2.5 py-1 bg-sky-50 border border-sky-100 text-sky-600 text-[10px] font-bold rounded-full shrink-0">{{ $totalEkskul }} Ekskul</span>
+                        <span class="px-2.5 py-1 bg-sky-50 border border-sky-100 text-sky-600 text-xs font-bold rounded-full shrink-0">{{ $totalEkskul }} Ekskul</span>
                     </a>
                     <a href="{{ route('kesiswaan.kelas.index') }}" class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-xl flex items-center justify-between mb-2.5 border border-amber-100 gap-3 hover:border-amber-200 hover:shadow-sm transition">
                         <div class="flex items-center gap-3 min-w-0">
@@ -346,10 +346,10 @@
                             </div>
                             <div class="min-w-0">
                                 <h4 class="text-xs font-bold text-slate-800">Data Kelas</h4>
-                                <p class="text-[10px] text-slate-400 mt-0.5">Manajemen daftar kelas berdasarkan tingkat dan periode tahun ajaran</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Manajemen daftar kelas berdasarkan tingkat dan periode tahun ajaran</p>
                             </div>
                         </div>
-                        <span class="px-2.5 py-1 bg-amber-50 border border-amber-100 text-amber-600 text-[10px] font-bold rounded-full shrink-0">{{ $totalKelas }} Kelas</span>
+                        <span class="px-2.5 py-1 bg-amber-50 border border-amber-100 text-amber-600 text-xs font-bold rounded-full shrink-0">{{ $totalKelas }} Kelas</span>
                     </a>
                 </div>
             </div>
@@ -363,7 +363,7 @@
                 <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
                     <div>
                         <h2 class="text-sm font-extrabold text-slate-900">Ringkasan</h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Statistik data sekolah</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Statistik data sekolah</p>
                     </div>
                     <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center shadow-md shadow-sky-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -375,16 +375,16 @@
                 <div class="p-5">
                     <div class="grid grid-cols-3 gap-2">
                         <div class="rounded-2xl bg-gradient-to-br from-sky-50 to-white border border-sky-100 p-3 text-center">
-                            <p class="text-xl font-extrabold text-sky-700 leading-none">{{ $totalUsers }}</p>
-                            <p class="text-[9px] text-slate-400 font-semibold mt-1.5">Akun</p>
+                            <p class="text-xl md:text-2xl font-extrabold text-sky-700 leading-none">{{ $totalUsers }}</p>
+                            <p class="text-xs text-slate-400 font-semibold mt-1.5">Akun</p>
                         </div>
                         <div class="rounded-2xl bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 p-3 text-center">
-                            <p class="text-xl font-extrabold text-emerald-600 leading-none">{{ $totalSiswa }}</p>
-                            <p class="text-[9px] text-slate-400 font-semibold mt-1.5">Siswa</p>
+                            <p class="text-xl md:text-2xl font-extrabold text-emerald-600 leading-none">{{ $totalSiswa }}</p>
+                            <p class="text-xs text-slate-400 font-semibold mt-1.5">Siswa</p>
                         </div>
                         <div class="rounded-2xl bg-gradient-to-br from-amber-50 to-white border border-amber-100 p-3 text-center">
-                            <p class="text-xl font-extrabold text-amber-600 leading-none">{{ $totalEkskul }}</p>
-                            <p class="text-[9px] text-slate-400 font-semibold mt-1.5">Ekskul</p>
+                            <p class="text-xl md:text-2xl font-extrabold text-amber-600 leading-none">{{ $totalEkskul }}</p>
+                            <p class="text-xs text-slate-400 font-semibold mt-1.5">Ekskul</p>
                         </div>
                     </div>
 
@@ -395,7 +395,7 @@
                             </span>
                             <div>
                                 <p class="text-xs font-bold text-slate-700">Ekskul Buka Pendaftaran</p>
-                                <p class="text-[10px] text-slate-400">{{ $ekskulBuka }} dari {{ $totalEkskul }} ekskul</p>
+                                <p class="text-xs text-slate-400">{{ $ekskulBuka }} dari {{ $totalEkskul }} ekskul</p>
                             </div>
                         </div>
                         <span class="text-amber-600 text-sm" aria-hidden="true">→</span>
@@ -408,7 +408,7 @@
                 <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
                     <div>
                         <h2 class="text-sm font-extrabold text-slate-900">Informasi</h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Tips pengelolaan akun</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Tips pengelolaan akun</p>
                     </div>
                     <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 flex items-center justify-center shadow-md shadow-amber-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -422,13 +422,13 @@
                         <svg class="w-4 h-4 text-sky-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <p class="text-[11px] text-slate-600 leading-relaxed">Setiap akun baru memiliki kata sandi default <span class="font-bold text-slate-800">"password"</span>. Disarankan untuk segera diubah oleh pemilik akun.</p>
+                        <p class="text-xs text-slate-600 leading-relaxed">Setiap akun baru memiliki kata sandi default <span class="font-bold text-slate-800">"password"</span>. Disarankan untuk segera diubah oleh pemilik akun.</p>
                     </div>
                     <div class="rounded-xl border border-amber-100 bg-amber-50/70 p-3.5 flex items-start gap-3">
                         <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
-                        <p class="text-[11px] text-slate-600 leading-relaxed">Pastikan data ekskul, pembina, dan kelas sudah lengkap sebelum membuka pendaftaran.</p>
+                        <p class="text-xs text-slate-600 leading-relaxed">Pastikan data ekskul, pembina, dan kelas sudah lengkap sebelum membuka pendaftaran.</p>
                     </div>
                 </div>
             </div>
@@ -452,6 +452,21 @@
         const kelasData  = @json($kelasPerBulan['data']);
         const ekskulData = @json($ekskulPerBulan['data']);
 
+        const dashboardCharts = [];
+
+        function getChartColors() {
+            const isDark = document.documentElement.classList.contains('dark-mode') || document.documentElement.classList.contains('dark');
+            return {
+                isDark: isDark,
+                gridColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(226, 232, 240, 0.6)',
+                tickColor: isDark ? '#94a3b8' : '#64748b',
+                tooltipBg: isDark ? '#1e293b' : '#0F172A',
+                pointBorderColor: isDark ? '#1e293b' : '#fff',
+            };
+        }
+
+        const themeColors = getChartColors();
+
         // --- GRAFIK AKUN (line + area gradient) ---
         const akunCanvas = document.getElementById('akunChart');
         if (akunCanvas) {
@@ -460,7 +475,7 @@
             gradient.addColorStop(0, 'rgba(56, 189, 248, 0.35)');
             gradient.addColorStop(1, 'rgba(56, 189, 248, 0)');
 
-            new Chart(ctx, {
+            const akunChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: akunLabels,
@@ -473,7 +488,7 @@
                         tension: 0.4,
                         borderWidth: 3,
                         pointBackgroundColor: '#2563EB',
-                        pointBorderColor: '#fff',
+                        pointBorderColor: themeColors.pointBorderColor,
                         pointBorderWidth: 2,
                         pointRadius: 4,
                         pointHoverRadius: 6,
@@ -487,7 +502,7 @@
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: '#0F172A',
+                            backgroundColor: themeColors.tooltipBg,
                             titleFont: { weight: 700 },
                             padding: 10,
                             cornerRadius: 10,
@@ -500,49 +515,53 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { precision: 0, stepSize: 1 },
-                            grid: { color: 'rgba(226, 232, 240, 0.6)', drawBorder: false }
+                            ticks: { precision: 0, stepSize: 1, color: themeColors.tickColor },
+                            grid: { color: themeColors.gridColor, drawBorder: false }
                         },
                         x: {
                             grid: { display: false },
-                            ticks: { maxRotation: 0, autoSkip: true }
+                            ticks: { maxRotation: 0, autoSkip: true, color: themeColors.tickColor }
                         }
                     }
                 }
             });
+            dashboardCharts.push(akunChart);
         }
 
-        const barOptions = (color) => ({
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: anim,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: '#0F172A',
-                    titleFont: { weight: 700 },
-                    padding: 10,
-                    cornerRadius: 10,
-                    displayColors: false,
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { precision: 0, stepSize: 1, font: { size: 10 } },
-                    grid: { color: 'rgba(226, 232, 240, 0.6)', drawBorder: false }
+        const barOptions = (color) => {
+            const c = getChartColors();
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: anim,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: c.tooltipBg,
+                        titleFont: { weight: 700 },
+                        padding: 10,
+                        cornerRadius: 10,
+                        displayColors: false,
+                    }
                 },
-                x: {
-                    grid: { display: false },
-                    ticks: { font: { size: 10 }, maxRotation: 0, autoSkip: true }
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0, stepSize: 1, font: { size: 10 }, color: c.tickColor },
+                        grid: { color: c.gridColor, drawBorder: false }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 10 }, maxRotation: 0, autoSkip: true, color: c.tickColor }
+                    }
                 }
-            }
-        });
+            };
+        };
 
         // --- GRAFIK KELAS (bar) ---
         const kelasCanvas = document.getElementById('kelasChart');
         if (kelasCanvas) {
-            new Chart(kelasCanvas.getContext('2d'), {
+            const kelasChart = new Chart(kelasCanvas.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: akunLabels,
@@ -557,12 +576,13 @@
                 },
                 options: barOptions('#FACC15')
             });
+            dashboardCharts.push(kelasChart);
         }
 
         // --- GRAFIK EKSUL (bar emerald) ---
         const ekskulCanvas = document.getElementById('ekskulChart');
         if (ekskulCanvas) {
-            new Chart(ekskulCanvas.getContext('2d'), {
+            const ekskulChart = new Chart(ekskulCanvas.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: akunLabels,
@@ -577,7 +597,28 @@
                 },
                 options: barOptions('#34D399')
             });
+            dashboardCharts.push(ekskulChart);
         }
+
+        function updateChartThemes() {
+            const c = getChartColors();
+            dashboardCharts.forEach(chart => {
+                if (!chart) return;
+                if (chart.options.scales?.y) {
+                    if (chart.options.scales.y.grid) chart.options.scales.y.grid.color = c.gridColor;
+                    if (chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = c.tickColor;
+                }
+                if (chart.options.scales?.x) {
+                    if (chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = c.tickColor;
+                }
+                if (chart.options.plugins?.tooltip) {
+                    chart.options.plugins.tooltip.backgroundColor = c.tooltipBg;
+                }
+                chart.update('none');
+            });
+        }
+
+        window.addEventListener('soul-theme-change', updateChartThemes);
     });
 </script>
 @endsection

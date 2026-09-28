@@ -35,7 +35,7 @@
             <div class="mb-4">
                 <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama Ekskul <span class="text-rose-500">*</span></label>
                 <input type="text" name="nama_ekskul" value="{{ old('nama_ekskul', $ekskul->nama_ekskul) }}" required
-                    class="w-full px-4 py-2.5 rounded-2xl bg-sky-50/50 border border-sky-100 text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                        class="soul-field">
                 @error('nama_ekskul') <p class="text-rose-500 text-[10px] mt-1">{{ $message }}</p> @enderror
             </div>
 
@@ -71,7 +71,7 @@
                         <img src="{{ asset('storage/' . $ekskul->logo) }}" alt="Logo" class="w-20 h-20 object-contain rounded-2xl border border-sky-100 bg-sky-50 mb-2">
                     @endif
                     <input type="file" name="logo" accept="image/*"
-                        class="w-full px-4 py-2.5 rounded-2xl bg-sky-50/50 border border-sky-100 text-xs focus:outline-none focus:bg-white focus:border-sky-400 transition file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-sky-100 file:text-sky-700 hover:file:bg-sky-200">
+                        class="soul-file-input">
                     @error('logo') <p class="text-rose-500 text-[10px] mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -81,7 +81,7 @@
                         <img src="{{ asset('storage/' . $ekskul->cover) }}" alt="Cover" class="w-32 h-20 object-cover rounded-2xl border border-sky-100 mb-2">
                     @endif
                     <input type="file" name="cover" accept="image/*"
-                        class="w-full px-4 py-2.5 rounded-2xl bg-sky-50/50 border border-sky-100 text-xs focus:outline-none focus:bg-white focus:border-sky-400 transition file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-sky-100 file:text-sky-700 hover:file:bg-sky-200">
+                        class="soul-file-input">
                     @error('cover') <p class="text-rose-500 text-[10px] mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -92,7 +92,7 @@
         </form>
     </div>
 
-    <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl">
+        <div class="soul-card p-5 md:p-6 max-w-2xl">
         <div class="mb-4 flex justify-between items-center">
             <div>
                 <h3 class="text-sm font-bold text-slate-800">Galeri Momen</h3>
@@ -128,9 +128,9 @@
             @csrf
             <label class="block text-xs font-bold text-slate-700 mb-1">Tambah Foto</label>
             <input type="file" name="foto[]" multiple accept="image/*" required
-                class="w-full px-4 py-2.5 rounded-2xl bg-sky-50/50 border border-sky-100 text-xs focus:outline-none focus:bg-white focus:border-sky-400 transition file:mr-3 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-sky-100 file:text-sky-700 hover:file:bg-sky-200">
+                class="soul-file-input">
             <input type="text" name="caption" placeholder="Keterangan foto (opsional)"
-                class="w-full px-4 py-2.5 rounded-2xl bg-sky-50/50 border border-sky-100 text-xs focus:outline-none focus:bg-white focus:border-sky-400 transition">
+                class="soul-field">
             @error('foto') <p class="text-rose-500 text-[10px] mt-1">{{ $message }}</p> @enderror
             <button type="submit" class="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl transition">Upload Foto</button>
         </form>
