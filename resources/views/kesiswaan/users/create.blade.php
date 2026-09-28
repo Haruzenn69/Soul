@@ -66,8 +66,9 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">NIS</label>
-                    <input type="text" name="nis" value="{{ old('nis') }}"
+                    <input type="text" name="nis" value="{{ old('nis') }}" inputmode="numeric" maxlength="10"
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
+                    <p class="text-[10px] text-gray-400 mt-1">Harus tepat 10 angka.</p>
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>
@@ -132,8 +133,9 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">NIP</label>
-                    <input type="text" name="nip" value="{{ old('nip') }}"
+                    <input type="text" name="nip" value="{{ old('nip') }}" inputmode="numeric" maxlength="18"
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
+                    <p class="text-[10px] text-gray-400 mt-1">Harus tepat 18 angka.</p>
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>

@@ -92,7 +92,11 @@ class UserController extends Controller
                     }
 
                     if (str_contains(strtolower($error), 'the nip field format is invalid')) {
-                        return 'NIP hanya boleh berisi angka. Periksa kembali kolom NIP pada file.';
+                        return 'Periksa kolom NIP pada file. NIP harus terdiri dari tepat 18 angka.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the nip field must be 18 digits')) {
+                        return 'Periksa kolom NIP pada file. NIP harus terdiri dari tepat 18 angka.';
                     }
 
                     if (str_contains(strtolower($error), 'the nis field is required')) {
@@ -100,7 +104,11 @@ class UserController extends Controller
                     }
 
                     if (str_contains(strtolower($error), 'the nis field format is invalid')) {
-                        return 'NIS hanya boleh berisi angka. Periksa kembali kolom NIS pada file.';
+                        return 'Periksa kolom NIS pada file. NIS harus terdiri dari tepat 10 angka.';
+                    }
+
+                    if (str_contains(strtolower($error), 'the nis field must be 10 digits')) {
+                        return 'Periksa kolom NIS pada file. NIS harus terdiri dari tepat 10 angka.';
                     }
 
                     if (str_contains(strtolower($error), 'the nama field is required')) {
@@ -171,7 +179,7 @@ class UserController extends Controller
 
         if ($request->input('role') === 'siswa') {
             $rules += [
-                'nis' => ['required', 'string', 'max:255', 'unique:siswas,nis'],
+                'nis' => ['required', 'string', 'digits:10', 'unique:siswas,nis'],
                 'nama' => ['required', 'string', 'max:255'],
                 'kelas_id' => ['required', 'exists:kelas,id'],
                 'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
@@ -182,13 +190,16 @@ class UserController extends Controller
             }
         } elseif ($request->input('role') === 'pembina') {
             $rules += [
-                'nip' => ['required', 'string', 'max:255', 'unique:pembinas,nip'],
+                'nip' => ['required', 'string', 'digits:18', 'unique:pembinas,nip'],
                 'pembina_nama' => ['required', 'string', 'max:255'],
                 'pembina_jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
             ];
         }
 
-        $data = $request->validate($rules);
+        $data = $request->validate($rules, [
+            'nis.digits' => 'Periksa NIS. NIS harus terdiri dari tepat 10 angka.',
+            'nip.digits' => 'Periksa NIP. NIP harus terdiri dari tepat 18 angka.',
+        ]);
 
         $user = DB::transaction(function () use ($data) {
             if ($data['role'] === 'siswa' && $data['jabatan'] === 'ketua') {
@@ -262,7 +273,7 @@ class UserController extends Controller
         if ($request->input('role') === 'siswa') {
             $nisIgnore = $user->siswa ? ','.$user->siswa->id : '';
             $rules += [
-                'nis' => ['required', 'string', 'max:255', 'unique:siswas,nis'.$nisIgnore],
+                'nis' => ['required', 'string', 'digits:10', 'unique:siswas,nis'.$nisIgnore],
                 'nama' => ['required', 'string', 'max:255'],
                 'kelas_id' => ['required', 'exists:kelas,id'],
                 'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
@@ -274,13 +285,16 @@ class UserController extends Controller
         } elseif ($request->input('role') === 'pembina') {
             $nipIgnore = $user->pembina ? ','.$user->pembina->id : '';
             $rules += [
-                'nip' => ['required', 'string', 'max:255', 'unique:pembinas,nip'.$nipIgnore],
+                'nip' => ['required', 'string', 'digits:18', 'unique:pembinas,nip'.$nipIgnore],
                 'pembina_nama' => ['required', 'string', 'max:255'],
                 'pembina_jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
             ];
         }
 
-        $data = $request->validate($rules);
+        $data = $request->validate($rules, [
+            'nis.digits' => 'Periksa NIS. NIS harus terdiri dari tepat 10 angka.',
+            'nip.digits' => 'Periksa NIP. NIP harus terdiri dari tepat 18 angka.',
+        ]);
 
         DB::transaction(function () use ($user, $data) {
             $existingSiswa = $user->siswa;

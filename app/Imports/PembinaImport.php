@@ -26,7 +26,7 @@ class PembinaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHead
             'nip' => [
                 'required',
                 'string',
-                'regex:/^\\d+$/',
+                'digits:18',
                 function (string $attribute, $value, $fail): void {
                     $nip = trim((string) $value);
 
