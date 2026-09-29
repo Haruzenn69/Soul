@@ -66,10 +66,10 @@
             <h2 class="text-sm font-extrabold text-slate-900">Data Siswa</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">NIS</label>
-                    <input type="text" name="nis" value="{{ old('nis', $user->siswa?->nis) }}" inputmode="numeric" maxlength="10"
-                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
-                    <p class="text-[10px] text-slate-400 mt-1">Harus tepat 10 angka.</p>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">NIS</label>
+                    <input type="text" name="nis" value="{{ old('nis', $user->siswa?->nis) }}"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
+                    <p class="text-[10px] text-gray-400 mt-1">Harus tepat 10 angka.</p>
                 </div>
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>
@@ -187,10 +187,10 @@
             <h2 class="text-sm font-extrabold text-slate-900">Data Pembina</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">NIP</label>
-                    <input type="text" name="nip" value="{{ old('nip', $user->pembina?->nip) }}" inputmode="numeric" maxlength="18"
-                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
-                    <p class="text-[10px] text-slate-400 mt-1">Harus tepat 18 angka.</p>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">NIP</label>
+                    <input type="text" name="nip" value="{{ old('nip', $user->pembina?->nip) }}"
+                           class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
+                    <p class="text-[10px] text-gray-400 mt-1">Harus tepat 18 angka.</p>
                 </div>
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>
