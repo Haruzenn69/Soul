@@ -26,7 +26,6 @@
         }
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @include('partials.theme-mode-head')
 </head>
 <body class="bg-bg fg-fg antialiased">
 

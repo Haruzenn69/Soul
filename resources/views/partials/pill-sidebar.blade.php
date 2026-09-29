@@ -112,8 +112,8 @@
     }
 
     .ps-blob { position: absolute; border-radius: 50%; filter: blur(38px); pointer-events: none; }
-    .ps-blob-1 { top: -40px; right: -40px; width: 170px; height: 170px; background: rgba(186, 230, 253, .55); }
-    .ps-blob-2 { bottom: 20px; left: -50px; width: 150px; height: 150px; background: rgba(254, 240, 199, .6); }
+    .ps-blob-1 { top: -40px; right: -40px; width: 170px; height: 170px; background: rgba(241, 245, 249, .9); }
+    .ps-blob-2 { bottom: 20px; left: -50px; width: 150px; height: 150px; background: rgba(248, 250, 252, .9); }
 
     .ps-toggle {
         position: absolute;
@@ -155,7 +155,7 @@
         height: 42px;
         flex-shrink: 0;
         border-radius: 16px;
-        background: linear-gradient(135deg, #38bdf8, #3b82f6);
+        background: #3b82f6;
         color: #fff;
         font-weight: 800;
         font-size: 13px;
@@ -272,7 +272,7 @@
     }
     body.ps-collapsed .ps-group[open] summary {
         border-radius: 12px;
-        background: linear-gradient(to right, #e0f2fe, #dbeafe);
+        background: #e0f2fe;
         color: #075985;
         box-shadow: 0 1px 2px rgba(186, 230, 253, .65);
     }
@@ -320,7 +320,7 @@
     .ps-item:focus-visible { outline: 2px solid rgba(56, 189, 248, .6); outline-offset: 2px; }
     .ps-item.ps-active,
     .ps-item[aria-current="page"] {
-        background: linear-gradient(to right, #e0f2fe, #dbeafe);
+        background: #e0f2fe;
         color: #075985;
         font-weight: 600;
         box-shadow: 0 1px 2px rgba(186, 230, 253, .65);
@@ -334,7 +334,7 @@
         width: 4px;
         height: 24px;
         border-radius: 0 9999px 9999px 0;
-        background: linear-gradient(to bottom, #38bdf8, #3b82f6);
+        background: #3b82f6;
     }
     body.ps-collapsed .ps-item { justify-content: center; padding: 10px 0; }
     body.ps-collapsed .ps-item:hover { transform: none; }
@@ -394,7 +394,7 @@
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        background: #f59e0b;
         box-shadow: 0 0 0 2px #fff, 0 2px 6px rgba(245, 158, 11, .5);
     }
 
@@ -465,7 +465,7 @@
         gap: 4px;
         padding: 6px;
         border-radius: 16px;
-        background: linear-gradient(to right, #f0f9ff, #fffbeb);
+        background: #f8fafc;
         border: 1px solid #e0f2fe;
         box-shadow: 0 1px 3px rgba(186, 230, 253, .6);
         position: relative;
@@ -488,7 +488,7 @@
         height: 36px;
         flex-shrink: 0;
         border-radius: 9999px;
-        background: linear-gradient(135deg, #fcd34d, #facc15);
+        background: #facc15;
         color: #78350f;
         font-weight: 800;
         font-size: 12px;
@@ -682,13 +682,13 @@
     <div id="sidebar-overlay" class="hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-[2px] md:hidden" onclick="closeSidebar()"></div>
     <aside id="sidebar-mobile" class="hidden fixed inset-y-0 left-0 z-50 flex w-[min(21rem,88vw)] flex-col overflow-hidden border-r border-sky-100 bg-white p-4 shadow-2xl md:hidden" aria-label="Menu navigasi Siswa">
         <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
-            <div class="absolute -top-24 -right-16 h-64 w-64 rounded-full bg-sky-100/80 blur-3xl"></div>
-            <div class="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-amber-100/80 blur-3xl"></div>
+            <div class="absolute -top-24 -right-16 h-64 w-64 rounded-full bg-slate-100/80 blur-3xl"></div>
+            <div class="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-slate-100/80 blur-3xl"></div>
         </div>
         <div class="relative flex h-full min-h-0 flex-col overflow-y-auto">
             <div class="mb-6 mt-1 flex items-center justify-between px-2">
                 <a href="{{ $psDashboardUrl }}" class="flex min-w-0 items-center gap-3">
-                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-xs font-extrabold text-white shadow-lg shadow-sky-300">SOUL</span>
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-500 text-xs font-extrabold text-white shadow-lg shadow-sky-300">SOUL</span>
                     <span class="min-w-0">
                         <strong class="block text-sm font-extrabold leading-none tracking-tight text-slate-900">{{ $psLogoBrand ?? 'SOUL' }}</strong>
                         <small class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Panel Siswa</small>
@@ -712,7 +712,7 @@
                     @endphp
                     @if (isset($psMobileItem['children']))
                         <details class="group" {{ $psMobileActive ? 'open' : '' }}>
-                            <summary class="flex min-h-[42px] cursor-pointer list-none items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs {{ $psMobileActive ? 'bg-gradient-to-r from-sky-100 to-blue-100 font-semibold text-sky-800' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
+                            <summary class="flex min-h-[42px] cursor-pointer list-none items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs {{ $psMobileActive ? 'bg-sky-100 font-semibold text-sky-800' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
                                 <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg[$psMobileItem['icon']] ?? '' !!}</svg>
                                 <span>{{ $psMobileItem['label'] }}</span>
                                 <svg class="ml-auto h-4 w-4 shrink-0 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
@@ -728,9 +728,9 @@
                             </div>
                         </details>
                     @else
-                        <a href="{{ $psMobileItem['url'] }}" @if (($psMobileItem['label'] ?? null) === 'Nilai') data-ps-nilai @endif aria-current="{{ $psMobileActive ? 'page' : 'false' }}" class="relative flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs transition-all {{ $psMobileActive ? 'bg-gradient-to-r from-sky-100 to-blue-100 font-semibold text-sky-800 shadow-sm shadow-sky-100' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
+                        <a href="{{ $psMobileItem['url'] }}" @if (($psMobileItem['label'] ?? null) === 'Nilai') data-ps-nilai @endif aria-current="{{ $psMobileActive ? 'page' : 'false' }}" class="relative flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs transition-all {{ $psMobileActive ? 'bg-sky-100 font-semibold text-sky-800 shadow-sm shadow-sky-100' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
                             @if ($psMobileActive)
-                                <span class="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500" aria-hidden="true"></span>
+                                <span class="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-blue-500" aria-hidden="true"></span>
                             @endif
                             <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg[$psMobileItem['icon']] ?? '' !!}</svg>
                             <span>{{ $psMobileItem['label'] }}</span>
@@ -739,7 +739,7 @@
                 @endforeach
                 @foreach ($psMore ?? [] as $psMobileMore)
                     @php $psMobileMoreActive = isset($psMobileMore['is']) && request()->routeIs((array) $psMobileMore['is']); @endphp
-                    <a href="{{ $psMobileMore['url'] }}" aria-current="{{ $psMobileMoreActive ? 'page' : 'false' }}" class="flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs {{ $psMobileMoreActive ? 'bg-gradient-to-r from-sky-100 to-blue-100 font-semibold text-sky-800' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
+                    <a href="{{ $psMobileMore['url'] }}" aria-current="{{ $psMobileMoreActive ? 'page' : 'false' }}" class="flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs {{ $psMobileMoreActive ? 'bg-sky-100 font-semibold text-sky-800' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
                         <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg[$psMobileMore['icon'] ?? 'document'] ?? '' !!}</svg>
                         <span>{{ $psMobileMore['label'] }}</span>
                     </a>
@@ -751,9 +751,9 @@
             </nav>
 
             <div class="mt-auto pt-6">
-                <div class="flex items-center justify-between rounded-2xl border border-sky-100 bg-gradient-to-r from-sky-50 to-amber-50 p-3 shadow-sm">
+                <div class="flex items-center justify-between rounded-2xl border border-sky-100 bg-slate-50 p-3 shadow-sm">
                     <a href="{{ $psProfileUrl }}" class="flex min-w-0 items-center gap-2.5">
-                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 to-yellow-400 text-xs font-extrabold text-amber-900 shadow-md shadow-amber-200">{{ strtoupper(mb_substr($psNama, 0, 1)) }}</span>
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-300 text-xs font-extrabold text-amber-900 shadow-md shadow-amber-200">{{ strtoupper(mb_substr($psNama, 0, 1)) }}</span>
                         <span class="min-w-0 text-left">
                             <strong class="block truncate text-xs font-bold leading-tight text-slate-800">{{ $psNama }}</strong>
                             <small class="block truncate text-[10px] font-medium text-slate-400">{{ $psSubU }}</small>
@@ -842,10 +842,10 @@
         var a = document.createElement('a');
         a.href = url;
         a.setAttribute('data-ps-nilai', '1');
-        a.className = 'relative flex items-center gap-3 px-3.5 py-2.5 text-xs rounded-xl transition-all ' + (active ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 font-medium');
+        a.className = 'relative flex items-center gap-3 px-3.5 py-2.5 text-xs rounded-xl transition-all ' + (active ? 'bg-sky-100 text-sky-800 font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 font-medium');
         var html = '';
         if (active) {
-            html += '<span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>';
+            html += '<span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-blue-500"></span>';
         }
         html += '<span class="text-base flex items-center justify-center w-4 h-4"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2v2H9V5zm1 8l2 2 4-4"/></svg></span>';
         html += '<span>Nilai</span>';
