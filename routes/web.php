@@ -15,6 +15,7 @@ use App\Http\Controllers\Ketua\DashboardController as KetuaDashboardController;
 use App\Http\Controllers\Ketua\NotifikasiController as KetuaNotifikasiController;
 use App\Http\Controllers\LaporanBulananController;
 use App\Http\Controllers\NotifikasiController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\Pembina\FaqController as PembinaFaqController;
 use App\Http\Controllers\Pembina\NotifikasiController as PembinaNotifikasiController;
 use App\Http\Controllers\Pembina\PembinaController;
@@ -72,6 +73,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/onboarding/complete', [OnboardingController::class, 'complete'])->name('onboarding.complete');
+    Route::post('/onboarding/setup', [OnboardingController::class, 'setup'])->name('onboarding.setup');
 });
 
 Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('kesiswaan.')->group(function () {

@@ -11,11 +11,32 @@ class Siswa extends Model
     protected $fillable = [
         'user_id',
         'nis',
-        'nama',              // ← GANTI dari 'nama_lengkap' ke 'nama'
+        'foto',
+        'nama',
+        'tempat_lahir',
+        'tanggal_lahir',
+        'agama',
         'kelas_id',
+        'angkatan',
         'jenis_kelamin',
+        'email',
+        'no_telp',
+        'alamat',
+        'medsos',
         'jabatan',
     ];
+
+    public function getFotoUrlAttribute(): ?string
+    {
+        return $this->foto ? asset('storage/' . $this->foto) : null;
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'tanggal_lahir' => 'date',
+        ];
+    }
 
     public function user(): BelongsTo
     {

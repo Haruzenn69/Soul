@@ -1,125 +1,247 @@
 @extends('layouts.kesiswaan')
 
-@section('title', 'Akun Pengguna')
+@section('title', 'Kelola Akun Pengguna')
 
 @section('content')
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-            <h1 class="text-2xl font-extrabold text-theme-dark">Akun Pengguna</h1>
-            <p class="text-xs text-gray-400 mt-1">Buat, ubah role, reset password, dan hapus akun. Password default: <span class="font-bold text-theme-dark">password</span></p>
+<div class="space-y-5 animate-fade-up">
+
+    {{-- HERO CARD BIRU (STYLE SAMA DENGAN DASHBOARD KESISWAAN) --}}
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200">
+        {{-- Ambient blur circles --}}
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
+            <div class="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
         </div>
-        <div class="flex gap-2 shrink-0 items-center">
-            <a href="{{ route('kesiswaan.users.import-area') }}"
-               class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-full shadow-lg shadow-emerald-500/20 transition flex items-center gap-2">
-                <span>⬆</span> Import Excel
-            </a>
-            <a href="{{ route('kesiswaan.users.create') }}"
-               class="px-6 py-3 bg-theme-blue hover:bg-theme-darkBlue text-white font-bold text-xs rounded-full shadow-lg shadow-blue-500/20 transition flex items-center gap-2 shrink-0">
-                <span>+</span> Buat Akun
-            </a>
+
+        {{-- Header + CTA --}}
+        <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+               
+            
+                <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">
+                    Akun Pengguna
+                </h1>
+                <p class="text-xs text-white/80 mt-1.5 max-w-xl leading-relaxed">
+                    Kelola data pengguna, perbarui akun siswa, guru/pembina, dan staf sekolah melalui panel kesiswaan.
+                </p>
+            </div>
+
+            <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
+                <a href="{{ route('kesiswaan.users.import-area') }}"
+                   class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/20 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                    </svg>
+                    Import Excel
+                </a>
+                <a href="{{ route('kesiswaan.users.create') }}"
+                   class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Buat Akun
+                </a>
+            </div>
+        </div>
+
+        {{-- FILTER TABS DI DALAM CARD BIRU --}}
+        <div class="relative mt-6 pt-5 border-t border-white/15">
+            <div class="text-[11px] font-bold text-white/75 uppercase tracking-wider mb-2.5">
+                Filter Tampilan Akun:
+            </div>
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+                @php
+                    $activeRole = request('role');
+                    $currentQ = request('q');
+                    
+                    $tabAllUrl = route('kesiswaan.users.index', array_filter(['q' => $currentQ]));
+                    $tabSiswaUrl = route('kesiswaan.users.index', array_filter(['role' => 'siswa', 'q' => $currentQ]));
+                    $tabGuruUrl = route('kesiswaan.users.index', array_filter(['role' => 'pembina', 'q' => $currentQ]));
+                    $tabStaffUrl = route('kesiswaan.users.index', array_filter(['role' => 'staff', 'q' => $currentQ]));
+                @endphp
+
+                {{-- Tab: Semua --}}
+                <a href="{{ $tabAllUrl }}"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap {{ empty($activeRole) ? 'bg-white text-sky-700 shadow-md shadow-sky-900/15' : 'bg-white/10 backdrop-blur border border-white/20 text-white hover:bg-white/20' }}">
+                    <span>Semua Akun</span>
+                    <span class="px-2 py-0.5 rounded-full text-[11px] {{ empty($activeRole) ? 'bg-sky-100 text-sky-700 font-bold' : 'bg-white/15 text-white' }}">
+                        {{ $counts['all'] }}
+                    </span>
+                </a>
+
+                {{-- Tab: Siswa (Hanya Siswa) --}}
+                <a href="{{ $tabSiswaUrl }}"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap {{ $activeRole === 'siswa' ? 'bg-white text-sky-700 shadow-md shadow-sky-900/15' : 'bg-white/10 backdrop-blur border border-white/20 text-white hover:bg-white/20' }}">
+                    <span>Siswa</span>
+                    <span class="px-2 py-0.5 rounded-full text-[11px] {{ $activeRole === 'siswa' ? 'bg-sky-100 text-sky-700 font-bold' : 'bg-white/15 text-white' }}">
+                        {{ $counts['siswa'] }}
+                    </span>
+                </a>
+
+                {{-- Tab: Guru / Pembina (Hanya Guru) --}}
+                <a href="{{ $tabGuruUrl }}"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap {{ in_array($activeRole, ['pembina', 'guru']) ? 'bg-white text-sky-700 shadow-md shadow-sky-900/15' : 'bg-white/10 backdrop-blur border border-white/20 text-white hover:bg-white/20' }}">
+                    <span>Guru / Pembina</span>
+                    <span class="px-2 py-0.5 rounded-full text-[11px] {{ in_array($activeRole, ['pembina', 'guru']) ? 'bg-sky-100 text-sky-700 font-bold' : 'bg-white/15 text-white' }}">
+                        {{ $counts['guru'] }}
+                    </span>
+                </a>
+
+                {{-- Tab: Staf & Admin --}}
+                <a href="{{ $tabStaffUrl }}"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap {{ in_array($activeRole, ['staff', 'kesiswaan', 'admin']) ? 'bg-white text-sky-700 shadow-md shadow-sky-900/15' : 'bg-white/10 backdrop-blur border border-white/20 text-white hover:bg-white/20' }}">
+                    <span>Staf & Admin</span>
+                    <span class="px-2 py-0.5 rounded-full text-[11px] {{ in_array($activeRole, ['staff', 'kesiswaan', 'admin']) ? 'bg-sky-100 text-sky-700 font-bold' : 'bg-white/15 text-white' }}">
+                        {{ $counts['staff'] }}
+                    </span>
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Filter -->
-    <form method="GET" action="{{ route('kesiswaan.users.index') }}" class="flex flex-wrap gap-3 items-center bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
-        <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari username, email, nama..."
-               class="flex-1 min-w-[200px] px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
-        <select name="role" class="px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
-            <option value="">Semua Role</option>
-            @foreach (['admin', 'kesiswaan', 'pembina', 'siswa'] as $r)
-                <option value="{{ $r }}" {{ request('role') === $r ? 'selected' : '' }}>{{ ucfirst($r) }}</option>
-            @endforeach
-        </select>
-        <button type="submit" class="px-5 py-2.5 bg-theme-dark text-white font-bold text-xs rounded-2xl hover:bg-black transition">Filter</button>
+    {{-- SEARCH & FILTER FORM --}}
+    <form method="GET" action="{{ route('kesiswaan.users.index') }}" class="bg-white p-4 rounded-3xl border border-sky-100 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+        <div class="relative flex-1">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </span>
+            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama, NIS, NIP, username, atau email..."
+                   class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+        </div>
+
+        <div class="flex items-center gap-2">
+            <select name="role" class="px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                <option value="">Semua Role</option>
+                <option value="siswa" {{ request('role') === 'siswa' ? 'selected' : '' }}>Siswa</option>
+                <option value="pembina" {{ in_array(request('role'), ['pembina', 'guru']) ? 'selected' : '' }}>Guru / Pembina</option>
+                <option value="kesiswaan" {{ request('role') === 'kesiswaan' ? 'selected' : '' }}>Kesiswaan</option>
+                <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
+            </select>
+
+            <button type="submit" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
+                Filter
+            </button>
+
+            @if(request()->filled('q') || request()->filled('role'))
+                <a href="{{ route('kesiswaan.users.index') }}"
+                   class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-2xl transition"
+                   title="Reset filter">
+                    Reset
+                </a>
+            @endif
+        </div>
     </form>
 
-    <!-- Tabel Akun -->
-    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm overflow-x-auto">
-        <table class="card-table w-full text-left">
-            <thead>
-                <tr class="text-[11px] font-bold text-gray-400 tracking-wider uppercase border-b border-gray-100">
-                    <th class="py-3 px-2">Pengguna</th>
-                    <th class="py-3 px-2">Username</th>
-                    <th class="py-3 px-2">Email</th>
-                    <th class="py-3 px-2">Role</th>
-                    <th class="py-3 px-2">Detail</th>
-                    <th class="py-3 px-2 text-right">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-50">
-                @forelse ($users as $user)
-                    <tr class="hover:bg-gray-50/60 transition text-xs">
-                        <td class="py-3.5 px-2">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full {{ $user->role === 'pembina' ? 'bg-theme-blue' : ($user->role === 'kesiswaan' ? 'bg-theme-yellow' : 'bg-emerald-500') }} text-white font-bold flex items-center justify-center text-[10px] uppercase shrink-0">
-                                    {{ substr($user->username, 0, 2) }}
+    {{-- TABEL PENGGUNA --}}
+    <div class="bg-white rounded-3xl border border-sky-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-bold text-slate-400 tracking-wider uppercase">
+                        <th class="py-3.5 px-5">Pengguna</th>
+                        <th class="py-3.5 px-5">Role</th>
+                        <th class="py-3.5 px-5 text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-xs">
+                    @forelse ($users as $user)
+                        <tr class="hover:bg-sky-50/30 transition">
+                            {{-- Pengguna / Nama --}}
+                            <td class="py-3.5 px-5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 font-extrabold flex items-center justify-center text-xs uppercase shrink-0">
+                                        {{ strtoupper(substr($user->siswa?->nama ?? $user->pembina?->nama ?? $user->username ?? 'U', 0, 2)) }}
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-slate-900 leading-snug">
+                                            {{ $user->siswa?->nama ?? $user->pembina?->nama ?? ($user->username ?? 'User') }}
+                                        </div>
+                                        <div class="text-[11px] text-slate-400">
+                                            @if($user->username)
+                                                <span>{{ '@' . $user->username }}</span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200/60 px-1.5 py-0.5 rounded-lg text-[10px] font-semibold">
+                                                    Belum set username (Login: {{ $user->siswa?->nis ?? $user->pembina?->nip ?? $user->email }})
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
-                                <span class="font-bold">{{ $user->siswa?->nama ?? $user->pembina?->nama ?? '-' }}</span>
-                            </div>
-                        </td>
-                        <td class="py-3.5 px-2 font-medium">{{ $user->username }}</td>
-                        <td class="py-3.5 px-2 text-gray-500">{{ $user->email }}</td>
-                        <td class="py-3.5 px-2">
-                            <span class="px-3 py-1 rounded-full font-bold text-[11px]
-                                {{ $user->role === 'admin' ? 'bg-purple-50 text-purple-600' : '' }}
-                                {{ $user->role === 'kesiswaan' ? 'bg-yellow-50 text-yellow-600' : '' }}
-                                {{ $user->role === 'pembina' ? 'bg-blue-50 text-theme-blue' : '' }}
-                                {{ $user->role === 'siswa' ? 'bg-emerald-50 text-emerald-600' : '' }}">
-                                {{ ucfirst($user->role) }}
-                            </span>
-                            @if ($user->role === 'siswa' && $user->siswa?->jabatan === 'ketua')
-                                <span class="ml-1 px-3 py-1 rounded-full font-bold text-[11px] bg-theme-dark text-theme-yellow">Ketua</span>
-                            @endif
-                        </td>
-                        <td class="py-3.5 px-2 text-gray-400">
-                            @if ($user->siswa)
-                                NIS {{ $user->siswa->nis }} Â· {{ $user->siswa->kelas?->nama ?? '-' }}
-                            @elseif ($user->pembina)
-                                NIP {{ $user->pembina->nip }}
-                            @else
-                                -
-                            @endif
-                        </td>
-                        <td class="py-3.5 px-2">
-                            <div class="flex gap-2 justify-end items-center">
-                                @if ($user->role === 'admin' && auth()->user()->role !== 'admin')
-                                    <span class="text-[10px] text-gray-400 italic px-3 flex items-center gap-1.5">
-                                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                            <rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>
-                                        </svg>
-                                        Dikelola Admin
-                                    </span>
-                                @else
-                                    <a href="{{ route('kesiswaan.users.edit', $user) }}"
-                                       class="px-3 py-1.5 bg-blue-50 text-theme-blue font-bold rounded-full hover:bg-blue-100 transition">Edit</a>
-                                    <form action="{{ route('kesiswaan.users.reset-password', $user) }}" method="POST"
-                                          onsubmit="return confirm('Reset password akun {{ $user->username }} ke &quot;password&quot;?')">
-                                        @csrf
-                                        <button type="submit" title="Reset password"
-                                                class="px-3 py-1.5 bg-amber-50 text-amber-600 font-bold rounded-full hover:bg-amber-100 transition">Reset PW</button>
-                                    </form>
-                                    @if ($user->id !== auth()->id())
-                                        <form action="{{ route('kesiswaan.users.destroy', $user) }}" method="POST"
-                                              onsubmit="return confirm('Hapus akun {{ $user->username }}? Tindakan ini permanen!')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="px-3 py-1.5 bg-red-50 text-red-500 font-bold rounded-full hover:bg-red-100 transition">Hapus</button>
-                                        </form>
-                                    @endif
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="py-10 text-center text-gray-400 text-xs">Belum ada akun yang cocok.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                            </td>
 
-        <div class="mt-4">
-            {{ $users->links() }}
+                            {{-- Role (Bukan berbentuk pil, teks bersih dan rapi) --}}
+                            <td class="py-3.5 px-5 whitespace-nowrap">
+                                <div class="text-xs font-semibold text-slate-700">
+                                    @if ($user->role === 'siswa')
+                                        <span>Siswa</span>
+                                        @if ($user->siswa?->jabatan === 'ketua')
+                                            <span class="text-amber-600 font-bold ml-1">(Ketua)</span>
+                                        @endif
+                                    @elseif ($user->role === 'pembina')
+                                        <span>Guru / Pembina</span>
+                                    @elseif ($user->role === 'kesiswaan')
+                                        <span>Kesiswaan</span>
+                                    @elseif ($user->role === 'admin')
+                                        <span>Admin</span>
+                                    @else
+                                        <span>{{ ucfirst($user->role) }}</span>
+                                    @endif
+                                </div>
+                            </td>
+
+                            {{-- Aksi (Hanya Edit Akun) --}}
+                            <td class="py-3.5 px-5 text-right">
+                                <div class="flex justify-end items-center">
+                                    @if ($user->role === 'admin' && auth()->user()->role !== 'admin')
+                                        <span class="text-[11px] text-slate-400 italic flex items-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                <rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>
+                                            </svg>
+                                            Dikelola Admin
+                                        </span>
+                                    @else
+                                        <a href="{{ route('kesiswaan.users.edit', $user) }}"
+                                           class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold rounded-xl transition text-xs"
+                                           title="Edit Akun">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                            Edit Akun
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="py-12 text-center">
+                                <div class="flex flex-col items-center justify-center text-slate-400">
+                                    <svg class="w-10 h-10 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                    </svg>
+                                    <p class="text-xs font-semibold text-slate-600">Tidak ada akun yang sesuai kriteria.</p>
+                                    @if(request()->filled('q') || request()->filled('role'))
+                                        <p class="text-[11px] text-slate-400 mt-0.5">Coba ubah kata kunci atau hapus filter yang diterapkan.</p>
+                                        <a href="{{ route('kesiswaan.users.index') }}" class="mt-3 text-xs font-bold text-sky-600 hover:text-sky-700">
+                                            Tampilkan semua akun
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
+
+        @if($users->hasPages())
+            <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50">
+                {{ $users->links() }}
+            </div>
+        @endif
     </div>
+
+</div>
 @endsection

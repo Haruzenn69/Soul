@@ -1,11 +1,10 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
-import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+    darkMode: 'class',
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
-        './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
         './resources/js/**/*.{js,ts,tsx}',
     ],
@@ -13,7 +12,10 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', 'Inter', ...defaultTheme.fontFamily.sans],
+                // Halaman utama memuat "Plus Jakarta Sans" (Google Fonts),
+                // halaman auth memuat "Figtree" (fonts.bunny.net).
+                // Rantai fallback ini memilih otomatis font yang termuat.
+                sans: ['"Plus Jakarta Sans"', 'Figtree', 'Inter', ...defaultTheme.fontFamily.sans],
                 serif: ['"DM Serif Display"', ...defaultTheme.fontFamily.serif],
             },
             borderRadius: {
@@ -22,42 +24,23 @@ export default {
                 sm: 'calc(var(--radius) - 4px)',
             },
             colors: {
-                background: 'hsl(var(--background))',
-                foreground: 'hsl(var(--foreground))',
-                card: {
-                    DEFAULT: 'hsl(var(--card))',
-                    foreground: 'hsl(var(--card-foreground))',
+                // Palet semantik yang sebelumnya didefinisikan ulang sebagai
+                // `tailwind.config` inline di dalam setiap blade.
+                theme: {
+                    blue: '#2563EB',
+                    darkBlue: '#1D4ED8',
+                    yellow: '#FACC15',
+                    dark: '#0F172A',
+                    light: '#F8FAFC',
+                    lightBg: '#F8FAFC',
                 },
-                popover: {
-                    DEFAULT: 'hsl(var(--popover))',
-                    foreground: 'hsl(var(--popover-foreground))',
-                },
-                primary: {
-                    DEFAULT: 'hsl(var(--primary))',
-                    foreground: 'hsl(var(--primary-foreground))',
-                },
-                secondary: {
-                    DEFAULT: 'hsl(var(--secondary))',
-                    foreground: 'hsl(var(--secondary-foreground))',
-                },
-                muted: {
-                    DEFAULT: 'hsl(var(--muted))',
-                    foreground: 'hsl(var(--muted-foreground))',
-                },
-                accent: {
-                    DEFAULT: 'hsl(var(--accent))',
-                    foreground: 'hsl(var(--accent-foreground))',
-                },
-                destructive: {
-                    DEFAULT: 'hsl(var(--destructive))',
-                    foreground: 'hsl(var(--destructive-foreground))',
-                },
-                border: 'hsl(var(--border))',
-                input: 'hsl(var(--input))',
-                ring: 'hsl(var(--ring))',
             },
         },
     },
 
-    plugins: [forms],
+    // Catatan: @tailwindcss/forms sengaja tidak diaktifkan.
+    // 90+ halaman memakai class utilitas apa adanya (tanpa komponen form),
+    // dan cdn.tailwindcss.com yang sebelumnya dipakai TIDAK memuat plugin ini.
+    // Mengaktifkannya akan mengubah tampilan seluruh input/select/textarea.
+    plugins: [],
 };

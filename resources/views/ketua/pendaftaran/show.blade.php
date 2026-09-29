@@ -16,36 +16,36 @@
     <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl space-y-5">
         <div class="grid gap-5 sm:grid-cols-2">
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tanggal Daftar</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Tanggal Daftar</p>
             <p class="font-medium text-sm">{{ $pendaftaran->tanggal_daftar->format('d/m/Y') }}</p>
         </div>
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">NIS</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">NIS</p>
             <p class="font-medium text-sm">{{ $pendaftaran->siswa->nis }}</p>
         </div>
         </div>
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nama</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Nama</p>
             <p class="font-medium text-sm">{{ $pendaftaran->siswa->nama }}</p>
         </div>
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kelas</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Kelas</p>
             <p class="font-medium text-sm">{{ $pendaftaran->siswa->kelas->nama ?? '-' }}</p>
         </div>
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Alasan Bergabung</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Alasan Bergabung</p>
             <p class="font-medium text-sm text-slate-700 bg-sky-50/50 p-3 rounded-2xl border border-sky-100 mt-1">{{ $pendaftaran->alasan ?? 'Tidak mencantumkan alasan.' }}</p>
         </div>
         <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Status</p>
             @if($pendaftaran->status === 'pending')
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 border border-amber-200">Pending</span>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200">Pending</span>
             @elseif($pendaftaran->status === 'diterima')
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Diterima</span>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Diterima</span>
             @elseif($pendaftaran->status === 'ditolak')
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">Ditolak</span>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">Ditolak</span>
             @else
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">{{ ucfirst($pendaftaran->status) }}</span>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">{{ ucfirst($pendaftaran->status) }}</span>
             @endif
         </div>
 

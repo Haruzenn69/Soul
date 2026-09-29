@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['username', 'email', 'password', 'role'])]
+#[Fillable(['username', 'email', 'password', 'role', 'onboarding_completed_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -43,7 +43,7 @@ class User extends Authenticatable
 
     public function needsOnboarding(): bool
     {
-        return $this->role !== 'admin' && $this->role !== 'kesiswaan' && is_null($this->onboarding_completed_at);
+        return $this->role !== 'admin' && $this->role !== 'kesiswaan' && (is_null($this->onboarding_completed_at) || empty($this->username));
     }
 
     protected $fillable = [

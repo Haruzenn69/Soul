@@ -25,16 +25,22 @@
         'notif' => route('ketua.notifikasi'),
         'items' => [
             ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('ketua.dashboard'), 'is' => 'ketua.dashboard'],
-            ['icon' => 'calendar', 'label' => 'Kegiatan', 'url' => route('ketua.kegiatan.index'), 'is' => 'ketua.kegiatan.*'],
-            ['icon' => 'clipboard-check', 'label' => 'Rekap Absensi', 'url' => route('ketua.presensi.rekap'), 'is' => 'ketua.presensi.rekap'],
-            ['icon' => 'clipboard-list', 'label' => 'Pendaftaran', 'url' => route('ketua.pendaftaran.index'), 'is' => 'ketua.pendaftaran.*'],
-            ['icon' => 'users', 'label' => 'Kelola Anggota', 'url' => route('ketua.anggota.index'), 'is' => ['ketua.anggota.index', 'ketua.anggota.update-status']],
-            ['icon' => 'logout', 'label' => 'Pengajuan Keluar', 'url' => route('ketua.pengajuan-keluar.index'), 'is' => ['ketua.pengajuan-keluar.index', 'ketua.pengajuan-keluar.show', 'ketua.pengajuan-keluar.update']],
-            ['icon' => 'columns', 'label' => 'Laporan Bulanan', 'url' => route('ketua.laporan-bulanan.index'), 'is' => 'ketua.laporan-bulanan.*'],
-            ['icon' => 'building', 'label' => 'Profil Ekskul', 'url' => route('ketua.profil-ekskul.edit'), 'is' => 'ketua.profil-ekskul.*'],
-            ['icon' => 'star', 'label' => 'Prestasi', 'url' => route('ketua.prestasi.index'), 'is' => 'ketua.prestasi.*'],
-            ['icon' => 'chat', 'label' => 'Testimoni', 'url' => route('ketua.testimoni.index'), 'is' => 'ketua.testimoni.*'],
-            ['icon' => 'help', 'label' => 'FAQ', 'url' => route('ketua.faq.index'), 'is' => 'ketua.faq.*'],
+            ['icon' => 'users', 'label' => 'Keanggotaan', 'children' => [
+                ['icon' => 'users', 'label' => 'Kelola Anggota', 'url' => route('ketua.anggota.index'), 'is' => ['ketua.anggota.index', 'ketua.anggota.update-status']],
+                ['icon' => 'clipboard-list', 'label' => 'Pendaftaran', 'url' => route('ketua.pendaftaran.index'), 'is' => 'ketua.pendaftaran.*'],
+                ['icon' => 'logout', 'label' => 'Pengajuan Keluar', 'url' => route('ketua.pengajuan-keluar.index'), 'is' => ['ketua.pengajuan-keluar.index', 'ketua.pengajuan-keluar.show', 'ketua.pengajuan-keluar.update']],
+            ]],
+            ['icon' => 'calendar', 'label' => 'Kegiatan', 'children' => [
+                ['icon' => 'calendar', 'label' => 'Kegiatan', 'url' => route('ketua.kegiatan.index'), 'is' => 'ketua.kegiatan.*'],
+                ['icon' => 'clipboard-check', 'label' => 'Rekap Absensi', 'url' => route('ketua.presensi.rekap'), 'is' => 'ketua.presensi.rekap'],
+                ['icon' => 'columns', 'label' => 'Laporan Bulanan', 'url' => route('ketua.laporan-bulanan.index'), 'is' => 'ketua.laporan-bulanan.*'],
+            ]],
+            ['icon' => 'building', 'label' => 'Kelola Katalog', 'children' => [
+                ['icon' => 'building', 'label' => 'Profil Ekskul', 'url' => route('ketua.profil-ekskul.edit'), 'is' => 'ketua.profil-ekskul.*'],
+                ['icon' => 'star', 'label' => 'Prestasi', 'url' => route('ketua.prestasi.index'), 'is' => 'ketua.prestasi.*'],
+                ['icon' => 'chat', 'label' => 'Testimoni', 'url' => route('ketua.testimoni.index'), 'is' => 'ketua.testimoni.*'],
+                ['icon' => 'help', 'label' => 'FAQ', 'url' => route('ketua.faq.index'), 'is' => 'ketua.faq.*'],
+            ]],
             ['icon' => 'user', 'label' => 'Profile', 'url' => route('profile.edit'), 'is' => 'profile.edit'],
         ],
         'more' => [],
@@ -44,10 +50,10 @@
         'notif' => route('siswa.notifikasi'),
         'items' => [
             ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('siswa.dashboard'), 'is' => 'siswa.dashboard'],
+            ['icon' => 'document', 'label' => 'Katalog Ekskul', 'url' => route('siswa.katalog'), 'is' => ['siswa.katalog', 'ekskul.detail']],
             ['icon' => 'calendar', 'label' => 'Presensi & Kegiatan', 'url' => route('siswa.presensi'), 'is' => 'siswa.presensi'],
             ['icon' => 'bars', 'label' => 'Rekap Absensi', 'url' => route('siswa.rekap'), 'is' => 'siswa.rekap'],
             ['icon' => 'user', 'label' => 'Profil Saya', 'url' => route('profile.edit'), 'is' => 'profile.edit'],
-            ['icon' => 'document', 'label' => 'Katalog Ekskul', 'url' => route('siswa.katalog'), 'is' => ['siswa.katalog', 'ekskul.detail']],
         ],
         'more' => [
             ['label' => 'Daftar Ekskul', 'url' => route('siswa.daftar-ekskul'), 'is' => 'siswa.daftar-ekskul'],
@@ -63,29 +69,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif']
-                    },
-                    colors: {
-                        theme: { blue: '#2563EB', darkBlue: '#1D4ED8', yellow: '#FACC15', dark: '#0F172A', lightBg: '#F8FAFC' }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes blob { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(24px, -18px) scale(1.08); } 66% { transform: translate(-16px, 12px) scale(.94); } }
-        .animate-fade-up { animation: fadeUp .6s cubic-bezier(.22,1,.36,1) both; }
-        .animate-floaty { animation: floaty 5s ease-in-out infinite; }
-        .animate-blob { animation: blob 10s ease-in-out infinite; }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased min-h-screen md:flex selection:bg-sky-100 selection:text-sky-700 overflow-x-hidden">@include('partials.pill-sidebar', [
     'psTitle' => $psSidebar['title'],
@@ -122,18 +106,47 @@
             </div>
             <nav aria-label="Menu utama mobile" class="space-y-1.5">
                 @foreach($psSidebar['items'] as $psMItem)
-                    @php $psMActive = request()->routeIs((array) $psMItem['is']); @endphp
-                    <a href="{{ $psMItem['url'] }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ $psMActive ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
-                        @if($psMActive)
-                            <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
-                        @endif
-                        <span class="text-base flex items-center justify-center w-4 h-4">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                {!! $psIconSvg[$psMItem['icon']] ?? '' !!}
-                            </svg>
-                        </span>
-                        {{ $psMItem['label'] }}
-                    </a>
+                    @php
+                        $psMActive = isset($psMItem['children'])
+                            ? collect($psMItem['children'])->contains(fn ($child) => request()->routeIs((array) $child['is']))
+                            : request()->routeIs((array) $psMItem['is']);
+                    @endphp
+                    @if(isset($psMItem['children']))
+                        <details class="group" {{ $psMActive ? 'open' : '' }}>
+                            <summary class="relative flex items-center gap-3 px-3.5 py-2.5 {{ $psMActive ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all cursor-pointer list-none">
+                                <span class="text-base flex items-center justify-center w-4 h-4">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        {!! $psIconSvg[$psMItem['icon']] ?? '' !!}
+                                    </svg>
+                                </span>
+                                {{ $psMItem['label'] }}
+                                <svg class="w-4 h-4 ml-auto transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+                            </summary>
+                            <div class="ml-7 pl-4 mt-1 space-y-1 border-l border-sky-100">
+                                @foreach($psMItem['children'] as $psMChild)
+                                    @php $psMChildActive = request()->routeIs((array) $psMChild['is']); @endphp
+                                    <a href="{{ $psMChild['url'] }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs {{ $psMChildActive ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            {!! $psIconSvg[$psMChild['icon']] ?? '' !!}
+                                        </svg>
+                                        {{ $psMChild['label'] }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        </details>
+                    @else
+                        <a href="{{ $psMItem['url'] }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ $psMActive ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                            @if($psMActive)
+                                <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
+                            @endif
+                            <span class="text-base flex items-center justify-center w-4 h-4">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    {!! $psIconSvg[$psMItem['icon']] ?? '' !!}
+                                </svg>
+                            </span>
+                            {{ $psMItem['label'] }}
+                        </a>
+                    @endif
                 @endforeach
             </nav>
 
@@ -260,28 +273,37 @@
 
                 <!-- KOLOM KIRI: Foto Profile & Informasi Singkat -->
                 <div class="lg:col-span-1">
-                    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 p-6 text-center animate-fade-up" style="animation-delay: .1s">
+                    <div class="h-full bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 p-6 text-center animate-fade-up" style="animation-delay: .1s">
                         <!-- Foto Profile -->
                         <div class="relative inline-block">
-                            <div class="w-28 h-28 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-sky-100 to-blue-100 border-4 border-sky-300 flex items-center justify-center mx-auto overflow-hidden shadow-lg shadow-sky-200 animate-floaty">
-                                <span class="text-3xl md:text-4xl font-extrabold text-sky-600">
-                                    {{ strtoupper(substr($siswa->nama ?? auth()->user()->username ?? 'S', 0, 1)) }}
-                                </span>
+                            <div class="w-28 h-28 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-sky-100 to-blue-100 border-4 border-sky-300 flex items-center justify-center mx-auto overflow-hidden shadow-lg shadow-sky-200">
+                                @if($siswa->foto)
+                                    <img src="{{ $siswa->foto_url }}" alt="Foto Profile" class="w-full h-full object-cover">
+                                @else
+                                    <span class="text-3xl md:text-4xl font-extrabold text-sky-600">
+                                        {{ strtoupper(substr($siswa->nama ?? auth()->user()->username ?? 'S', 0, 1)) }}
+                                    </span>
+                                @endif
                             </div>
-                            <button class="absolute bottom-2 right-2 bg-gradient-to-br from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white p-1.5 rounded-full shadow-md shadow-sky-300 transition-all">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                            </button>
                         </div>
 
                         <h3 class="text-sm font-extrabold text-slate-900 mt-4">{{ $siswa->nama ?? auth()->user()->username }}</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">{{ $siswa->kelas->nama ?? 'Siswa' }}</p>
+                        <p class="text-xs text-sky-600 font-bold">@ {{ auth()->user()->username }}</p>
+                        <p class="text-xs text-slate-400 mt-0.5">{{ $siswa->kelas->nama ?? 'Siswa' }} • Angkatan {{ $siswa->angkatan ?? '-' }}</p>
 
-                        <div class="mt-4 pt-4 border-t border-sky-50">
-                            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Bergabung sejak</p>
-                            <p class="text-xs font-bold text-slate-700 mt-1">{{ $siswa?->created_at ? \Carbon\Carbon::parse($siswa->created_at)->isoFormat('D MMMM Y') : '-' }}</p>
+                        <div class="mt-4 pt-4 border-t border-sky-50 text-left space-y-2 text-xs">
+                            <div class="flex items-center justify-between text-slate-500">
+                                <span class="text-[11px] text-slate-400">Media Sosial:</span>
+                                <span class="font-bold text-sky-700">{{ $siswa->medsos ?? '-' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-slate-500">
+                                <span class="text-[11px] text-slate-400">No. Telp / WA:</span>
+                                <span class="font-semibold text-slate-700">{{ $siswa->no_telp ?? '-' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-slate-500">
+                                <span class="text-[11px] text-slate-400">Bergabung:</span>
+                                <span class="font-semibold text-slate-700">{{ $siswa?->created_at ? \Carbon\Carbon::parse($siswa->created_at)->isoFormat('D MMMM Y') : '-' }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -295,7 +317,7 @@
                             <h2 class="text-sm font-extrabold text-slate-900">{{ $profilLengkap ? 'Ubah Data Pribadi' : 'Lengkapi Data Pribadi' }}</h2>
                             <p class="text-[11px] text-slate-400 mt-0.5">{{ $profilLengkap ? 'Perbarui informasi identitas diri kamu' : 'Wajib diisi agar bisa mendaftar ekskul' }}</p>
                         </div>
-                        <form method="POST" action="{{ route('siswa.profile.update-data') }}" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <form method="POST" action="{{ route('siswa.profile.update-data') }}" enctype="multipart/form-data" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                             @csrf
                             <div>
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>
@@ -304,6 +326,17 @@
                                 </div>
                                 <p class="text-[10px] text-slate-400 mt-1.5">Ditetapkan oleh kesiswaan.</p>
                             </div>
+
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Username Login <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">@</span>
+                                    <input type="text" name="username" value="{{ old('username', auth()->user()->username) }}" required
+                                           class="w-full pl-8 pr-4 py-2.5 bg-sky-50/60 border @error('username') border-rose-300 @else border-sky-100 @enderror rounded-2xl text-xs font-semibold focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-1.5">Gunakan username yang mudah diingat.</p>
+                            </div>
+
                             <div>
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Kelas</label>
                                 <div class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs text-slate-700 font-bold">
@@ -311,6 +344,14 @@
                                 </div>
                                 <p class="text-[10px] text-slate-400 mt-1.5">Ditetapkan oleh kesiswaan.</p>
                             </div>
+
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Foto Profil</label>
+                                <input type="file" name="foto" accept="image/jpeg,image/png,image/jpg,image/webp"
+                                       class="w-full px-3 py-2 bg-sky-50/60 border @error('foto') border-rose-300 @else border-sky-100 @enderror rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition file:mr-3 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-sky-500 file:text-white hover:file:bg-sky-600">
+                                <p class="text-[10px] text-slate-400 mt-1.5">Format JPG/PNG/WebP, maks 2MB.</p>
+                            </div>
+
                             <div>
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Jenis Kelamin <span class="text-red-500">*</span></label>
                                 <select name="jenis_kelamin" required
@@ -320,13 +361,66 @@
                                     <option value="perempuan" {{ old('jenis_kelamin', $siswa?->jenis_kelamin) === 'perempuan' ? 'selected' : '' }}>Perempuan</option>
                                 </select>
                             </div>
+
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Angkatan</label>
+                                <input type="text" name="angkatan" value="{{ old('angkatan', $siswa->angkatan) }}" placeholder="Contoh: 2024 atau 2024/2025"
+                                       class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Agama</label>
+                                <select name="agama"
+                                        class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                    <option value="">Pilih Agama...</option>
+                                    @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agm)
+                                        <option value="{{ $agm }}" {{ old('agama', $siswa->agama) === $agm ? 'selected' : '' }}>{{ $agm }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tempat Lahir</label>
+                                <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $siswa->tempat_lahir) }}" placeholder="Kota kelahiran"
+                                       class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tanggal Lahir</label>
+                                <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $siswa->tanggal_lahir?->format('Y-m-d')) }}"
+                                       class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">No. Telp / WhatsApp</label>
+                                <input type="text" name="no_telp" value="{{ old('no_telp', $siswa->no_telp) }}" placeholder="08xxxxxxxxxx"
+                                       class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                            </div>
+
                             <div>
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Email (opsional)</label>
                                 <input type="email" name="email" value="{{ old('email', auth()->user()->email ?? '') }}" placeholder="contoh@email.com"
                                        class="w-full px-4 py-2.5 bg-sky-50/60 border @error('email') border-red-300 @else border-sky-100 @enderror rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
-                                <p class="text-[10px] text-slate-400 mt-1.5">Email tidak wajib. Hanya untuk notifikasi & fitur lupa password.</p>
                             </div>
-                            <div class="md:col-span-2 flex items-center gap-3 pt-1">
+
+                            {{-- MEDIA SOSIAL DENGAN SISTEM ARAHAN --}}
+                            <div class="md:col-span-2">
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Media Sosial</label>
+                                <input type="text" name="medsos" value="{{ old('medsos', $siswa->medsos) }}" placeholder="misal: @nama_siswa (Instagram) / link profil medsos"
+                                       class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                <div class="mt-2 p-2.5 bg-sky-50 border border-sky-100 rounded-2xl text-[11px] text-sky-800 flex items-start gap-2">
+                                    <span>💡</span>
+                                    <span><b>Arahan Sistem:</b> Masukkan akun Instagram (contoh: <code class="bg-white/80 px-1 py-0.5 rounded text-sky-700 font-mono font-bold">@nama_kamu</code>) atau kontak medsos aktif Anda untuk mempermudah koordinasi latihan dan kegiatan ekstrakurikuler.</span>
+                                </div>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Alamat Lengkap</label>
+                                <textarea name="alamat" rows="2" placeholder="Alamat domisili lengkap"
+                                          class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('alamat', $siswa->alamat) }}</textarea>
+                            </div>
+
+                            <div class="md:col-span-2 flex items-center gap-3 pt-2">
                                 <button type="submit"
                                         class="px-6 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition hover:-translate-y-0.5">
                                     {{ $profilLengkap ? 'Simpan Perubahan' : 'Simpan & Lanjutkan' }}
@@ -338,8 +432,12 @@
                         </form>
                     </div>
 
-                    <!-- Data Diri -->
-                    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .15s">
+                </div>
+
+                <div class="lg:col-span-3 grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
+
+                <!-- Data Diri -->
+                <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up h-full" style="animation-delay: .15s">
                         <div class="px-6 py-5 border-b border-sky-50">
                             <h2 class="text-sm font-extrabold text-slate-900">Data Diri</h2>
                             <p class="text-[11px] text-slate-400 mt-0.5">Informasi akun dan identitas kamu</p>
@@ -358,6 +456,10 @@
                                 <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa->kelas->nama ?? '-' }}</p>
                             </div>
                             <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
+                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Angkatan</p>
+                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa->angkatan ?? '-' }}</p>
+                            </div>
+                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
                                 <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Jenis Kelamin</p>
                                 <p class="text-sm font-bold text-slate-800 mt-1">{{ ucfirst($siswa->jenis_kelamin ?? '-') }}</p>
                             </div>
@@ -369,11 +471,15 @@
                                 <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Email</p>
                                 <p class="text-sm font-bold text-slate-800 mt-1">{{ auth()->user()->email ?? '-' }}</p>
                             </div>
+                            <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
+                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Media Sosial</p>
+                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa->medsos ?? '-' }}</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Informasi Ekskul -->
-                    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .2s">
+                <!-- Informasi Ekskul -->
+                <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up h-full" style="animation-delay: .2s">
                         <div class="px-6 py-5 border-b border-sky-50">
                             <h2 class="text-sm font-extrabold text-slate-900">Informasi Ekskul</h2>
                             <p class="text-[11px] text-slate-400 mt-0.5">Status keanggotaan ekstrakurikulermu</p>
@@ -422,16 +528,18 @@
                                 </div>
                             @endif
                         </div>
-                    </div>
+                </div>
 
-                    <!-- Pengajuan Keluar Ekskul -->
-                    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .25s">
+                </div>
+
+                <!-- Pengajuan Keluar Ekskul -->
+                <div class="profile-exit-card lg:col-span-3 bg-white rounded-3xl border-2 border-red-200 shadow-lg shadow-red-200/70 ring-1 ring-red-100/80 overflow-hidden animate-fade-up" style="animation-delay: .25s">
                         <div class="px-6 py-5 flex items-center justify-between border-b border-sky-50">
                             <div>
                                 <h2 class="text-sm font-extrabold text-slate-900">Pengajuan Keluar Ekskul</h2>
                                 <p class="text-[11px] text-slate-400 mt-0.5">Tindakan ini bersifat permanen</p>
                             </div>
-                            <span class="text-[10px] font-bold text-amber-700 bg-gradient-to-r from-amber-100 to-yellow-100 border border-amber-200 px-3 py-1.5 rounded-full">Sakral</span>
+                            <span class="profile-sacred-badge text-[10px] font-bold text-amber-700 bg-gradient-to-r from-amber-100 to-yellow-100 border border-amber-200 px-3 py-1.5 rounded-full">Sakral</span>
                         </div>
 
                         <div class="p-6">

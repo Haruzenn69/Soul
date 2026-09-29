@@ -70,7 +70,7 @@ class LoginRequest extends FormRequest
                 $user = User::find($userId);
 
                 if ($user) {
-                    $attempted = Auth::attempt(['username' => $user->username, 'password' => $password], $remember);
+                    $attempted = Auth::attempt(['id' => $user->id, 'password' => $password], $remember);
                 }
             }
         }

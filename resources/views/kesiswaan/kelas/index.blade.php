@@ -5,11 +5,11 @@
 @section('content')
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h1 class="text-2xl font-extrabold text-theme-dark">Data Kelas</h1>
+            <h1 class="text-xl md:text-2xl font-extrabold text-theme-dark">Data Kelas</h1>
             <p class="text-xs text-gray-400 mt-1">Kelola daftar kelas per tingkat dan tahun ajaran.</p>
         </div>
         @if ($tahunAjarans->isEmpty())
-            <span class="px-4 py-2 bg-amber-50 text-amber-600 rounded-full text-[11px] font-bold flex items-center gap-1.5">
+            <span class="px-4 py-2 bg-amber-50 text-amber-600 rounded-full text-xs font-bold flex items-center gap-1.5">
                 <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
                 </svg>
@@ -61,7 +61,7 @@
     <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm overflow-x-auto">
         <table class="card-table w-full text-left">
             <thead>
-                <tr class="text-[11px] font-bold text-gray-400 tracking-wider uppercase border-b border-gray-100">
+                <tr class="text-xs font-bold text-gray-400 tracking-wider uppercase border-b border-gray-100">
                     <th class="py-3 px-2">Nama Kelas</th>
                     <th class="py-3 px-2">Tingkat</th>
                     <th class="py-3 px-2">Tahun Ajaran</th>
@@ -74,11 +74,11 @@
                     <tr class="hover:bg-gray-50/60 transition text-xs">
                         <td class="py-3.5 px-2 font-bold">{{ $k->nama }}</td>
                         <td class="py-3.5 px-2">
-                            <span class="px-3 py-1 rounded-full font-bold text-[11px] bg-blue-50 text-theme-blue uppercase">{{ config("kelas.tingkat.{$k->tingkat}") }}</span>
+                            <span class="px-3 py-1 rounded-full font-bold text-xs bg-blue-50 text-theme-blue uppercase">{{ config("kelas.tingkat.{$k->tingkat}") }}</span>
                         </td>
                         <td class="py-3.5 px-2 text-gray-500">{{ $k->tahunAjaran?->nama ?? '-' }}
                             @if ($k->tahunAjaran?->is_active)
-                                <span class="ml-1 px-2 py-0.5 rounded-full font-bold text-[10px] bg-emerald-50 text-emerald-600">Aktif</span>
+                                <span class="ml-1 px-2 py-0.5 rounded-full font-bold text-xs bg-emerald-50 text-emerald-600">Aktif</span>
                             @endif
                         </td>
                         <td class="py-3.5 px-2 text-gray-500">{{ $k->siswas->count() }} siswa</td>
@@ -122,7 +122,7 @@
             <h2 class="text-base font-extrabold text-theme-dark mb-2">Tambah Kelas</h2>
 
             <div>
-                <label class="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Tingkat</label>
+                <label class="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Tingkat</label>
                 <select name="tingkat" required data-tingkat
                         class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
                     <option value="" disabled selected>Pilih tingkat...</option>
@@ -133,14 +133,14 @@
             </div>
 
             <div>
-                <label class="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Jurusan</label>
+                <label class="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Jurusan</label>
                 <select name="jurusan" required data-jurusan disabled
                         class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition disabled:opacity-60">
                 </select>
             </div>
 
             <div>
-                <label class="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Nomor Rombel</label>
+                <label class="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Nomor Rombel</label>
                 <input type="number" name="rombel" min="1" required data-rombel
                        placeholder="misal: 1, 2, 3..."
                        class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
@@ -157,7 +157,7 @@
             </select>
 
             <div class="px-4 py-3 bg-blue-50/60 border border-blue-100 rounded-2xl">
-                <span class="block text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-1">Nama Kelas</span>
+                <span class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Nama Kelas</span>
                 <p data-preview class="text-sm font-extrabold text-theme-blue">Pilih tingkat, jurusan, dan rombel</p>
             </div>
 
@@ -176,7 +176,7 @@
             <h2 class="text-base font-extrabold text-theme-dark mb-2">Edit Kelas</h2>
 
             <div>
-                <label class="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Tingkat</label>
+                <label class="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Tingkat</label>
                 <select name="tingkat" required data-tingkat
                         class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
                     @foreach (config('kelas.tingkat') as $value => $label)
@@ -186,14 +186,14 @@
             </div>
 
             <div>
-                <label class="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Jurusan</label>
+                <label class="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Jurusan</label>
                 <select name="jurusan" required data-jurusan
                         class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
                 </select>
             </div>
 
             <div>
-                <label class="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Nomor Rombel</label>
+                <label class="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide">Nomor Rombel</label>
                 <input type="number" name="rombel" min="1" required data-rombel
                        placeholder="misal: 1, 2, 3..."
                        class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:border-theme-blue transition">
@@ -207,7 +207,7 @@
             </select>
 
             <div class="px-4 py-3 bg-blue-50/60 border border-blue-100 rounded-2xl">
-                <span class="block text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-1">Nama Kelas</span>
+                <span class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Nama Kelas</span>
                 <p data-preview class="text-sm font-extrabold text-theme-blue">Pilih tingkat, jurusan, dan rombel</p>
             </div>
 
