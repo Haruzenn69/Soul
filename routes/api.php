@@ -28,7 +28,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // ============================================================
     // API SISWA
     // ============================================================
-    Route::prefix('siswa')->middleware('role:siswa')->name('siswa.')->group(function () {
+    // API route names must not collide with the Blade/web route names.
+    // The web application uses names such as ketua.dashboard and
+    // siswa.dashboard for HTML pages.
+    Route::prefix('siswa')->middleware('role:siswa')->name('api.siswa.')->group(function () {
         Route::get('/dashboard', [SiswaController::class, 'dashboard'])->name('dashboard');
         Route::get('/katalog', [SiswaController::class, 'katalog'])->name('katalog');
         Route::get('/daftar-exkul', [SiswaController::class, 'daftar'])->name('daftar');
@@ -50,7 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // ============================================================
     // API KETUA EKSKUL (siswa dengan jabatan ketua)
     // ============================================================
-    Route::prefix('ketua')->middleware(['role:siswa', 'ketua_ekskul'])->name('ketua.')->group(function () {
+    Route::prefix('ketua')->middleware(['role:siswa', 'ketua_ekskul'])->name('api.ketua.')->group(function () {
         Route::get('/dashboard', [KetuaDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/kegiatan', [KetuaKegiatanController::class, 'index'])->name('kegiatan.index');
