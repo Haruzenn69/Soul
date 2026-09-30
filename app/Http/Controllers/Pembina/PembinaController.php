@@ -9,6 +9,7 @@ use App\Models\Kegiatan;
 use App\Models\LaporanBulanan;
 use App\Models\Pelatih;
 use App\Models\Pendaftaran;
+use App\Models\Siswa;
 use App\Models\Testimoni;
 use App\Services\NotifikasiService;
 use App\Services\RekapAbsensiService;
@@ -122,6 +123,66 @@ class PembinaController extends Controller
         $anggota = $query->get();
 
         return view('pembina.anggota', compact('anggota', 'ekskuls'));
+    }
+
+    public function pilihKetua(Request $request, Ekskul $ekskul, Siswa $siswa)
+    {
+        $pembina = auth()->user()?->pembina;
+        abort_unless($pembina && $ekskul->pembina_id === $pembina->id, 403);
+
+        // Pastikan siswa terdaftar dengan status diterima di ekskul ini
+        $pendaftaran = Pendaftaran::where('ekskul_id', $ekskul->id)
+            ->where('siswa_id', $siswa->id)
+            ->where('status', 'diterima')
+            ->first();
+
+        if (! $pendaftaran) {
+            return back()->with('error', 'Siswa yang dipilih bukan anggota aktif di ekskul '.$ekskul->nama_ekskul.'.');
+        }
+
+        // Cek apakah siswa ini sudah menjadi ketua di ekskul lain
+        $isKetuaDiLain = Siswa::where('id', $siswa->id)
+            ->where('jabatan', 'ketua')
+            ->whereHas('pendaftarans', function ($q) use ($ekskul) {
+                $q->where('ekskul_id', '!=', $ekskul->id)
+                  ->where('status', 'diterima');
+            })
+            ->exists();
+
+        if ($isKetuaDiLain) {
+            return back()->with('error', "{$siswa->nama} saat ini sudah menjabat sebagai Ketua di ekskul lain. Satu siswa hanya dapat menjadi ketua pada 1 ekskul.");
+        }
+
+        DB::transaction(function () use ($ekskul, $siswa) {
+            // Turunkan ketua lama di ekskul ini (jika ada) kembali menjadi siswa biasa
+            $ketuaLamas = Siswa::where('jabatan', 'ketua')
+                ->whereHas('pendaftarans', function ($q) use ($ekskul) {
+                    $q->where('ekskul_id', $ekskul->id)
+                      ->where('status', 'diterima');
+                })
+                ->get();
+
+            foreach ($ketuaLamas as $lama) {
+                $lama->update(['jabatan' => 'siswa']);
+            }
+
+            // Angkat siswa terpilih menjadi ketua
+            $siswa->update(['jabatan' => 'ketua']);
+        });
+
+        return back()->with('success', "Berhasil menetapkan {$siswa->nama} ({$siswa->nis}) sebagai Ketua Ekskul {$ekskul->nama_ekskul}.");
+    }
+
+    public function copotKetua(Ekskul $ekskul, Siswa $siswa)
+    {
+        $pembina = auth()->user()?->pembina;
+        abort_unless($pembina && $ekskul->pembina_id === $pembina->id, 403);
+
+        if ($siswa->jabatan === 'ketua') {
+            $siswa->update(['jabatan' => 'siswa']);
+        }
+
+        return back()->with('success', "Jabatan Ketua Ekskul {$ekskul->nama_ekskul} untuk {$siswa->nama} telah dicopot. Siswa kembali menjadi anggota biasa.");
     }
 
     public function pendaftaran(Request $request)

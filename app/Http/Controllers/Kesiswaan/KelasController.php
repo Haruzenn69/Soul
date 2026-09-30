@@ -15,18 +15,71 @@ class KelasController extends Controller
 {
     public function index(Request $request): View
     {
+        $currentTingkat = $request->input('tingkat');
+        $currentTahunAjaranId = $request->input('tahun_ajaran_id');
+        $q = $request->input('q');
+
         $kelas = Kelas::with(['tahunAjaran', 'siswas'])
-            ->when($request->filled('q'), function ($query) use ($request) {
-                $query->where('nama', 'like', '%'.$request->input('q').'%');
+            ->when($q, function ($query) use ($q) {
+                $query->where('nama', 'like', '%'.$q.'%');
             })
-            ->when($request->filled('tingkat'), fn ($query) => $query->where('tingkat', $request->input('tingkat')))
+            ->when($currentTingkat, fn ($query) => $query->where('tingkat', $currentTingkat))
+            ->when($currentTahunAjaranId, fn ($query) => $query->where('tahun_ajaran_id', $currentTahunAjaranId))
             ->orderBy('nama')
-            ->paginate(10)
+            ->paginate(12)
             ->withQueryString();
+
+        $counts = [
+            'all' => Kelas::count(),
+            'x' => Kelas::where('tingkat', 'x')->count(),
+            'xi' => Kelas::where('tingkat', 'xi')->count(),
+            'xii' => Kelas::where('tingkat', 'xii')->count(),
+            'total_siswa' => \App\Models\Siswa::whereNotNull('kelas_id')->count(),
+        ];
 
         return view('kesiswaan.kelas.index', [
             'kelas' => $kelas,
+            'counts' => $counts,
             'tahunAjarans' => TahunAjaran::orderBy('nama', 'desc')->get(),
+            'activeTingkat' => $currentTingkat,
+        ]);
+    }
+
+    public function show(Request $request, Kelas $kela): View
+    {
+        $kela->load(['tahunAjaran']);
+
+        $sort = in_array($request->input('sort'), ['nama', 'nis', 'created_at'], true) ? $request->input('sort') : 'nama';
+        $direction = $request->input('direction') === 'desc' ? 'desc' : 'asc';
+
+        $siswas = $kela->siswas()
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $q = '%'.$request->input('q').'%';
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('nama', 'like', $q)
+                        ->orWhere('nis', 'like', $q)
+                        ->orWhere('email', 'like', $q);
+                });
+            })
+            ->when($request->filled('jenis_kelamin'), fn ($query) => $query->where('jenis_kelamin', $request->input('jenis_kelamin')))
+            ->when($request->filled('jabatan'), fn ($query) => $query->where('jabatan', $request->input('jabatan')))
+            ->orderBy($sort, $direction)
+            ->paginate(15)
+            ->withQueryString();
+
+        $stats = [
+            'total' => $kela->siswas()->count(),
+            'laki' => $kela->siswas()->where('jenis_kelamin', 'laki-laki')->count(),
+            'perempuan' => $kela->siswas()->where('jenis_kelamin', 'perempuan')->count(),
+            'ketua' => $kela->siswas()->where('jabatan', 'ketua')->count(),
+        ];
+
+        return view('kesiswaan.kelas.show', [
+            'kelas' => $kela,
+            'siswas' => $siswas,
+            'stats' => $stats,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 
