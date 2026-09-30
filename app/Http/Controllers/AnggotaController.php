@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Models\Pendaftaran;
+use App\Models\Siswa;
 use App\Services\NotifikasiService;
+use App\Support\TableKit;
 use Illuminate\Http\Request;
 
 class AnggotaController extends Controller
@@ -14,22 +16,31 @@ class AnggotaController extends Controller
     public function index(Request $request)
     {
         $ekskul = $this->ekskul();
-        $anggotas = Pendaftaran::where('ekskul_id', $ekskul->id)
-            ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_NONAKTIF, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_KELUAR])
+        $base = Pendaftaran::where('ekskul_id', $ekskul->id)
+            ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_NONAKTIF, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_KELUAR]);
+
+        $totalAnggotas = (clone $base)->count();
+
+        $query = (clone $base)
             ->when($request->filled('cari'), function ($query) use ($request) {
                 $cari = $request->input('cari');
                 $query->whereHas('siswa', fn ($s) => $s->where('nama', 'like', "%{$cari}%")->orWhere('nis', 'like', "%{$cari}%"));
             })
-            ->when($request->filled('status') && $request->input('status') !== 'semua', fn ($query) => $query->where('status', $request->input('status')))
+            ->when($request->filled('status') && $request->input('status') !== 'semua', fn ($query) => $query->where('status', $request->input('status')));
+
+        $peringatanCount = (clone $query)->where('status', 'peringatan')->count();
+        $nonaktifCount = (clone $query)->where('status', 'nonaktif')->count();
+        $keluarCount = (clone $query)->where('status', 'keluar')->count();
+
+        [$sort, $direction] = TableKit::sort(['nama', 'nis', 'status', 'tanggal_daftar'], 'tanggal_daftar', 'desc');
+
+        $anggotas = (clone $query)
             ->with('siswa.kelas')
-            ->latest('tanggal_daftar')
-            ->get();
+            ->orderBy($sort === 'nama' || $sort === 'nis' ? Siswa::select($sort)->whereColumn('siswas.id', 'pendaftarans.siswa_id') : $sort, $direction)
+            ->paginate(10)
+            ->withQueryString();
 
-        $peringatanCount = $anggotas->where('status', 'peringatan')->count();
-        $nonaktifCount = $anggotas->where('status', 'nonaktif')->count();
-        $keluarCount = $anggotas->where('status', 'keluar')->count();
-
-        return view('ketua.anggota.index', compact('anggotas', 'peringatanCount', 'nonaktifCount', 'keluarCount'));
+        return view('ketua.anggota.index', compact('anggotas', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'sort', 'direction'));
     }
 
     public function updateStatus(Request $request, Pendaftaran $pendaftaran)

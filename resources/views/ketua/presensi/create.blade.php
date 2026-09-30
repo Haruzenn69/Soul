@@ -16,16 +16,46 @@
     <div class="ketua-card-list bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
         <form action="{{ route('ketua.presensi.store', $kegiatan) }}" method="POST">
             @csrf
+            <div class="px-5 md:px-6 py-4 bg-amber-50/60 border-b border-amber-100">
+                <p class="text-xs font-bold text-slate-700">Kehadiran Pelatih</p>
+                <p class="text-[10px] text-slate-400 mt-1">Tandai status kehadiran pelatih ekskul pada kegiatan ini.</p>
+                @if($pelatih)
+                    <div class="mt-3 flex flex-col sm:flex-row sm:items-center gap-3">
+                        <span class="inline-flex items-center gap-2 text-xs font-bold text-slate-800">
+                            <span class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 flex items-center justify-center text-[10px] font-extrabold">P</span>
+                            {{ $pelatih->nama }}
+                        </span>
+                        <select name="pelatih_presensi[status]"
+                            class="px-3 py-1.5 rounded-full bg-white border border-amber-200 text-xs focus:outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100 transition w-full sm:w-auto">
+                            @php $pelatihCurrent = $pelatihStatus ?? 'hadir'; @endphp
+                            <option value="hadir" {{ $pelatihCurrent === 'hadir' ? 'selected' : '' }}>Hadir</option>
+                            <option value="sakit" {{ $pelatihCurrent === 'sakit' ? 'selected' : '' }}>Sakit</option>
+                            <option value="izin" {{ $pelatihCurrent === 'izin' ? 'selected' : '' }}>Izin</option>
+                            <option value="alpha" {{ $pelatihCurrent === 'alpha' ? 'selected' : '' }}>Alpha</option>
+                        </select>
+                        <input type="hidden" name="pelatih_presensi[pelatih_id]" value="{{ $pelatih->id }}">
+                    </div>
+                @else
+                    <p class="text-[10px] text-slate-400 mt-1">Ekskul ini belum memiliki pelatih yang tercatat.</p>
+                @endif
+            </div>
             <div class="px-5 md:px-6 py-4 bg-sky-50/60 border-b border-sky-100">
                 <p class="text-xs font-bold text-slate-700">Tandai kehadiran anggota</p>
                 <p class="text-[10px] text-slate-400 mt-1">Periksa status setiap anggota, lalu simpan setelah semua data sesuai.</p>
             </div>
+            @include('partials.table-client-tools', [
+                'tableId' => 'presensi-table',
+                'searchCols' => [1],
+                'filterCols' => [2],
+                'filterOptions' => ['hadir' => 'Hadir', 'sakit' => 'Sakit', 'izin' => 'Izin', 'alpha' => 'Alpha'],
+                'defaultSize' => 10,
+            ])
             <div class="overflow-x-auto">
-            <table class="card-table w-full text-left text-xs md:text-sm">
+            <table id="presensi-table" class="card-table w-full text-left text-xs md:text-sm">
                 <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
                     <tr>
                         <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
-                        <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Nama</th>
+                        <th data-sort-index="1" class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap cursor-pointer select-none hover:text-slate-800 transition" title="Klik untuk urutkan">Nama</th>
                         <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Status</th>
                     </tr>
                 </thead>
