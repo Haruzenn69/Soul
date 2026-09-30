@@ -83,7 +83,7 @@ class KetuaGaleriEkskulTest extends TestCase
 
         $this->get(route('ekskul.detail', $ekskul))
             ->assertOk()
-            ->assertSee('Momen Kami')
+            ->assertSee('Galeri')
             ->assertSee('storage/ekskul/galeri/momen.jpg');
     }
 }
