@@ -7,7 +7,7 @@
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Kelola Prestasi</h1>
-            <p class="text-xs text-slate-400 mt-1">Tambah dan kelola prestasi ekskul</p>
+            <p class="text-xs text-slate-400 mt-1">Total: {{ $total }} prestasi</p>
         </div>
     </div>
 
@@ -44,16 +44,32 @@
         </form>
     </div>
 
+    @include('partials.table-filters', [
+        'action' => route('ketua.prestasi.index'),
+        'placeholder' => 'Cari judul / kategori...',
+        'filters' => [
+            ['name' => 'kategori', 'allLabel' => 'Semua Kategori', 'options' => $kategoriOptions->mapWithKeys(fn ($k) => [$k => $k])->all()],
+        ],
+    ])
+
     <!-- Table Card -->
     <div class="ketua-card-list bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
         <div class="overflow-x-auto">
         <table class="card-table w-full text-left text-xs md:text-sm">
+            <colgroup>
+                <col class="w-8">
+                <col>
+                <col>
+                <col class="w-24">
+                <col class="w-20">
+                <col class="w-20">
+            </colgroup>
             <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
                 <tr>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
-                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Judul</th>
-                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Kategori</th>
-                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Tahun</th>
+                    @include('partials.th-sort', ['label' => 'Judul', 'key' => 'judul', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
+                    @include('partials.th-sort', ['label' => 'Kategori', 'key' => 'kategori', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
+                    @include('partials.th-sort', ['label' => 'Tahun', 'key' => 'tahun', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Foto</th>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Aksi</th>
                 </tr>
@@ -88,5 +104,6 @@
             </tbody>
         </table>
         </div>
+        @include('partials.table-pagination', ['rows' => $prestasis, 'label' => 'prestasi'])
     </div>
 @endsection

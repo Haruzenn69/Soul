@@ -195,32 +195,42 @@
     </div>
     @endif
 
-    <!-- B. MATERI DAN KEGIATAN YANG DILAKSANAKAN -->
-    @if($laporan->materi_kegiatan)
+    <!-- B. KEGIATAN RUTIN -->
     <div class="section">
-        <div class="section-title">B. Materi dan Kegiatan yang Dilaksanakan</div>
+        <div class="section-title">B. Materi Kegiatan Rutin yang Dilaksanakan</div>
         <ol>
-            @foreach(explode("\n", $laporan->materi_kegiatan) as $line)
-                @if(trim($line) !== '')
-                    <li>{{ trim($line) }}</li>
-                @endif
-            @endforeach
+            @forelse ($rutinKegiatans ?? collect() as $kegiatan)
+                <li>Pada tanggal {{ $kegiatan->tanggalText() }}, kegiatan yang dilaksanakan berupa {{ $kegiatan->materi }}.@if($kegiatan->deskripsi) {{ $kegiatan->deskripsi }}@endif</li>
+            @empty
+                <li>Tidak ada kegiatan rutin pada bulan ini.</li>
+            @endforelse
         </ol>
     </div>
-    @endif
 
-    <!-- C. KEHADIRAN PESERTA -->
+    <!-- C. KEGIATAN EVENT -->
+    <div class="section">
+        <div class="section-title">C. Kegiatan Event yang Dilaksanakan (Diklat, Lomba, dll.)</div>
+        <ol>
+            @forelse ($eventKegiatans ?? collect() as $kegiatan)
+                <li>Pada tanggal {{ $kegiatan->tanggalText() }}, kegiatan yang dilaksanakan berupa {{ $kegiatan->materi }}.@if($kegiatan->deskripsi) {{ $kegiatan->deskripsi }}@endif</li>
+            @empty
+                <li>Tidak ada kegiatan event pada bulan ini.</li>
+            @endforelse
+        </ol>
+    </div>
+
+    <!-- D. KEHADIRAN PESERTA -->
     @if($laporan->kehadiran)
     <div class="section">
-        <div class="section-title">C. Kehadiran Peserta</div>
+        <div class="section-title">D. Kehadiran Peserta</div>
         <p>{!! nl2br(e($laporan->kehadiran)) !!}</p>
     </div>
     @endif
 
-    <!-- D. EVALUASI KEGIATAN -->
+    <!-- E. EVALUASI KEGIATAN -->
     @if($laporan->evaluasi_keberhasilan || $laporan->evaluasi_kendala || $laporan->evaluasi_solusi)
     <div class="section">
-        <div class="section-title">D. Evaluasi Kegiatan</div>
+        <div class="section-title">E. Evaluasi Kegiatan</div>
         @if($laporan->evaluasi_keberhasilan)
             <div class="evaluasi-item">
                 <span class="label">Keberhasilan:</span> {!! nl2br(e($laporan->evaluasi_keberhasilan)) !!}
@@ -239,57 +249,19 @@
     </div>
     @endif
 
-    <!-- DOKUMENTASI (JIKA ADA) -->
-    @php
-        $dokumentasiPaths = [];
-        if ($laporan->dokumentasi) {
-            $dokumentasiPaths[] = $laporan->dokumentasi;
-        }
-        foreach ($dokumentasiKegiatan ?? $laporan->dokumentasi_kegiatan ?? [] as $dk) {
-            $dokumentasiPaths[] = $dk;
-        }
-    @endphp
-    @if(count($dokumentasiPaths) > 0)
+    <!-- F. DOKUMENTASI KEGIATAN RUTIN -->
+    @if(collect($dokumentasiRutin ?? [])->isNotEmpty())
     <div class="section">
-        <div class="section-title">E. Dokumentasi</div>
-        <div class="dokumentasi">
-            @foreach($dokumentasiPaths as $dokDoc)
-                @php
-                    $imgPath = storage_path('app/public/' . $dokDoc);
-                    $imgExists = file_exists($imgPath);
-                @endphp
-                @if($imgExists)
-                    @php
-                        $exif = @exif_read_data($imgPath);
-                        $orientation = $exif['COMPUTED']['Orientation'] ?? $exif['Orientation'] ?? null;
-                        $img = @imagecreatefromstring(file_get_contents($imgPath));
+        <div class="section-title">F. Dokumentasi Kegiatan Rutin</div>
+        @include('partials.pdf-dokumentasi', ['paths' => $dokumentasiRutin ?? []])
+    </div>
+    @endif
 
-                        if ($img && $orientation) {
-                            $flip = [2, 4, 5, 7];
-                            $rotate = [3 => 180, 6 => 270, 8 => 90];
-                            if (in_array($orientation, $flip)) {
-                                $img = $orientation <= 2 ? $img : imagerotate($img, $rotate[$orientation] ?? 0, 0);
-                            } elseif (isset($rotate[$orientation])) {
-                                $img = imagerotate($img, $rotate[$orientation], 0);
-                            }
-                        }
-
-                        if ($img) {
-                            ob_start();
-                            imagejpeg($img, null, 90);
-                            $imageData = base64_encode(ob_get_clean());
-                            imagedestroy($img);
-                            $src = 'data:image/jpeg;base64,' . $imageData;
-                        } else {
-                            $imageData = base64_encode(file_get_contents($imgPath));
-                            $mime = mime_content_type($imgPath);
-                            $src = 'data:' . $mime . ';base64,' . $imageData;
-                        }
-                    @endphp
-                    <img src="{{ $src }}" alt="Dokumentasi">
-                @endif
-            @endforeach
-        </div>
+    <!-- G. DOKUMENTASI KEGIATAN EVENT -->
+    @if(collect($dokumentasiEvent ?? [])->isNotEmpty())
+    <div class="section">
+        <div class="section-title">G. Dokumentasi Kegiatan Event</div>
+        @include('partials.pdf-dokumentasi', ['paths' => $dokumentasiEvent ?? []])
     </div>
     @endif
 

@@ -38,6 +38,14 @@
         </form>
     </div>
 
+    @include('partials.table-filters', [
+        'action' => route('ketua.faq.index'),
+        'placeholder' => 'Cari pertanyaan / jawaban...',
+        'filters' => [
+            ['name' => 'status', 'allLabel' => 'Semua Status', 'options' => ['pending' => 'Menunggu', 'answered' => 'Ditampilkan']],
+        ],
+    ])
+
     <!-- Table Card -->
     <div class="ketua-card-list bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
         <div class="overflow-x-auto">
@@ -45,9 +53,9 @@
             <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
                 <tr>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
-                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Pertanyaan</th>
+                    @include('partials.th-sort', ['label' => 'Pertanyaan', 'key' => 'pertanyaan', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Jawaban</th>
-                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Status</th>
+                    @include('partials.th-sort', ['label' => 'Status', 'key' => 'status', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Aksi</th>
                 </tr>
             </thead>
@@ -97,5 +105,6 @@
             </tbody>
         </table>
         </div>
+        @include('partials.table-pagination', ['rows' => $faqs, 'label' => 'FAQ'])
     </div>
 @endsection

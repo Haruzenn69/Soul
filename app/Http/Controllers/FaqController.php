@@ -5,23 +5,36 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Models\Faq;
 use App\Services\NotifikasiService;
+use App\Support\TableKit;
 use Illuminate\Http\Request;
 
 class FaqController extends Controller
 {
     use KetuaEkskul;
 
-    public function index()
+    public function index(Request $request)
     {
         $ekskul = $this->ekskul();
-        $faqs = $ekskul->faqs()
-            ->orderByRaw("FIELD(status, 'pending', 'answered')")
-            ->latest()
-            ->get();
+        $base = $ekskul->faqs();
 
-        $pendingCount = $faqs->where('status', Faq::STATUS_PENDING)->count();
+        $pendingCount = (clone $base)->where('status', Faq::STATUS_PENDING)->count();
+        $total = (clone $base)->count();
 
-        return view('ketua.faq.index', compact('faqs', 'pendingCount'));
+        [$sort, $direction] = TableKit::sort(['pertanyaan', 'status'], 'status', 'asc');
+
+        $faqs = (clone $base)
+            ->when($request->filled('cari'), function ($query) use ($request) {
+                $cari = $request->input('cari');
+                $query->where(fn ($q) => $q->where('pertanyaan', 'like', "%{$cari}%")->orWhere('jawaban', 'like', "%{$cari}%"));
+            })
+            ->when($request->filled('status') && $request->input('status') !== 'semua', fn ($query) => $query->where('status', $request->input('status')))
+            ->when($sort === 'status',
+                fn ($query) => $query->when($direction === 'asc', fn ($q) => $q->orderByRaw("CASE status WHEN 'pending' THEN 1 ELSE 2 END"), fn ($q) => $q->orderByDesc('status')),
+                fn ($query) => $query->orderBy($sort, $direction))
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('ketua.faq.index', compact('faqs', 'pendingCount', 'total', 'sort', 'direction'));
     }
 
     public function store(Request $request)

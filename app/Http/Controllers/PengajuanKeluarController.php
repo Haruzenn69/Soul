@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Models\Pendaftaran;
 use App\Models\PengajuanKeluar;
+use App\Models\Siswa;
 use App\Services\NotifikasiService;
+use App\Support\TableKit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,15 +15,29 @@ class PengajuanKeluarController extends Controller
 {
     use KetuaEkskul;
 
-    public function index()
+    public function index(Request $request)
     {
         $ekskul = $this->ekskul();
-        $pengajuanKeluars = PengajuanKeluar::where('ekskul_id', $ekskul->id)
-            ->with('siswa')
-            ->latest('tanggal_pengajuan')
-            ->get();
+        $base = PengajuanKeluar::where('ekskul_id', $ekskul->id);
+        $total = (clone $base)->count();
 
-        return view('ketua.pengajuan-keluar.index', compact('pengajuanKeluars'));
+        [$sort, $direction] = TableKit::sort(['tanggal_pengajuan', 'nama', 'status'], 'tanggal_pengajuan', 'desc');
+
+        $pengajuanKeluars = (clone $base)
+            ->when($request->filled('cari'), function ($query) use ($request) {
+                $cari = $request->input('cari');
+                $query->where(function ($sub) use ($cari) {
+                    $sub->whereHas('siswa', fn ($s) => $s->where('nama', 'like', "%{$cari}%"))
+                        ->orWhere('alasan', 'like', "%{$cari}%");
+                });
+            })
+            ->when($request->filled('status') && $request->input('status') !== 'semua', fn ($query) => $query->where('status', $request->input('status')))
+            ->with('siswa')
+            ->orderBy($sort === 'nama' ? Siswa::select('nama')->whereColumn('siswas.id', 'pengajuan_keluars.siswa_id') : $sort, $direction)
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('ketua.pengajuan-keluar.index', compact('pengajuanKeluars', 'total', 'sort', 'direction'));
     }
 
     public function show(PengajuanKeluar $pengajuanKeluar)
