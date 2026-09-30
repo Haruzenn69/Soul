@@ -10,11 +10,14 @@ use App\Http\Controllers\Kesiswaan\EkskulController;
 use App\Http\Controllers\Kesiswaan\KelasController;
 use App\Http\Controllers\Kesiswaan\LaporanPenilaianController as KesiswaanLaporanPenilaianController;
 use App\Http\Controllers\Kesiswaan\NotifikasiController as KesiswaanNotifikasiController;
+use App\Http\Controllers\Kesiswaan\PembinaController as KesiswaanPembinaController;
+use App\Http\Controllers\Kesiswaan\SiswaController;
 use App\Http\Controllers\Kesiswaan\UserController;
 use App\Http\Controllers\Ketua\DashboardController as KetuaDashboardController;
 use App\Http\Controllers\Ketua\NotifikasiController as KetuaNotifikasiController;
 use App\Http\Controllers\LaporanBulananController;
 use App\Http\Controllers\NotifikasiController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\Pembina\FaqController as PembinaFaqController;
 use App\Http\Controllers\Pembina\NotifikasiController as PembinaNotifikasiController;
 use App\Http\Controllers\Pembina\PembinaController;
@@ -72,6 +75,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/onboarding/complete', [OnboardingController::class, 'complete'])->name('onboarding.complete');
+    Route::post('/onboarding/setup', [OnboardingController::class, 'setup'])->name('onboarding.setup');
 });
 
 Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('kesiswaan.')->group(function () {
@@ -86,11 +90,17 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
     Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])
         ->name('users.reset-password');
 
-    Route::resource('ekskuls', EkskulController::class)->except(['show']);
+    Route::resource('ekskuls', EkskulController::class)->except([]);
+    Route::post('pembina/{pembina}/assign-ekskul', [KesiswaanPembinaController::class, 'assignEkskul'])->name('pembina.assign-ekskul');
+    Route::delete('pembina/{pembina}/remove-ekskul/{ekskul}', [KesiswaanPembinaController::class, 'removeEkskul'])->name('pembina.remove-ekskul');
 
-    Route::resource('kelas', KelasController::class)->except(['show'])->parameters([
+    Route::resource('kelas', KelasController::class)->parameters([
         'kelas' => 'kela',
     ]);
+
+    Route::get('siswa', [SiswaController::class, 'index'])->name('siswa.index');
+
+    Route::get('pembina', [KesiswaanPembinaController::class, 'index'])->name('pembina.index');
 
     Route::get('/profile', function () {
         return view('kesiswaan.profile', ['user' => auth()->user()]);
@@ -155,6 +165,8 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::get('/dashboard', [PembinaController::class, 'dashboard'])->name('dashboard');
     Route::patch('/ekskuls/{ekskul}/pelatih', [PembinaController::class, 'updatePelatih'])->name('ekskul.pelatih');
     Route::get('/anggota', [PembinaController::class, 'anggota'])->name('anggota');
+    Route::post('/ekskuls/{ekskul}/pilih-ketua/{siswa}', [PembinaController::class, 'pilihKetua'])->name('ekskul.pilih-ketua');
+    Route::post('/ekskuls/{ekskul}/copot-ketua/{siswa}', [PembinaController::class, 'copotKetua'])->name('ekskul.copot-ketua');
     Route::get('/pendaftaran', [PembinaController::class, 'pendaftaran'])->name('pendaftaran');
     Route::get('/laporan', [PembinaController::class, 'laporan'])->name('laporan.index');
     Route::get('/laporan/{laporanBulanan}/detail', [PembinaController::class, 'laporanShow'])->name('laporan.show');
@@ -196,6 +208,7 @@ Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name
     Route::resource('kegiatan', KegiatanController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
     Route::get('kegiatan/{kegiatan}/presensi', [PresensiController::class, 'create'])->name('presensi.create');
     Route::post('kegiatan/{kegiatan}/presensi', [PresensiController::class, 'store'])->name('presensi.store');
+    Route::get('rekap-absensi/print', [PresensiController::class, 'rekapPdf'])->name('presensi.rekap-pdf');
     Route::get('rekap-absensi', [PresensiController::class, 'rekap'])->name('presensi.rekap');
     Route::resource('pendaftaran', PendaftaranController::class)->only(['index', 'show', 'update']);
     Route::resource('pengajuan-keluar', PengajuanKeluarController::class)->only(['index', 'show', 'update']);

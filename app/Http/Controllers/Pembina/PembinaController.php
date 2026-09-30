@@ -9,6 +9,7 @@ use App\Models\Kegiatan;
 use App\Models\LaporanBulanan;
 use App\Models\Pelatih;
 use App\Models\Pendaftaran;
+use App\Models\Siswa;
 use App\Models\Testimoni;
 use App\Services\NotifikasiService;
 use App\Services\RekapAbsensiService;
@@ -122,6 +123,66 @@ class PembinaController extends Controller
         $anggota = $query->get();
 
         return view('pembina.anggota', compact('anggota', 'ekskuls'));
+    }
+
+    public function pilihKetua(Request $request, Ekskul $ekskul, Siswa $siswa)
+    {
+        $pembina = auth()->user()?->pembina;
+        abort_unless($pembina && $ekskul->pembina_id === $pembina->id, 403);
+
+        // Pastikan siswa terdaftar dengan status diterima di ekskul ini
+        $pendaftaran = Pendaftaran::where('ekskul_id', $ekskul->id)
+            ->where('siswa_id', $siswa->id)
+            ->where('status', 'diterima')
+            ->first();
+
+        if (! $pendaftaran) {
+            return back()->with('error', 'Siswa yang dipilih bukan anggota aktif di ekskul '.$ekskul->nama_ekskul.'.');
+        }
+
+        // Cek apakah siswa ini sudah menjadi ketua di ekskul lain
+        $isKetuaDiLain = Siswa::where('id', $siswa->id)
+            ->where('jabatan', 'ketua')
+            ->whereHas('pendaftarans', function ($q) use ($ekskul) {
+                $q->where('ekskul_id', '!=', $ekskul->id)
+                  ->where('status', 'diterima');
+            })
+            ->exists();
+
+        if ($isKetuaDiLain) {
+            return back()->with('error', "{$siswa->nama} saat ini sudah menjabat sebagai Ketua di ekskul lain. Satu siswa hanya dapat menjadi ketua pada 1 ekskul.");
+        }
+
+        DB::transaction(function () use ($ekskul, $siswa) {
+            // Turunkan ketua lama di ekskul ini (jika ada) kembali menjadi siswa biasa
+            $ketuaLamas = Siswa::where('jabatan', 'ketua')
+                ->whereHas('pendaftarans', function ($q) use ($ekskul) {
+                    $q->where('ekskul_id', $ekskul->id)
+                      ->where('status', 'diterima');
+                })
+                ->get();
+
+            foreach ($ketuaLamas as $lama) {
+                $lama->update(['jabatan' => 'siswa']);
+            }
+
+            // Angkat siswa terpilih menjadi ketua
+            $siswa->update(['jabatan' => 'ketua']);
+        });
+
+        return back()->with('success', "Berhasil menetapkan {$siswa->nama} ({$siswa->nis}) sebagai Ketua Ekskul {$ekskul->nama_ekskul}.");
+    }
+
+    public function copotKetua(Ekskul $ekskul, Siswa $siswa)
+    {
+        $pembina = auth()->user()?->pembina;
+        abort_unless($pembina && $ekskul->pembina_id === $pembina->id, 403);
+
+        if ($siswa->jabatan === 'ketua') {
+            $siswa->update(['jabatan' => 'siswa']);
+        }
+
+        return back()->with('success', "Jabatan Ketua Ekskul {$ekskul->nama_ekskul} untuk {$siswa->nama} telah dicopot. Siswa kembali menjadi anggota biasa.");
     }
 
     public function pendaftaran(Request $request)
@@ -277,7 +338,10 @@ class PembinaController extends Controller
                 'ekskul' => null,
                 'bulan' => $bulan,
                 'kegiatans' => collect(),
+                'eventKegiatans' => collect(),
                 'rows' => collect(),
+                'pelatih' => null,
+                'presensiPelatih' => [],
                 'totalHadir' => 0,
                 'totalIzin' => 0,
                 'totalSakit' => 0,
@@ -304,26 +368,65 @@ class PembinaController extends Controller
         abort_unless($pembina, 404);
 
         $validated = $request->validate([
+            'username' => ['nullable', 'string', 'min:3', 'max:50', 'alpha_dash', Rule::unique('users', 'username')->ignore(auth()->id())],
             'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
             'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore(auth()->id())],
+            'foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'tempat_lahir' => ['nullable', 'string', 'max:100'],
+            'tanggal_lahir' => ['nullable', 'date'],
+            'agama' => ['nullable', 'string', 'max:50'],
+            'no_telp' => ['nullable', 'string', 'max:25'],
+            'alamat' => ['nullable', 'string'],
+            'medsos' => ['nullable', 'string', 'max:255'],
         ], [
+            'username.alpha_dash' => 'Username hanya boleh berisi huruf, angka, tanda hubung (-), dan garis bawah (_).',
+            'username.unique' => 'Username sudah digunakan akun lain.',
             'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah dipakai akun lain.',
+            'foto.image' => 'File foto harus berupa gambar.',
+            'foto.mimes' => 'Format foto harus berupa JPG, PNG, atau WebP.',
+            'foto.max' => 'Ukuran foto maksimal 2MB.',
         ]);
 
         $user = auth()->user();
 
-        DB::transaction(function () use ($pembina, $user, $validated) {
-            $pembina->update([
-                'jenis_kelamin' => $validated['jenis_kelamin'],
-            ]);
+        DB::transaction(function () use ($pembina, $user, $validated, $request) {
+            $fotoPath = null;
+            if ($request->hasFile('foto')) {
+                if ($pembina->foto && \Illuminate\Support\Facades\Storage::disk('public')->exists($pembina->foto)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($pembina->foto);
+                }
+                $fotoPath = $request->file('foto')->store('profile-photos', 'public');
+            }
 
+            $updateData = [
+                'jenis_kelamin' => $validated['jenis_kelamin'],
+                'tempat_lahir' => $validated['tempat_lahir'] ?? $pembina->tempat_lahir,
+                'tanggal_lahir' => $validated['tanggal_lahir'] ?? $pembina->tanggal_lahir,
+                'agama' => $validated['agama'] ?? $pembina->agama,
+                'email' => $validated['email'] ?? $pembina->email,
+                'no_telp' => $validated['no_telp'] ?? $pembina->no_telp,
+                'alamat' => $validated['alamat'] ?? $pembina->alamat,
+                'medsos' => $validated['medsos'] ?? $pembina->medsos,
+            ];
+
+            if ($fotoPath) {
+                $updateData['foto'] = $fotoPath;
+            }
+
+            $pembina->update($updateData);
+
+            $userUpdates = [];
+            if (!empty($validated['username']) && $validated['username'] !== $user->username) {
+                $userUpdates['username'] = $validated['username'];
+            }
             if (filled($validated['email']) && $validated['email'] !== $user->email) {
-                $user->update([
-                    'email' => $validated['email'],
-                    'email_verified_at' => null,
-                ]);
+                $userUpdates['email'] = $validated['email'];
+                $userUpdates['email_verified_at'] = null;
+            }
+            if (!empty($userUpdates)) {
+                $user->update($userUpdates);
             }
 
             if ($pembina->isProfileComplete()) {

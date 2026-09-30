@@ -44,6 +44,9 @@ class KesiswaanEkskulTest extends TestCase
                 'jenis_kelamin' => 'laki-laki',
                 'jabatan' => 'ketua',
                 'ekskul_id' => $ekskul->id,
+                'agama' => 'Islam',
+                'tempat_lahir' => 'Bandung',
+                'tanggal_lahir' => '2008-05-14',
             ])
             ->assertStatus(422);
 

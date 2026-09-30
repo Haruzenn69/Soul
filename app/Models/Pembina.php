@@ -11,10 +11,29 @@ class Pembina extends Model
     protected $fillable = [
         'user_id',
         'nip',
+        'foto',
         'nama',
+        'tempat_lahir',
+        'tanggal_lahir',
+        'agama',
         'jenis_kelamin',
-        // HAPUS 'no_telepon' dan 'alamat' karena tidak ada di migration
+        'email',
+        'no_telp',
+        'alamat',
+        'medsos',
     ];
+
+    public function getFotoUrlAttribute(): ?string
+    {
+        return $this->foto ? asset('storage/' . $this->foto) : null;
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'tanggal_lahir' => 'date',
+        ];
+    }
 
     public function user(): BelongsTo
     {

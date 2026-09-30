@@ -18,4 +18,9 @@ class Pelatih extends Model
     {
         return $this->hasMany(Ekskul::class);
     }
+
+    public function presensiPelatihs(): HasMany
+    {
+        return $this->hasMany(PresensiPelatih::class);
+    }
 }

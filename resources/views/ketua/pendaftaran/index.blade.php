@@ -7,25 +7,33 @@
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Daftar Pendaftaran</h1>
-            <p class="text-xs text-slate-400 mt-1">Total: {{ $pendaftarans->count() }} pendaftar</p>
+            <p class="text-xs text-slate-400 mt-1">Total: {{ $total }} pendaftar</p>
         </div>
         <div class="flex gap-2 flex-wrap">
             <div class="flex items-center gap-2">
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200">
                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                    Pending: {{ $pendaftarans->where('status', 'pending')->count() }}
+                    Pending: {{ $pendingCount }}
                 </span>
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    Diterima: {{ $pendaftarans->where('status', 'diterima')->count() }}
+                    Diterima: {{ $diterimaCount }}
                 </span>
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700 border border-rose-200">
                     <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                    Ditolak: {{ $pendaftarans->where('status', 'ditolak')->count() }}
+                    Ditolak: {{ $ditolakCount }}
                 </span>
             </div>
         </div>
     </div>
+
+    @include('partials.table-filters', [
+        'action' => route('ketua.pendaftaran.index'),
+        'placeholder' => 'Cari nama / NIS...',
+        'filters' => [
+            ['name' => 'status', 'allLabel' => 'Semua Status', 'options' => ['pending' => 'Pending', 'diterima' => 'Diterima', 'ditolak' => 'Ditolak']],
+        ],
+    ])
 
     <!-- Table Card dengan overflow-x-auto -->
     <div class="ketua-card-list bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
@@ -35,10 +43,10 @@
                     <tr>
                         <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap rounded-l-xl">No</th>
                         <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">NIS</th>
-                        <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Nama</th>
+                        @include('partials.th-sort', ['label' => 'Nama', 'key' => 'nama', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                         <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Kelas</th>
-                        <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Tanggal Daftar</th>
-                        <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Status</th>
+                        @include('partials.th-sort', ['label' => 'Tanggal Daftar', 'key' => 'tanggal_daftar', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
+                        @include('partials.th-sort', ['label' => 'Status', 'key' => 'status', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                         <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap rounded-r-xl">Aksi</th>
                     </tr>
                 </thead>
@@ -97,15 +105,6 @@
             </table>
         </div>
 
-        <!-- Footer Tabel dengan Total -->
-        <div class="ketua-card-footer px-3 md:px-6 py-3 border-t border-sky-50 flex justify-between items-center">
-            <span class="text-[10px] md:text-xs text-slate-400">Menampilkan {{ $pendaftarans->count() }} data</span>
-            @if(method_exists($pendaftarans, 'hasPages') && $pendaftarans->hasPages())
-                <div class="flex gap-1">
-                    {{ $pendaftarans->links() }}
-                </div>
-            @endif
-        </div>
+        @include('partials.table-pagination', ['rows' => $pendaftarans, 'label' => 'pendaftaran'])
     </div>
-</div>
 @endsection

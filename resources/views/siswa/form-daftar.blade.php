@@ -3,18 +3,35 @@
 @section('title', 'Form Pendaftaran Ekskul')
 
 @section('content')
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 animate-fade-up">
-        <div>
-            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Form Pendaftaran Ekskul</h1>
-            <p class="text-xs text-slate-400 mt-0.5">Isi data diri kamu untuk mendaftar ekskul</p>
+    <!-- HERO CARD BIRU (STYLE SAMA DENGAN KELOLA AKUN PENGGUNA) -->
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200 animate-fade-up">
+        {{-- Ambient blur circles --}}
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
+            <div class="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
         </div>
-        <a href="{{ route('siswa.daftar-ekskul') }}" class="px-4 py-2 bg-white hover:bg-sky-50 text-slate-600 text-xs font-semibold rounded-lg border border-sky-100 shadow-sm transition flex items-center gap-2 w-full md:w-auto justify-center md:justify-start">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </svg>
-            Kembali
-        </a>
+
+        {{-- Header + CTA --}}
+        <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">
+                    Form Pendaftaran Ekskul
+                </h1>
+                <p class="text-xs text-white/80 mt-1.5 max-w-xl leading-relaxed">
+                    Isi data diri kamu untuk mendaftar ekskul. Pastikan alasan kamu ditulis dengan jelas dan masuk akal.
+                </p>
+            </div>
+
+            <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
+                <a href="{{ route('siswa.daftar-ekskul') }}"
+                   class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/20 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Kembali
+                </a>
+            </div>
+        </div>
     </div>
 
     <!-- Kartu Ekskul yang dipilih -->

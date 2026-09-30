@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Models\Kegiatan;
 use App\Services\NotifikasiService;
+use App\Support\TableKit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,7 +16,12 @@ class KegiatanController extends Controller
     public function index(Request $request)
     {
         $ekskul = $this->ekskul();
-        $kegiatans = Kegiatan::where('ekskul_id', $ekskul->id)
+        $base = Kegiatan::where('ekskul_id', $ekskul->id);
+        $total = (clone $base)->count();
+
+        [$sort, $direction] = TableKit::sort(['tanggal_kegiatan', 'materi'], 'tanggal_kegiatan', 'desc');
+
+        $kegiatans = (clone $base)
             ->when($request->filled('cari'), function ($query) use ($request) {
                 $cari = $request->input('cari');
                 $query->where(function ($sub) use ($cari) {
@@ -23,11 +29,19 @@ class KegiatanController extends Controller
                         ->orWhere('deskripsi', 'like', '%'.$cari.'%');
                 });
             })
+            ->when($request->filled('jenis') && $request->input('jenis') !== 'semua', function ($query) use ($request) {
+                if ($request->input('jenis') === 'event') {
+                    $query->whereNotNull('jenis_kegiatan');
+                } else {
+                    $query->whereNull('jenis_kegiatan');
+                }
+            })
             ->withCount('presensis')
-            ->latest('tanggal_kegiatan')
-            ->get();
+            ->orderBy($sort, $direction)
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('ketua.kegiatan.index', compact('kegiatans', 'ekskul'));
+        return view('ketua.kegiatan.index', compact('kegiatans', 'ekskul', 'total', 'sort', 'direction'));
     }
 
     public function create()
@@ -39,6 +53,9 @@ class KegiatanController extends Controller
     {
         $validated = $request->validate([
             'materi' => 'required|string|max:255',
+            'jenis_kegiatan' => 'nullable|in:event',
+            'tanggal_kegiatan' => 'required|date',
+            'tanggal_berakhir' => 'nullable|date|after_or_equal:tanggal_kegiatan',
             'deskripsi' => 'nullable|string',
             'dokumentasi' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -53,9 +70,11 @@ class KegiatanController extends Controller
         $kegiatan = Kegiatan::create([
             'ekskul_id' => $ekskul->id,
             'materi' => $validated['materi'],
+            'jenis_kegiatan' => $validated['jenis_kegiatan'] ?? null,
             'deskripsi' => $validated['deskripsi'] ?? null,
             'dokumentasi' => $dokumentasiPath,
-            'tanggal_kegiatan' => now()->toDateString(),
+            'tanggal_kegiatan' => $validated['tanggal_kegiatan'],
+            'tanggal_berakhir' => $validated['tanggal_berakhir'] ?? null,
         ]);
 
         NotifikasiService::kegiatanDibuat($kegiatan);
@@ -67,9 +86,11 @@ class KegiatanController extends Controller
     {
         $this->ensureEkskul($kegiatan);
 
-        $kegiatan->load(['presensis.pendaftaran.siswa']);
+        $kegiatan->load(['presensis.pendaftaran.siswa', 'presensiPelatihs', 'ekskul.pelatih']);
 
-        return view('ketua.kegiatan.show', compact('kegiatan'));
+        $presensiPelatih = $kegiatan->presensiPelatihs->first();
+
+        return view('ketua.kegiatan.show', compact('kegiatan', 'presensiPelatih'));
     }
 
     public function edit(Kegiatan $kegiatan)
@@ -85,6 +106,9 @@ class KegiatanController extends Controller
 
         $validated = $request->validate([
             'materi' => 'required|string|max:255',
+            'jenis_kegiatan' => 'nullable|in:event',
+            'tanggal_kegiatan' => 'required|date',
+            'tanggal_berakhir' => 'nullable|date|after_or_equal:tanggal_kegiatan',
             'deskripsi' => 'nullable|string',
             'dokumentasi' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -99,8 +123,11 @@ class KegiatanController extends Controller
 
         $kegiatan->update([
             'materi' => $validated['materi'],
+            'jenis_kegiatan' => $validated['jenis_kegiatan'] ?? null,
             'deskripsi' => $validated['deskripsi'] ?? null,
             'dokumentasi' => $dokumentasiPath,
+            'tanggal_kegiatan' => $validated['tanggal_kegiatan'],
+            'tanggal_berakhir' => $validated['tanggal_berakhir'] ?? null,
         ]);
 
         return redirect()->route('ketua.kegiatan.show', $kegiatan)

@@ -22,6 +22,29 @@
                 @error('materi') <p class="text-rose-500 text-[10px] mt-1">{{ $message }}</p> @enderror
             </div>
             <div class="mb-5">
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">Tipe kegiatan</label>
+                <select name="jenis_kegiatan" id="jenis-kegiatan"
+                    class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                    <option value="" @selected(old('jenis_kegiatan') === null || old('jenis_kegiatan') === '')>Kegiatan rutin (latihan biasa)</option>
+                    <option value="event" @selected(old('jenis_kegiatan') === 'event')>Event ekskul (diklat, lomba, dll.)</option>
+                </select>
+                <p class="text-[10px] text-slate-400 mt-1.5">Kegiatan event tidak dihitung dalam persentase kehadiran rekap, ditampilkan terpisah.</p>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-4 mb-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Tanggal kegiatan <span class="text-rose-500">*</span></label>
+                    <input type="date" name="tanggal_kegiatan" value="{{ old('tanggal_kegiatan', now()->toDateString()) }}" required
+                        class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                    @error('tanggal_kegiatan') <p class="text-rose-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div id="row-tanggal-berakhir" class="{{ old('jenis_kegiatan') === 'event' ? '' : 'hidden' }}">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Tanggal berakhir <span class="font-normal text-slate-400">(event saja)</span></label>
+                    <input type="date" name="tanggal_berakhir" value="{{ old('tanggal_berakhir') }}"
+                        class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                    @error('tanggal_berakhir') <p class="text-rose-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+            <div class="mb-5">
                 <label class="block text-xs font-bold text-slate-700 mb-1.5">Deskripsi <span class="font-normal text-slate-400">(opsional)</span></label>
                 <textarea name="deskripsi" rows="4" placeholder="Deskripsi kegiatan..."
                     class="w-full px-4 py-2.5 bg-sky-50/50 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('deskripsi') }}</textarea>
@@ -36,7 +59,22 @@
             <div class="flex flex-col-reverse sm:flex-row gap-2 pt-2">
                 <a href="{{ route('ketua.kegiatan.index') }}" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition text-center">Batal</a>
                 <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-lg shadow-sky-200 transition">Simpan kegiatan</button>
-            </div>
+</div>
         </form>
     </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const jenis = document.getElementById('jenis-kegiatan');
+        const rowBerakhir = document.getElementById('row-tanggal-berakhir');
+        if (jenis && rowBerakhir) {
+            const toggle = () => rowBerakhir.classList.toggle('hidden', jenis.value !== 'event');
+            jenis.addEventListener('change', toggle);
+            toggle();
+        }
+    });
+</script>
+@endpush

@@ -25,15 +25,30 @@
         <!-- KOLOM KIRI: Foto & Info Singkat -->
         <div class="lg:col-span-1">
             <div class="h-full bg-white p-6 rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .1s">
-                <div class="w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-sky-100 to-blue-100 border-4 border-sky-300 flex items-center justify-center shadow-lg shadow-sky-200">
-                    <span class="text-3xl font-extrabold text-sky-600 uppercase">{{ strtoupper(substr($pembina->nama ?? 'P', 0, 1)) }}</span>
+                <div class="relative w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-sky-100 to-blue-100 border-4 border-sky-300 flex items-center justify-center shadow-lg shadow-sky-200 overflow-hidden group">
+                    @if($pembina->foto)
+                        <img id="pembina-avatar-img" src="{{ $pembina->foto_url }}" alt="Foto Profile" class="w-full h-full object-cover">
+                    @else
+                        <span id="pembina-avatar-initial" class="text-3xl font-extrabold text-sky-600 uppercase">{{ strtoupper(substr($pembina->nama ?? 'P', 0, 1)) }}</span>
+                    @endif
                 </div>
                 <h3 class="text-sm font-extrabold text-slate-900 mt-4">{{ $pembina->nama ?? '-' }}</h3>
-                <p class="text-xs text-slate-400">Pembina Ekskul</p>
+                <p class="text-xs text-sky-600 font-bold">@ {{ auth()->user()->username }}</p>
+                <p class="text-xs text-slate-400 mt-0.5">Pembina Ekskul</p>
 
-                <div class="mt-4 pt-4 border-t border-sky-50">
-                    <p class="text-[10px] text-slate-400">Bergabung sejak</p>
-                    <p class="text-xs font-semibold text-slate-700 mt-0.5">{{ $pembina->created_at ? \Carbon\Carbon::parse($pembina->created_at)->isoFormat('D MMMM Y') : '-' }}</p>
+                <div class="mt-4 pt-4 border-t border-sky-50 text-left space-y-2 text-xs">
+                    <div class="flex items-center justify-between text-slate-500">
+                        <span class="text-[11px] text-slate-400">Media Sosial:</span>
+                        <span class="font-bold text-sky-700">{{ $pembina->medsos ?? '-' }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-slate-500">
+                        <span class="text-[11px] text-slate-400">No. Telp / WA:</span>
+                        <span class="font-semibold text-slate-700">{{ $pembina->no_telp ?? '-' }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-slate-500">
+                        <span class="text-[11px] text-slate-400">Bergabung:</span>
+                        <span class="font-semibold text-slate-700">{{ $pembina->created_at ? \Carbon\Carbon::parse($pembina->created_at)->isoFormat('D MMMM Y') : '-' }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -43,7 +58,7 @@
             <!-- UBAH / LENGKAPI DATA Diri -->
             <div class="bg-white p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 animate-fade-up" style="animation-delay: .12s">
                 <h2 class="text-sm font-extrabold text-slate-900 mb-4">{{ $profileComplete ? 'Ubah Data Pribadi' : 'Lengkapi Data Pribadi' }}</h2>
-                <form method="POST" action="{{ route('pembina.profile.update') }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form method="POST" action="{{ route('pembina.profile.update') }}" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @csrf
                     <div>
                         <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>
@@ -52,6 +67,24 @@
                         </div>
                         <p class="text-[10px] text-slate-400 mt-1.5">Ditetapkan oleh kesiswaan.</p>
                     </div>
+
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Username Login <span class="text-rose-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">@</span>
+                            <input type="text" name="username" value="{{ old('username', auth()->user()->username) }}" required
+                                   class="w-full pl-8 pr-4 py-2.5 bg-sky-50/60 border @error('username') border-rose-300 @else border-sky-100 @enderror rounded-xl text-xs font-semibold focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-1.5">Gunakan username yang mudah diingat untuk login.</p>
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Foto Profil</label>
+                        <input type="file" name="foto" accept="image/jpeg,image/png,image/jpg,image/webp"
+                               class="w-full px-3 py-2 bg-sky-50/60 border @error('foto') border-rose-300 @else border-sky-100 @enderror rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-sky-500 file:text-white hover:file:bg-sky-600">
+                        <p class="text-[10px] text-slate-400 mt-1.5">Format JPG/PNG/WebP, maksimal 2MB.</p>
+                    </div>
+
                     <div>
                         <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Jenis Kelamin <span class="text-red-500">*</span></label>
                         <select name="jenis_kelamin" required
@@ -61,13 +94,60 @@
                             <option value="perempuan" {{ old('jenis_kelamin', $pembina?->jenis_kelamin) === 'perempuan' ? 'selected' : '' }}>Perempuan</option>
                         </select>
                     </div>
-                    <div class="md:col-span-2">
+
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Agama</label>
+                        <select name="agama"
+                                class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                            <option value="">Pilih Agama...</option>
+                            @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agm)
+                                <option value="{{ $agm }}" {{ old('agama', $pembina->agama) === $agm ? 'selected' : '' }}>{{ $agm }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tempat Lahir</label>
+                        <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $pembina->tempat_lahir) }}" placeholder="Kota kelahiran"
+                               class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tanggal Lahir</label>
+                        <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $pembina->tanggal_lahir?->format('Y-m-d')) }}"
+                               class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                    </div>
+
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">No. Telp / WhatsApp</label>
+                        <input type="text" name="no_telp" value="{{ old('no_telp', $pembina->no_telp) }}" placeholder="08xxxxxxxxxx"
+                               class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                    </div>
+
+                    <div>
                         <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Email (opsional)</label>
                         <input type="email" name="email" value="{{ old('email', auth()->user()->email ?? '') }}" placeholder="contoh@email.com"
                                class="w-full px-4 py-2.5 bg-sky-50/60 border @error('email') border-red-300 @else border-sky-100 @enderror rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
-                        <p class="text-[10px] text-slate-400 mt-1.5">Email tidak wajib. Hanya untuk notifikasi & fitur lupa password.</p>
                     </div>
+
+                    {{-- MEDIA SOSIAL DENGAN SISTEM ARAHAN --}}
                     <div class="md:col-span-2">
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Media Sosial</label>
+                        <input type="text" name="medsos" value="{{ old('medsos', $pembina->medsos) }}" placeholder="misal: @nama_pembina (Instagram) / link profil medsos"
+                               class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                        <div class="mt-2 p-2.5 bg-sky-50 border border-sky-100 rounded-xl text-[11px] text-sky-800 flex items-start gap-2">
+                            <span>💡</span>
+                            <span><b>Arahan Sistem:</b> Cantumkan akun Instagram atau kontak publik Anda agar anggota dan kesiswaan dapat berkoordinasi secara cepat untuk kebutuhan ekskul.</span>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Alamat Lengkap</label>
+                        <textarea name="alamat" rows="2" placeholder="Alamat domisili lengkap"
+                                  class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('alamat', $pembina->alamat) }}</textarea>
+                    </div>
+
+                    <div class="md:col-span-2 pt-2">
                         <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition hover:-translate-y-0.5">
                             {{ $profileComplete ? 'Simpan Perubahan' : 'Simpan Data' }}
                         </button>
@@ -78,7 +158,7 @@
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
-            <!-- Data Diri -->
+            <!-- Data Diri Ringkas -->
             <div class="h-full bg-white p-6 rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 animate-fade-up" style="animation-delay: .15s">
                 <h2 class="text-sm font-extrabold text-slate-900 mb-4">Data Diri</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -101,6 +181,10 @@
                     <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-xl border border-sky-100">
                         <p class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">Email</p>
                         <p class="text-sm font-bold text-slate-800 mt-1">{{ auth()->user()->email ?? '-' }}</p>
+                    </div>
+                    <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-xl border border-amber-100">
+                        <p class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">Media Sosial</p>
+                        <p class="text-sm font-bold text-slate-800 mt-1">{{ $pembina->medsos ?? '-' }}</p>
                     </div>
                 </div>
             </div>

@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Models\Ekskul;
+use App\Models\Kegiatan;
 use App\Models\Pendaftaran;
 use App\Models\Presensi;
+use App\Models\PresensiPelatih;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -31,11 +33,17 @@ class RekapAbsensiService
     /**
      * Bangun data rekap absensi untuk satu ekskul pada satu bulan.
      *
+     * Kegiatan rutin dihitung ke persentase kehadiran, kegiatan event
+     * (mis. diklat) hanya ditampilkan di bagian terpisah dan tidak dihitung.
+     *
      * @return array{
      *     ekskul: Ekskul,
      *     bulan: string,
      *     kegiatans: Collection<int, Kegiatan>,
+     *     eventKegiatans: Collection<int, Kegiatan>,
      *     rows: Collection<int, object>,
+     *     pelatih: Pelatih|null,
+     *     presensiPelatih: array<int, string>,
      *     totalHadir: int,
      *     totalIzin: int,
      *     totalSakit: int,
@@ -50,9 +58,12 @@ class RekapAbsensiService
         $tanggalMulai = Carbon::createFromFormat('Y-m', $bulan)->startOfMonth()->toDateString();
         $tanggalAkhir = Carbon::createFromFormat('Y-m', $bulan)->endOfMonth()->toDateString();
 
-        $kegiatans = $ekskul->kegiatans()
+        $semuaKegiatan = $ekskul->kegiatans()
             ->whereBetween('tanggal_kegiatan', [$tanggalMulai, $tanggalAkhir])
             ->get();
+
+        $kegiatans = $semuaKegiatan->reject(fn (Kegiatan $k) => $k->isEvent())->sortBy('tanggal_kegiatan')->values();
+        $eventKegiatans = $semuaKegiatan->filter(fn (Kegiatan $k) => $k->isEvent())->sortBy('tanggal_kegiatan')->values();
 
         $pendaftarans = $ekskul->pendaftarans()
             ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
@@ -61,7 +72,7 @@ class RekapAbsensiService
             ->sortBy(fn (Pendaftaran $p) => $p->siswa?->nama ?? '')
             ->values();
 
-        $kegiatanIds = $kegiatans->modelKeys();
+        $kegiatanIds = $semuaKegiatan->modelKeys();
         $pendaftaranIds = $pendaftarans->modelKeys();
 
         $presensis = Presensi::whereIn('pendaftaran_id', $pendaftaranIds)
@@ -69,16 +80,28 @@ class RekapAbsensiService
             ->get()
             ->keyBy(fn (Presensi $p) => $p->pendaftaran_id.'-'.$p->kegiatan_id);
 
-        $rows = $pendaftarans->map(function (Pendaftaran $pendaftaran) use ($kegiatans, $presensis) {
+        $pelatih = $ekskul->pelatih;
+        $presensiPelatih = $pelatih
+            ? PresensiPelatih::where('pelatih_id', $pelatih->id)
+                ->whereIn('kegiatan_id', $kegiatanIds)
+                ->pluck('status', 'kegiatan_id')
+                ->toArray()
+            : [];
+
+        $rows = $pendaftarans->map(function (Pendaftaran $pendaftaran) use ($semuaKegiatan, $kegiatans, $presensis) {
             $perKegiatan = [];
             $hadir = 0;
             $izin = 0;
             $sakit = 0;
             $alpha = 0;
 
-            foreach ($kegiatans as $kegiatan) {
+            foreach ($semuaKegiatan as $kegiatan) {
                 $status = $presensis->get($pendaftaran->id.'-'.$kegiatan->id)?->status;
                 $perKegiatan[$kegiatan->id] = $status;
+
+                if ($kegiatan->isEvent()) {
+                    continue;
+                }
 
                 match ($status) {
                     Presensi::STATUS_HADIR => $hadir++,
@@ -107,7 +130,10 @@ class RekapAbsensiService
             'ekskul' => $ekskul,
             'bulan' => $bulan,
             'kegiatans' => $kegiatans,
+            'eventKegiatans' => $eventKegiatans,
             'rows' => $rows,
+            'pelatih' => $pelatih,
+            'presensiPelatih' => $presensiPelatih,
             'totalHadir' => $rows->sum('hadir'),
             'totalIzin' => $rows->sum('izin'),
             'totalSakit' => $rows->sum('sakit'),

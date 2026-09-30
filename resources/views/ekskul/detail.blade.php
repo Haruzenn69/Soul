@@ -11,16 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @include('partials.theme-mode-head')
-    <style>
-        .ekskul-gradient-mesh {
-            background-color: #0284c7;
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(199, 89%, 48%, 1) 0, transparent 50%),
-                radial-gradient(at 50% 0%, hsla(217, 91%, 60%, 1) 0, transparent 50%),
-                radial-gradient(at 100% 0%, hsla(43, 96%, 56%, 0.8) 0, transparent 50%);
-        }
-    </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-sky-50 via-white to-amber-50/50 font-sans text-slate-800 antialiased selection:bg-sky-100 selection:text-sky-700">
     @php

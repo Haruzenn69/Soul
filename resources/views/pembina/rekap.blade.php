@@ -44,4 +44,6 @@
 
     @include('partials.rekap-summary')
     @include('partials.rekap-matriks')
+    @include('partials.rekap-event')
+    @include('partials.rekap-pelatih')
 @endsection

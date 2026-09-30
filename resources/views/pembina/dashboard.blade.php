@@ -141,7 +141,12 @@
                         <h2 class="text-sm font-extrabold text-slate-900">Daftar Anggota Ekskul</h2>
                         <p class="text-[11px] text-slate-400 mt-0.5">Kelola keanggotaan ekskul binaan</p>
                     </div>
-                    <span class="text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">{{ $anggotaAktifCount ?? 0 }} Aktif</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">{{ $anggotaAktifCount ?? 0 }} Aktif</span>
+                        <a href="{{ route('pembina.anggota') }}" class="text-[11px] font-bold text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-full transition">
+                            Tentukan Ketua →
+                        </a>
+                    </div>
                 </div>
 
                 @if(isset($anggota) && count($anggota) > 0)

@@ -7,21 +7,23 @@
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
         <div>
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Daftar Kegiatan</h1>
-            <p class="text-xs text-slate-400 mt-1">Total: {{ $kegiatans->count() }} kegiatan</p>
+            <p class="text-xs text-slate-400 mt-1">Total: {{ $total }} kegiatan</p>
         </div>
         <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <form method="GET" action="{{ route('ketua.kegiatan.index') }}" class="flex gap-2 min-w-0">
-                <label for="cari-kegiatan" class="sr-only">Cari kegiatan</label>
-                <input id="cari-kegiatan" type="search" name="cari" value="{{ request('cari') }}"
-                    placeholder="Cari kegiatan..." class="w-full sm:w-56 px-3 py-2 border border-slate-200 rounded-xl text-sm">
-                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition-all">Cari</button>
-            </form>
             <a href="{{ route('ketua.kegiatan.create') }}" class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 transition inline-flex items-center justify-center gap-2 shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Kegiatan baru
             </a>
         </div>
     </div>
+
+    @include('partials.table-filters', [
+        'action' => route('ketua.kegiatan.index'),
+        'placeholder' => 'Cari kegiatan...',
+        'filters' => [
+            ['name' => 'jenis', 'allLabel' => 'Semua Jenis', 'options' => ['rutin' => 'Rutin', 'event' => 'Event']],
+        ],
+    ])
 
     <!-- Table Card -->
     <div class="ketua-card-list bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
@@ -30,9 +32,9 @@
                 <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
                     <tr>
                         <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap rounded-l-xl">No</th>
-                        <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Tanggal</th>
+                        @include('partials.th-sort', ['label' => 'Tanggal', 'key' => 'tanggal_kegiatan', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                         <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Hari</th>
-                        <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Kegiatan</th>
+                        @include('partials.th-sort', ['label' => 'Kegiatan', 'key' => 'materi', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                         <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Presensi</th>
                         <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap rounded-r-xl">Aksi</th>
                     </tr>
@@ -41,9 +43,18 @@
                     @forelse($kegiatans as $kegiatan)
                         <tr class="hover:bg-sky-50/50 transition" data-card-href="{{ route('ketua.kegiatan.show', $kegiatan) }}">
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap text-slate-500">{{ $loop->iteration }}</td>
-                            <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap font-medium text-slate-700">{{ $kegiatan->tanggal_kegiatan->format('d/m/Y') }}</td>
+                            <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap font-medium text-slate-700">
+                                @if($kegiatan->isEvent() && $kegiatan->tanggal_berakhir)
+                                    {{ $kegiatan->tanggal_kegiatan->format('d/m/Y') }} &ndash; {{ $kegiatan->tanggal_berakhir->format('d/m/Y') }}
+                                @else
+                                    {{ $kegiatan->tanggal_kegiatan->format('d/m/Y') }}
+                                @endif
+                            </td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap text-slate-600">
                                 {{ $kegiatan->tanggal_kegiatan->isoFormat('dddd') }}
+                                @if($kegiatan->isEvent())
+                                    <span class="ml-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">Event</span>
+                                @endif
                             </td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap font-medium text-slate-800">{{ $kegiatan->materi }}</td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap">
@@ -95,15 +106,7 @@
             </table>
         </div>
 
-        <!-- Footer Tabel dengan Total -->
-        <div class="ketua-card-footer px-3 md:px-6 py-3 border-t border-sky-50 flex justify-between items-center">
-            <span class="text-[10px] md:text-xs text-slate-400">Menampilkan {{ $kegiatans->count() }} kegiatan</span>
-            @if(method_exists($kegiatans, 'hasPages') && $kegiatans->hasPages())
-                <div class="flex gap-1">
-                    {{ $kegiatans->links() }}
-                </div>
-            @endif
-        </div>
+        @include('partials.table-pagination', ['rows' => $kegiatans, 'label' => 'kegiatan'])
     </div>
 </div>
 @endsection

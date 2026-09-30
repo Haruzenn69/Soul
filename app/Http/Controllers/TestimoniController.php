@@ -5,23 +5,36 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Models\Testimoni;
 use App\Services\NotifikasiService;
+use App\Support\TableKit;
 use Illuminate\Http\Request;
 
 class TestimoniController extends Controller
 {
     use KetuaEkskul;
 
-    public function index()
+    public function index(Request $request)
     {
         $ekskul = $this->ekskul();
-        $testimoniss = $ekskul->testimoniss()
-            ->orderByRaw("FIELD(status, 'pending', 'approved', 'rejected')")
-            ->latest()
-            ->get();
+        $base = $ekskul->testimoniss();
 
-        $pendingCount = $testimoniss->where('status', Testimoni::STATUS_PENDING)->count();
+        $pendingCount = (clone $base)->where('status', Testimoni::STATUS_PENDING)->count();
+        $total = (clone $base)->count();
 
-        return view('ketua.testimoni.index', compact('testimoniss', 'pendingCount'));
+        [$sort, $direction] = TableKit::sort(['nama', 'status'], 'status', 'asc');
+
+        $testimoniss = (clone $base)
+            ->when($request->filled('cari'), function ($query) use ($request) {
+                $cari = $request->input('cari');
+                $query->where(fn ($q) => $q->where('nama', 'like', "%{$cari}%")->orWhere('kelas', 'like', "%{$cari}%")->orWhere('quote', 'like', "%{$cari}%"));
+            })
+            ->when($request->filled('status') && $request->input('status') !== 'semua', fn ($query) => $query->where('status', $request->input('status')))
+            ->when($sort === 'status',
+                fn ($query) => $query->when($direction === 'asc', fn ($q) => $q->orderByRaw("CASE status WHEN 'pending' THEN 1 WHEN 'approved' THEN 2 ELSE 3 END"), fn ($q) => $q->orderByDesc('status')),
+                fn ($query) => $query->orderBy($sort, $direction))
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('ketua.testimoni.index', compact('testimoniss', 'pendingCount', 'total', 'sort', 'direction'));
     }
 
     public function store(Request $request)

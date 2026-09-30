@@ -21,6 +21,10 @@
                         @endforeach
                     </select>
                 </form>
+                <a href="{{ route('ketua.presensi.rekap-pdf', ['bulan' => $bulan]) }}" target="_blank"
+                    class="px-4 py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs rounded-xl shadow-md shadow-sky-200 transition">
+                    Print PDF
+                </a>
                 <a href="{{ route('ketua.kegiatan.index') }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition">Kegiatan</a>
                 <a href="{{ route('ketua.dashboard') }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition">Dashboard</a>
             </div>
@@ -28,5 +32,7 @@
 
         @include('partials.rekap-summary')
         @include('partials.rekap-matriks')
+        @include('partials.rekap-event')
+        @include('partials.rekap-pelatih')
     </div>
 @endsection
