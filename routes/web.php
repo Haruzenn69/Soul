@@ -37,6 +37,7 @@ use App\Http\Controllers\Siswa\PengajuanController;
 use App\Http\Controllers\Siswa\PresensiController as SiswaPresensiController;
 use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
 use App\Http\Controllers\TestimoniController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -57,6 +58,21 @@ Route::get('/storage/{path}', function (string $path) {
 
     return response()->file($filePath);
 })->where('path', '.*')->name('storage.public');
+
+Route::middleware(['auth', 'role:kesiswaan,admin'])->get('/maintenance/clear-cache', function () {
+    $secret = env('MAINTENANCE_SECRET', '0192837465');
+
+    abort_unless(hash_equals($secret, request('token', '')), 403, 'Token tidak valid.');
+
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+
+    return response('Cache berhasil dibersihkan: '.implode(', ', [
+        'config', 'cache', 'view', 'route',
+    ]));
+})->name('maintenance.clear-cache');
 
 Route::get('/', [HomeController::class, 'landing'])->name('siswa.landing');
 
