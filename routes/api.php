@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Ketua\LaporanBulananController as KetuaLaporanBulan
 use App\Http\Controllers\Api\Ketua\MembershipController as KetuaMembershipController;
 use App\Http\Controllers\Api\Ketua\NotifikasiController as KetuaNotifikasiController;
 use App\Http\Controllers\Api\Ketua\ProfilEkskulController as KetuaProfilEkskulController;
+use App\Http\Controllers\Api\Ketua\TestimoniController as KetuaTestimoniController;
 use App\Http\Controllers\Api\Siswa\SiswaController;
 use Illuminate\Support\Facades\Route;
 
@@ -86,6 +87,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/prestasi', [KetuaProfilEkskulController::class, 'prestasi'])->name('prestasi');
         Route::post('/prestasi', [KetuaProfilEkskulController::class, 'storePrestasi'])->name('prestasi.store');
         Route::delete('/prestasi/{prestasi}', [KetuaProfilEkskulController::class, 'destroyPrestasi'])->name('prestasi.destroy');
+
+        Route::get('/testimoni', [KetuaTestimoniController::class, 'index'])->name('testimoni.index');
+        Route::post('/testimoni', [KetuaTestimoniController::class, 'store'])->name('testimoni.store');
+        Route::post('/testimoni/{testimoni}/approve', [KetuaTestimoniController::class, 'approve'])->name('testimoni.approve');
+        Route::post('/testimoni/{testimoni}/reject', [KetuaTestimoniController::class, 'reject'])->name('testimoni.reject');
+        Route::delete('/testimoni/{testimoni}', [KetuaTestimoniController::class, 'destroy'])->name('testimoni.destroy');
 
         Route::get('/notifikasi', [KetuaNotifikasiController::class, 'index'])->name('notifikasi');
         Route::post('/notifikasi/{notifikasi}/read', [KetuaNotifikasiController::class, 'read'])->name('notifikasi.read');

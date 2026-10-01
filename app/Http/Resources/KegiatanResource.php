@@ -22,6 +22,7 @@ class KegiatanResource extends JsonResource
             'tanggal_berakhir' => $this->tanggal_berakhir?->toDateString(),
             'tanggal_text' => $this->tanggalText(),
             'presensis_count' => $this->whenHas('presensis_count', fn () => (int) $this->presensis_count),
+            'hadir_count' => $this->whenHas('hadir_count', fn () => (int) $this->hadir_count),
         ];
     }
 }
