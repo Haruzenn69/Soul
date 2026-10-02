@@ -14,6 +14,14 @@ class EkskulController extends Controller
 {
     public function index(Request $request): View
     {
+        $sort = in_array($request->input('sort'), ['nama_ekskul', 'status', 'rekrutmen', 'created_at'], true) ? $request->input('sort') : 'nama_ekskul';
+        $direction = $request->input('direction') === 'desc' ? 'desc' : 'asc';
+
+        $sortColumn = match ($sort) {
+            'rekrutmen' => 'is_open_recruitment',
+            default => $sort,
+        };
+
         $ekskuls = Ekskul::with(['pembina', 'pelatih'])
             ->when($request->filled('q'), function ($query) use ($request) {
                 $q = $request->input('q');
@@ -24,13 +32,15 @@ class EkskulController extends Controller
             ->when($request->input('status') === 'nonaktif', fn ($q) => $q->where('status', false))
             ->when($request->input('rekrutmen') === 'buka', fn ($q) => $q->where('is_open_recruitment', true))
             ->when($request->input('rekrutmen') === 'tutup', fn ($q) => $q->where('is_open_recruitment', false))
-            ->latest()
+            ->orderBy($sortColumn, $direction)
             ->paginate(15)
             ->withQueryString();
 
         return view('kesiswaan.ekskuls.index', [
-            'ekskuls'  => $ekskuls,
-            'pembinas' => Pembina::withCount('ekskuls')->orderBy('nama')->get(),
+            'ekskuls'   => $ekskuls,
+            'pembinas'  => Pembina::withCount('ekskuls')->orderBy('nama')->get(),
+            'sort'      => $sort,
+            'direction' => $direction,
         ]);
     }
 
@@ -38,19 +48,29 @@ class EkskulController extends Controller
     {
         $ekskul->load(['pembina', 'pelatih']);
 
-        $anggota = $ekskul->pendaftarans()
+        $sort = in_array($request->input('sort'), ['nama', 'nis', 'status', 'tanggal_daftar'], true) ? $request->input('sort') : 'status';
+        $direction = $request->input('direction') === 'desc' ? 'desc' : 'asc';
+
+        $anggotaQuery = $ekskul->pendaftarans()
             ->with('siswa.kelas')
             ->when($request->filled('q'), function ($query) use ($request) {
                 $q = '%' . $request->input('q') . '%';
                 $query->whereHas('siswa', fn ($s) => $s->where('nama', 'like', $q)->orWhere('nis', 'like', $q));
             })
             ->when($request->filled('status_anggota'), fn ($query) => $query->where('status', $request->input('status_anggota')))
-            ->whereNotIn('status', [Pendaftaran::STATUS_KELUAR])
-            ->orderBy('status')
-            ->paginate(20)
-            ->withQueryString();
+            ->whereNotIn('status', [Pendaftaran::STATUS_KELUAR]);
 
-        return view('kesiswaan.ekskuls.show', compact('ekskul', 'anggota'));
+        if (in_array($sort, ['nama', 'nis'], true)) {
+            $anggotaQuery->join('siswas', 'siswas.id', '=', 'pendaftarans.siswa_id')
+                ->select('pendaftarans.*')
+                ->orderBy("siswas.{$sort}", $direction);
+        } else {
+            $anggotaQuery->orderBy($sort, $direction);
+        }
+
+        $anggota = $anggotaQuery->paginate(20)->withQueryString();
+
+        return view('kesiswaan.ekskuls.show', compact('ekskul', 'anggota', 'sort', 'direction'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -62,9 +82,19 @@ class EkskulController extends Controller
             'jadwal'      => ['nullable', 'string', 'max:255'],
         ]);
 
+        if (!empty($data['pembina_id'])) {
+            $pembina = Pembina::findOrFail($data['pembina_id']);
+            $count = Ekskul::where('pembina_id', $pembina->id)->count();
+            if ($count >= 4) {
+                return back()->withErrors([
+                    'pembina_id' => "Pembina {$pembina->nama} sudah membina 4 ekskul (batas maksimal 4 ekskul per pembina)."
+                ])->withInput();
+            }
+        }
+
         Ekskul::create($data);
 
-        return back()->with('success', "Ekskul {$data['nama_ekskul']} berhasil ditambahkan. Pembina dapat ditugaskan di halaman Data Pembina.");
+        return back()->with('success', "Ekskul {$data['nama_ekskul']} berhasil ditambahkan.");
     }
 
     public function update(Request $request, Ekskul $ekskul): RedirectResponse

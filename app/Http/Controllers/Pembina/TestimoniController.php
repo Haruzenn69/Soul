@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pembina;
 use App\Http\Controllers\Controller;
 use App\Models\Testimoni;
 use App\Services\NotifikasiService;
+use App\Support\TableKit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -40,20 +41,29 @@ class TestimoniController extends Controller
             abort(403, 'Ekskul bukan binaan Anda.');
         }
 
-        $query = Testimoni::whereIn('ekskul_id', $ekskulIds)
-            ->with('ekskul')
-            ->orderByRaw("CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END")
-            ->latest();
+        $base = Testimoni::whereIn('ekskul_id', $ekskulIds)->with('ekskul');
 
         if ($ekskulFilter) {
-            $query->where('ekskul_id', $ekskulFilter);
+            $base->where('ekskul_id', $ekskulFilter);
         }
 
-        $testimoniss = $query->get();
+        $pendingCount = (clone $base)->where('status', Testimoni::STATUS_PENDING)->count();
+        $approvedCount = (clone $base)->where('status', Testimoni::STATUS_APPROVED)->count();
+        $totalCount = (clone $base)->count();
 
-        $pendingCount = $testimoniss->where('status', Testimoni::STATUS_PENDING)->count();
-        $approvedCount = $testimoniss->where('status', Testimoni::STATUS_APPROVED)->count();
-        $totalCount = $testimoniss->count();
+        [$sort, $direction] = TableKit::sort(['nama', 'status', 'created_at'], 'status', 'asc');
+
+        $testimoniss = (clone $base)
+            ->when($request->filled('cari'), function ($query) use ($request) {
+                $cari = $request->input('cari');
+                $query->where(fn ($q) => $q->where('nama', 'like', "%{$cari}%")->orWhere('kelas', 'like', "%{$cari}%")->orWhere('quote', 'like', "%{$cari}%"));
+            })
+            ->when($request->filled('status') && $request->input('status') !== 'semua', fn ($query) => $query->where('status', $request->input('status')))
+            ->when($sort === 'status',
+                fn ($query) => $query->when($direction === 'asc', fn ($q) => $q->orderByRaw("CASE status WHEN 'pending' THEN 1 WHEN 'approved' THEN 2 ELSE 3 END"), fn ($q) => $q->orderByDesc('status')),
+                fn ($query) => $query->orderBy($sort, $direction))
+            ->paginate(10)
+            ->withQueryString();
 
         return view('pembina.testimoni.index', compact(
             'testimoniss',
@@ -61,7 +71,9 @@ class TestimoniController extends Controller
             'approvedCount',
             'totalCount',
             'ekskuls',
-            'ekskulFilter'
+            'ekskulFilter',
+            'sort',
+            'direction'
         ));
     }
 

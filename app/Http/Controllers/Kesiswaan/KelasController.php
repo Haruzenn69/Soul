@@ -19,13 +19,17 @@ class KelasController extends Controller
         $currentTahunAjaranId = $request->input('tahun_ajaran_id');
         $q = $request->input('q');
 
+        $sort = in_array($request->input('sort'), ['nama', 'tingkat', 'siswas_count', 'created_at'], true) ? $request->input('sort') : 'nama';
+        $direction = $request->input('direction') === 'desc' ? 'desc' : 'asc';
+
         $kelas = Kelas::with(['tahunAjaran', 'siswas'])
+            ->withCount('siswas')
             ->when($q, function ($query) use ($q) {
                 $query->where('nama', 'like', '%'.$q.'%');
             })
             ->when($currentTingkat, fn ($query) => $query->where('tingkat', $currentTingkat))
             ->when($currentTahunAjaranId, fn ($query) => $query->where('tahun_ajaran_id', $currentTahunAjaranId))
-            ->orderBy('nama')
+            ->orderBy($sort, $direction)
             ->paginate(12)
             ->withQueryString();
 
@@ -42,6 +46,8 @@ class KelasController extends Controller
             'counts' => $counts,
             'tahunAjarans' => TahunAjaran::orderBy('nama', 'desc')->get(),
             'activeTingkat' => $currentTingkat,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 

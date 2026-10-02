@@ -153,4 +153,61 @@ final class EkskulInfo
 
         return sprintf('%02d.%02d', $jam, $menit);
     }
+
+    /**
+     * Tentukan kelompok/bidang ekskul berdasarkan nama ekskul.
+     * Contoh: Karate/Futsal -> "Olahraga", Tari/Musik -> "Kesenian", Paskibra -> "Bela Negara & Kepemimpinan".
+     */
+    public static function bidang(?string $namaEkskul): string
+    {
+        $nama = mb_strtolower(trim((string) $namaEkskul));
+        if ($nama === '') {
+            return 'Umum';
+        }
+
+        // Olahraga & Bela Diri
+        if (preg_match('/(karate|taekwondo|silat|pencak|futsal|sepak|bola|basket|voli|volly|badminton|bulu tangkis|bulutangkis|tenis|renang|atletik|catur)/i', $nama)) {
+            return 'Olahraga';
+        }
+
+        // Kesenian, Musik & Budaya
+        if (preg_match('/(tari|dance|karawitan|teater|paduan suara|choir|vocal|vokal|musik|band|angklung|seni|lukis|drumband|marching band)/i', $nama)) {
+            return 'Kesenian';
+        }
+
+        // Kepemimpinan, Kebangsaan & Bela Negara
+        if (preg_match('/(paskibra|pramuka|pmr|palang merah|pks|patroli)/i', $nama)) {
+            return 'Bela Negara & Kepemimpinan';
+        }
+
+        // Kerohanian & Keagamaan
+        if (preg_match('/(rohis|rokris|irma|masjid|tahfidz|qasidah|islam|kristen|katolik)/i', $nama)) {
+            return 'Kerohanian & Keagamaan';
+        }
+
+        // Teknologi, Sains & Akademik
+        if (preg_match('/(it|robotik|robotics|coding|komputer|multimedia|design|desain|kir|karya ilmiah|english|japanese|jepang|jurnalistik|sinematografi)/i', $nama)) {
+            return 'Teknologi & Sains';
+        }
+
+        // Keterampilan & Kewirausahaan
+        if (preg_match('/(koperasi|kewirausahaan|tata boga|boga|busana)/i', $nama)) {
+            return 'Keterampilan';
+        }
+
+        return 'Umum';
+    }
+
+    public static function bidangBadgeClass(string $bidang): string
+    {
+        return match ($bidang) {
+            'Olahraga' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            'Kesenian' => 'bg-purple-50 text-purple-700 border-purple-200',
+            'Bela Negara & Kepemimpinan' => 'bg-rose-50 text-rose-700 border-rose-200',
+            'Kerohanian & Keagamaan' => 'bg-teal-50 text-teal-700 border-teal-200',
+            'Teknologi & Sains' => 'bg-sky-50 text-sky-700 border-sky-200',
+            'Keterampilan' => 'bg-amber-50 text-amber-700 border-amber-200',
+            default => 'bg-slate-50 text-slate-700 border-slate-200',
+        };
+    }
 }

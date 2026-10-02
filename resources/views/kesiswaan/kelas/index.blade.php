@@ -4,7 +4,22 @@
 
 @section('content')
 @php
-    $hasFilter = request()->filled(['q', 'tahun_ajaran_id']);
+    $sort = $sort ?? 'nama';
+    $direction = $direction ?? 'asc';
+
+    $sortLink = function (string $column) use ($sort, $direction) {
+        $nextDirection = $sort === $column && $direction === 'asc' ? 'desc' : 'asc';
+        return request()->fullUrlWithQuery(['sort' => $column, 'direction' => $nextDirection, 'page' => null]);
+    };
+
+    $sortIcon = function (string $column) use ($sort, $direction) {
+        if ($sort !== $column) {
+            return 'M8 9l4-4 4 4M8 15l4 4 4-4';
+        }
+        return $direction === 'asc' ? 'M8 15l4 4 4-4' : 'M8 9l4-4 4 4';
+    };
+
+    $hasFilter = request()->filled(['q', 'tahun_ajaran_id']) || request()->filled('sort');
 @endphp
 
 <div class="space-y-5 animate-fade-up">
@@ -124,6 +139,12 @@
         @if ($activeTingkat)
             <input type="hidden" name="tingkat" value="{{ $activeTingkat }}">
         @endif
+        @if(request('sort'))
+            <input type="hidden" name="sort" value="{{ request('sort') }}">
+        @endif
+        @if(request('direction'))
+            <input type="hidden" name="direction" value="{{ request('direction') }}">
+        @endif
 
         <div class="flex flex-col md:flex-row gap-3 items-stretch">
             {{-- Search Bar --}}
@@ -171,11 +192,32 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-bold text-slate-400 tracking-wider uppercase">
-                        <th class="py-3.5 px-5">Nama Kelas</th>
-                        <th class="py-3.5 px-5">Tingkat</th>
+                        <th class="py-3.5 px-5">
+                            <a href="{{ $sortLink('nama') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
+                                Nama Kelas
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('nama') }}"/>
+                                </svg>
+                            </a>
+                        </th>
+                        <th class="py-3.5 px-5">
+                            <a href="{{ $sortLink('tingkat') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
+                                Tingkat
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('tingkat') }}"/>
+                                </svg>
+                            </a>
+                        </th>
                         <th class="py-3.5 px-5">Jurusan / Rombel</th>
                         <th class="py-3.5 px-5">Tahun Ajaran</th>
-                        <th class="py-3.5 px-5">Jumlah Siswa</th>
+                        <th class="py-3.5 px-5">
+                            <a href="{{ $sortLink('siswas_count') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
+                                Jumlah Siswa
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('siswas_count') }}"/>
+                                </svg>
+                            </a>
+                        </th>
                         <th class="py-3.5 px-5 text-right">Aksi</th>
                     </tr>
                 </thead>

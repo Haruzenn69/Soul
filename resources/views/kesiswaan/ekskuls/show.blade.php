@@ -4,7 +4,22 @@
 
 @section('content')
 @php
-    $hasFilter = request()->filled(['q', 'status_anggota']);
+    $sort = $sort ?? 'status';
+    $direction = $direction ?? 'asc';
+
+    $sortLink = function (string $column) use ($sort, $direction) {
+        $nextDirection = $sort === $column && $direction === 'asc' ? 'desc' : 'asc';
+        return request()->fullUrlWithQuery(['sort' => $column, 'direction' => $nextDirection, 'page' => null]);
+    };
+
+    $sortIcon = function (string $column) use ($sort, $direction) {
+        if ($sort !== $column) {
+            return 'M8 9l4-4 4 4M8 15l4 4 4-4';
+        }
+        return $direction === 'asc' ? 'M8 15l4 4 4-4' : 'M8 9l4-4 4 4';
+    };
+
+    $hasFilter = request()->filled(['q', 'status_anggota']) || request()->filled('sort');
     $statusColors = [
         'diterima'   => 'bg-emerald-50 text-emerald-700 border border-emerald-100',
         'pending'    => 'bg-amber-50 text-amber-700 border border-amber-100',
@@ -122,9 +137,15 @@
                         {{ strtoupper(substr($ekskul->pelatih->nama, 0, 2)) }}
                     </div>
                     <div>
-                        <div class="font-bold text-sm text-slate-900">{{ $ekskul->pelatih->nama }}</div>
-                        <div class="text-[11px] text-slate-400">{{ ucfirst($ekskul->pelatih->jenis_kelamin ?? '-') }}</div>
-                        <div class="text-[11px] text-slate-400">{{ $ekskul->pelatih->no_hp ?? 'No. HP belum diisi' }}</div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-sm text-slate-900">{{ $ekskul->pelatih->nama }}</span>
+                            @if($ekskul->pelatih->isTerverifikasi())
+                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Terverifikasi</span>
+                            @elseif($ekskul->pelatih->isPending())
+                                <a href="{{ route('kesiswaan.pelatih.index', ['status' => 'pending']) }}" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 hover:underline">Verifikasi Sekarang &rarr;</a>
+                            @endif
+                        </div>
+                        <div class="text-[11px] text-slate-400">{{ ucfirst($ekskul->pelatih->jenis_kelamin ?? '-') }} &bull; {{ $ekskul->pelatih->no_hp ?? 'No. HP belum diisi' }}</div>
                     </div>
                 </div>
             @else
@@ -138,6 +159,12 @@
 
     {{-- SEARCH & FILTER ANGGOTA --}}
     <form method="GET" action="{{ route('kesiswaan.ekskuls.show', $ekskul) }}" class="bg-white p-4 rounded-3xl border border-sky-100 shadow-sm">
+        @if(request('sort'))
+            <input type="hidden" name="sort" value="{{ request('sort') }}">
+        @endif
+        @if(request('direction'))
+            <input type="hidden" name="direction" value="{{ request('direction') }}">
+        @endif
         <div class="flex flex-col lg:flex-row gap-3 items-stretch">
             <div class="text-xs font-extrabold text-slate-700 flex items-center gap-2 shrink-0">
                 <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
@@ -176,12 +203,40 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-bold text-slate-400 tracking-wider uppercase">
-                        <th class="py-3.5 px-5">Anggota</th>
-                        <th class="py-3.5 px-5">NIS</th>
+                        <th class="py-3.5 px-5">
+                            <a href="{{ $sortLink('nama') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
+                                Anggota
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('nama') }}"/>
+                                </svg>
+                            </a>
+                        </th>
+                        <th class="py-3.5 px-5">
+                            <a href="{{ $sortLink('nis') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
+                                NIS
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('nis') }}"/>
+                                </svg>
+                            </a>
+                        </th>
                         <th class="py-3.5 px-5">Kelas</th>
                         <th class="py-3.5 px-5">Jenis Kelamin</th>
-                        <th class="py-3.5 px-5">Tanggal Daftar</th>
-                        <th class="py-3.5 px-5">Status</th>
+                        <th class="py-3.5 px-5">
+                            <a href="{{ $sortLink('tanggal_daftar') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
+                                Tanggal Daftar
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('tanggal_daftar') }}"/>
+                                </svg>
+                            </a>
+                        </th>
+                        <th class="py-3.5 px-5">
+                            <a href="{{ $sortLink('status') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
+                                Status
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('status') }}"/>
+                                </svg>
+                            </a>
+                        </th>
                         <th class="py-3.5 px-5 text-right">Aksi</th>
                     </tr>
                 </thead>

@@ -27,18 +27,7 @@
         </div>
     </div>
 
-    <!-- Filter Ekskul -->
-    @if($ekskuls->count() > 1)
-        <form method="GET" action="{{ route('pembina.testimoni.index') }}" class="flex items-center gap-2">
-            <select name="ekskul" onchange="this.form.submit()"
-                class="px-4 py-2.5 bg-white border border-sky-100 rounded-2xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
-                <option value="">Semua Ekskul</option>
-                @foreach($ekskuls as $ex)
-                    <option value="{{ $ex->id }}" {{ ($ekskulFilter ?? 0) == $ex->id ? 'selected' : '' }}>{{ $ex->nama_ekskul }}</option>
-                @endforeach
-            </select>
-        </form>
-    @endif
+
 
     <!-- Add Form Card -->
     <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl space-y-5 animate-fade-up" style="animation-delay: .1s">
@@ -83,6 +72,25 @@
         </form>
     </div>
 
+    @php
+        $filters = [
+            ['name' => 'status', 'allLabel' => 'Semua Status', 'options' => ['pending' => 'Menunggu', 'approved' => 'Ditampilkan', 'rejected' => 'Ditolak']],
+        ];
+        if ($ekskuls->count() > 1) {
+            $filters[] = [
+                'name' => 'ekskul',
+                'allLabel' => 'Semua Ekskul',
+                'options' => $ekskuls->pluck('nama_ekskul', 'id')->toArray()
+            ];
+        }
+    @endphp
+
+    @include('partials.table-filters', [
+        'action' => route('pembina.testimoni.index'),
+        'placeholder' => 'Cari nama / kelas / testimoni...',
+        'filters' => $filters,
+    ])
+
     <!-- Table Card -->
     <div class="bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
         <div class="overflow-x-auto">
@@ -90,21 +98,25 @@
             <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
                 <tr>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
-                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Ekskul</th>
-                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Nama</th>
+                    @if($ekskuls->count() > 1)
+                        <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Ekskul</th>
+                    @endif
+                    @include('partials.th-sort', ['label' => 'Nama', 'key' => 'nama', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Kelas</th>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Testimoni</th>
-                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Status</th>
+                    @include('partials.th-sort', ['label' => 'Status', 'key' => 'status', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-sky-50">
-                @forelse($testimoniss as $testimoni)
+                @forelse($testimoniss as $key => $testimoni)
                     <tr class="hover:bg-sky-50/50 transition">
-                        <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $loop->iteration }}</td>
-                        <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
-                            <span class="px-2.5 py-1 bg-sky-50 border border-sky-100 rounded-full text-[10px] font-bold text-sky-700">{{ $testimoni->ekskul->nama_ekskul ?? '-' }}</span>
-                        </td>
+                        <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $testimoniss->firstItem() + $key }}</td>
+                        @if($ekskuls->count() > 1)
+                            <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
+                                <span class="px-2.5 py-1 bg-sky-50 border border-sky-100 rounded-full text-[10px] font-bold text-sky-700">{{ $testimoni->ekskul->nama_ekskul ?? '-' }}</span>
+                            </td>
+                        @endif
                         <td class="px-4 md:px-6 py-3.5 font-medium whitespace-nowrap">{{ $testimoni->nama }}</td>
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $testimoni->kelas ?? '-' }}</td>
                         <td class="px-4 md:px-6 py-3.5 max-w-md">
@@ -151,11 +163,14 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-4 md:px-6 py-10 text-center text-slate-400">Belum ada testimoni. Tambahkan suara anggota melalui form di atas.</td>
+                        <td colspan="{{ $ekskuls->count() > 1 ? 7 : 6 }}" class="px-4 md:px-6 py-10 text-center text-slate-400">Belum ada testimoni. Tambahkan suara anggota melalui form di atas.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
+        </div>
+        <div class="p-4 border-t border-sky-100">
+            {{ $testimoniss->links() }}
         </div>
     </div>
 @endsection
