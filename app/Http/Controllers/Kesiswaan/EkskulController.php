@@ -85,9 +85,6 @@ class EkskulController extends Controller
             'deskripsi'   => ['nullable', 'string'],
             'jadwal'      => ['nullable', 'string', 'max:255'],
         ]);
-<<<<<<< HEAD
-=======
-
         if (!empty($data['pembina_id'])) {
             $pembina = Pembina::findOrFail($data['pembina_id']);
             $count = Ekskul::where('pembina_id', $pembina->id)->count();
@@ -97,8 +94,6 @@ class EkskulController extends Controller
                 ])->withInput();
             }
         }
-
->>>>>>> origin/main
         Ekskul::create($data);
 
         return back()->with('success', "Ekskul {$data['nama_ekskul']} berhasil ditambahkan.");
@@ -113,16 +108,6 @@ class EkskulController extends Controller
             'deskripsi' => ['nullable', 'string'],
             'jadwal' => ['nullable', 'string', 'max:255'],
         ]);
-        if ($ekskul->pembina_id != $data['pembina_id']) {
-            $pembina = Pembina::findOrFail($data['pembina_id']);
-            $pembinaEkskulCount = Ekskul::where('pembina_id', $pembina->id)->count();
-            if ($pembinaEkskulCount >= 4) {
-                return back()->withErrors([
-                    'pembina_id' => "Pembina {$pembina->nama} sudah membina 4 ekskul (batas maksimal 4 ekskul per pembina)."
-                ])->withInput();
-            }
-        }
-
         $ekskul->update($data);
 
         return back()->with('success', "Ekskul {$ekskul->nama_ekskul} berhasil diperbarui.");

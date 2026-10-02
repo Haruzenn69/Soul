@@ -110,4 +110,25 @@ class UserCreateFormTest extends TestCase
         $response->assertSessionHasErrors('tanggal_lahir');
         $this->assertDatabaseMissing('siswas', ['nis' => '3000000001']);
     }
+
+    public function test_pembina_dapat_dibuat_tanpa_email(): void
+    {
+        $response = $this->actingAs($this->makeUser('kesiswaan'))
+            ->post(route('kesiswaan.users.store'), [
+                'role' => 'pembina',
+                'pembina_nama' => 'Budi Pembina',
+                'nip' => '198001012010011001',
+            ]);
+
+        $response->assertRedirect(route('kesiswaan.users.index'));
+        $response->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('users', [
+            'role' => 'pembina',
+            'email' => null,
+        ]);
+        $this->assertDatabaseHas('pembinas', [
+            'nama' => 'Budi Pembina',
+            'email' => null,
+        ]);
+    }
 }
