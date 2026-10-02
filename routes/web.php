@@ -92,8 +92,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::post('/onboarding/complete', [OnboardingController::class, 'complete'])->name('onboarding.complete');
     Route::post('/onboarding/setup', [OnboardingController::class, 'setup'])->name('onboarding.setup');
+    Route::post('/onboarding/login', [OnboardingController::class, 'returnToLogin'])->name('onboarding.login');
 });
 
 Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('kesiswaan.')->group(function () {
@@ -117,8 +117,10 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
     ]);
 
     Route::get('siswa', [SiswaController::class, 'index'])->name('siswa.index');
+    Route::get('siswa/{siswa}/riwayat-profil', [SiswaController::class, 'riwayatProfil'])->name('siswa.riwayat-profil');
 
     Route::get('pembina', [KesiswaanPembinaController::class, 'index'])->name('pembina.index');
+    Route::get('pembina/{pembina}/riwayat-profil', [KesiswaanPembinaController::class, 'riwayatProfil'])->name('pembina.riwayat-profil');
 
     Route::get('pelatih', [KesiswaanPelatihController::class, 'index'])->name('pelatih.index');
     Route::post('pelatih/{pelatih}/verifikasi', [KesiswaanPelatihController::class, 'verifikasi'])->name('pelatih.verifikasi');

@@ -13,7 +13,7 @@
             <!-- TEXT + CTA -->
             <div class="lg:col-span-3">
                 <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight">
-                    Halo, {{ auth()->user()->username }}!
+                    Selamat datang {{ auth()->user()->username }}
                 </h1>
                 <p class="text-sm text-white/85 mt-1.5 font-medium">
                     {{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }}

@@ -265,7 +265,7 @@
                     </div>
                     <div class="flex-1">
                         <h2 class="text-sm font-extrabold text-amber-900">Lengkapi Data Diri Kamu</h2>
-                        <p class="text-xs text-amber-700 mt-1 leading-relaxed">Nama dan kelas ditetapkan oleh kesiswaan. Lengkapi <b>jenis kelamin</b> (dan email bila ada) pada form di bawah agar bisa <b>mendaftar ekskul</b>.</p>
+                        <p class="text-xs text-amber-700 mt-1 leading-relaxed">Data biodata yang belum lengkap perlu diperbarui oleh kesiswaan. Kamu tetap dapat mengubah foto profil, nomor telepon, dan email di bawah.</p>
                     </div>
                 </div>
             @endif
@@ -315,7 +315,8 @@
                     <!-- UBAH / LENGKAPI DATA PRIBADI -->
                     <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .12s">
                         <div class="px-6 py-5 border-b border-sky-50">
-                            <h2 class="text-sm font-extrabold text-slate-900">{{ $profilLengkap ? 'Ubah Data Pribadi' : 'Lengkapi Data Pribadi' }}</h2>
+                        <h2 class="text-sm font-extrabold text-slate-900">Data yang Dapat Diubah</h2>
+                        <p class="text-[11px] text-slate-400 mt-1">Kamu dapat mengubah foto profil, nomor telepon, dan email. Biodata lainnya dikelola kesiswaan.</p>
                             <p class="text-[11px] text-slate-400 mt-0.5">{{ $profilLengkap ? 'Perbarui informasi identitas diri kamu' : 'Wajib diisi agar bisa mendaftar ekskul' }}</p>
                         </div>
                         <form method="POST" action="{{ route('siswa.profile.update-data') }}" enctype="multipart/form-data" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -354,8 +355,8 @@
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Jenis Kelamin <span class="text-red-500">*</span></label>
-                                <select name="jenis_kelamin" required
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Jenis Kelamin (dikelola kesiswaan)</label>
+                                <select disabled
                                         class="w-full px-4 py-2.5 bg-sky-50/60 border @error('jenis_kelamin') border-red-300 @else border-sky-100 @enderror rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                                     <option value="" {{ !$siswa?->jenis_kelamin ? 'selected' : '' }} disabled>Pilih...</option>
                                     <option value="laki-laki" {{ old('jenis_kelamin', $siswa?->jenis_kelamin) === 'laki-laki' ? 'selected' : '' }}>Laki-laki</option>
@@ -364,14 +365,14 @@
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Angkatan</label>
-                                <input type="text" name="angkatan" value="{{ old('angkatan', $siswa->angkatan) }}" placeholder="Contoh: 2024 atau 2024/2025"
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Angkatan (dikelola kesiswaan)</label>
+                                <input disabled type="text" value="{{ $siswa->angkatan }}" placeholder="Contoh: 2024 atau 2024/2025"
                                        class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Agama</label>
-                                <select name="agama"
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Agama (dikelola kesiswaan)</label>
+                                <select disabled
                                         class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                                     <option value="">Pilih Agama...</option>
                                     @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agm)
@@ -381,14 +382,14 @@
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tempat Lahir</label>
-                                <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $siswa->tempat_lahir) }}" placeholder="Kota kelahiran"
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tempat Lahir (dikelola kesiswaan)</label>
+                                <input disabled type="text" value="{{ $siswa->tempat_lahir }}" placeholder="Kota kelahiran"
                                        class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tanggal Lahir</label>
-                                <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $siswa->tanggal_lahir?->format('Y-m-d')) }}"
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tanggal Lahir (dikelola kesiswaan)</label>
+                                <input disabled type="date" value="{{ $siswa->tanggal_lahir?->format('Y-m-d') }}"
                                        class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                             </div>
 
@@ -406,8 +407,8 @@
 
                             {{-- MEDIA SOSIAL DENGAN SISTEM ARAHAN --}}
                             <div class="md:col-span-2">
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Media Sosial</label>
-                                <input type="text" name="medsos" value="{{ old('medsos', $siswa->medsos) }}" placeholder="misal: @nama_siswa (Instagram) / link profil medsos"
+                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Media Sosial (dikelola kesiswaan)</label>
+                                <input disabled type="text" value="{{ $siswa->medsos }}" placeholder="misal: @nama_siswa (Instagram) / link profil medsos"
                                        class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                                 <div class="mt-2 p-2.5 bg-sky-50 border border-sky-100 rounded-2xl text-[11px] text-sky-800 flex items-start gap-2">
                                     <span>💡</span>
@@ -417,14 +418,14 @@
 
                             <div class="md:col-span-2">
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Alamat Lengkap</label>
-                                <textarea name="alamat" rows="2" placeholder="Alamat domisili lengkap"
+                                <textarea disabled rows="2" placeholder="Alamat domisili lengkap"
                                           class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('alamat', $siswa->alamat) }}</textarea>
                             </div>
 
                             <div class="md:col-span-2 flex items-center gap-3 pt-2">
                                 <button type="submit"
                                         class="px-6 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition hover:-translate-y-0.5">
-                                    {{ $profilLengkap ? 'Simpan Perubahan' : 'Simpan & Lanjutkan' }}
+                                    Simpan Perubahan
                                 </button>
                                 @if(!$profilLengkap)
                                     <span class="text-[11px] text-slate-400">Data ini dibutuhkan untuk mendaftar ekskul.</span>

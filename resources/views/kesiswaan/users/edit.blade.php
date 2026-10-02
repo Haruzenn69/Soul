@@ -187,19 +187,19 @@
             <h2 class="text-sm font-extrabold text-slate-900">Data Pembina</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">NIP</label>
-                    <input type="text" name="nip" value="{{ old('nip', $user->pembina?->nip) }}"
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">NIP *</label>
+                    <input required type="text" name="nip" value="{{ old('nip', $user->pembina?->nip) }}"
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
                     <p class="text-[10px] text-gray-400 mt-1">Harus tepat 18 angka.</p>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>
-                    <input type="text" name="pembina_nama" value="{{ old('pembina_nama', $user->pembina?->nama) }}"
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Nama Lengkap *</label>
+                    <input required type="text" name="pembina_nama" value="{{ old('pembina_nama', $user->pembina?->nama) }}"
                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Jenis Kelamin</label>
-                    <select name="pembina_jenis_kelamin"
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Jenis Kelamin *</label>
+                    <select required name="pembina_jenis_kelamin"
                             class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                         <option value="" {{ !old('pembina_jenis_kelamin', $user->pembina?->jenis_kelamin) ? 'selected' : '' }} disabled>Pilih...</option>
                         <option value="laki-laki" {{ old('pembina_jenis_kelamin', $user->pembina?->jenis_kelamin) === 'laki-laki' ? 'selected' : '' }}>Laki-laki</option>
@@ -207,8 +207,8 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Agama</label>
-                    <select name="pembina_agama"
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Agama *</label>
+                    <select required name="pembina_agama"
                             class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                         <option value="">Pilih Agama...</option>
                         @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agm)
@@ -217,22 +217,22 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Tempat Lahir</label>
-                    <input type="text" name="pembina_tempat_lahir" value="{{ old('pembina_tempat_lahir', $user->pembina?->tempat_lahir) }}" placeholder="Kota kelahiran"
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Tempat Lahir *</label>
+                    <input required type="text" name="pembina_tempat_lahir" value="{{ old('pembina_tempat_lahir', $user->pembina?->tempat_lahir) }}" placeholder="Kota kelahiran"
                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Tanggal Lahir</label>
-                    <input type="date" name="pembina_tanggal_lahir" value="{{ old('pembina_tanggal_lahir', $user->pembina?->tanggal_lahir?->format('Y-m-d')) }}"
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Tanggal Lahir *</label>
+                    <input required type="date" name="pembina_tanggal_lahir" value="{{ old('pembina_tanggal_lahir', $user->pembina?->tanggal_lahir?->format('Y-m-d')) }}"
                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">No. Telp / WA</label>
-                    <input type="text" name="pembina_no_telp" value="{{ old('pembina_no_telp', $user->pembina?->no_telp) }}" placeholder="08xxxxxxxxxx"
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">No. Telp / WA *</label>
+                    <input required type="text" name="pembina_no_telp" value="{{ old('pembina_no_telp', $user->pembina?->no_telp) }}" placeholder="08xxxxxxxxxx"
                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Media Sosial</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Media Sosial (opsional)</label>
                     <input type="text" name="pembina_medsos" value="{{ old('pembina_medsos', $user->pembina?->medsos) }}" placeholder="@username / link medsos"
                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                 </div>
@@ -241,15 +241,15 @@
                          alt="Foto Profil Pembina"
                          class="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-sm flex-shrink-0">
                     <div class="flex-1">
-                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Ganti Foto Profil Pembina</label>
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Ganti Foto Profil Pembina (opsional)</label>
                         <input type="file" name="pembina_foto" accept="image/*"
                                class="w-full px-3 py-1.5 bg-white border border-slate-200/80 rounded-xl text-xs file:mr-3 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-sky-500 file:text-white hover:file:bg-sky-600 transition">
                         <p class="text-[10px] text-slate-400 mt-1">Format: JPG, PNG, WEBP. Maks 2MB.</p>
                     </div>
                 </div>
                 <div class="md:col-span-3">
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Alamat</label>
-                    <textarea name="pembina_alamat" rows="2" placeholder="Alamat domisili lengkap"
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Alamat *</label>
+                    <textarea required name="pembina_alamat" rows="2" placeholder="Alamat domisili lengkap"
                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">{{ old('pembina_alamat', $user->pembina?->alamat) }}</textarea>
                 </div>
             </div>
@@ -289,8 +289,12 @@
 <script>
     function toggleRoleFields() {
         const role = document.getElementById('role').value;
-        document.getElementById('fields-siswa').classList.toggle('hidden', role !== 'siswa');
-        document.getElementById('fields-pembina').classList.toggle('hidden', role !== 'pembina');
+        const siswaFields = document.getElementById('fields-siswa');
+        const pembinaFields = document.getElementById('fields-pembina');
+        siswaFields.classList.toggle('hidden', role !== 'siswa');
+        pembinaFields.classList.toggle('hidden', role !== 'pembina');
+        siswaFields.querySelectorAll('input, select, textarea').forEach(field => field.disabled = role !== 'siswa');
+        pembinaFields.querySelectorAll('input, select, textarea').forEach(field => field.disabled = role !== 'pembina');
         toggleEkskulField();
     }
     function toggleEkskulField() {

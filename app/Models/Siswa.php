@@ -63,6 +63,11 @@ class Siswa extends Model
         return $this->hasMany(Notifikasi::class);
     }
 
+    public function profileHistories(): HasMany
+    {
+        return $this->hasMany(SiswaProfileHistory::class)->latest();
+    }
+
     public function pengajuanKeluar(): HasMany
     {
         return $this->pengajuanKeluars();

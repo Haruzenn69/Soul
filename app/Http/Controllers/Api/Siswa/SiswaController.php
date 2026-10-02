@@ -17,6 +17,7 @@ use App\Models\Presensi;
 use App\Models\Ekskul;
 use App\Models\Pendaftaran;
 use App\Models\Siswa;
+use App\Models\SiswaProfileHistory;
 use App\Rules\AlasanValid;
 use App\Services\NotifikasiService;
 use App\Services\RekapAbsensiService;
@@ -121,26 +122,52 @@ class SiswaController extends ApiController
         $user = $request->user();
 
         $validated = $request->validate([
-            'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
             'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'no_telp' => ['nullable', 'string', 'max:25'],
+            'foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ], [
-            'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah dipakai akun lain.',
+            'foto.image' => 'File foto harus berupa gambar.',
+            'foto.mimes' => 'Format foto harus berupa JPG, PNG, atau WebP.',
+            'foto.max' => 'Ukuran foto maksimal 2MB.',
         ]);
 
-        DB::transaction(function () use ($user, $siswa, $validated) {
-            $siswa->update(['jenis_kelamin' => $validated['jenis_kelamin']]);
+        $oldEmail = $user->email;
+        $oldFoto = $siswa->foto;
+        $newEmail = $validated['email'] ?? null;
+        $newNoTelp = $validated['no_telp'] ?? null;
+        $fotoPath = $request->hasFile('foto')
+            ? $request->file('foto')->store('profile-photos', 'public')
+            : $oldFoto;
 
-            if (filled($validated['email'] ?? null) && $validated['email'] !== $user->email) {
-                $user->update([
-                    'email' => $validated['email'],
-                    'email_verified_at' => null,
-                ]);
+        DB::transaction(function () use ($user, $siswa, $oldEmail, $oldFoto, $newEmail, $newNoTelp, $fotoPath) {
+            if ($newEmail !== $oldEmail) {
+                $user->update(['email' => $newEmail, 'email_verified_at' => null]);
             }
 
-            if ($siswa->isProfileComplete()) {
-                $user->update(['onboarding_completed_at' => $user->onboarding_completed_at ?? now()]);
+            $changes = [
+                'email' => [$oldEmail, $newEmail],
+                'no_telp' => [$siswa->no_telp, $newNoTelp],
+                'foto' => [$oldFoto, $fotoPath],
+            ];
+
+            $siswa->update([
+                'email' => $newEmail,
+                'no_telp' => $newNoTelp,
+                'foto' => $fotoPath,
+            ]);
+
+            foreach ($changes as $field => [$oldValue, $newValue]) {
+                if ($oldValue !== $newValue) {
+                    SiswaProfileHistory::create([
+                        'siswa_id' => $siswa->id,
+                        'changed_by_user_id' => $user->id,
+                        'field' => $field,
+                        'old_value' => $oldValue,
+                        'new_value' => $newValue,
+                    ]);
+                }
             }
         });
 
