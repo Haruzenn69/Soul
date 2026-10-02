@@ -650,4 +650,28 @@ class PembinaController extends Controller
 
         return $labels->implode(', ').', dan '.$last;
     }
+
+
+
+
+    public function anggotaShow(\App\Models\Pendaftaran $pendaftaran)
+    {
+        $ekskuls = $this->getEkskuls();
+        abort_unless($ekskuls->pluck('id')->contains($pendaftaran->ekskul_id), 403);
+        $pendaftaran->load(['siswa.kelas', 'ekskul.pembina', 'ekskul.pelatih']);
+        return view('pembina.anggota.show', compact('pendaftaran', 'ekskuls'));
+    }
+
+    public function anggotaByEkskul(Request $request, \App\Models\Ekskul $ekskul)
+    {
+        $ekskuls = $this->getEkskuls();
+        abort_unless($ekskuls->pluck('id')->contains($ekskul->id), 403);
+
+        // Redirect ke halaman anggota utama dengan ekskul sudah dipilih
+        // agar semua filter/sort/search tetap konsisten di satu tempat
+        return redirect()->route('pembina.anggota', array_merge(
+            $request->only(['cari', 'sort', 'status_keanggotaan', 'jurusan', 'jenis_kelamin', 'tingkat', 'status_keaktifan']),
+            ['ekskul' => $ekskul->id]
+        ));
+    }
 }

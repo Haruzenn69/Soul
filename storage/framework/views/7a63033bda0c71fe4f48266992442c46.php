@@ -221,7 +221,58 @@
         height: 15px;
         flex: 0 0 auto;
     }
-    body.ps-collapsed .ps-group-chevron { display: none; }
+
+    /* Level 3: sub-sub-menu */
+    .ps-submenu3 {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin: 2px 0 2px 16px;
+        padding-left: 10px;
+        border-left: 1px dashed #bae6fd;
+    }
+    .ps-submenu3 a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 8px;
+        border-radius: 8px;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color .15s ease, color .15s ease;
+    }
+    .ps-submenu3 a:hover,
+    .ps-submenu3 a.ps-active { background: #f0f9ff; color: #0369a1; }
+    .ps-submenu3 a svg { width: 13px; height: 13px; flex: 0 0 auto; }
+    .ps-submenu details.ps-subgroup { position: relative; }
+    .ps-submenu details.ps-subgroup summary {
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 7px 10px;
+        border-radius: 9px;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color .15s ease, color .15s ease;
+    }
+    .ps-submenu details.ps-subgroup summary::-webkit-details-marker { display: none; }
+    .ps-submenu details.ps-subgroup summary:hover { background: #f0f9ff; color: #0369a1; }
+    .ps-submenu details.ps-subgroup[open] summary { background: #f0f9ff; color: #0369a1; }
+    .ps-submenu details.ps-subgroup summary svg { width: 15px; height: 15px; flex: 0 0 auto; }
+    .ps-sub-chevron {
+        margin-left: auto;
+        width: 12px !important;
+        height: 12px !important;
+        transition: transform .18s ease;
+        flex: 0 0 auto;
+    }
+    .ps-submenu details.ps-subgroup[open] .ps-sub-chevron { transform: rotate(180deg); }
+
     body.ps-collapsed .ps-group,
     body.ps-collapsed .ps-group[open] {
         position: relative;
@@ -559,8 +610,18 @@
             <?php $__currentLoopData = $psItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $psItem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <?php
                     $psActive = isset($psItem['children'])
-                        ? collect($psItem['children'])->contains(fn ($child) => request()->routeIs((array) $child['is']))
-                        : request()->routeIs((array) $psItem['is']);
+                        ? collect($psItem['children'])->contains(function ($child) {
+                            // Check direct child
+                            if (isset($child['is']) && request()->routeIs((array) $child['is'])) return true;
+                            // Check grandchildren (level 3)
+                            if (isset($child['children'])) {
+                                return collect($child['children'])->contains(
+                                    fn ($gc) => isset($gc['is']) && request()->routeIs((array) $gc['is'])
+                                );
+                            }
+                            return false;
+                          })
+                        : (isset($psItem['is']) && request()->routeIs((array) $psItem['is']));
                 ?>
                 <?php if(isset($psItem['children'])): ?>
                     <details class="ps-group" <?php echo e($psActive ? 'open' : ''); ?>>
@@ -578,14 +639,45 @@
                         </summary>
                         <div class="ps-submenu" data-label="<?php echo e($psItem['label']); ?>">
                             <?php $__currentLoopData = $psItem['children']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $psChild): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <?php $psChildActive = request()->routeIs((array) $psChild['is']); ?>
-                                <a href="<?php echo e($psChild['url']); ?>" class="<?php echo e($psChildActive ? 'ps-active' : ''); ?>" aria-current="<?php echo e($psChildActive ? 'page' : 'false'); ?>">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <?php echo $psIconSvg[$psChild['icon']] ?? ''; ?>
+                                <?php $psChildActive = isset($psChild['is']) && request()->routeIs((array) $psChild['is']); ?>
+                                <?php if(isset($psChild['children'])): ?>
+                                    
+                                    <?php
+                                        $psSubActive = collect($psChild['children'])->contains(
+                                            fn ($gc) => isset($gc['is']) && request()->routeIs((array) $gc['is'])
+                                        ) || $psChildActive;
+                                    ?>
+                                    <details class="ps-subgroup" <?php echo e($psSubActive ? 'open' : ''); ?>>
+                                        <summary class="<?php echo e($psSubActive ? 'ps-active' : ''); ?>">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <?php echo $psIconSvg[$psChild['icon']] ?? ''; ?>
 
-                                    </svg>
-                                    <span><?php echo e($psChild['label']); ?></span>
-                                </a>
+                                            </svg>
+                                            <span><?php echo e($psChild['label']); ?></span>
+                                            <svg class="ps-sub-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                                        </summary>
+                                        <div class="ps-submenu3">
+                                            <?php $__currentLoopData = $psChild['children']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $psGc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php $psGcActive = isset($psGc['is']) && request()->routeIs((array) $psGc['is']); ?>
+                                                <a href="<?php echo e($psGc['url'] ?? '#'); ?>" class="<?php echo e($psGcActive ? 'ps-active' : ''); ?>" aria-current="<?php echo e($psGcActive ? 'page' : 'false'); ?>">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                        <?php echo $psIconSvg[$psGc['icon'] ?? 'users'] ?? ''; ?>
+
+                                                    </svg>
+                                                    <span><?php echo e($psGc['label']); ?></span>
+                                                </a>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </div>
+                                    </details>
+                                <?php else: ?>
+                                    <a href="<?php echo e($psChild['url'] ?? '#'); ?>" class="<?php echo e($psChildActive ? 'ps-active' : ''); ?>" aria-current="<?php echo e($psChildActive ? 'page' : 'false'); ?>">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <?php echo $psIconSvg[$psChild['icon']] ?? ''; ?>
+
+                                        </svg>
+                                        <span><?php echo e($psChild['label']); ?></span>
+                                    </a>
+                                <?php endif; ?>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </details>
@@ -700,8 +792,8 @@
                 <?php $__currentLoopData = $psItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $psMobileItem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <?php
                         $psMobileActive = isset($psMobileItem['children'])
-                            ? collect($psMobileItem['children'])->contains(fn ($child) => request()->routeIs((array) $child['is']))
-                            : request()->routeIs((array) $psMobileItem['is']);
+                            ? collect($psMobileItem['children'])->contains(fn ($child) => isset($child['is']) && request()->routeIs((array) $child['is']))
+                            : (isset($psMobileItem['is']) && request()->routeIs((array) $psMobileItem['is']));
                     ?>
                     <?php if(isset($psMobileItem['children'])): ?>
                         <details class="group" <?php echo e($psMobileActive ? 'open' : ''); ?>>
@@ -712,8 +804,8 @@
                             </summary>
                             <div class="ml-7 mt-1 space-y-1 border-l border-sky-100 pl-4">
                                 <?php $__currentLoopData = $psMobileItem['children']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $psMobileChild): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <?php $psMobileChildActive = request()->routeIs((array) $psMobileChild['is']); ?>
-                                    <a href="<?php echo e($psMobileChild['url']); ?>" class="flex min-h-[40px] items-center gap-2.5 rounded-lg px-3 py-2 text-xs <?php echo e($psMobileChildActive ? 'bg-sky-50 font-semibold text-sky-700' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700'); ?>">
+                                    <?php $psMobileChildActive = isset($psMobileChild['is']) && request()->routeIs((array) $psMobileChild['is']); ?>
+                                    <a href="<?php echo e($psMobileChild['url'] ?? '#'); ?>" class="flex min-h-[40px] items-center gap-2.5 rounded-lg px-3 py-2 text-xs <?php echo e($psMobileChildActive ? 'bg-sky-50 font-semibold text-sky-700' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700'); ?>">
                                         <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?php echo $psIconSvg[$psMobileChild['icon']] ?? ''; ?></svg>
                                         <span><?php echo e($psMobileChild['label']); ?></span>
                                     </a>

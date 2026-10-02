@@ -174,6 +174,8 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::get('/pelatih/create', [PembinaPelatihController::class, 'create'])->name('pelatih.create');
     Route::post('/pelatih', [PembinaPelatihController::class, 'store'])->name('pelatih.store');
     Route::get('/anggota', [PembinaController::class, 'anggota'])->name('anggota');
+    Route::get('/anggota/ekskul/{ekskul}', [PembinaController::class, 'anggotaByEkskul'])->name('anggota.ekskul');
+    Route::get('/anggota/{pendaftaran}', [PembinaController::class, 'anggotaShow'])->name('anggota.show');
     Route::post('/ekskuls/{ekskul}/pilih-ketua/{siswa}', [PembinaController::class, 'pilihKetua'])->name('ekskul.pilih-ketua');
     Route::post('/ekskuls/{ekskul}/copot-ketua/{siswa}', [PembinaController::class, 'copotKetua'])->name('ekskul.copot-ketua');
     Route::get('/pendaftaran', [PembinaController::class, 'pendaftaran'])->name('pendaftaran');
