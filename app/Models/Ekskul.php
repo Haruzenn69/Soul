@@ -86,4 +86,9 @@ class Ekskul extends Model
             ->first()
             ?->siswa;
     }
+
+    public function getBidangAttribute(): string
+    {
+        return \App\Support\EkskulInfo::bidang($this->nama_ekskul);
+    }
 }

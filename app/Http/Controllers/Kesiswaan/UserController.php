@@ -32,6 +32,9 @@ class UserController extends Controller
             $roleFilter = 'pembina';
         }
 
+        $sort = in_array($request->input('sort'), ['username', 'email', 'role', 'created_at'], true) ? $request->input('sort') : 'created_at';
+        $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
+
         $users = User::with(['siswa.kelas', 'pembina.ekskuls'])
             ->when($request->filled('q'), function ($query) use ($request) {
                 $q = $request->input('q');
@@ -49,7 +52,7 @@ class UserController extends Controller
                     $query->where('role', $roleFilter);
                 }
             })
-            ->latest()
+            ->orderBy($sort, $direction)
             ->paginate(10)
             ->withQueryString();
 
@@ -60,7 +63,7 @@ class UserController extends Controller
             'staff' => User::whereIn('role', ['kesiswaan', 'admin'])->count(),
         ];
 
-        return view('kesiswaan.users.index', compact('users', 'counts', 'roleFilter'));
+        return view('kesiswaan.users.index', compact('users', 'counts', 'roleFilter', 'sort', 'direction'));
     }
 
     public function templateSiswa()

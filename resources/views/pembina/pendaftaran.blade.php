@@ -2,6 +2,25 @@
 @section('title', 'Pendaftaran Ekskul')
 
 @section('content')
+@php
+    $sort = $sort ?? 'tanggal_daftar';
+    $direction = $direction ?? 'desc';
+
+    $sortLink = function (string $column) use ($sort, $direction) {
+        $nextDirection = $sort === $column && $direction === 'asc' ? 'desc' : 'asc';
+        return request()->fullUrlWithQuery(['sort' => $column, 'direction' => $nextDirection, 'page' => null]);
+    };
+
+    $sortIcon = function (string $column) use ($sort, $direction) {
+        if ($sort !== $column) {
+            return 'M8 9l4-4 4 4M8 15l4 4 4-4';
+        }
+        return $direction === 'asc' ? 'M8 15l4 4 4-4' : 'M8 9l4-4 4 4';
+    };
+
+    $hasFilter = request()->filled(['cari', 'status', 'ekskul']) || request()->filled('sort');
+@endphp
+
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 animate-fade-up">
         <div>
             <h1 class="text-xl font-extrabold text-slate-900">Riwayat Pendaftaran</h1>
@@ -12,7 +31,7 @@
     <!-- RINGKASAN STATUS -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-white p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .1s">
-            <p class="text-2xl font-extrabold text-slate-900">{{ $pendaftarans->count() }}</p>
+            <p class="text-2xl font-extrabold text-slate-900">{{ $pendaftarans->total() }}</p>
             <p class="text-[10px] font-bold text-slate-400 uppercase">Total</p>
         </div>
         <div class="bg-white p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .15s">
@@ -31,7 +50,14 @@
 
     <!-- FILTER -->
     <div class="bg-white p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 animate-fade-up" style="animation-delay: .3s">
-        <form method="GET" action="{{ route('pembina.pendaftaran') }}" class="flex flex-col sm:flex-row gap-3">
+        <form method="GET" action="{{ route('pembina.pendaftaran') }}" class="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+            @if(request('sort'))
+                <input type="hidden" name="sort" value="{{ request('sort') }}">
+            @endif
+            @if(request('direction'))
+                <input type="hidden" name="direction" value="{{ request('direction') }}">
+            @endif
+
             <div class="relative flex-1">
                 <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,13 +67,28 @@
                 <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari nama atau NIS..."
                     class="w-full pl-10 pr-4 py-2 bg-sky-50/60 border border-sky-100 rounded-xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
             </div>
+
+            @if($ekskuls->count() > 1)
+                <select name="ekskul" class="px-3 py-2 bg-sky-50/60 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+                    <option value="">Semua Ekskul</option>
+                    @foreach($ekskuls as $ex)
+                        <option value="{{ $ex->id }}" @selected(request('ekskul') == $ex->id)>{{ $ex->nama_ekskul }}</option>
+                    @endforeach
+                </select>
+            @endif
+
             <select name="status" class="px-3 py-2 bg-sky-50/60 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
                 <option value="">Semua Status</option>
                 @foreach(['pending' => 'Pending', 'diterima' => 'Diterima', 'ditolak' => 'Ditolak', 'nonaktif' => 'Nonaktif', 'keluar' => 'Keluar'] as $val => $label)
                     <option value="{{ $val }}" @selected(request('status') == $val)>{{ $label }}</option>
                 @endforeach
             </select>
+
             <button type="submit" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-semibold rounded-xl transition shadow-lg shadow-sky-200">Filter</button>
+
+            @if($hasFilter)
+                <a href="{{ route('pembina.pendaftaran') }}" class="px-3 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition">Reset</a>
+            @endif
         </form>
     </div>
 
@@ -59,18 +100,39 @@
                     <thead class="bg-sky-50">
                         <tr>
                             <th class="text-left p-3 font-semibold text-slate-500 rounded-l-xl">No</th>
-                            <th class="text-left p-3 font-semibold text-slate-500">Nama</th>
+                            <th class="text-left p-3 font-semibold text-slate-500">
+                                <a href="{{ $sortLink('nama') }}" class="inline-flex items-center gap-1 hover:text-sky-600 transition">
+                                    Nama
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('nama') }}"/>
+                                    </svg>
+                                </a>
+                            </th>
                             <th class="text-left p-3 font-semibold text-slate-500">Kelas</th>
                             @if($ekskuls->count() > 1)<th class="text-left p-3 font-semibold text-slate-500">Ekskul</th>@endif
                             <th class="text-left p-3 font-semibold text-slate-500">Alasan</th>
-                            <th class="text-left p-3 font-semibold text-slate-500">Tanggal Daftar</th>
-                            <th class="text-left p-3 font-semibold text-slate-500 rounded-r-xl">Status</th>
+                            <th class="text-left p-3 font-semibold text-slate-500">
+                                <a href="{{ $sortLink('tanggal_daftar') }}" class="inline-flex items-center gap-1 hover:text-sky-600 transition">
+                                    Tanggal Daftar
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('tanggal_daftar') }}"/>
+                                    </svg>
+                                </a>
+                            </th>
+                            <th class="text-left p-3 font-semibold text-slate-500 rounded-r-xl">
+                                <a href="{{ $sortLink('status') }}" class="inline-flex items-center gap-1 hover:text-sky-600 transition">
+                                    Status
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('status') }}"/>
+                                    </svg>
+                                </a>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($pendaftarans as $key => $item)
                         <tr class="border-b border-sky-50 hover:bg-sky-50/50 transition">
-                            <td class="p-3">{{ $key + 1 }}</td>
+                            <td class="p-3">{{ $pendaftarans->firstItem() + $key }}</td>
                             <td class="p-3 font-medium">{{ $item->siswa->nama ?? '-' }}</td>
                             <td class="p-3">{{ $item->siswa->kelas->nama ?? '-' }}</td>
                             @if($ekskuls->count() > 1)<td class="p-3">{{ $item->ekskul->nama_ekskul ?? '-' }}</td>@endif
@@ -91,6 +153,10 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <div class="mt-4">
+                {{ $pendaftarans->links() }}
             </div>
         @else
             <div class="text-center py-8 text-slate-400">

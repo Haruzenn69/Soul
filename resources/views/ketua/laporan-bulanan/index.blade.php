@@ -7,13 +7,21 @@
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Daftar Laporan Bulanan</h1>
-            <p class="text-xs text-slate-400 mt-1">Total: {{ $laporans->count() }} laporan</p>
+            <p class="text-xs text-slate-400 mt-1">Total: {{ $total }} laporan</p>
         </div>
         <a href="{{ route('ketua.laporan-bulanan.create') }}" class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 transition inline-flex w-full sm:w-auto items-center justify-center gap-2 shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             Laporan Baru
         </a>
     </div>
+
+    @include('partials.table-filters', [
+        'action' => route('ketua.laporan-bulanan.index'),
+        'placeholder' => 'Cari bulan / materi...',
+        'filters' => [
+            ['name' => 'status', 'allLabel' => 'Semua Status', 'options' => ['draft' => 'Draft', 'menunggu' => 'Menunggu Pembina', 'disetujui' => 'Disetujui', 'ditolak' => 'Ditolak']],
+        ],
+    ])
 
     <!-- Table Card -->
     <div class="ketua-card-list bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
@@ -22,9 +30,9 @@
             <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
                 <tr>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
-                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Bulan</th>
+                    @include('partials.th-sort', ['label' => 'Bulan', 'key' => 'bulan', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Materi</th>
-                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Status</th>
+                    @include('partials.th-sort', ['label' => 'Status', 'key' => 'status', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Aksi</th>
                 </tr>
             </thead>
@@ -66,5 +74,6 @@
             </tbody>
         </table>
         </div>
+        @include('partials.table-pagination', ['rows' => $laporans, 'label' => 'laporan'])
     </div>
 @endsection

@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Models\Pendaftaran;
 use App\Models\Siswa;
 use App\Services\NotifikasiService;
+use App\Support\TableKit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,15 +14,30 @@ class PendaftaranController extends Controller
 {
     use KetuaEkskul;
 
-    public function index()
+    public function index(Request $request)
     {
         $ekskul = $this->ekskul();
-        $pendaftarans = Pendaftaran::where('ekskul_id', $ekskul->id)
-            ->with('siswa')
-            ->latest('tanggal_daftar')
-            ->get();
+        $base = Pendaftaran::where('ekskul_id', $ekskul->id);
 
-        return view('ketua.pendaftaran.index', compact('pendaftarans'));
+        $total = (clone $base)->count();
+        $pendingCount = (clone $base)->where('status', 'pending')->count();
+        $diterimaCount = (clone $base)->where('status', 'diterima')->count();
+        $ditolakCount = (clone $base)->where('status', 'ditolak')->count();
+
+        [$sort, $direction] = TableKit::sort(['tanggal_daftar', 'status', 'nama'], 'tanggal_daftar', 'desc');
+
+        $pendaftarans = (clone $base)
+            ->when($request->filled('cari'), function ($query) use ($request) {
+                $cari = $request->input('cari');
+                $query->whereHas('siswa', fn ($s) => $s->where('nama', 'like', "%{$cari}%")->orWhere('nis', 'like', "%{$cari}%"));
+            })
+            ->when($request->filled('status') && $request->input('status') !== 'semua', fn ($query) => $query->where('status', $request->input('status')))
+            ->with('siswa.kelas')
+            ->orderBy($sort === 'nama' ? Siswa::select('nama')->whereColumn('siswas.id', 'pendaftarans.siswa_id') : $sort, $direction)
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('ketua.pendaftaran.index', compact('pendaftarans', 'pendingCount', 'diterimaCount', 'ditolakCount', 'total', 'sort', 'direction'));
     }
 
     public function show(Pendaftaran $pendaftaran)

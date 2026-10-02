@@ -39,7 +39,7 @@
 
         @if($laporan->materi_kegiatan)
         <div>
-            <p class="text-xs font-bold text-slate-500 mb-1">Materi dan Kegiatan</p>
+            <p class="text-xs font-bold text-slate-500 mb-1">Materi dan Kegiatan (Rutin &amp; Event)</p>
             <p class="font-medium text-sm whitespace-pre-line">{{ $laporan->materi_kegiatan }}</p>
         </div>
         @endif

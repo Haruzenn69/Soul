@@ -48,6 +48,267 @@
     .card-table td {
         @apply align-middle;
     }
+
+    /* -----------------------------------------------------------------
+       Katalog ekskul — "indeks + rak"
+
+       Kartu tidak memakai gradient atau bayangan lembut. Yang membedakan
+       kartu bukan radius-nya, tapi materialnya: tepi tinta 4px di sisi kiri
+       sebagai penanda status pendaftaran, garis rambut sebagai pemisah, dan
+       kertas polos tanpa efek. Terasa seperti kartu tercetak, bukan bantal.
+       ----------------------------------------------------------------- */
+    .soul-kartu {
+        --soul-tinta: #2563eb;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        @apply rounded-xl border border-slate-200 bg-white;
+        box-shadow: inset 4px 0 0 var(--soul-tinta), 0 1px 2px rgb(15 23 42 / .05);
+        transition: box-shadow .18s ease, transform .18s ease;
+    }
+
+    /* Pendaftaran ditutup: tepi tinta jadi abu, isinya tetap terbaca. */
+    .soul-kartu--tutup {
+        --soul-tinta: #cbd5e1;
+    }
+
+    .soul-kartu:hover {
+        transform: translateY(-1px);
+        box-shadow: inset 6px 0 0 var(--soul-tinta), 0 10px 22px -14px rgb(15 23 42 / .40);
+    }
+
+    /* Placeholder logo/crest: bingkai netral supaya logo yang diunggah dan
+       monogram yang diketik terlihat seperti dua wajah dari satu komponen.
+       Modifier ukuran ada di sini, bukan sebagai kelas utilitas di Blade,
+       supaya tidak ada dua aturan border-radius/height yang saling menimpa. */
+    .soul-crest {
+        @apply grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-lg border border-slate-200 bg-white;
+    }
+
+    .soul-crest--md {
+        @apply h-12 w-12;
+    }
+
+    .soul-crest--lg {
+        @apply h-16 w-16;
+    }
+
+    .soul-crest-mono {
+        @apply text-sm font-extrabold tracking-tight text-slate-900;
+    }
+
+    .soul-crest-mono--lg {
+        @apply text-xl;
+    }
+
+    /* Sumbu minggu — elemen utama kartu. Hari ekskul bertemu digambar
+       sebagai bar, sisanya jadi centang di garis basal. Token tinta diwarisi
+       dari kartu induk; di halaman profil tidak ada kartu, jadi ada
+       nilai bawaan. */
+    .soul-minggu {
+        @apply grid select-none grid-cols-7;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .soul-minggu-kolom {
+        @apply flex flex-col items-center;
+    }
+
+    .soul-minggu-batang {
+        @apply h-1 w-1.5 rounded-[2px] bg-slate-300;
+    }
+
+    .soul-minggu-batang--aktif {
+        @apply h-4;
+        background-color: var(--soul-tinta, #2563eb);
+    }
+
+    .soul-minggu-sumbu {
+        @apply h-px w-full bg-slate-200;
+    }
+
+    .soul-minggu-label {
+        @apply mt-1.5 text-[10px] font-semibold leading-none text-slate-500;
+    }
+
+    .soul-minggu-label--aktif {
+        color: var(--soul-tinta, #2563eb);
+    }
+
+    .soul-minggu--besar .soul-minggu-batang {
+        @apply h-1.5 w-2;
+    }
+
+    .soul-minggu--besar .soul-minggu-batang--aktif {
+        @apply h-7;
+    }
+
+    .soul-minggu--besar .soul-minggu-label {
+        @apply mt-2 text-[11px];
+    }
+
+    /* Slot jadwal: tinggi minimum dijaga agar tinggi kartu tetap seragam
+       meskipun jadwalnya belum diatur. */
+    .soul-jadwal {
+        @apply min-h-[4.25rem];
+    }
+
+    /* Baris data: kunci di kiri, nilai di kanan. Kunci ini benar-benar
+       penanda field, bukan label dekoratif. */
+    .soul-axiom {
+        display: grid;
+        grid-template-columns: 4.75rem minmax(0, 1fr);
+        column-gap: .75rem;
+        @apply items-baseline py-1.5;
+    }
+
+    .soul-axiom + .soul-axiom {
+        @apply border-t border-slate-100;
+    }
+
+    .soul-axiom-kunci {
+        @apply text-[11px] font-semibold tracking-wide text-slate-500;
+    }
+
+    .soul-axiom-nilai {
+        @apply text-[13px] font-semibold leading-snug text-slate-800;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Tombol datar: gradien sky-400→blue-500 dipakai di seluruh aplikasi dan
+       sudah jadi tanda tangan yang tidak lagi membedakan apa pun. Warna
+       primary memakai theme.blue (#2563EB) — white di atasnya rasio 5.2:1,
+       sedangkan sky-600 hanya 4.1:1 dan gagal untuk teks 13px. */
+    .soul-btn {
+        @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-[13px] font-semibold transition;
+    }
+
+    .soul-btn:focus-visible,
+    .soul-kartu :is(a, button):focus-visible,
+    .soul-indeks-item:focus-visible {
+        outline: 2px solid #2563eb;
+        outline-offset: 2px;
+    }
+
+    .soul-btn--utama {
+        @apply text-white;
+        background-color: #2563eb;
+    }
+
+    .soul-btn--utama:hover {
+        background-color: #1d4ed8;
+    }
+
+    .soul-btn--bawa {
+        @apply border border-slate-300 bg-white text-slate-700;
+    }
+
+    .soul-btn--bawa:hover {
+        @apply border-sky-400 text-sky-800;
+    }
+
+    .soul-btn--mati {
+        @apply cursor-not-allowed border border-slate-200 bg-slate-50 text-slate-400;
+    }
+
+    /* Rail indeks: daftar filter vertikal dengan jumlah, bukan baris pil. */
+    .soul-indeks-item {
+        @apply flex w-full items-baseline justify-between gap-3 border-l-2 border-transparent py-2 pl-3 pr-1 text-left text-sm text-slate-600 transition;
+    }
+
+    .soul-indeks-item:hover {
+        @apply border-slate-300 text-slate-900;
+    }
+
+    .soul-indeks-item[aria-current="true"] {
+        @apply font-semibold text-sky-900;
+        border-left-color: #2563eb;
+    }
+
+    .soul-indeks-item[aria-current="true"] .soul-indeks-jumlah {
+        color: #2563eb;
+    }
+
+    .soul-indeks-jumlah {
+        @apply text-[13px] font-semibold text-slate-500;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Kepala halaman: judul, satu kalimat pendukung, lalu garis rambut
+       yang digambar dari kiri. */
+    .soul-kepala {
+        @apply flex flex-col gap-1;
+    }
+
+    .soul-garis {
+        @apply mt-4 block h-px w-full origin-left bg-slate-200;
+        animation: soulGaris .5s cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+    .soul-rak {
+        animation: soulRak .38s ease-out both;
+    }
+
+    /* Status milik siswa sendiri, bukan milik ekskul. */
+    .soul-status {
+        @apply inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[13px] font-semibold;
+    }
+
+    .soul-status--menunggu {
+        @apply border-amber-200 bg-amber-50 text-amber-800;
+    }
+
+    .soul-status--terdaftar {
+        @apply border-slate-200 bg-white text-slate-700;
+    }
+
+    /* Kolom isian. Cincin fokus dibuat tegas, bukan halo tipis, supaya tetap
+       terlihat saat navigasi keyboard. */
+    .soul-kolom {
+        @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-[13px] leading-relaxed text-slate-800;
+        @apply placeholder:text-slate-400;
+    }
+
+    .soul-kolom:focus {
+        @apply border-[#2563eb] outline-none;
+        box-shadow: 0 0 0 3px rgb(37 99 235 / .22);
+    }
+
+    /* Baris tanya-jawab: kartu di dalam kartu dihindari, diganti baris
+       bergaris rambut. Tanda plus berputar 45° saat dibuka. */
+    .soul-tanya {
+        @apply list-none border-b border-slate-200;
+    }
+
+    .soul-tanya::-webkit-details-marker {
+        display: none;
+    }
+
+    .soul-tanya summary {
+        @apply flex cursor-pointer items-start justify-between gap-4 py-4 text-[15px] font-semibold leading-snug text-slate-900;
+    }
+
+    .soul-tanya summary:focus-visible {
+        outline: 2px solid #2563eb;
+        outline-offset: -2px;
+    }
+
+    .soul-tanya-tanda {
+        @apply mt-0.5 shrink-0 text-lg leading-none text-slate-400 transition-transform duration-200;
+    }
+
+    .soul-tanya[open] .soul-tanya-tanda {
+        transform: rotate(45deg);
+    }
+
+    .soul-tanya[open] .soul-tanya-tanda,
+    .soul-tanya summary:hover .soul-tanya-tanda {
+        color: #2563eb;
+    }
+
+    .soul-tanya-jawab {
+        @apply max-w-[68ch] pb-4 text-sm leading-relaxed text-slate-600;
+    }
 }
 
 /* ---------------------------------------------------------------------
@@ -90,6 +351,37 @@
 .animate-fade-up { animation: fadeUp .6s cubic-bezier(.22, 1, .36, 1) both; }
 .animate-floaty  { animation: floaty 5s ease-in-out infinite; }
 .animate-blob    { animation: blob 10s ease-in-out infinite; }
+
+/* ---------------------------------------------------------------------
+   Momen tunggal saat halaman katalog dimuat: garis rambut di bawah judul
+   digambar dari kiri, lalu rak kartu memudar masuk sebagai satu grup.
+   Kartu tidak digerakkan satu per satu — stagger per kartu adalah tanda
+   halaman yang dibuat mesin, bukan tanda halaman yang dirancang.
+   --------------------------------------------------------------------- */
+@keyframes soulGaris {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+}
+
+@keyframes soulRak {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .soul-garis,
+    .soul-rak {
+        animation: none !important;
+    }
+
+    .soul-kartu {
+        transition: none;
+    }
+
+    .soul-kartu:hover {
+        transform: none;
+    }
+}
 
 /* Alpine.js: cegah kilat elemen sebelum Alpine.start() */
 [x-cloak] { display: none !important; }

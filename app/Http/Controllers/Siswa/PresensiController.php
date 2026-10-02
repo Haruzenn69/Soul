@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
+use App\Models\Kegiatan;
 use App\Models\Presensi;
 use App\Services\RekapAbsensiService;
+use App\Support\TableKit;
 use Illuminate\Http\Request;
 
 class PresensiController extends Controller
@@ -15,20 +17,70 @@ class PresensiController extends Controller
         $siswa = $user->siswa;
 
         $pendaftaran = $siswa ? $siswa->activePendaftaran() : null;
-        $presensis = $pendaftaran
-            ? Presensi::where('pendaftaran_id', $pendaftaran->id)->with('kegiatan')
-                ->when($request->filled('cari'), function ($query) use ($request) {
-                    $cari = $request->input('cari');
-                    $query->whereHas('kegiatan', fn ($k) => $k->where('materi', 'like', "%{$cari}%"));
-                })
-                ->when($request->filled('bulan'), function ($query) use ($request) {
-                    [$tahun, $bulan] = explode('-', $request->input('bulan'));
-                    $query->whereHas('kegiatan', fn ($k) => $k->whereYear('tanggal_kegiatan', $tahun)->whereMonth('tanggal_kegiatan', $bulan));
-                })
-                ->get()
-            : collect();
 
-        return view('siswa.presensi', compact('presensis', 'siswa'));
+        if (! $pendaftaran) {
+            return view('siswa.presensi', [
+                'presensis' => collect(),
+                'siswa' => $siswa,
+                'availableMonths' => collect(),
+                'stats' => ['hadir' => 0, 'izin' => 0, 'sakit' => 0, 'alpha' => 0, 'total' => 0],
+                'sort' => 'tanggal',
+                'direction' => 'desc',
+            ]);
+        }
+
+        [$sort, $direction] = TableKit::sort(['tanggal', 'status', 'materi'], 'tanggal', 'desc');
+
+        $baseQuery = Presensi::where('pendaftaran_id', $pendaftaran->id)
+            ->with(['kegiatan.ekskul']);
+
+        $stats = [
+            'total' => (clone $baseQuery)->count(),
+            'hadir' => (clone $baseQuery)->where('status', 'hadir')->count(),
+            'izin'  => (clone $baseQuery)->where('status', 'izin')->count(),
+            'sakit' => (clone $baseQuery)->where('status', 'sakit')->count(),
+            'alpha' => (clone $baseQuery)->where('status', 'alpha')->count(),
+        ];
+
+        $kegiatanIds = (clone $baseQuery)->pluck('kegiatan_id');
+        $availableMonths = Kegiatan::whereIn('id', $kegiatanIds)
+            ->selectRaw('DISTINCT SUBSTRING(tanggal_kegiatan, 1, 7) as bulan')
+            ->orderByDesc('bulan')
+            ->pluck('bulan');
+
+        $query = (clone $baseQuery);
+
+        if ($request->filled('cari')) {
+            $cari = $request->input('cari');
+            $query->whereHas('kegiatan', fn ($k) => $k->where('materi', 'like', "%{$cari}%"));
+        }
+
+        if ($request->filled('bulan') && $request->input('bulan') !== 'semua' && str_contains($request->input('bulan'), '-')) {
+            [$tahun, $bln] = explode('-', $request->input('bulan'));
+            $query->whereHas('kegiatan', fn ($k) => $k->whereYear('tanggal_kegiatan', $tahun)->whereMonth('tanggal_kegiatan', $bln));
+        }
+
+        if ($request->filled('status') && $request->input('status') !== 'semua') {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($sort === 'tanggal') {
+            $query->orderBy(
+                Kegiatan::select('tanggal_kegiatan')->whereColumn('kegiatans.id', 'presensis.kegiatan_id'),
+                $direction
+            );
+        } elseif ($sort === 'materi') {
+            $query->orderBy(
+                Kegiatan::select('materi')->whereColumn('kegiatans.id', 'presensis.kegiatan_id'),
+                $direction
+            );
+        } else {
+            $query->orderBy($sort, $direction);
+        }
+
+        $presensis = $query->paginate(10)->withQueryString();
+
+        return view('siswa.presensi', compact('presensis', 'siswa', 'availableMonths', 'stats', 'sort', 'direction'));
     }
 
     public function rekap(Request $request)

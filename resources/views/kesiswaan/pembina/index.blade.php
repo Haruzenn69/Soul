@@ -182,6 +182,10 @@
 
                             {{-- Aksi --}}
                             <td class="py-3.5 px-5 text-right whitespace-nowrap">
+                                <a href="{{ route('kesiswaan.pembina.riwayat-profil', $p) }}"
+                                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold rounded-xl transition text-xs mr-1">
+                                    Riwayat Profil
+                                </a>
                                 @if ($p->user_id)
                                     <a href="{{ route('kesiswaan.users.edit', $p->user_id) }}"
                                        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold rounded-xl transition text-xs">

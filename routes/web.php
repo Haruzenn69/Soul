@@ -10,6 +10,7 @@ use App\Http\Controllers\Kesiswaan\EkskulController;
 use App\Http\Controllers\Kesiswaan\KelasController;
 use App\Http\Controllers\Kesiswaan\LaporanPenilaianController as KesiswaanLaporanPenilaianController;
 use App\Http\Controllers\Kesiswaan\NotifikasiController as KesiswaanNotifikasiController;
+use App\Http\Controllers\Kesiswaan\PelatihController as KesiswaanPelatihController;
 use App\Http\Controllers\Kesiswaan\PembinaController as KesiswaanPembinaController;
 use App\Http\Controllers\Kesiswaan\SiswaController;
 use App\Http\Controllers\Kesiswaan\UserController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\Pembina\FaqController as PembinaFaqController;
 use App\Http\Controllers\Pembina\NotifikasiController as PembinaNotifikasiController;
+use App\Http\Controllers\Pembina\PelatihController as PembinaPelatihController;
 use App\Http\Controllers\Pembina\PembinaController;
 use App\Http\Controllers\Pembina\PenilaianController as PembinaPenilaianController;
 use App\Http\Controllers\Pembina\TestimoniController as PembinaTestimoniController;
@@ -37,6 +39,7 @@ use App\Http\Controllers\Siswa\PengajuanController;
 use App\Http\Controllers\Siswa\PresensiController as SiswaPresensiController;
 use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
 use App\Http\Controllers\TestimoniController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -57,6 +60,21 @@ Route::get('/storage/{path}', function (string $path) {
 
     return response()->file($filePath);
 })->where('path', '.*')->name('storage.public');
+
+Route::middleware(['auth', 'role:kesiswaan,admin'])->get('/maintenance/clear-cache', function () {
+    $secret = env('MAINTENANCE_SECRET', '0192837465');
+
+    abort_unless(hash_equals($secret, request('token', '')), 403, 'Token tidak valid.');
+
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+
+    return response('Cache berhasil dibersihkan: '.implode(', ', [
+        'config', 'cache', 'view', 'route',
+    ]));
+})->name('maintenance.clear-cache');
 
 Route::get('/', [HomeController::class, 'landing'])->name('siswa.landing');
 
@@ -99,8 +117,14 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
     ]);
 
     Route::get('siswa', [SiswaController::class, 'index'])->name('siswa.index');
+    Route::get('siswa/{siswa}/riwayat-profil', [SiswaController::class, 'riwayatProfil'])->name('siswa.riwayat-profil');
 
     Route::get('pembina', [KesiswaanPembinaController::class, 'index'])->name('pembina.index');
+    Route::get('pembina/{pembina}/riwayat-profil', [KesiswaanPembinaController::class, 'riwayatProfil'])->name('pembina.riwayat-profil');
+
+    Route::get('pelatih', [KesiswaanPelatihController::class, 'index'])->name('pelatih.index');
+    Route::post('pelatih/{pelatih}/verifikasi', [KesiswaanPelatihController::class, 'verifikasi'])->name('pelatih.verifikasi');
+    Route::post('pelatih/{pelatih}/tolak', [KesiswaanPelatihController::class, 'tolak'])->name('pelatih.tolak');
 
     Route::get('/profile', function () {
         return view('kesiswaan.profile', ['user' => auth()->user()]);
@@ -164,6 +188,9 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')->group(function () {
     Route::get('/dashboard', [PembinaController::class, 'dashboard'])->name('dashboard');
     Route::patch('/ekskuls/{ekskul}/pelatih', [PembinaController::class, 'updatePelatih'])->name('ekskul.pelatih');
+    Route::get('/pelatih', [PembinaPelatihController::class, 'index'])->name('pelatih.index');
+    Route::get('/pelatih/create', [PembinaPelatihController::class, 'create'])->name('pelatih.create');
+    Route::post('/pelatih', [PembinaPelatihController::class, 'store'])->name('pelatih.store');
     Route::get('/anggota', [PembinaController::class, 'anggota'])->name('anggota');
     Route::post('/ekskuls/{ekskul}/pilih-ketua/{siswa}', [PembinaController::class, 'pilihKetua'])->name('ekskul.pilih-ketua');
     Route::post('/ekskuls/{ekskul}/copot-ketua/{siswa}', [PembinaController::class, 'copotKetua'])->name('ekskul.copot-ketua');
@@ -208,6 +235,7 @@ Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name
     Route::resource('kegiatan', KegiatanController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
     Route::get('kegiatan/{kegiatan}/presensi', [PresensiController::class, 'create'])->name('presensi.create');
     Route::post('kegiatan/{kegiatan}/presensi', [PresensiController::class, 'store'])->name('presensi.store');
+    Route::get('rekap-absensi/print', [PresensiController::class, 'rekapPdf'])->name('presensi.rekap-pdf');
     Route::get('rekap-absensi', [PresensiController::class, 'rekap'])->name('presensi.rekap');
     Route::resource('pendaftaran', PendaftaranController::class)->only(['index', 'show', 'update']);
     Route::resource('pengajuan-keluar', PengajuanKeluarController::class)->only(['index', 'show', 'update']);

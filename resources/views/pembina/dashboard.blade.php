@@ -15,12 +15,12 @@
             <div class="lg:col-span-3">
                 <div class="flex items-center gap-2 mb-3 flex-wrap">
                     <span class="px-3 py-1 rounded-full bg-white/15 backdrop-blur border border-white/20 text-[10px] font-bold tracking-wide uppercase">Dashboard Pembina</span>
-                    @if($ekskul)
+                    @foreach($ekskulsByBidang ?? [] as $bidang => $ekskulBidangList)
                         <span class="px-3 py-1 rounded-full bg-amber-300/30 backdrop-blur border border-amber-200/40 text-[10px] font-bold tracking-wide uppercase flex items-center gap-1.5">
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse"></span>
-                            Membina {{ $ekskul->nama_ekskul }}
+                            Membina {{ $bidang }}
                         </span>
-                    @endif
+                    @endforeach
                 </div>
                 <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight">
                     Halo, {{ $pembina->nama ?? 'Pembina' }}!
@@ -63,7 +63,7 @@
                 <!-- floating stat card overlapping bottom edge -->
                 <div class="absolute -bottom-10 left-3 right-3 z-10 grid grid-cols-3 gap-2 bg-white rounded-2xl shadow-xl shadow-sky-900/10 p-3">
                     <div class="text-center border-r border-slate-100 pr-1">
-                        <p class="text-base font-extrabold text-sky-700 leading-none">{{ $ekskul ? 1 : 0 }}</p>
+                        <p class="text-base font-extrabold text-sky-700 leading-none">{{ $ekskuls->count() }}</p>
                         <p class="text-[9px] text-slate-400 font-semibold mt-1">Ekskul</p>
                     </div>
                     <div class="text-center border-r border-slate-100 px-1">
@@ -114,8 +114,8 @@
     <div class="grid grid-cols-3 gap-3 lg:hidden">
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-3 md:p-5 shadow-md shadow-sky-100 animate-fade-up" style="animation-delay: .1s">
             <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Ekskul Dibina</p>
-            <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $ekskul ? 1 : 0 }}</h3>
-            <p class="text-[11px] font-semibold {{ $ekskul ? 'text-emerald-600' : 'text-amber-600' }} mt-0.5 md:mt-1">{{ $ekskul ? 'Aktif' : 'Belum' }}</p>
+            <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $ekskuls->count() }}</h3>
+            <p class="text-[11px] font-semibold {{ $ekskuls->count() > 0 ? 'text-emerald-600' : 'text-amber-600' }} mt-0.5 md:mt-1">{{ $ekskuls->count() > 0 ? 'Aktif' : 'Belum' }}</p>
         </div>
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 to-yellow-50 border border-amber-200 p-3 md:p-5 shadow-md shadow-amber-100 animate-fade-up" style="animation-delay: .2s">
             <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Anggota Aktif</p>
@@ -134,75 +134,72 @@
 
         <!-- LEFT COLUMN -->
         <div class="lg:col-span-2 space-y-6">
-            <!-- DAFTAR ANGGOTA -->
-            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .15s">
-                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
-                    <div>
-                        <h2 class="text-sm font-extrabold text-slate-900">Daftar Anggota Ekskul</h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Kelola keanggotaan ekskul binaan</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">{{ $anggotaAktifCount ?? 0 }} Aktif</span>
-                        <a href="{{ route('pembina.anggota') }}" class="text-[11px] font-bold text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-full transition">
-                            Tentukan Ketua →
+            {{-- EKSKUL PER BIDANG CARDS --}}
+            @if(($ekskulsByBidang ?? collect())->isNotEmpty())
+                @foreach($ekskulsByBidang as $bidangNama => $ekskulBidangList)
+                @php
+                    $badgeClass = \App\Support\EkskulInfo::bidangBadgeClass($bidangNama);
+                    $totalAktifBidang = 0;
+                    foreach($ekskulBidangList as $eksB) {
+                        $totalAktifBidang += \App\Models\Pendaftaran::where('ekskul_id', $eksB->id)->where('status', 'diterima')->count();
+                    }
+                @endphp
+                <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .15s">
+                    <div class="px-6 py-4 flex items-center justify-between border-b border-sky-50">
+                        <div class="flex items-center gap-3">
+                            <span class="px-2.5 py-1 rounded-xl border text-[11px] font-bold {{ $badgeClass }}">{{ $bidangNama }}</span>
+                            <div>
+                                <h2 class="text-sm font-extrabold text-slate-900">Bidang {{ $bidangNama }}</h2>
+                                <p class="text-[11px] text-slate-400">{{ $ekskulBidangList->count() }} ekskul · {{ $totalAktifBidang }} anggota aktif</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('pembina.anggota') }}" class="text-[11px] font-bold text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-full transition shrink-0">
+                            Kelola Anggota →
                         </a>
                     </div>
-                </div>
-
-                @if(isset($anggota) && count($anggota) > 0)
-                    <div class="overflow-x-auto">
-                        <table class="card-table w-full text-xs">
-                            <thead>
-                                <tr class="bg-gradient-to-r from-sky-50 to-blue-50 rounded-xl">
-                                    <th class="text-left p-3 font-semibold text-slate-500 rounded-l-xl">No</th>
-                                    <th class="text-left p-3 font-semibold text-slate-500">NIS</th>
-                                    <th class="text-left p-3 font-semibold text-slate-500">Nama</th>
-                                    <th class="text-left p-3 font-semibold text-slate-500">Kelas</th>
-                                    <th class="text-left p-3 font-semibold text-slate-500">Jabatan</th>
-                                    <th class="text-left p-3 font-semibold text-slate-500 rounded-r-xl">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($anggota as $key => $item)
-                                <tr class="border-b border-sky-50 hover:bg-sky-50/50 transition">
-                                    <td class="p-3 text-slate-500">{{ $key + 1 }}</td>
-                                    <td class="p-3 font-medium text-slate-700">{{ $item->siswa->nis ?? '-' }}</td>
-                                    <td class="p-3 font-medium text-slate-800">{{ $item->siswa->nama ?? '-' }}</td>
-                                    <td class="p-3 text-slate-600">{{ $item->siswa->kelas->nama ?? '-' }}</td>
-                                    <td class="p-3">
-                                        <span class="px-2 py-1 rounded-full text-[10px] font-semibold border
-                                            {{ $item->siswa->jabatan == 'ketua' ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-sky-100 text-sky-700 border-sky-200' }}">
-                                            @if($item->siswa->jabatan == 'ketua') Ketua @else Anggota @endif
-                                        </span>
-                                    </td>
-                                    <td class="p-3">
-                                        @if($item->status === 'diterima')
-                                            <span class="px-2 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">Aktif</span>
-                                        @elseif($item->status === 'nonaktif')
-                                            <span class="px-2 py-1 rounded-full text-[10px] font-semibold bg-red-100 text-red-700 border border-red-200">Nonaktif</span>
-                                        @elseif($item->status === 'keluar')
-                                            <span class="px-2 py-1 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">Keluar</span>
-                                        @else
-                                            <span class="px-2 py-1 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 border border-amber-200">{{ ucfirst($item->status) }}</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="text-center py-10">
-                        <div class="mx-auto w-16 h-16 rounded-2xl bg-sky-50 flex items-center justify-center text-sky-300 border border-sky-100">
-                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                            </svg>
+                    <div class="divide-y divide-slate-50">
+                        @foreach($ekskulBidangList as $eksB)
+                        @php
+                            $ketuaEksB = $eksB->ketua();
+                            $anggotaCount = \App\Models\Pendaftaran::where('ekskul_id', $eksB->id)->where('status', 'diterima')->count();
+                        @endphp
+                        <div class="px-6 py-4 flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-100 to-blue-100 flex items-center justify-center text-sky-700 font-extrabold text-xs shrink-0 border border-sky-200">
+                                    {{ strtoupper(substr($eksB->nama_ekskul, 0, 2)) }}
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-xs font-extrabold text-slate-900 truncate">{{ $eksB->nama_ekskul }}</h4>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">
+                                        {{ $anggotaCount }} Anggota Aktif
+                                        @if($ketuaEksB) · Ketua: <span class="font-semibold text-amber-700">{{ $ketuaEksB->nama }}</span>@endif
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                @if($eksB->status)
+                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Aktif</span>
+                                @else
+                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">Nonaktif</span>
+                                @endif
+                                @if($eksB->is_open_recruitment)
+                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">Buka Rekrutmen</span>
+                                @endif
+                            </div>
                         </div>
-                        <p class="text-xs font-semibold text-slate-500 mt-3">Belum ada anggota</p>
-                        <p class="text-[11px] text-slate-400 mt-1">Belum ada siswa yang terdaftar di ekskul ini</p>
+                        @endforeach
                     </div>
-                @endif
-            </div>
+                </div>
+                @endforeach
+            @else
+                <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 p-10 text-center animate-fade-up">
+                    <div class="mx-auto w-16 h-16 rounded-2xl bg-sky-50 flex items-center justify-center text-sky-300 border border-sky-100 mb-3">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
+                    </div>
+                    <p class="text-xs font-semibold text-slate-500">Belum ada ekskul binaan</p>
+                    <p class="text-[11px] text-slate-400 mt-1">Hubungi kesiswaan untuk mendapatkan binaan ekskul</p>
+                </div>
+            @endif
 
             <!-- AGENDA KEGIATAN MENDATANG -->
             <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .2s">
@@ -274,9 +271,15 @@
                 <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
                     <div>
                         <h2 class="text-sm font-extrabold text-slate-900">Pelatih Ekskul</h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Tentukan pelatih untuk ekskul binaanmu</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Tentukan pelatih terverifikasi untuk ekskul binaanmu</p>
                     </div>
-                    <span class="text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">{{ $ekskuls->count() ?? 0 }} Ekskul</span>
+                    <div class="flex items-center gap-2">
+                        <a href="{{ route('pembina.pelatih.index') }}"
+                           class="text-[11px] font-bold text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-100 px-3 py-1.5 rounded-full transition inline-flex items-center gap-1">
+                            Kelola Pelatih
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
                 </div>
 
                 @forelse($ekskuls ?? collect() as $ekskulBinaan)

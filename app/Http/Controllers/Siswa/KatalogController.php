@@ -8,31 +8,55 @@ use Illuminate\Http\Request;
 
 class KatalogController extends Controller
 {
+    /** Nilai yang diterima pada query string `status`. */
+    private const FILTER = ['buka', 'tutup'];
+
     public function index(Request $request)
     {
-        $user = auth()->user();
-        $siswa = $user->siswa;
+        $siswa = auth()->user()?->siswa;
 
-        $isRegistered = false;
-        $isPending = false;
+        // Satu siswa hanya boleh punya satu ekskul aktif dan satu pendaftaran
+        // yang menunggu, jadi cukup ambiguity-nya status, bukan isi daftar.
+        $pendaftaran = $siswa?->activePendaftaran();
+        $menunggu = $siswa?->pendingPendaftaran();
 
-        if ($siswa) {
-            $isRegistered = $siswa->activePendaftaran() ? true : false;
-            $isPending = $siswa->pendingPendaftaran() ? true : false;
-        }
+        $status = $request->query('status');
+        $status = in_array($status, self::FILTER, true) ? $status : null;
 
-        $ekskuls = Ekskul::with('pembina')
+        $cari = Ekskul::query()
+            ->with('pembina')
             ->where('status', true)
             ->when($request->filled('cari'), function ($query) use ($request) {
                 $cari = $request->input('cari');
+
                 $query->where(function ($sub) use ($cari) {
                     $sub->where('nama_ekskul', 'like', "%{$cari}%")
                         ->orWhere('deskripsi', 'like', "%{$cari}%")
+                        ->orWhere('tagline', 'like', "%{$cari}%")
                         ->orWhereHas('pembina', fn ($p) => $p->where('nama', 'like', "%{$cari}%"));
                 });
-            })
+            });
+
+        // Jumlah dihitung dari hasil pencarian, bukan dari seluruh tabel, supaya
+        // angka di rail selalu menjawab "dari ekskul yang ini, berapa yang bisa
+        // saya daftar?".
+        $jumlah = [
+            'semua' => (clone $cari)->count(),
+            'buka' => (clone $cari)->where('is_open_recruitment', true)->count(),
+            'tutup' => (clone $cari)->where('is_open_recruitment', false)->count(),
+        ];
+
+        $ekskuls = (clone $cari)
+            ->when($status === 'buka', fn ($query) => $query->where('is_open_recruitment', true))
+            ->when($status === 'tutup', fn ($query) => $query->where('is_open_recruitment', false))
             ->get();
 
-        return view('siswa.katalog', compact('ekskuls', 'siswa', 'isRegistered', 'isPending'));
+        return view('siswa.katalog', [
+            'ekskuls' => $ekskuls,
+            'jumlah' => $jumlah,
+            'status' => $status,
+            'ekskulAktif' => $pendaftaran?->ekskul,
+            'menunggu' => $menunggu !== null,
+        ]);
     }
 }

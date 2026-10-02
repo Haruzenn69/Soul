@@ -8,6 +8,7 @@ use App\Models\LaporanBulanan;
 use App\Models\Pendaftaran;
 use App\Models\Presensi;
 use App\Services\NotifikasiService;
+use App\Support\TableKit;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -69,17 +70,37 @@ class LaporanBulananController extends Controller
             return 'Belum ada kegiatan yang tercatat untuk bulan ini.';
         }
 
+        $rutin = $kegiatans->reject(fn ($k) => $k->isEvent());
+        $event = $kegiatans->filter(fn ($k) => $k->isEvent());
+
         $teks = '';
-        foreach ($kegiatans as $k) {
-            $tanggal = $k->tanggal_kegiatan->translatedFormat('d F Y');
-            $line = "Pada tanggal {$tanggal}, kegiatan yang dilaksanakan berupa {$k->materi}.";
-            if ($k->deskripsi) {
-                $line .= " {$k->deskripsi}";
+
+        if ($rutin->isNotEmpty()) {
+            $teks .= "Kegiatan Rutin:\n";
+            foreach ($rutin as $k) {
+                $teks .= '- '.$this->narasiKegiatan($k)."\n";
             }
-            $teks .= $line."\n";
         }
 
-        return trim($teks);
+        if ($event->isNotEmpty()) {
+            $teks .= "Kegiatan Event (Diklat, Lomba, dll.):\n";
+            foreach ($event as $k) {
+                $teks .= '- '.$this->narasiKegiatan($k)."\n";
+            }
+        }
+
+        return trim($teks) ?: 'Belum ada kegiatan yang tercatat untuk bulan ini.';
+    }
+
+    private function narasiKegiatan($kegiatan)
+    {
+        $tanggal = $kegiatan->tanggalText();
+        $line = "Pada tanggal {$tanggal}, kegiatan yang dilaksanakan berupa {$kegiatan->materi}.";
+        if ($kegiatan->deskripsi) {
+            $line .= " {$kegiatan->deskripsi}";
+        }
+
+        return $line;
     }
 
     private function generateKehadiran($ekskul, $bulan)
@@ -89,6 +110,7 @@ class LaporanBulananController extends Controller
         $kegiatanIds = Kegiatan::where('ekskul_id', $ekskul->id)
             ->whereYear('tanggal_kegiatan', substr($bulan, 0, 4))
             ->whereMonth('tanggal_kegiatan', substr($bulan, 5, 2))
+            ->whereNull('jenis_kegiatan')
             ->pluck('id');
 
         $totalKegiatan = $kegiatanIds->count();
@@ -122,14 +144,28 @@ class LaporanBulananController extends Controller
         return implode(' ', $teksParts);
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $ekskul = $this->ekskul();
-        $laporans = LaporanBulanan::where('ekskul_id', $ekskul->id)
-            ->latest('bulan')
-            ->get();
+        $base = LaporanBulanan::where('ekskul_id', $ekskul->id);
+        $total = (clone $base)->count();
 
-        return view('ketua.laporan-bulanan.index', compact('laporans'));
+        [$sort, $direction] = TableKit::sort(['bulan', 'status'], 'bulan', 'desc');
+
+        $laporans = (clone $base)
+            ->when($request->filled('cari'), function ($query) use ($request) {
+                $cari = $request->input('cari');
+                $query->where(function ($sub) use ($cari) {
+                    $sub->where('bulan', 'like', "%{$cari}%")
+                        ->orWhere('materi_kegiatan', 'like', "%{$cari}%");
+                });
+            })
+            ->when($request->filled('status') && $request->input('status') !== 'semua', fn ($query) => $query->where('status', $request->input('status')))
+            ->orderBy($sort, $direction)
+            ->paginate(8)
+            ->withQueryString();
+
+        return view('ketua.laporan-bulanan.index', compact('laporans', 'total', 'sort', 'direction'));
     }
 
     public function create()
@@ -244,19 +280,27 @@ class LaporanBulananController extends Controller
         $ekskul = $laporan_bulanan->ekskul;
         $kelas = $this->generateKelas($ekskul);
 
-        $dokumentasiKegiatan = Kegiatan::where('ekskul_id', $ekskul->id)
-            ->whereYear('tanggal_kegiatan', substr($laporan_bulanan->bulan, 0, 4))
-            ->whereMonth('tanggal_kegiatan', substr($laporan_bulanan->bulan, 5, 2))
-            ->whereNotNull('dokumentasi')
-            ->orderBy('tanggal_kegiatan')
-            ->pluck('dokumentasi')
-            ->values()
-            ->toArray();
+        $tahun = substr($laporan_bulanan->bulan, 0, 4);
+        $bulan = substr($laporan_bulanan->bulan, 5, 2);
+
+        $kegiatanQuery = Kegiatan::where('ekskul_id', $ekskul->id)
+            ->whereYear('tanggal_kegiatan', $tahun)
+            ->whereMonth('tanggal_kegiatan', $bulan)
+            ->orderBy('tanggal_kegiatan');
+
+        $rutinKegiatans = (clone $kegiatanQuery)->whereNull('jenis_kegiatan')->get();
+        $eventKegiatans = (clone $kegiatanQuery)->whereNotNull('jenis_kegiatan')->get();
+
+        $dokumentasiRutin = $rutinKegiatans->filter(fn ($k) => filled($k->dokumentasi))->pluck('dokumentasi')->values()->toArray();
+        $dokumentasiEvent = $eventKegiatans->filter(fn ($k) => filled($k->dokumentasi))->pluck('dokumentasi')->values()->toArray();
 
         $pdf = Pdf::loadView('ketua.laporan-bulanan.pdf', [
             'laporan' => $laporan_bulanan,
             'kelas' => $kelas,
-            'dokumentasiKegiatan' => $dokumentasiKegiatan,
+            'rutinKegiatans' => $rutinKegiatans,
+            'eventKegiatans' => $eventKegiatans,
+            'dokumentasiRutin' => $dokumentasiRutin,
+            'dokumentasiEvent' => $dokumentasiEvent,
         ]);
         $filename = 'laporan-'.str_replace('/', '-', $laporan_bulanan->bulan).'-'.($ekskul->nama_ekskul ?? 'ekskul').'.pdf';
 

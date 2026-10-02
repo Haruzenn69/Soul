@@ -652,19 +652,10 @@ html.dark-mode .recruitment-open-badge {
     color: #6ee7b7 !important;
 }
 
-html.dark-mode .catalog-filter,
-html.dark-mode .catalog-card {
+/* catalog-filter (legacy pill button) */
+html.dark-mode .catalog-filter {
     background-color: #202020 !important;
     border-color: #3a3a3a !important;
-}
-
-html.dark-mode .catalog-card {
-    box-shadow: 0 8px 24px rgb(0 0 0 / .28) !important;
-}
-
-html.dark-mode .catalog-card:hover {
-    border-color: #525252 !important;
-    box-shadow: 0 12px 28px rgb(0 0 0 / .36) !important;
 }
 
 html.dark-mode .catalog-filter:hover {
@@ -672,16 +663,53 @@ html.dark-mode .catalog-filter:hover {
     border-color: #525252 !important;
 }
 
-html.dark-mode .catalog-closed-badge {
-    background-color: #2b1d27 !important;
-    border-color: #713642 !important;
-    color: #fda4af !important;
+/* catalog-filter-tab (new tab-bar style in filter container) */
+html.dark-mode .catalog-filter-tab {
+    color: #a3a3a3 !important;
 }
 
-html.dark-mode .catalog-unavailable {
+html.dark-mode .catalog-filter-tab:hover {
+    background-color: #262626 !important;
+    color: #e0f2fe !important;
+}
+
+/* catalog-card — main ekskul card */
+html.dark-mode .catalog-card {
+    background-color: #1e1e1e !important;
+    border-color: #333333 !important;
+    box-shadow: 0 4px 16px rgb(0 0 0 / .32) !important;
+}
+
+html.dark-mode .catalog-card:hover {
+    border-color: #444444 !important;
+    box-shadow: 0 12px 28px rgb(0 0 0 / .48) !important;
+}
+
+/* The top color strip inside catalog-card stays as gradient, so no override needed.
+   But the border divider inside the card (border-sky-50) needs darkening. */
+html.dark-mode .catalog-card .border-sky-50 {
+    border-color: #2a2a2a !important;
+}
+
+/* Badge: open recruitment — keep emerald tint subtle in dark */
+html.dark-mode .recruitment-open-badge {
+    background-color: #102b26 !important;
+    border-color: #1f5c4a !important;
+    color: #6ee7b7 !important;
+}
+
+/* Badge: closed — neutral gray pill */
+html.dark-mode .catalog-closed-badge {
     background-color: #2a2a2a !important;
     border-color: #3a3a3a !important;
-    color: #8a8a8a !important;
+    color: #6b7280 !important;
+}
+
+/* Disabled / unavailable button */
+html.dark-mode .catalog-unavailable {
+    background-color: #242424 !important;
+    border-color: #3a3a3a !important;
+    color: #6b7280 !important;
 }
 
 html.dark-mode .attendance-status--hadir {
@@ -729,6 +757,154 @@ html.dark-mode .soul-field {
     background-color: #1f1f1f !important;
     border-color: #3a3a3a !important;
     color: #e2e8f0 !important;
+}
+
+/* Katalog ekskul. Kartu memakai variabel --soul-tinta untuk tepi kiri dan bar
+   sumbu minggu, jadi satu token ini cukup untuk mode terang maupun gelap. */
+html.dark-mode .soul-kartu {
+    --soul-tinta: #3b82f6;
+    background-color: #1e1e1e !important;
+    border-color: #333333 !important;
+}
+
+html.dark-mode .soul-kartu--tutup {
+    --soul-tinta: #4b5563;
+}
+
+html.dark-mode .soul-kartu:hover {
+    box-shadow: inset 6px 0 0 var(--soul-tinta), 0 10px 22px -14px rgb(0 0 0 / .7) !important;
+}
+
+html.dark-mode .soul-crest {
+    background-color: #262626 !important;
+    border-color: #3a3a3a !important;
+}
+
+html.dark-mode .soul-crest-mono {
+    color: #e2e8f0 !important;
+}
+
+html.dark-mode .soul-minggu-batang {
+    background-color: #3f3f3f !important;
+}
+
+html.dark-mode .soul-minggu-sumbu {
+    background-color: #2f2f2f !important;
+}
+
+html.dark-mode .soul-minggu-label {
+    color: #8f8f8f !important;
+}
+
+html.dark-mode .soul-axiom + .soul-axiom {
+    border-top-color: #2f2f2f !important;
+}
+
+html.dark-mode .soul-axiom-kunci {
+    color: #8f8f8f !important;
+}
+
+html.dark-mode .soul-axiom-nilai {
+    color: #e2e8f0 !important;
+}
+
+html.dark-mode .soul-btn:focus-visible,
+html.dark-mode .soul-kartu :is(a, button):focus-visible,
+html.dark-mode .soul-indeks-item:focus-visible {
+    outline-color: #60a5fa !important;
+}
+
+html.dark-mode .soul-btn--utama {
+    background-color: #1d4ed8 !important;
+}
+
+html.dark-mode .soul-btn--utama:hover {
+    background-color: #1e40af !important;
+}
+
+html.dark-mode .soul-btn--bawa {
+    background-color: #262626 !important;
+    border-color: #3a3a3a !important;
+    color: #cbd5e1 !important;
+}
+
+html.dark-mode .soul-btn--bawa:hover {
+    border-color: #3b82f6 !important;
+    color: #bfdbfe !important;
+}
+
+html.dark-mode .soul-btn--mati {
+    background-color: #1a1a1a !important;
+    border-color: #2f2f2f !important;
+    color: #6b7280 !important;
+}
+
+html.dark-mode .soul-indeks-item {
+    color: #a3a3a3 !important;
+}
+
+html.dark-mode .soul-indeks-item:hover {
+    border-left-color: #525252 !important;
+    color: #e5e5e5 !important;
+}
+
+html.dark-mode .soul-indeks-item[aria-current="true"] {
+    border-left-color: #3b82f6 !important;
+    color: #bfdbfe !important;
+}
+
+html.dark-mode .soul-indeks-jumlah {
+    color: #8f8f8f !important;
+}
+
+html.dark-mode .soul-indeks-item[aria-current="true"] .soul-indeks-jumlah {
+    color: #60a5fa !important;
+}
+
+html.dark-mode .soul-garis {
+    background-color: #333333 !important;
+}
+
+html.dark-mode .soul-status--menunggu {
+    background-color: #2b2210 !important;
+    border-color: #5a4413 !important;
+    color: #fcd34d !important;
+}
+
+html.dark-mode .soul-status--terdaftar {
+    background-color: #1e1e1e !important;
+    border-color: #3a3a3a !important;
+    color: #cbd5e1 !important;
+}
+
+html.dark-mode .soul-kolom {
+    background-color: #1f1f1f !important;
+    border-color: #3a3a3a !important;
+    color: #e2e8f0 !important;
+}
+
+html.dark-mode .soul-kolom:focus {
+    border-color: #60a5fa !important;
+    box-shadow: 0 0 0 3px rgb(96 165 250 / .25) !important;
+}
+
+html.dark-mode .soul-tanya,
+html.dark-mode .soul-tanya summary {
+    border-color: #333333;
+    color: #e2e8f0;
+}
+
+html.dark-mode .soul-tanya summary:focus-visible {
+    outline-color: #60a5fa !important;
+}
+
+html.dark-mode .soul-tanya-jawab {
+    color: #cbd5e1 !important;
+}
+
+html.dark-mode .soul-tanya[open] .soul-tanya-tanda,
+html.dark-mode .soul-tanya summary:hover .soul-tanya-tanda {
+    color: #60a5fa !important;
 }
 
 /* Native file inputs keep a light browser button unless it is themed explicitly. */
@@ -1203,6 +1379,101 @@ html.dark-mode #soul-theme-toggle {
 html.dark-mode table thead th.sticky {
     background-color: #262626 !important;
     background-image: none !important;
+}
+
+/* ==========================================================================
+   Ekskul Detail Page Dark Mode
+   ========================================================================== */
+html.dark-mode body {
+    background-color: #121212 !important;
+}
+
+html.dark-mode header.sticky {
+    background-color: rgba(24, 24, 24, 0.88) !important;
+    border-color: #2e2e2e !important;
+}
+
+html.dark-mode .ekskul-gradient-mesh {
+    background-color: #0c4a6e !important;
+    background-image: 
+        radial-gradient(at 0% 0%, hsla(199, 89%, 30%, 1) 0, transparent 50%),
+        radial-gradient(at 50% 0%, hsla(217, 91%, 35%, 1) 0, transparent 50%),
+        radial-gradient(at 100% 0%, hsla(43, 96%, 35%, 0.8) 0, transparent 50%) !important;
+}
+
+/* Detail page cards */
+html.dark-mode article,
+html.dark-mode section#tentang .bg-white,
+html.dark-mode section#tentang [class*="from-amber-50"],
+html.dark-mode section#prestasi article,
+html.dark-mode section#kegiatan article,
+html.dark-mode section#testimoni article,
+html.dark-mode section#faq .bg-white,
+html.dark-mode section .rounded-3xl.bg-white,
+html.dark-mode div.bg-white.relative {
+    background-color: #1a1a1a !important;
+    border-color: #2c2c2c !important;
+    color: #e2e8f0 !important;
+}
+
+/* Headings and text in detail */
+html.dark-mode h1,
+html.dark-mode h2,
+html.dark-mode h3,
+html.dark-mode h4 {
+    color: #f8fafc !important;
+}
+
+/* FAQ Accordion Details */
+html.dark-mode section#faq details summary:hover {
+    background-color: #222222 !important;
+}
+
+html.dark-mode section#faq details div[class*="border-t"] {
+    background-color: #151515 !important;
+    border-color: #282828 !important;
+}
+
+/* Metric / Quick facts cards in detail hero */
+html.dark-mode div[class*="bg-sky-50/60"],
+html.dark-mode div[class*="bg-amber-50/60"],
+html.dark-mode div[class*="bg-emerald-50/60"],
+html.dark-mode div[class*="bg-blue-50/60"] {
+    background-color: #202020 !important;
+    border-color: #303030 !important;
+}
+
+/* Inner card boxes */
+html.dark-mode section#tentang [class*="bg-white/80"] {
+    background-color: #222222 !important;
+    border-color: #333333 !important;
+    color: #cbd5e1 !important;
+}
+
+/* Inputs & textareas in detail */
+html.dark-mode textarea[id="quote"],
+html.dark-mode input[id="pertanyaan"] {
+    background-color: #202020 !important;
+    border-color: #3a3a3a !important;
+    color: #f1f5f9 !important;
+}
+
+html.dark-mode textarea[id="quote"]:focus,
+html.dark-mode input[id="pertanyaan"]:focus {
+    background-color: #262626 !important;
+    border-color: #38bdf8 !important;
+}
+
+/* Empty states */
+html.dark-mode div[class*="border-dashed"] {
+    background-color: #181818 !important;
+    border-color: #333333 !important;
+}
+
+/* Footer */
+html.dark-mode footer {
+    background-color: #141414 !important;
+    border-color: #282828 !important;
 }
 
 @media print {

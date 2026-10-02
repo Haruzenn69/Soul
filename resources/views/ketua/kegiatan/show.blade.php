@@ -20,11 +20,16 @@
         <div class="grid gap-5 sm:grid-cols-2">
             <div>
                 <p class="text-xs font-bold text-slate-500 mb-1">Tanggal kegiatan</p>
-                <p class="font-semibold text-sm text-slate-800">{{ $kegiatan->tanggal_kegiatan->isoFormat('dddd, D MMMM Y') }}</p>
+                <p class="font-semibold text-sm text-slate-800">{{ $kegiatan->tanggalText() }}</p>
             </div>
             <div>
                 <p class="text-xs font-bold text-slate-500 mb-1">Nama kegiatan</p>
-                <p class="font-semibold text-sm text-slate-800">{{ $kegiatan->materi }}</p>
+                <p class="font-semibold text-sm text-slate-800">
+                    {{ $kegiatan->materi }}
+                    @if($kegiatan->isEvent())
+                        <span class="ml-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">Event</span>
+                    @endif
+                </p>
             </div>
         </div>
         @if($kegiatan->deskripsi)
@@ -39,6 +44,32 @@
             <img src="{{ asset('storage/' . $kegiatan->dokumentasi) }}" alt="Dokumentasi Kegiatan" class="mt-2 max-w-sm rounded-2xl border border-sky-100 shadow-sm">
         </div>
         @endif
+
+        @php
+            $pelatih = $kegiatan->ekskul->pelatih;
+        @endphp
+        <div class="rounded-2xl border border-amber-100 bg-amber-50/40 p-4 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <span class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 flex items-center justify-center text-xs font-extrabold shadow-md shadow-amber-200">P</span>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800">Kehadiran Pelatih</h3>
+                    <p class="text-[10px] text-slate-400 mt-0.5">{{ $pelatih?->nama ?? 'Pelatih belum tercatat' }}</p>
+                </div>
+            </div>
+            @if($presensiPelatih)
+                @php
+                    $pelatihBadge = match ($presensiPelatih->status) {
+                        'hadir' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                        'sakit' => 'bg-amber-100 text-amber-700 border-amber-200',
+                        'izin' => 'bg-sky-100 text-sky-700 border-sky-200',
+                        default => 'bg-red-100 text-red-700 border-red-200',
+                    };
+                @endphp
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border {{ $pelatihBadge }}">{{ ucfirst($presensiPelatih->status) }}</span>
+            @else
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500 border border-slate-200">Belum diabsen</span>
+            @endif
+        </div>
 
         @php
             $rekap = [
@@ -75,12 +106,19 @@
         </div>
 
         <h3 class="text-sm font-bold text-slate-800 mb-3">Daftar presensi</h3>
+        @include('partials.table-client-tools', [
+            'tableId' => 'presensi-show-table',
+            'searchCols' => [1],
+            'filterCols' => [2],
+            'filterOptions' => ['hadir' => 'Hadir', 'sakit' => 'Sakit', 'izin' => 'Izin', 'alpha' => 'Alpha'],
+            'defaultSize' => 10,
+        ])
         <div class="overflow-x-auto">
-        <table class="card-table w-full text-left text-xs md:text-sm">
+        <table id="presensi-show-table" class="card-table w-full text-left text-xs md:text-sm">
             <thead class="bg-sky-50">
                 <tr>
                     <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
-                    <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Nama</th>
+                    <th data-sort-index="1" class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap cursor-pointer select-none hover:text-slate-800 transition" title="Klik untuk urutkan">Nama</th>
                     <th class="px-4 py-3 font-semibold text-slate-500 whitespace-nowrap">Status</th>
                 </tr>
             </thead>

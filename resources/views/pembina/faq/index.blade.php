@@ -27,19 +27,6 @@
         </div>
     </div>
 
-    <!-- Filter Ekskul -->
-    @if($ekskuls->count() > 1)
-        <form method="GET" action="{{ route('pembina.faq.index') }}" class="flex items-center gap-2">
-            <select name="ekskul" onchange="this.form.submit()"
-                class="px-4 py-2.5 bg-white border border-sky-100 rounded-2xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
-                <option value="">Semua Ekskul</option>
-                @foreach($ekskuls as $ex)
-                    <option value="{{ $ex->id }}" {{ ($ekskulFilter ?? 0) == $ex->id ? 'selected' : '' }}>{{ $ex->nama_ekskul }}</option>
-                @endforeach
-            </select>
-        </form>
-    @endif
-
     <!-- Add Form Card -->
     <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl space-y-5 animate-fade-up" style="animation-delay: .1s">
         <h3 class="text-sm font-extrabold text-slate-900 mb-4">Tambah FAQ</h3>
@@ -76,6 +63,84 @@
         </form>
     </div>
 
+    <!-- Search & Filter Bar -->
+    <div class="bg-white rounded-2xl border border-sky-100 shadow-sm overflow-hidden">
+        <form method="GET" action="{{ route('pembina.faq.index') }}" id="faq-filter-form">
+            <div class="p-4 flex flex-col sm:flex-row gap-3 border-b border-slate-100">
+                {{-- Search --}}
+                <div class="relative flex-1">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </span>
+                    <input type="text" name="cari" id="input-cari-faq" value="{{ request('cari') }}"
+                        placeholder="Cari pertanyaan atau jawaban..."
+                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+                </div>
+
+                {{-- Filter Ekskul --}}
+                @if($ekskuls->count() > 1)
+                <div class="relative shrink-0">
+                    <select name="ekskul" id="select-faq-ekskul" onchange="this.form.submit()"
+                        class="pl-4 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all appearance-none">
+                        <option value="">Semua Ekskul</option>
+                        @foreach($ekskuls as $ex)
+                            <option value="{{ $ex->id }}" {{ ($ekskulFilter ?? 0) == $ex->id ? 'selected' : '' }}>{{ $ex->nama_ekskul }}</option>
+                        @endforeach
+                    </select>
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </span>
+                </div>
+                @endif
+
+                {{-- Filter Status --}}
+                <div class="relative shrink-0">
+                    <select name="status" id="select-faq-status" onchange="this.form.submit()"
+                        class="pl-4 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all appearance-none">
+                        <option value="semua" @selected(request('status') === 'semua' || !request('status'))>Semua Status</option>
+                        <option value="pending"  @selected(request('status') === 'pending')>Menunggu Jawaban</option>
+                        <option value="answered" @selected(request('status') === 'answered')>Sudah Dijawab</option>
+                    </select>
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </span>
+                </div>
+
+                {{-- Sort --}}
+                <div class="relative shrink-0">
+                    <select name="sort" id="select-faq-sort" onchange="this.form.submit()"
+                        class="pl-4 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all appearance-none">
+                        <option value="status" @selected($sort === 'status' && $direction === 'asc')>Status (Pending Dulu)</option>
+                        <option value="status_desc" @selected($sort === 'status' && $direction === 'desc')>Status (Dijawab Dulu)</option>
+                        <option value="pertanyaan" @selected($sort === 'pertanyaan' && $direction === 'asc')>Pertanyaan A–Z</option>
+                        <option value="pertanyaan_desc" @selected($sort === 'pertanyaan' && $direction === 'desc')>Pertanyaan Z–A</option>
+                        <option value="created_at" @selected($sort === 'created_at' && $direction === 'asc')>Terlama</option>
+                        <option value="created_at_desc" @selected($sort === 'created_at' && $direction === 'desc')>Terbaru</option>
+                    </select>
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/></svg>
+                    </span>
+                </div>
+
+                {{-- Submit + Reset --}}
+                <div class="flex gap-2 shrink-0">
+                    <button type="submit"
+                        class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-2xl transition shadow-sm shadow-sky-200">
+                        Cari
+                    </button>
+                    @if(request('cari') || request('ekskul') || (request('status') && request('status') !== 'semua'))
+                        <a href="{{ route('pembina.faq.index') }}"
+                            class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-2xl transition">
+                            Reset
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </form>
+    </div>
+
     <!-- Table Card -->
     <div class="bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
         <div class="overflow-x-auto">
@@ -83,10 +148,12 @@
             <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
                 <tr>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
+                    @if($ekskuls->count() > 1)
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Ekskul</th>
-                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Pertanyaan</th>
+                    @endif
+                    @include('partials.th-sort', ['label' => 'Pertanyaan', 'key' => 'pertanyaan', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Jawaban</th>
-                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Status</th>
+                    @include('partials.th-sort', ['label' => 'Status', 'key' => 'status', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Aksi</th>
                 </tr>
             </thead>
@@ -94,9 +161,11 @@
                 @forelse($faqs as $faq)
                     <tr class="hover:bg-sky-50/50 transition">
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">{{ $loop->iteration }}</td>
+                        @if($ekskuls->count() > 1)
                         <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
                             <span class="px-2.5 py-1 bg-sky-50 border border-sky-100 rounded-full text-[10px] font-bold text-sky-700">{{ $faq->ekskul->nama_ekskul ?? '-' }}</span>
                         </td>
+                        @endif
                         <td class="px-4 md:px-6 py-3.5 font-medium max-w-sm leading-relaxed">{{ $faq->pertanyaan }}</td>
                         <td class="px-4 md:px-6 py-3.5 max-w-md">
                             @if($faq->status === 'pending')
@@ -133,11 +202,51 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-4 md:px-6 py-10 text-center text-slate-400">Belum ada FAQ. Tambahkan pertanyaan yang sering ditanyakan siswa.</td>
+                        <td colspan="{{ $ekskuls->count() > 1 ? 7 : 6 }}" class="px-4 md:px-6 py-10 text-center text-slate-400">
+                            @if(request('cari') || request('status'))
+                                <p class="text-sm font-medium">Tidak ada FAQ yang sesuai pencarian.</p>
+                                <a href="{{ route('pembina.faq.index') }}" class="text-xs text-sky-500 hover:underline mt-1 inline-block">Reset filter</a>
+                            @else
+                                Belum ada FAQ. Tambahkan pertanyaan yang sering ditanyakan siswa.
+                            @endif
+                        </td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
         </div>
+        @include('partials.table-pagination', ['rows' => $faqs, 'label' => 'FAQ'])
     </div>
+</div>
+
+<script>
+// Handle sort select — encode sort+direction into a single value then split it on submit
+document.getElementById('select-faq-sort')?.addEventListener('change', function() {
+    const val = this.value;
+    const form = document.getElementById('faq-filter-form');
+    // Remove existing sort/direction hidden inputs
+    form.querySelectorAll('input[name="sort"], input[name="direction"]').forEach(el => el.remove());
+
+    const parts = val.split('_desc');
+    const isDesc = val.endsWith('_desc');
+    const sortKey = isDesc ? parts[0] : val;
+    const dir = isDesc ? 'desc' : 'asc';
+
+    const sortInput = document.createElement('input');
+    sortInput.type = 'hidden';
+    sortInput.name = 'sort';
+    sortInput.value = sortKey;
+    form.appendChild(sortInput);
+
+    const dirInput = document.createElement('input');
+    dirInput.type = 'hidden';
+    dirInput.name = 'direction';
+    dirInput.value = dir;
+    form.appendChild(dirInput);
+
+    // Remove the select's name so it doesn't conflict
+    this.removeAttribute('name');
+    form.submit();
+});
+</script>
 @endsection

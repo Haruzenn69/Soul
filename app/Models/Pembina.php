@@ -45,9 +45,19 @@ class Pembina extends Model
         return $this->hasMany(Ekskul::class);
     }
 
+    public function profileHistories(): HasMany
+    {
+        return $this->hasMany(PembinaProfileHistory::class)->latest();
+    }
+
     public function notifikasis(): HasMany
     {
         return $this->hasMany(Notifikasi::class);
+    }
+
+    public function pelatihs(): HasMany
+    {
+        return $this->hasMany(Pelatih::class);
     }
 
     public function isProfileComplete(): bool

@@ -45,6 +45,14 @@
         </form>
     </div>
 
+    @include('partials.table-filters', [
+        'action' => route('ketua.testimoni.index'),
+        'placeholder' => 'Cari nama / kelas / isi...',
+        'filters' => [
+            ['name' => 'status', 'allLabel' => 'Semua Status', 'options' => ['pending' => 'Menunggu', 'approved' => 'Ditampilkan', 'rejected' => 'Ditolak']],
+        ],
+    ])
+
     <!-- Table Card -->
     <div class="ketua-card-list bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
         <div class="overflow-x-auto">
@@ -52,10 +60,10 @@
             <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
                 <tr>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
-                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Nama</th>
+                    @include('partials.th-sort', ['label' => 'Nama', 'key' => 'nama', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Kelas</th>
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Testimoni</th>
-                    <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Status</th>
+                    @include('partials.th-sort', ['label' => 'Status', 'key' => 'status', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
                     <th class="px-4 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Aksi</th>
                 </tr>
             </thead>
@@ -115,5 +123,6 @@
             </tbody>
         </table>
         </div>
+        @include('partials.table-pagination', ['rows' => $testimoniss, 'label' => 'testimoni'])
     </div>
 @endsection

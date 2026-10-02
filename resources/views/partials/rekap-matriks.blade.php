@@ -8,7 +8,8 @@
         null    => ['bg-slate-100 text-slate-400', '–', 'Belum diabsen'],
     ];
     $matriksTitle = $matriksTitle ?? 'Matriks Kehadiran';
-    $matriksSubtitle = $matriksSubtitle ?? ($rows->count().' anggota · '.$kegiatans->count().' kegiatan');
+    $eventCount = isset($eventKegiatans) ? $eventKegiatans->count() : 0;
+    $matriksSubtitle = $matriksSubtitle ?? ($rows->count().' anggota · '.$kegiatans->count().' kegiatan rutin'.($eventCount > 0 ? ' · '.$eventCount.' event' : ''));
 @endphp
 
 {{-- LEGEND --}}
@@ -39,12 +40,20 @@
         @endif
     </div>
 
+    @include('partials.table-client-tools', [
+        'tableId' => 'rekap-matriks-table',
+        'searchCols' => [1],
+        'filterCols' => [],
+        'filterOptions' => [],
+        'defaultSize' => 10,
+    ])
+
     <div class="overflow-x-auto">
-        <table class="card-table w-full text-left text-xs md:text-sm min-w-max">
+        <table id="rekap-matriks-table" class="card-table w-full text-left text-xs md:text-sm min-w-max">
             <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
                 <tr>
                     <th class="px-4 md:px-5 py-3 font-semibold text-slate-500 sticky left-0 bg-gradient-to-r from-sky-50 to-blue-50 z-10" rowspan="2">No</th>
-                    <th class="px-4 md:px-5 py-3 font-semibold text-slate-500 sticky left-10 bg-gradient-to-r from-sky-50 to-blue-50 z-10" rowspan="2">Nama</th>
+                    <th data-sort-index="1" class="px-4 md:px-5 py-3 font-semibold text-slate-500 sticky left-10 bg-gradient-to-r from-sky-50 to-blue-50 z-10 cursor-pointer select-none hover:text-slate-800 transition" rowspan="2" title="Klik untuk urutkan">Nama</th>
                     <th colspan="{{ max($kegiatans->count(), 1) }}" class="px-3 py-3 font-semibold text-slate-500 text-center">Pertemuan (tanggal & materi)</th>
                     <th colspan="5" class="px-3 py-3 font-semibold text-slate-500 text-center">Total</th>
                 </tr>

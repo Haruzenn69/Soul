@@ -80,4 +80,13 @@ class PembinaController extends Controller
         return back()->with('success', "Ekskul {$ekskul->nama_ekskul} berhasil dilepas dari {$pembina->nama}.");
     }
 
+    public function riwayatProfil(Pembina $pembina): View
+    {
+        $riwayat = $pembina->profileHistories()
+            ->with('changedBy.pembina')
+            ->paginate(30);
+
+        return view('kesiswaan.pembina.riwayat-profil', compact('pembina', 'riwayat'));
+    }
+
 }
