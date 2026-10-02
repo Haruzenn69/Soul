@@ -10,8 +10,11 @@ use App\Models\LaporanBulanan;
 use App\Models\Pendaftaran;
 use App\Models\Presensi;
 use App\Services\NotifikasiService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 
 class LaporanBulananController extends ApiController
 {
@@ -63,6 +66,55 @@ class LaporanBulananController extends ApiController
 
         return $this->ok([
             'laporan' => (new LaporanBulananResource($laporan_bulanan))->resolve(),
+        ]);
+    }
+
+    public function downloadPdf(LaporanBulanan $laporan_bulanan): Response
+    {
+        $this->ensureEkskul($laporan_bulanan);
+
+        $ekskul = $laporan_bulanan->ekskul;
+        $kelas = $ekskul->pendaftarans()
+            ->where('status', Pendaftaran::STATUS_DITERIMA)
+            ->with('siswa.kelas')
+            ->get()
+            ->pluck('siswa.kelas.tingkat')
+            ->unique()
+            ->sort()
+            ->map(fn ($tingkat) => config("kelas.tingkat.{$tingkat}"))
+            ->values();
+        $kelasLabel = match ($kelas->count()) {
+            0 => '-',
+            1 => $kelas->first(),
+            2 => $kelas->join(' & '),
+            default => $kelas->slice(0, -1)->implode(', ').', dan '.$kelas->last(),
+        };
+        $tahun = substr($laporan_bulanan->bulan, 0, 4);
+        $bulan = substr($laporan_bulanan->bulan, 5, 2);
+        $kegiatanQuery = Kegiatan::where('ekskul_id', $ekskul->id)
+            ->whereYear('tanggal_kegiatan', $tahun)
+            ->whereMonth('tanggal_kegiatan', $bulan)
+            ->orderBy('tanggal_kegiatan');
+        $rutinKegiatans = (clone $kegiatanQuery)->whereNull('jenis_kegiatan')->get();
+        $eventKegiatans = (clone $kegiatanQuery)->whereNotNull('jenis_kegiatan')->get();
+        $dokumentasiRutin = $rutinKegiatans->whereNotNull('dokumentasi')
+            ->pluck('dokumentasi')->values()->all();
+        $dokumentasiEvent = $eventKegiatans->whereNotNull('dokumentasi')
+            ->pluck('dokumentasi')->values()->all();
+
+        $pdf = Pdf::loadView('ketua.laporan-bulanan.pdf', [
+            'laporan' => $laporan_bulanan,
+            'kelas' => $kelasLabel,
+            'rutinKegiatans' => $rutinKegiatans,
+            'eventKegiatans' => $eventKegiatans,
+            'dokumentasiRutin' => $dokumentasiRutin,
+            'dokumentasiEvent' => $dokumentasiEvent,
+        ]);
+        $filename = 'laporan-'.str_replace('/', '-', $laporan_bulanan->bulan).'-'.Str::slug($ekskul->nama_ekskul ?? 'ekskul').'.pdf';
+
+        return response($pdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CatalogController;
 use App\Http\Controllers\Api\Ketua\DashboardController as KetuaDashboardController;
+use App\Http\Controllers\Api\Ketua\FaqController as KetuaFaqController;
 use App\Http\Controllers\Api\Ketua\KegiatanController as KetuaKegiatanController;
 use App\Http\Controllers\Api\Ketua\LaporanBulananController as KetuaLaporanBulananController;
 use App\Http\Controllers\Api\Ketua\MembershipController as KetuaMembershipController;
@@ -13,6 +14,8 @@ use App\Http\Controllers\Api\Siswa\SiswaController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword'])
+    ->middleware('throttle:5,1');
 
 Route::get('/catalog', [CatalogController::class, 'index']);
 Route::get('/catalog/{ekskul}', [CatalogController::class, 'show']);
@@ -47,6 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/notifikasi/read-all', [SiswaController::class, 'bacaSemuaNotifikasi'])->name('notifikasi.read-all');
         Route::get('/profile', [SiswaController::class, 'profil'])->name('profile');
         Route::post('/profile', [SiswaController::class, 'updateProfil'])->name('profile.update');
+        Route::post('/password', [SiswaController::class, 'updatePassword'])->name('password.update');
         Route::get('/kelas', [SiswaController::class, 'kelas'])->name('kelas');
         Route::post('/onboarding/complete', [SiswaController::class, 'onboardingComplete'])->name('onboarding.complete');
     });
@@ -65,6 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/kegiatan/{kegiatan}/presensi', [KetuaKegiatanController::class, 'presensiForm'])->name('kegiatan.presensi-form');
         Route::post('/kegiatan/{kegiatan}/presensi', [KetuaKegiatanController::class, 'storePresensi'])->name('kegiatan.presensi');
         Route::get('/rekap', [KetuaKegiatanController::class, 'rekap'])->name('rekap');
+        Route::get('/rekap/pdf', [KetuaKegiatanController::class, 'downloadRekapPdf'])->name('rekap.pdf');
 
         Route::get('/anggota', [KetuaMembershipController::class, 'anggota'])->name('anggota');
         Route::post('/anggota/{pendaftaran}/status', [KetuaMembershipController::class, 'updateStatusAnggota'])->name('anggota.status');
@@ -76,6 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/laporan-bulanan', [KetuaLaporanBulananController::class, 'index'])->name('laporan-bulanan.index');
         Route::post('/laporan-bulanan', [KetuaLaporanBulananController::class, 'store'])->name('laporan-bulanan.store');
         Route::get('/laporan-bulanan/{laporan_bulanan}', [KetuaLaporanBulananController::class, 'show'])->name('laporan-bulanan.show');
+        Route::get('/laporan-bulanan/{laporan_bulanan}/pdf', [KetuaLaporanBulananController::class, 'downloadPdf'])->name('laporan-bulanan.pdf');
         Route::post('/laporan-bulanan/{laporan_bulanan}/update', [KetuaLaporanBulananController::class, 'update'])->name('laporan-bulanan.update');
         Route::post('/laporan-bulanan/{laporan_bulanan}/serahkan', [KetuaLaporanBulananController::class, 'submitToPembina'])->name('laporan-bulanan.submit');
 
@@ -97,5 +103,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/notifikasi', [KetuaNotifikasiController::class, 'index'])->name('notifikasi');
         Route::post('/notifikasi/{notifikasi}/read', [KetuaNotifikasiController::class, 'read'])->name('notifikasi.read');
         Route::post('/notifikasi/read-all', [KetuaNotifikasiController::class, 'readAll'])->name('notifikasi.read-all');
+        Route::get('/faq', [KetuaFaqController::class, 'index'])->name('faq.index');
+        Route::post('/faq', [KetuaFaqController::class, 'store'])->name('faq.store');
+        Route::post('/faq/{faq}/answer', [KetuaFaqController::class, 'answer'])->name('faq.answer');
+        Route::delete('/faq/{faq}', [KetuaFaqController::class, 'destroy'])->name('faq.destroy');
     });
+
 });
