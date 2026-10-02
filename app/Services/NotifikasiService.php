@@ -7,6 +7,7 @@ use App\Models\Faq;
 use App\Models\Kegiatan;
 use App\Models\LaporanBulanan;
 use App\Models\Notifikasi;
+use App\Models\Pelatih;
 use App\Models\Pendaftaran;
 use App\Models\PengajuanKeluar;
 use App\Models\Testimoni;
@@ -330,6 +331,58 @@ class NotifikasiService
             'pesan' => 'Pertanyaan kamu untuk ekskul '.$faq->ekskul->nama_ekskul.' sudah dijawab dan tampil di halaman katalog.',
             'tipe' => 'diterima',
         ]);
+    }
+
+    public static function pelatihDiajukan(Pelatih $pelatih): void
+    {
+        $ekskulNama = $pelatih->ekskul?->nama_ekskul ?? 'Ekskul';
+        $pembinaNama = $pelatih->pembina?->nama ?? 'Pembina';
+
+        // Notifikasi ke pembina pengusul
+        if ($pelatih->pembina_id) {
+            Notifikasi::create([
+                'pembina_id' => $pelatih->pembina_id,
+                'judul' => 'Pendaftaran Pelatih Diajukan',
+                'pesan' => "Pendaftaran pelatih {$pelatih->nama} untuk ekskul {$ekskulNama} berhasil dikirim dan sedang menunggu verifikasi kesiswaan.",
+                'tipe' => 'info',
+            ]);
+        }
+
+        // Notifikasi ke kesiswaan
+        self::untukKesiswaan([
+            'judul' => 'Pengajuan Pelatih Baru',
+            'pesan' => "Pembina {$pembinaNama} mengajukan pendaftaran pelatih baru ({$pelatih->nama}) untuk ekskul {$ekskulNama}. Silakan tinjau berkas.",
+            'tipe' => 'info',
+        ]);
+    }
+
+    public static function pelatihDiverifikasi(Pelatih $pelatih): void
+    {
+        $ekskulNama = $pelatih->ekskul?->nama_ekskul ?? 'Ekskul';
+
+        if ($pelatih->pembina_id) {
+            Notifikasi::create([
+                'pembina_id' => $pelatih->pembina_id,
+                'judul' => 'Pelatih Terverifikasi',
+                'pesan' => "Pelatih {$pelatih->nama} untuk ekskul {$ekskulNama} telah diverifikasi oleh kesiswaan dan sekarang tampil di katalog ekskul.",
+                'tipe' => 'diterima',
+            ]);
+        }
+    }
+
+    public static function pelatihDitolak(Pelatih $pelatih, ?string $alasan = null): void
+    {
+        $ekskulNama = $pelatih->ekskul?->nama_ekskul ?? 'Ekskul';
+        $catatan = $alasan ? " Catatan: {$alasan}" : '';
+
+        if ($pelatih->pembina_id) {
+            Notifikasi::create([
+                'pembina_id' => $pelatih->pembina_id,
+                'judul' => 'Pengajuan Pelatih Ditolak',
+                'pesan' => "Pengajuan pelatih {$pelatih->nama} untuk ekskul {$ekskulNama} ditolak oleh kesiswaan.{$catatan}",
+                'tipe' => 'ditolak',
+            ]);
+        }
     }
 
     private static function untukKesiswaan(array $data): void

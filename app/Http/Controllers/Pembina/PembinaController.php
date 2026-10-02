@@ -42,9 +42,12 @@ class PembinaController extends Controller
 
     public function dashboard()
     {
+        $pembina = auth()->user()?->pembina;
         $ekskuls = $this->getEkskuls();
         $ekskul = $ekskuls->first();
         $ekskulIds = $ekskuls->pluck('id');
+
+        $ekskulsByBidang = $ekskuls->groupBy(fn ($e) => $e->bidang);
 
         $anggota = Pendaftaran::whereIn('ekskul_id', $ekskulIds)
             ->whereIn('status', ['diterima', 'nonaktif', 'keluar'])
@@ -70,7 +73,7 @@ class PembinaController extends Controller
             ->latest('bulan')
             ->get();
 
-        $pelatihs = Pelatih::orderBy('nama')->get();
+        $pelatihs = Pelatih::where('status_verifikasi', Pelatih::VERIFIKASI_TERVERIFIKASI)->orderBy('nama')->get();
 
         $testimoniPendingCount = Testimoni::whereIn('ekskul_id', $ekskulIds)
             ->where('status', Testimoni::STATUS_PENDING)
@@ -80,7 +83,20 @@ class PembinaController extends Controller
             ->where('status', Faq::STATUS_PENDING)
             ->count();
 
-        return view('pembina.dashboard', compact('ekskul', 'ekskuls', 'pelatihs', 'anggota', 'anggotaAktifCount', 'pendaftaranPending', 'kegiatanMendatang', 'laporanDraft', 'testimoniPendingCount', 'faqPendingCount'));
+        return view('pembina.dashboard', compact(
+            'pembina',
+            'ekskul',
+            'ekskuls',
+            'ekskulsByBidang',
+            'pelatihs',
+            'anggota',
+            'anggotaAktifCount',
+            'pendaftaranPending',
+            'kegiatanMendatang',
+            'laporanDraft',
+            'testimoniPendingCount',
+            'faqPendingCount'
+        ));
     }
 
     public function updatePelatih(Request $request, Ekskul $ekskul)
@@ -104,25 +120,141 @@ class PembinaController extends Controller
         $ekskulIds = $ekskuls->pluck('id');
 
         $query = Pendaftaran::whereIn('ekskul_id', $ekskulIds)
-            ->where('status', 'diterima')
-            ->with(['siswa', 'siswa.kelas', 'ekskul']);
+            ->with(['siswa.kelas', 'ekskul'])
+            ->withCount([
+                'presensis as hadir_count' => fn ($q) => $q->where('status', \App\Models\Presensi::STATUS_HADIR),
+                'presensis as total_presensi',
+            ]);
 
-        if ($request->filled('cari')) {
-            $cari = $request->input('cari');
+        // 1. Dropdown Filter Ekskul
+        $selectedEkskul = $request->input('ekskul');
+        if ($selectedEkskul && $selectedEkskul !== 'semua' && $ekskulIds->contains($selectedEkskul)) {
+            $query->where('ekskul_id', $selectedEkskul);
+        }
+
+        // 2. Search: Nama siswa, NIS, email
+        $cari = trim((string) $request->input('cari'));
+        if ($cari !== '') {
             $query->whereHas('siswa', function ($q) use ($cari) {
                 $q->where('nama', 'like', "%{$cari}%")
-                    ->orWhere('nis', 'like', "%{$cari}%");
+                    ->orWhere('nis', 'like', "%{$cari}%")
+                    ->orWhere('email', 'like', "%{$cari}%");
             });
         }
 
-        $ekskulFilter = $request->input('ekskul');
-        if ($ekskulFilter && $ekskuls->pluck('id')->contains($ekskulFilter)) {
-            $query->where('ekskul_id', $ekskulFilter);
+        // 3. Filter Status Keanggotaan (Aktif vs Non-aktif)
+        $statusKeanggotaan = $request->input('status_keanggotaan', 'aktif');
+        if ($statusKeanggotaan === 'aktif') {
+            $query->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN]);
+        } elseif ($statusKeanggotaan === 'nonaktif') {
+            $query->whereIn('status', [Pendaftaran::STATUS_NONAKTIF, Pendaftaran::STATUS_KELUAR]);
+        } elseif ($statusKeanggotaan !== 'semua' && in_array($statusKeanggotaan, [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_NONAKTIF, Pendaftaran::STATUS_KELUAR])) {
+            $query->where('status', $statusKeanggotaan);
+        } else {
+            $query->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_NONAKTIF, Pendaftaran::STATUS_KELUAR]);
         }
 
-        $anggota = $query->get();
+        // 4. Filter Jurusan
+        $selectedJurusan = $request->input('jurusan');
+        if ($selectedJurusan && $selectedJurusan !== 'semua') {
+            $query->whereHas('siswa.kelas', fn ($k) => $k->where('jurusan', $selectedJurusan));
+        }
 
-        return view('pembina.anggota', compact('anggota', 'ekskuls'));
+        // 5. Filter Jenis Kelamin
+        $selectedJenisKelamin = $request->input('jenis_kelamin');
+        if ($selectedJenisKelamin && $selectedJenisKelamin !== 'semua') {
+            $query->whereHas('siswa', fn ($s) => $s->where('jenis_kelamin', $selectedJenisKelamin));
+        }
+
+        // 6. Filter Tingkat Kelas (10, 11, 12 atau x, xi, xii)
+        $selectedTingkat = $request->input('tingkat');
+        if ($selectedTingkat && $selectedTingkat !== 'semua') {
+            $tingkatRaw = strtolower((string) $selectedTingkat);
+            $tVal = match ($tingkatRaw) {
+                '10', 'x' => 'x',
+                '11', 'xi' => 'xi',
+                '12', 'xii' => 'xii',
+                default => $tingkatRaw,
+            };
+            $query->whereHas('siswa.kelas', fn ($k) => $k->where('tingkat', $tVal));
+        }
+
+        $anggotaCollection = $query->get();
+
+        // Kalkulasi Persentase Kehadiran & Status Keaktifan
+        $anggotaCollection->each(function ($item) {
+            $total = (int) $item->total_presensi;
+            $hadir = (int) $item->hadir_count;
+            $item->persentase_kehadiran = $total > 0 ? round(($hadir / $total) * 100, 1) : 0.0;
+
+            if ($item->persentase_kehadiran >= 80) {
+                $item->status_keaktifan = 'sangat_aktif';
+                $item->label_keaktifan = 'Sangat Aktif';
+            } elseif ($item->persentase_kehadiran >= 50) {
+                $item->status_keaktifan = 'cukup_aktif';
+                $item->label_keaktifan = 'Cukup Aktif';
+            } elseif ($item->persentase_kehadiran > 0) {
+                $item->status_keaktifan = 'kurang_aktif';
+                $item->label_keaktifan = 'Kurang Aktif';
+            } else {
+                $item->status_keaktifan = 'pasif';
+                $item->label_keaktifan = 'Belum Ada Presensi';
+            }
+        });
+
+        // 7. Filter Status Keaktifan
+        $selectedStatusKeaktifan = $request->input('status_keaktifan');
+        if ($selectedStatusKeaktifan && $selectedStatusKeaktifan !== 'semua') {
+            $anggotaCollection = $anggotaCollection->filter(function ($item) use ($selectedStatusKeaktifan) {
+                if ($selectedStatusKeaktifan === 'peringatan') {
+                    return $item->status === Pendaftaran::STATUS_PERINGATAN;
+                }
+                return $item->status_keaktifan === $selectedStatusKeaktifan;
+            });
+        }
+
+        // 8. Sorting
+        $sort = $request->input('sort', 'nama_asc');
+        switch ($sort) {
+            case 'nama_desc':
+                $anggota = $anggotaCollection->sortByDesc(fn ($i) => strtolower($i->siswa?->nama ?? ''), SORT_NATURAL)->values();
+                break;
+            case 'tanggal_daftar_desc':
+                $anggota = $anggotaCollection->sortByDesc('tanggal_daftar')->values();
+                break;
+            case 'tanggal_daftar_asc':
+                $anggota = $anggotaCollection->sortBy('tanggal_daftar')->values();
+                break;
+            case 'kehadiran_desc':
+                $anggota = $anggotaCollection->sortByDesc('persentase_kehadiran')->values();
+                break;
+            case 'kehadiran_asc':
+                $anggota = $anggotaCollection->sortBy('persentase_kehadiran')->values();
+                break;
+            case 'nama_asc':
+            default:
+                $sort = 'nama_asc';
+                $anggota = $anggotaCollection->sortBy(fn ($i) => strtolower($i->siswa?->nama ?? ''), SORT_NATURAL)->values();
+                break;
+        }
+
+        $jurusans = config('kelas.jurusan', []);
+        $tingkats = config('kelas.tingkat', []);
+
+        return view('pembina.anggota', compact(
+            'anggota',
+            'ekskuls',
+            'jurusans',
+            'tingkats',
+            'sort',
+            'statusKeanggotaan',
+            'selectedEkskul',
+            'selectedJurusan',
+            'selectedJenisKelamin',
+            'selectedTingkat',
+            'selectedStatusKeaktifan',
+            'cari'
+        ));
     }
 
     public function pilihKetua(Request $request, Ekskul $ekskul, Siswa $siswa)
@@ -190,13 +322,21 @@ class PembinaController extends Controller
         $ekskuls = $this->getEkskuls();
         $ekskulIds = $ekskuls->pluck('id');
 
+        $baseCounts = Pendaftaran::whereIn('ekskul_id', $ekskulIds)->get()->groupBy('status');
+
+        $sort = in_array($request->input('sort'), ['nama', 'tanggal_daftar', 'status'], true) ? $request->input('sort') : 'tanggal_daftar';
+        $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
+
         $query = Pendaftaran::whereIn('ekskul_id', $ekskulIds)
-            ->with(['siswa', 'siswa.kelas', 'ekskul'])
-            ->latest('tanggal_daftar');
+            ->with(['siswa', 'siswa.kelas', 'ekskul']);
 
         $status = $request->input('status');
-        if (in_array($status, ['pending', 'diterima', 'ditolak', 'nonaktif', 'keluar'])) {
+        if (in_array($status, ['pending', 'diterima', 'ditolak', 'nonaktif', 'keluar'], true)) {
             $query->where('status', $status);
+        }
+
+        if ($request->filled('ekskul') && $ekskulIds->contains($request->input('ekskul'))) {
+            $query->where('ekskul_id', $request->input('ekskul'));
         }
 
         if ($request->filled('cari')) {
@@ -207,42 +347,70 @@ class PembinaController extends Controller
             });
         }
 
-        $pendaftarans = $query->get();
+        if ($sort === 'nama') {
+            $query->join('siswas', 'siswas.id', '=', 'pendaftarans.siswa_id')
+                ->select('pendaftarans.*')
+                ->orderBy('siswas.nama', $direction);
+        } else {
+            $query->orderBy($sort, $direction);
+        }
 
-        $grouped = $pendaftarans->groupBy('status');
+        $pendaftarans = $query->paginate(15)->withQueryString();
 
-        return view('pembina.pendaftaran', compact('pendaftarans', 'ekskuls', 'grouped'));
+        return view('pembina.pendaftaran', [
+            'pendaftarans' => $pendaftarans,
+            'ekskuls' => $ekskuls,
+            'grouped' => $baseCounts,
+            'sort' => $sort,
+            'direction' => $direction,
+        ]);
     }
 
-    public function laporan()
+    public function laporan(Request $request)
     {
         $ekskuls = $this->getEkskuls();
         $ekskulIds = $ekskuls->pluck('id');
 
-        $laporans = LaporanBulanan::whereIn('ekskul_id', $ekskulIds)
+        $allowedSorts = ['bulan', 'status'];
+        $sort      = in_array($request->input('sort'), $allowedSorts, true) ? $request->input('sort') : 'bulan';
+        $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
+
+        $query = LaporanBulanan::whereIn('ekskul_id', $ekskulIds)
             ->where('status', '!=', 'draft')
-            ->with('ekskul')
-            ->latest('bulan')
-            ->get();
+            ->with('ekskul');
 
-        $kegiatans = Kegiatan::whereIn('ekskul_id', $ekskulIds)
-            ->withCount(['presensis as hadir_count' => function ($q) {
-                $q->where('status', 'hadir');
-            }])
-            ->withCount(['presensis as izin_count' => function ($q) {
-                $q->where('status', 'izin');
-            }])
-            ->withCount(['presensis as sakit_count' => function ($q) {
-                $q->where('status', 'sakit');
-            }])
-            ->withCount(['presensis as alpha_count' => function ($q) {
-                $q->where('status', 'alpha');
-            }])
-            ->withCount('presensis as total_count')
+        // Search: bulan atau ekskul
+        if ($request->filled('cari')) {
+            $cari = $request->input('cari');
+            $query->where(function ($q) use ($cari) {
+                $q->where('bulan', 'like', "%{$cari}%")
+                  ->orWhereHas('ekskul', fn ($e) => $e->where('nama_ekskul', 'like', "%{$cari}%"));
+            });
+        }
+
+        // Filter status
+        $statusFilter = $request->input('status');
+        if (in_array($statusFilter, ['menunggu', 'disetujui', 'ditolak'], true)) {
+            $query->where('status', $statusFilter);
+        }
+
+        // Filter ekskul
+        if ($request->filled('ekskul') && $ekskulIds->contains($request->input('ekskul'))) {
+            $query->where('ekskul_id', $request->input('ekskul'));
+        }
+
+        $laporans = $query->orderBy($sort, $direction)->paginate(10)->withQueryString();
+
+        $kegiatans = \App\Models\Kegiatan::whereIn('ekskul_id', $ekskulIds)
+            ->withCount(['presensis as hadir_count' => fn ($q) => $q->where('status', 'hadir')])
+            ->withCount(['presensis as izin_count'  => fn ($q) => $q->where('status', 'izin')])
+            ->withCount(['presensis as sakit_count' => fn ($q) => $q->where('status', 'sakit')])
+            ->withCount(['presensis as alpha_count' => fn ($q) => $q->where('status', 'alpha')])
             ->orderBy('tanggal_kegiatan', 'desc')
-            ->get();
+            ->paginate(10, ['*'], 'presensi_page')
+            ->withQueryString();
 
-        return view('pembina.laporan', compact('laporans', 'kegiatans', 'ekskuls'));
+        return view('pembina.laporan', compact('laporans', 'kegiatans', 'ekskuls', 'sort', 'direction'));
     }
 
     public function laporanShow(LaporanBulanan $laporanBulanan)
@@ -304,17 +472,33 @@ class PembinaController extends Controller
             ->with('success', 'Laporan ditolak.');
     }
 
-    public function presensi()
+    public function presensi(Request $request)
     {
         $ekskuls = $this->getEkskuls();
         $ekskulIds = $ekskuls->pluck('id');
 
-        $kegiatans = Kegiatan::whereIn('ekskul_id', $ekskulIds)
-            ->with(['presensis.pendaftaran.siswa'])
-            ->orderBy('tanggal_kegiatan', 'desc')
-            ->get();
+        $allowedSorts = ['tanggal_kegiatan', 'materi'];
+        $sort = in_array($request->input('sort'), $allowedSorts, true) ? $request->input('sort') : 'tanggal_kegiatan';
+        $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
 
-        return view('pembina.presensi', compact('kegiatans'));
+        $query = Kegiatan::whereIn('ekskul_id', $ekskulIds)
+            ->with(['presensis.pendaftaran.siswa', 'ekskul']);
+
+        if ($request->filled('cari')) {
+            $cari = $request->input('cari');
+            $query->where(function ($q) use ($cari) {
+                $q->where('materi', 'like', "%{$cari}%")
+                  ->orWhereHas('presensis.pendaftaran.siswa', fn ($s) => $s->where('nama', 'like', "%{$cari}%"));
+            });
+        }
+
+        if ($request->filled('ekskul') && $request->input('ekskul') !== 'semua' && $ekskulIds->contains($request->input('ekskul'))) {
+            $query->where('ekskul_id', $request->input('ekskul'));
+        }
+
+        $kegiatans = $query->orderBy($sort, $direction)->paginate(10)->withQueryString();
+
+        return view('pembina.presensi', compact('kegiatans', 'ekskuls', 'sort', 'direction'));
     }
 
     public function rekap(Request $request)

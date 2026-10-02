@@ -8,14 +8,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/welcome.css') }}">
-    @include('partials.theme-mode-head')
+    <link rel="stylesheet" href="<?php echo e(asset('css/welcome.css')); ?>">
+    <?php echo $__env->make('partials.theme-mode-head', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </head>
 <body>
-    @php
+    <?php
         $accountUrl = auth()->check() ? route('dashboard') : route('login');
         $firstName = auth()->check() ? (auth()->user()->username ? explode(' ', trim(auth()->user()->username))[0] : 'Sobat') : '';
-    @endphp
+    ?>
 
     <!-- ===================== HEADER ===================== -->
     <header class="site-header">
@@ -32,17 +32,17 @@
                     <a href="#community" class="header-nav-link">Tentang Kami</a>
                 </div>
 
-                @auth
-                    <a href="{{ $accountUrl }}" class="header-auth" aria-label="Buka dashboard Anda">
+                <?php if(auth()->guard()->check()): ?>
+                    <a href="<?php echo e($accountUrl); ?>" class="header-auth" aria-label="Buka dashboard Anda">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/></svg>
-                        <span>Halo, {{ $firstName }}</span>
+                        <span>Halo, <?php echo e($firstName); ?></span>
                     </a>
-                @else
-                    <a href="{{ route('login') }}" class="header-auth" aria-label="Masuk ke akun Anda">
+                <?php else: ?>
+                    <a href="<?php echo e(route('login')); ?>" class="header-auth" aria-label="Masuk ke akun Anda">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"/></svg>
                         <span>Masuk</span>
                     </a>
-                @endauth
+                <?php endif; ?>
 
                 <button class="menu-btn" onclick="openSheet()" type="button" aria-label="Menu">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
@@ -65,20 +65,20 @@
             <a href="#community" class="sheet-link" onclick="closeSheet()">Tentang Kami</a>
         </div>
         <div class="sheet-footer">
-            @auth
-                <a href="{{ $accountUrl }}" class="btn-outline">Dashboard</a>
-                <a href="{{ $accountUrl }}" class="btn-primary">Mulai Sekarang</a>
-            @else
-                <a href="{{ route('login') }}" class="btn-outline">Masuk</a>
-                <a href="{{ route('login') }}" class="btn-primary">Mulai Sekarang</a>
-            @endauth
+            <?php if(auth()->guard()->check()): ?>
+                <a href="<?php echo e($accountUrl); ?>" class="btn-outline">Dashboard</a>
+                <a href="<?php echo e($accountUrl); ?>" class="btn-primary">Mulai Sekarang</a>
+            <?php else: ?>
+                <a href="<?php echo e(route('login')); ?>" class="btn-outline">Masuk</a>
+                <a href="<?php echo e(route('login')); ?>" class="btn-primary">Mulai Sekarang</a>
+            <?php endif; ?>
         </div>
     </div>
 
     <!-- ===================== HERO ===================== -->
     <section class="hero-section">
-        <div class="hero-bg hero-bg--desktop" style="background-image: url('{{ asset('images/firefly.jpg') }}');" aria-hidden="true"></div>
-        <div class="hero-bg hero-bg--mobile" style="background-image: url('{{ asset('images/firefly-mobile.jpeg') }}');" aria-hidden="true"></div>
+        <div class="hero-bg hero-bg--desktop" style="background-image: url('<?php echo e(asset('images/firefly.jpg')); ?>');" aria-hidden="true"></div>
+        <div class="hero-bg hero-bg--mobile" style="background-image: url('<?php echo e(asset('images/firefly-mobile.jpeg')); ?>');" aria-hidden="true"></div>
         <div class="hero-overlay" aria-hidden="true"></div>
 
         <div class="hero-content">
@@ -93,11 +93,11 @@
             </p>
 
             <div class="hero-cta">
-                @auth
-                    <a href="{{ $accountUrl }}"><button>Mulai Sekarang</button></a>
-                @else
-                    <button type="button" onclick="window.location.href='{{ route('login') }}'">Mulai Sekarang</button>
-                @endauth
+                <?php if(auth()->guard()->check()): ?>
+                    <a href="<?php echo e($accountUrl); ?>"><button>Mulai Sekarang</button></a>
+                <?php else: ?>
+                    <button type="button" onclick="window.location.href='<?php echo e(route('login')); ?>'">Mulai Sekarang</button>
+                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -135,45 +135,45 @@
                 <h2 class="coverflow-eyebrow-text">Komunitas</h2>
                 <span class="coverflow-eyebrow-line coverflow-eyebrow-line--right"></span>
             </div>
-            @if($ekskuls->count() > 0)
+            <?php if($ekskuls->count() > 0): ?>
 
             <div class="coverflow-stage reveal reveal--right" style="--reveal-x: 140px; --reveal-delay: 0.1s;">
-                @foreach($ekskuls->take(6) as $ekskul)
+                <?php $__currentLoopData = $ekskuls->take(6); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ekskul): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <article class="coverflow-card">
-                    @if($ekskul->cover || $ekskul->logo)
-                        <img class="coverflow-card-img" src="{{ $ekskul->cover ? asset('storage/'.$ekskul->cover) : asset('storage/'.$ekskul->logo) }}" alt="{{ $ekskul->nama_ekskul }}">
-                    @else
-                        <div class="coverflow-card-fallback"><span>{{ strtoupper(substr($ekskul->nama_ekskul, 0, 2)) }}</span></div>
-                    @endif
+                    <?php if($ekskul->cover || $ekskul->logo): ?>
+                        <img class="coverflow-card-img" src="<?php echo e($ekskul->cover ? asset('storage/'.$ekskul->cover) : asset('storage/'.$ekskul->logo)); ?>" alt="<?php echo e($ekskul->nama_ekskul); ?>">
+                    <?php else: ?>
+                        <div class="coverflow-card-fallback"><span><?php echo e(strtoupper(substr($ekskul->nama_ekskul, 0, 2))); ?></span></div>
+                    <?php endif; ?>
                     <div class="coverflow-vignette"></div>
                     <div class="coverflow-content">
                         <div class="coverflow-tag-row">
-                            <span class="coverflow-tag">#{{ strtoupper(substr($ekskul->nama_ekskul, 0, 2)) }}</span>
+                            <span class="coverflow-tag">#<?php echo e(strtoupper(substr($ekskul->nama_ekskul, 0, 2))); ?></span>
                         </div>
                         <div class="coverflow-card-body">
-                            <h3 class="coverflow-title1">{{ strtoupper($ekskul->nama_ekskul) }}</h3>
-                            @if($ekskul->tagline)
-                                <span class="coverflow-title2">{{ $ekskul->tagline }}</span>
-                            @endif
+                            <h3 class="coverflow-title1"><?php echo e(strtoupper($ekskul->nama_ekskul)); ?></h3>
+                            <?php if($ekskul->tagline): ?>
+                                <span class="coverflow-title2"><?php echo e($ekskul->tagline); ?></span>
+                            <?php endif; ?>
                             <div class="coverflow-divider"></div>
-                            @if($ekskul->deskripsi)
-                                <p class="coverflow-desc">{{ $ekskul->deskripsi }}</p>
-                            @endif
-                            @auth
-                            <a href="{{ route('ekskul.detail', $ekskul) }}" class="coverflow-cta">
+                            <?php if($ekskul->deskripsi): ?>
+                                <p class="coverflow-desc"><?php echo e($ekskul->deskripsi); ?></p>
+                            <?php endif; ?>
+                            <?php if(auth()->guard()->check()): ?>
+                            <a href="<?php echo e(route('ekskul.detail', $ekskul)); ?>" class="coverflow-cta">
                                 Lihat Ekskul
                                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </a>
-@else
+<?php else: ?>
                             <span class="coverflow-cta-disabled" style="opacity: 0.5; pointer-events: none;">
                                 Lihat Ekskul
                                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </span>
-@endauth
+<?php endif; ?>
                         </div>
                     </div>
                 </article>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
 
             <button class="coverflow-arrow coverflow-arrow--prev" data-coverflow-prev type="button" aria-label="Ekskul sebelumnya">
@@ -184,18 +184,18 @@
             </button>
 
             <div class="coverflow-dots">
-                @foreach($ekskuls->take(6) as $index => $ekskul)
-                <button class="coverflow-dot" data-coverflow-dot type="button" aria-label="Ekskul {{ $index + 1 }}"></button>
-                @endforeach
+                <?php $__currentLoopData = $ekskuls->take(6); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $ekskul): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <button class="coverflow-dot" data-coverflow-dot type="button" aria-label="Ekskul <?php echo e($index + 1); ?>"></button>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
 
             <div class="coverflow-cta-wrap reveal reveal--left" style="--reveal-delay: 0.2s;">
-                <a href="{{ route('siswa.katalog') }}" class="coverflow-btn">LIHAT SEMUA EKSKUL</a>
+                <a href="<?php echo e(route('siswa.katalog')); ?>" class="coverflow-btn">LIHAT SEMUA EKSKUL</a>
             </div>
 
-            @else
+            <?php else: ?>
             <p class="ekskul-empty">Belum ada Komunitas yang tersedia.</p>
-            @endif
+            <?php endif; ?>
         </div>
     </section>
 
@@ -299,7 +299,7 @@
                             <div class="team-avatar">
                                 <div class="team-avatar-halo" aria-hidden="true"></div>
                                 <div class="team-avatar-frame">
-                                    <img class="team-avatar-img" src="{{ asset('images/rizki.jpg') }}" alt="Adit Pratama">
+                                    <img class="team-avatar-img" src="<?php echo e(asset('images/rizki.jpg')); ?>" alt="Adit Pratama">
                                 </div>
                             </div>
                             <div class="team-info">
@@ -334,7 +334,7 @@
                             <div class="team-avatar">
                                 <div class="team-avatar-halo" aria-hidden="true"></div>
                                 <div class="team-avatar-frame">
-                                    <img class="team-avatar-img" src="{{ asset('images/nazwa.jpeg') }}" alt="Rina Fitriani">
+                                    <img class="team-avatar-img" src="<?php echo e(asset('images/nazwa.jpeg')); ?>" alt="Rina Fitriani">
                                 </div>
                             </div>
                             <div class="team-info">
@@ -369,7 +369,7 @@
                             <div class="team-avatar">
                                 <div class="team-avatar-halo" aria-hidden="true"></div>
                                 <div class="team-avatar-frame">
-                                    <img class="team-avatar-img" src="{{ asset('images/fadhil.jpeg') }}" alt="Fadhil">
+                                    <img class="team-avatar-img" src="<?php echo e(asset('images/fadhil.jpeg')); ?>" alt="Fadhil">
                                 </div>
                             </div>
                             <div class="team-info">
@@ -427,7 +427,7 @@
                     <h3 class="footer-heading">Produk</h3>
                     <ul class="footer-links">
                         <li><a href="#features" class="footer-link">Fitur Unggulan</a></li>
-                        <li><a href="{{ route('siswa.katalog') }}" class="footer-link">Katalog Ekskul</a></li>
+                        <li><a href="<?php echo e(route('siswa.katalog')); ?>" class="footer-link">Katalog Ekskul</a></li>
                         <li><a href="#" class="footer-link">Presensi Digital</a></li>
                         <li><a href="#" class="footer-link">Laporan & Analitik</a></li>
                         <li><a href="#" class="footer-link">Notifikasi Cerdas</a></li>
@@ -474,7 +474,7 @@
             <!-- Bottom Bar -->
             <div class="footer-bottom">
                 <p class="footer-copyright">
-                    &copy; {{ date('Y') }} SOUL. Hak cipta dilindungi.
+                    &copy; <?php echo e(date('Y')); ?> SOUL. Hak cipta dilindungi.
                 </p>
                 <div class="footer-legal">
                     <a href="#" class="footer-legal-link">Kebijakan Privasi</a>
@@ -490,16 +490,17 @@
         </div>
     </footer>
 
-    <script src="{{ asset('js/welcome.js') }}"></script>
+    <script src="<?php echo e(asset('js/welcome.js')); ?>"></script>
 <script>
     function checkEkskulLogin(ekskulId) {
-        @if(auth()->check())
+        <?php if(auth()->check()): ?>
             window.location.href = `/ekskul/${ekskulId}`;
-        @else
-            window.location.href = '{{ route('login') }}';
-        @endif
+        <?php else: ?>
+            window.location.href = '<?php echo e(route('login')); ?>';
+        <?php endif; ?>
     }
 </script>
 
 </body>
 </html>
+<?php /**PATH C:\Users\ASUS\Soul\resources\views/welcome.blade.php ENDPATH**/ ?>

@@ -3,6 +3,22 @@
 @section('title', 'Kelola Akun Pengguna')
 
 @section('content')
+@php
+    $sort = $sort ?? 'created_at';
+    $direction = $direction ?? 'desc';
+
+    $sortLink = function (string $column) use ($sort, $direction) {
+        $nextDirection = $sort === $column && $direction === 'asc' ? 'desc' : 'asc';
+        return request()->fullUrlWithQuery(['sort' => $column, 'direction' => $nextDirection, 'page' => null]);
+    };
+
+    $sortIcon = function (string $column) use ($sort, $direction) {
+        if ($sort !== $column) {
+            return 'M8 9l4-4 4 4M8 15l4 4 4-4';
+        }
+        return $direction === 'asc' ? 'M8 15l4 4 4-4' : 'M8 9l4-4 4 4';
+    };
+@endphp
 <div class="space-y-5 animate-fade-up">
 
     {{-- HERO CARD BIRU (STYLE SAMA DENGAN DASHBOARD KESISWAAN) --}}
@@ -101,6 +117,13 @@
 
     {{-- SEARCH & FILTER FORM --}}
     <form method="GET" action="{{ route('kesiswaan.users.index') }}" class="bg-white p-4 rounded-3xl border border-sky-100 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+        @if(request('sort'))
+            <input type="hidden" name="sort" value="{{ request('sort') }}">
+        @endif
+        @if(request('direction'))
+            <input type="hidden" name="direction" value="{{ request('direction') }}">
+        @endif
+
         <div class="relative flex-1">
             <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,7 +147,7 @@
                 Filter
             </button>
 
-            @if(request()->filled('q') || request()->filled('role'))
+            @if(request()->filled('q') || request()->filled('role') || request()->filled('sort'))
                 <a href="{{ route('kesiswaan.users.index') }}"
                    class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-2xl transition"
                    title="Reset filter">
@@ -140,8 +163,22 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-bold text-slate-400 tracking-wider uppercase">
-                        <th class="py-3.5 px-5">Pengguna</th>
-                        <th class="py-3.5 px-5">Role</th>
+                        <th class="py-3.5 px-5">
+                            <a href="{{ $sortLink('username') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
+                                Pengguna
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('username') }}"/>
+                                </svg>
+                            </a>
+                        </th>
+                        <th class="py-3.5 px-5">
+                            <a href="{{ $sortLink('role') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
+                                Role
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('role') }}"/>
+                                </svg>
+                            </a>
+                        </th>
                         <th class="py-3.5 px-5 text-right">Aksi</th>
                     </tr>
                 </thead>

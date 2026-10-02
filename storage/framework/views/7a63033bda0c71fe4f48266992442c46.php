@@ -1,21 +1,5 @@
-{{-- =========================================================
-     PILL-RAIL SIDEBAR (versi seragam untuk ketua, pembina, siswa)
-     Kapsul vertikal ala theme proyek (sky/amber light), bisa dibentangkan.
-     Icon = SVG asli sidebar sebelumnya (stroke 2).
-     Pakai: @include('partials.pill-sidebar', [
-        'psTitle'       => 'Menu Ketua',
-        'psLogoBrand'   => 'SOUL',
-        'psDashboardUrl'=> route(...),
-        'psNotifUrl'    => route(...),
-        'psProfileUrl'  => route(...),
-        'psItems'       => [ ['icon','label','url','is(route-pattern)'], ... 6 item ],
-        'psMore'        => [ ['label','url','is'?] ],  // menu sekunder (dropdown gear)
-     ])
-     Icon key tersedia: dashboard, calendar, clipboard-check, clipboard-list,
-     document, bars, users, user, logout, lock, bell, columns, building,
-     star, chat, help.
-     ========================================================= --}}
-@php
+
+<?php
     $psIconSvg = [
         'dashboard' => '<path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/><path d="M14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"/><path d="M4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z"/><path d="M14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>',
         'calendar' => '<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>',
@@ -39,8 +23,8 @@
     $psGearSvg = '<circle cx="12" cy="12" r="3"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
     $psChevronSvg = '<path d="M15 19l-7-7 7-7"/>';
     $psLogoutSvg = '<path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>';
-@endphp
-@php
+?>
+<?php
     $psUser = auth()->user();
     $psRole = $psTitle ? trim(str_ireplace('Menu ', '', (string) $psTitle)) : '';
     if (! $psRole && $psUser && $psUser->role) {
@@ -69,7 +53,7 @@
         }
         array_splice($psItems, $psNilaiIndex, 0, [$psNilaiItem]);
     }
-@endphp
+?>
 
 <style>
     .ps-rail {
@@ -543,87 +527,92 @@
     }
 </style>
 
-<aside class="ps-rail" id="ps-rail" aria-label="{{ $psTitle ?? 'Navigasi' }}">
+<aside class="ps-rail" id="ps-rail" aria-label="<?php echo e($psTitle ?? 'Navigasi'); ?>">
     <div class="ps-pill">
         <div class="ps-deco" aria-hidden="true">
             <div class="ps-blob ps-blob-1"></div>
             <div class="ps-blob ps-blob-2"></div>
         </div>
 
-        <button type="button" class="ps-toggle" data-ps-toggle aria-label="Lipat atau bentangkan {{ $psTitle ?? 'navigasi' }}" aria-expanded="true">
+        <button type="button" class="ps-toggle" data-ps-toggle aria-label="Lipat atau bentangkan <?php echo e($psTitle ?? 'navigasi'); ?>" aria-expanded="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                {!! $psChevronSvg !!}
+                <?php echo $psChevronSvg; ?>
+
             </svg>
         </button>
 
-        <a class="ps-logo" href="{{ $psDashboardUrl }}" aria-label="Ke dashboard {{ $psTitle ?? '' }}">
+        <a class="ps-logo" href="<?php echo e($psDashboardUrl); ?>" aria-label="Ke dashboard <?php echo e($psTitle ?? ''); ?>">
             <span class="ps-logo-box">SOUL</span>
             <span class="ps-logo-txt">
-                <strong>{{ $psLogoBrand ?? 'SOUL' }}</strong>
-                <small>Panel {{ $psRole }}</small>
+                <strong><?php echo e($psLogoBrand ?? 'SOUL'); ?></strong>
+                <small>Panel <?php echo e($psRole); ?></small>
             </span>
             <span class="ps-tip">Dashboard</span>
         </a>
 
         <div class="ps-section" aria-hidden="true">
             <span class="ps-section-lbl">Menu utama</span>
-            <span class="ps-section-sub">{{ strtoupper($psTitle ?? '') }}</span>
+            <span class="ps-section-sub"><?php echo e(strtoupper($psTitle ?? '')); ?></span>
         </div>
 
         <nav class="ps-nav ps-nav-main" aria-label="Menu utama">
-            @foreach ($psItems as $psItem)
-                @php
+            <?php $__currentLoopData = $psItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $psItem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php
                     $psActive = isset($psItem['children'])
                         ? collect($psItem['children'])->contains(fn ($child) => request()->routeIs((array) $child['is']))
                         : request()->routeIs((array) $psItem['is']);
-                @endphp
-                @if (isset($psItem['children']))
-                    <details class="ps-group" {{ $psActive ? 'open' : '' }}>
-                        <summary class="ps-item {{ $psActive ? 'ps-active' : '' }}" aria-expanded="{{ $psActive ? 'true' : 'false' }}">
-                            @if ($psActive)
+                ?>
+                <?php if(isset($psItem['children'])): ?>
+                    <details class="ps-group" <?php echo e($psActive ? 'open' : ''); ?>>
+                        <summary class="ps-item <?php echo e($psActive ? 'ps-active' : ''); ?>" aria-expanded="<?php echo e($psActive ? 'true' : 'false'); ?>">
+                            <?php if($psActive): ?>
                                 <span class="ps-bar" aria-hidden="true"></span>
-                            @endif
+                            <?php endif; ?>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                {!! $psIconSvg[$psItem['icon']] ?? '' !!}
+                                <?php echo $psIconSvg[$psItem['icon']] ?? ''; ?>
+
                             </svg>
-                            <span class="ps-lb">{{ $psItem['label'] }}</span>
+                            <span class="ps-lb"><?php echo e($psItem['label']); ?></span>
                             <svg class="ps-group-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-                            <span class="ps-tip">{{ $psItem['label'] }}</span>
+                            <span class="ps-tip"><?php echo e($psItem['label']); ?></span>
                         </summary>
-                        <div class="ps-submenu" data-label="{{ $psItem['label'] }}">
-                            @foreach ($psItem['children'] as $psChild)
-                                @php $psChildActive = request()->routeIs((array) $psChild['is']); @endphp
-                                <a href="{{ $psChild['url'] }}" class="{{ $psChildActive ? 'ps-active' : '' }}" aria-current="{{ $psChildActive ? 'page' : 'false' }}">
+                        <div class="ps-submenu" data-label="<?php echo e($psItem['label']); ?>">
+                            <?php $__currentLoopData = $psItem['children']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $psChild): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php $psChildActive = request()->routeIs((array) $psChild['is']); ?>
+                                <a href="<?php echo e($psChild['url']); ?>" class="<?php echo e($psChildActive ? 'ps-active' : ''); ?>" aria-current="<?php echo e($psChildActive ? 'page' : 'false'); ?>">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        {!! $psIconSvg[$psChild['icon']] ?? '' !!}
+                                        <?php echo $psIconSvg[$psChild['icon']] ?? ''; ?>
+
                                     </svg>
-                                    <span>{{ $psChild['label'] }}</span>
+                                    <span><?php echo e($psChild['label']); ?></span>
                                 </a>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </details>
-                @else
-                    <a href="{{ $psItem['url'] }}" class="ps-item {{ $psActive ? 'ps-active' : '' }}"
-                       aria-current="{{ $psActive ? 'page' : 'false' }}">
-                        @if ($psActive)
+                <?php else: ?>
+                    <a href="<?php echo e($psItem['url']); ?>" class="ps-item <?php echo e($psActive ? 'ps-active' : ''); ?>"
+                       aria-current="<?php echo e($psActive ? 'page' : 'false'); ?>">
+                        <?php if($psActive): ?>
                             <span class="ps-bar" aria-hidden="true"></span>
-                        @endif
+                        <?php endif; ?>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            {!! $psIconSvg[$psItem['icon']] ?? '' !!}
+                            <?php echo $psIconSvg[$psItem['icon']] ?? ''; ?>
+
                         </svg>
-                        <span class="ps-lb">{{ $psItem['label'] }}</span>
-                        <span class="ps-tip">{{ $psItem['label'] }}</span>
+                        <span class="ps-lb"><?php echo e($psItem['label']); ?></span>
+                        <span class="ps-tip"><?php echo e($psItem['label']); ?></span>
                     </a>
-                @endif
-            @endforeach
+                <?php endif; ?>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </nav>
 
         <div class="ps-spacer" aria-hidden="true"></div>
 
         <nav class="ps-nav" aria-label="Lainnya">
-            <a href="{{ $psNotifUrl }}" class="ps-item" aria-label="Notifikasi">
+            <a href="<?php echo e($psNotifUrl); ?>" class="ps-item" aria-label="Notifikasi">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    {!! $psIconSvg['bell'] !!}
+                    <?php echo $psIconSvg['bell']; ?>
+
                 </svg>
                 <span class="ps-lb">Notifikasi</span>
                 <span class="ps-dot" aria-hidden="true"></span>
@@ -633,26 +622,27 @@
             <details class="ps-gear">
                 <summary class="ps-item" aria-label="Menu lainnya">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        {!! $psGearSvg !!}
+                        <?php echo $psGearSvg; ?>
+
                     </svg>
                     <span class="ps-lb">Pengaturan</span>
                     <span class="ps-tip">Lainnya</span>
                 </summary>
                 <div class="ps-menu">
-                    @if (! empty($psMore))
+                    <?php if(! empty($psMore)): ?>
                         <p class="ps-menu-head">Menu lebih banyak</p>
-                        @foreach ($psMore as $psMoreItem)
-                            @php
+                        <?php $__currentLoopData = $psMore; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $psMoreItem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php
                                 $psMoreActive = isset($psMoreItem['is']) ? request()->routeIs((array) $psMoreItem['is']) : false;
-                            @endphp
-                            <a href="{{ $psMoreItem['url'] }}" class="{{ $psMoreActive ? 'ps-active' : '' }}">{{ $psMoreItem['label'] }}</a>
-                        @endforeach
+                            ?>
+                            <a href="<?php echo e($psMoreItem['url']); ?>" class="<?php echo e($psMoreActive ? 'ps-active' : ''); ?>"><?php echo e($psMoreItem['label']); ?></a>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         <hr>
-                    @endif
-                    <a href="{{ $psProfileUrl }}">Profil</a>
+                    <?php endif; ?>
+                    <a href="<?php echo e($psProfileUrl); ?>">Profil</a>
                     <hr>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
+                    <form method="POST" action="<?php echo e(route('logout')); ?>">
+                        <?php echo csrf_field(); ?>
                         <button type="submit" class="ps-danger">Keluar</button>
                     </form>
                 </div>
@@ -660,27 +650,28 @@
         </nav>
 
         <div class="ps-user">
-            <a class="ps-user-link" href="{{ $psProfileUrl }}" aria-label="Profil {{ $psNama }}">
-                <span class="ps-avatar">{{ strtoupper(mb_substr($psNama, 0, 1)) }}</span>
+            <a class="ps-user-link" href="<?php echo e($psProfileUrl); ?>" aria-label="Profil <?php echo e($psNama); ?>">
+                <span class="ps-avatar"><?php echo e(strtoupper(mb_substr($psNama, 0, 1))); ?></span>
                 <span class="ps-user-txt">
-                    <strong>{{ $psNama }}</strong>
-                    <small>{{ $psSubU }}</small>
+                    <strong><?php echo e($psNama); ?></strong>
+                    <small><?php echo e($psSubU); ?></small>
                 </span>
             </a>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
+            <form method="POST" action="<?php echo e(route('logout')); ?>">
+                <?php echo csrf_field(); ?>
                 <button type="submit" class="ps-user-logout" aria-label="Keluar">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        {!! $psLogoutSvg !!}
+                        <?php echo $psLogoutSvg; ?>
+
                     </svg>
                 </button>
             </form>
-            <span class="ps-tip">{{ $psNama }}</span>
+            <span class="ps-tip"><?php echo e($psNama); ?></span>
         </div>
     </div>
 </aside>
 
-@if (($psUser->role ?? null) === 'siswa' && ! request()->routeIs('ketua.*', 'profile.edit'))
+<?php if(($psUser->role ?? null) === 'siswa' && ! request()->routeIs('ketua.*', 'profile.edit')): ?>
     <div id="sidebar-overlay" class="hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-[2px] md:hidden" onclick="closeSidebar()"></div>
     <aside id="sidebar-mobile" class="hidden fixed inset-y-0 left-0 z-50 flex w-[min(21rem,88vw)] flex-col overflow-hidden border-r border-sky-100 bg-white p-4 shadow-2xl md:hidden" aria-label="Menu navigasi Siswa">
         <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -689,10 +680,10 @@
         </div>
         <div class="relative flex h-full min-h-0 flex-col overflow-y-auto">
             <div class="mb-6 mt-1 flex items-center justify-between px-2">
-                <a href="{{ $psDashboardUrl }}" class="flex min-w-0 items-center gap-3">
+                <a href="<?php echo e($psDashboardUrl); ?>" class="flex min-w-0 items-center gap-3">
                     <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-500 text-xs font-extrabold text-white shadow-lg shadow-sky-300">SOUL</span>
                     <span class="min-w-0">
-                        <strong class="block text-sm font-extrabold leading-none tracking-tight text-slate-900">{{ $psLogoBrand ?? 'SOUL' }}</strong>
+                        <strong class="block text-sm font-extrabold leading-none tracking-tight text-slate-900"><?php echo e($psLogoBrand ?? 'SOUL'); ?></strong>
                         <small class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Panel Siswa</small>
                     </span>
                 </a>
@@ -706,70 +697,70 @@
                 <span class="text-[9px] font-semibold text-slate-300">PANEL SISWA</span>
             </div>
             <nav class="space-y-1.5" aria-label="Menu utama mobile">
-                @foreach ($psItems as $psMobileItem)
-                    @php
+                <?php $__currentLoopData = $psItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $psMobileItem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php
                         $psMobileActive = isset($psMobileItem['children'])
                             ? collect($psMobileItem['children'])->contains(fn ($child) => request()->routeIs((array) $child['is']))
                             : request()->routeIs((array) $psMobileItem['is']);
-                    @endphp
-                    @if (isset($psMobileItem['children']))
-                        <details class="group" {{ $psMobileActive ? 'open' : '' }}>
-                            <summary class="flex min-h-[42px] cursor-pointer list-none items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs {{ $psMobileActive ? 'bg-sky-100 font-semibold text-sky-800' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
-                                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg[$psMobileItem['icon']] ?? '' !!}</svg>
-                                <span>{{ $psMobileItem['label'] }}</span>
+                    ?>
+                    <?php if(isset($psMobileItem['children'])): ?>
+                        <details class="group" <?php echo e($psMobileActive ? 'open' : ''); ?>>
+                            <summary class="flex min-h-[42px] cursor-pointer list-none items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs <?php echo e($psMobileActive ? 'bg-sky-100 font-semibold text-sky-800' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700'); ?>">
+                                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?php echo $psIconSvg[$psMobileItem['icon']] ?? ''; ?></svg>
+                                <span><?php echo e($psMobileItem['label']); ?></span>
                                 <svg class="ml-auto h-4 w-4 shrink-0 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                             </summary>
                             <div class="ml-7 mt-1 space-y-1 border-l border-sky-100 pl-4">
-                                @foreach ($psMobileItem['children'] as $psMobileChild)
-                                    @php $psMobileChildActive = request()->routeIs((array) $psMobileChild['is']); @endphp
-                                    <a href="{{ $psMobileChild['url'] }}" class="flex min-h-[40px] items-center gap-2.5 rounded-lg px-3 py-2 text-xs {{ $psMobileChildActive ? 'bg-sky-50 font-semibold text-sky-700' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
-                                        <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg[$psMobileChild['icon']] ?? '' !!}</svg>
-                                        <span>{{ $psMobileChild['label'] }}</span>
+                                <?php $__currentLoopData = $psMobileItem['children']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $psMobileChild): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php $psMobileChildActive = request()->routeIs((array) $psMobileChild['is']); ?>
+                                    <a href="<?php echo e($psMobileChild['url']); ?>" class="flex min-h-[40px] items-center gap-2.5 rounded-lg px-3 py-2 text-xs <?php echo e($psMobileChildActive ? 'bg-sky-50 font-semibold text-sky-700' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700'); ?>">
+                                        <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?php echo $psIconSvg[$psMobileChild['icon']] ?? ''; ?></svg>
+                                        <span><?php echo e($psMobileChild['label']); ?></span>
                                     </a>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </details>
-                    @else
-                        <a href="{{ $psMobileItem['url'] }}" @if (($psMobileItem['label'] ?? null) === 'Nilai') data-ps-nilai @endif aria-current="{{ $psMobileActive ? 'page' : 'false' }}" class="relative flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs transition-all {{ $psMobileActive ? 'bg-sky-100 font-semibold text-sky-800 shadow-sm shadow-sky-100' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
-                            @if ($psMobileActive)
+                    <?php else: ?>
+                        <a href="<?php echo e($psMobileItem['url']); ?>" <?php if(($psMobileItem['label'] ?? null) === 'Nilai'): ?> data-ps-nilai <?php endif; ?> aria-current="<?php echo e($psMobileActive ? 'page' : 'false'); ?>" class="relative flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs transition-all <?php echo e($psMobileActive ? 'bg-sky-100 font-semibold text-sky-800 shadow-sm shadow-sky-100' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700'); ?>">
+                            <?php if($psMobileActive): ?>
                                 <span class="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-blue-500" aria-hidden="true"></span>
-                            @endif
-                            <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg[$psMobileItem['icon']] ?? '' !!}</svg>
-                            <span>{{ $psMobileItem['label'] }}</span>
+                            <?php endif; ?>
+                            <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?php echo $psIconSvg[$psMobileItem['icon']] ?? ''; ?></svg>
+                            <span><?php echo e($psMobileItem['label']); ?></span>
                         </a>
-                    @endif
-                @endforeach
-                @foreach ($psMore ?? [] as $psMobileMore)
-                    @php $psMobileMoreActive = isset($psMobileMore['is']) && request()->routeIs((array) $psMobileMore['is']); @endphp
-                    <a href="{{ $psMobileMore['url'] }}" aria-current="{{ $psMobileMoreActive ? 'page' : 'false' }}" class="flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs {{ $psMobileMoreActive ? 'bg-sky-100 font-semibold text-sky-800' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
-                        <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg[$psMobileMore['icon'] ?? 'document'] ?? '' !!}</svg>
-                        <span>{{ $psMobileMore['label'] }}</span>
+                    <?php endif; ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                <?php $__currentLoopData = $psMore ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $psMobileMore): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php $psMobileMoreActive = isset($psMobileMore['is']) && request()->routeIs((array) $psMobileMore['is']); ?>
+                    <a href="<?php echo e($psMobileMore['url']); ?>" aria-current="<?php echo e($psMobileMoreActive ? 'page' : 'false'); ?>" class="flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs <?php echo e($psMobileMoreActive ? 'bg-sky-100 font-semibold text-sky-800' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700'); ?>">
+                        <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?php echo $psIconSvg[$psMobileMore['icon'] ?? 'document'] ?? ''; ?></svg>
+                        <span><?php echo e($psMobileMore['label']); ?></span>
                     </a>
-                @endforeach
-                <a href="{{ $psNotifUrl }}" class="flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700">
-                    <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg['bell'] !!}</svg>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                <a href="<?php echo e($psNotifUrl); ?>" class="flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700">
+                    <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?php echo $psIconSvg['bell']; ?></svg>
                     <span>Notifikasi</span>
                 </a>
             </nav>
 
             <div class="mt-auto pt-6">
                 <div class="flex items-center justify-between rounded-2xl border border-sky-100 bg-slate-50 p-3 shadow-sm">
-                    <a href="{{ $psProfileUrl }}" class="flex min-w-0 items-center gap-2.5">
-                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-300 text-xs font-extrabold text-amber-900 shadow-md shadow-amber-200">{{ strtoupper(mb_substr($psNama, 0, 1)) }}</span>
+                    <a href="<?php echo e($psProfileUrl); ?>" class="flex min-w-0 items-center gap-2.5">
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-300 text-xs font-extrabold text-amber-900 shadow-md shadow-amber-200"><?php echo e(strtoupper(mb_substr($psNama, 0, 1))); ?></span>
                         <span class="min-w-0 text-left">
-                            <strong class="block truncate text-xs font-bold leading-tight text-slate-800">{{ $psNama }}</strong>
-                            <small class="block truncate text-[10px] font-medium text-slate-400">{{ $psSubU }}</small>
+                            <strong class="block truncate text-xs font-bold leading-tight text-slate-800"><?php echo e($psNama); ?></strong>
+                            <small class="block truncate text-[10px] font-medium text-slate-400"><?php echo e($psSubU); ?></small>
                         </span>
                     </a>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
+                    <form method="POST" action="<?php echo e(route('logout')); ?>">
+                        <?php echo csrf_field(); ?>
                         <button type="submit" class="px-2 py-1 text-xs font-bold text-slate-400 transition-colors hover:text-red-500">Keluar</button>
                     </form>
                 </div>
             </div>
         </div>
     </aside>
-@endif
+<?php endif; ?>
 
 <script>
     (function () {
@@ -829,7 +820,7 @@
     })();
 </script>
 
-@if (($psUser->role ?? null) === 'siswa')
+<?php if(($psUser->role ?? null) === 'siswa'): ?>
 <script>
     (function () {
         var sidebar = document.getElementById('sidebar-mobile');
@@ -839,8 +830,8 @@
         if (nav.querySelector('a[data-ps-nilai]')) return;
         var dash = nav.querySelector('a');
         if (!dash || dash.closest('details')) return;
-        var url = @json(request()->routeIs('ketua.*') || str_contains(strtolower((string) $psTitle), 'ketua') ? route('ketua.nilai') : route('siswa.nilai'));
-        var active = @json(request()->routeIs(['siswa.nilai', 'ketua.nilai']));
+        var url = <?php echo json_encode(request()->routeIs('ketua.*') || str_contains(strtolower((string) $psTitle), 'ketua') ? route('ketua.nilai') : route('siswa.nilai'), 512) ?>;
+        var active = <?php echo json_encode(request()->routeIs(['siswa.nilai', 'ketua.nilai']), 512) ?>;
         var a = document.createElement('a');
         a.href = url;
         a.setAttribute('data-ps-nilai', '1');
@@ -855,4 +846,5 @@
         dash.after(a);
     })();
 </script>
-@endif
+<?php endif; ?>
+<?php /**PATH C:\Users\ASUS\Soul\resources\views/partials/pill-sidebar.blade.php ENDPATH**/ ?>

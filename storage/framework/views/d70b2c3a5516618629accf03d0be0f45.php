@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    @include('partials.theme-mode-head')
+    <?php echo $__env->make('partials.theme-mode-head', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
     <style>
         * , *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -37,11 +37,11 @@
         }
         .login-bg--desktop {
             display: block;
-            background-image: url('{{ asset('images/firefly.jpg') }}');
+            background-image: url('<?php echo e(asset('images/firefly.jpg')); ?>');
         }
         .login-bg--mobile {
             display: none;
-            background-image: url('{{ asset('images/firefly-mobile.jpeg') }}');
+            background-image: url('<?php echo e(asset('images/firefly-mobile.jpeg')); ?>');
         }
         @media (max-width: 640px) {
             .login-bg--desktop { display: none; }
@@ -437,22 +437,22 @@
 
         <!-- ===================== KOLOM KANAN: FORM LOGIN ===================== -->
         <main class="login-right">
-            <a class="beranda-link" href="{{ url('/') }}">‹ Beranda</a>
+            <a class="beranda-link" href="<?php echo e(url('/')); ?>">‹ Beranda</a>
 
             <div class="login-form-wrap">
                 <h1 class="login-title">Log In Akun</h1>
                 <p class="login-subtitle">Hi, Selamat Datang <span class="hashtag">#SOULERS</span></p>
 
-                @if ($errors->any())
-                    <div class="login-alert">{{ $errors->first() }}</div>
-                @endif
+                <?php if($errors->any()): ?>
+                    <div class="login-alert"><?php echo e($errors->first()); ?></div>
+                <?php endif; ?>
 
-                <form action="{{ route('login') }}" method="POST" novalidate>
-                    @csrf
+                <form action="<?php echo e(route('login')); ?>" method="POST" novalidate>
+                    <?php echo csrf_field(); ?>
 
                     <div class="form-group">
                         <label class="form-label" for="email">NIS / NIP / Username / Email<span class="required">*</span></label>
-                        <input class="form-control" id="email" type="text" name="email" value="{{ old('email') }}" placeholder="Masukkan NIS, NIP, Username, atau Email" required autofocus>
+                        <input class="form-control" id="email" type="text" name="email" value="<?php echo e(old('email')); ?>" placeholder="Masukkan NIS, NIP, Username, atau Email" required autofocus>
                     </div>
 
                     <div class="form-group">
@@ -472,7 +472,7 @@
                     </div>
 
                     <div class="form-meta">
-                        <label class="remember"><input type="checkbox" name="remember" @checked(old('remember'))> Ingat Saya</label>
+                        <label class="remember"><input type="checkbox" name="remember" <?php if(old('remember')): echo 'checked'; endif; ?>> Ingat Saya</label>
                     </div>
 
                     <button type="submit" class="login-button">LOGIN</button>
@@ -499,4 +499,4 @@
 </script>
 
 </body>
-</html>
+</html><?php /**PATH C:\Users\ASUS\Soul\resources\views/auth/login.blade.php ENDPATH**/ ?>
