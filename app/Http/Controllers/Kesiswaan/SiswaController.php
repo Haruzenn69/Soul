@@ -44,4 +44,13 @@ class SiswaController extends Controller
             'direction' => $direction,
         ]);
     }
+
+    public function riwayatProfil(Siswa $siswa): View
+    {
+        $riwayat = $siswa->profileHistories()
+            ->with('changedBy.siswa')
+            ->paginate(30);
+
+        return view('kesiswaan.siswa.riwayat-profil', compact('siswa', 'riwayat'));
+    }
 }

@@ -670,16 +670,64 @@
                     <div class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-5">
                         <div class="border-b border-slate-100 pb-3">
                             <h3 class="text-sm font-extrabold text-slate-900">Data Guru / Pembina Ekskul</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">Isi nama lengkap pembina. Data lain bisa dilengkapi oleh pembina sendiri saat login pertama.</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Lengkapi seluruh biodata pembina. Username akan dibuat sendiri oleh pembina saat login pertama.</p>
                         </div>
 
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Nama Lengkap Beserta Gelar <span class="text-rose-500">*</span></label>
-                            <input type="text" name="pembina_nama" x-model="pembinaNama"
-                                   :disabled="role !== 'pembina'"
-                                   placeholder="Contoh: Dra. Hj. Siti Fatimah, M.Pd"
-                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
-                            <p class="text-[10px] text-slate-400 mt-1.5">Password default: <span class="font-bold text-slate-600">password</span>. Pembina akan mengisi data lengkap saat login pertama.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Nama Lengkap Beserta Gelar *</label>
+                                <input required type="text" name="pembina_nama" x-model="pembinaNama" :disabled="role !== 'pembina'" placeholder="Contoh: Dra. Siti Fatimah, M.Pd" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">NIP (18 angka) *</label>
+                                <input required type="text" inputmode="numeric" name="nip" :disabled="role !== 'pembina'" value="{{ old('nip') }}" minlength="18" maxlength="18" pattern="[0-9]{18}" placeholder="18 digit NIP" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Email *</label>
+                                <input required type="email" name="email" :disabled="role !== 'pembina'" value="{{ old('email') }}" placeholder="guru@sekolah.sch.id" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Jenis Kelamin *</label>
+                                <select required name="pembina_jenis_kelamin" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                    <option value="">Pilih jenis kelamin</option>
+                                    <option value="laki-laki" {{ old('pembina_jenis_kelamin') === 'laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                    <option value="perempuan" {{ old('pembina_jenis_kelamin') === 'perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tempat Lahir *</label>
+                                <input required type="text" name="pembina_tempat_lahir" :disabled="role !== 'pembina'" value="{{ old('pembina_tempat_lahir') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tanggal Lahir *</label>
+                                <input required type="date" name="pembina_tanggal_lahir" :disabled="role !== 'pembina'" value="{{ old('pembina_tanggal_lahir') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Agama *</label>
+                                <select required name="pembina_agama" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                    <option value="">Pilih agama</option>
+                                    @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agama)
+                                        <option value="{{ $agama }}" {{ old('pembina_agama') === $agama ? 'selected' : '' }}>{{ $agama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">No. Telp / WA *</label>
+                                <input required type="text" name="pembina_no_telp" :disabled="role !== 'pembina'" value="{{ old('pembina_no_telp') }}" placeholder="08xxxxxxxxxx" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Media Sosial (opsional)</label>
+                                <input type="text" name="pembina_medsos" :disabled="role !== 'pembina'" value="{{ old('pembina_medsos') }}" placeholder="@username / tautan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Alamat *</label>
+                                <textarea required name="pembina_alamat" rows="2" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">{{ old('pembina_alamat') }}</textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Foto Profil (opsional)</label>
+                                <input type="file" name="pembina_foto" accept="image/jpeg,image/png,image/jpg,image/webp" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <p class="text-[10px] text-slate-400 mt-1">Format JPG, PNG, WEBP. Maksimal 2MB.</p>
+                            </div>
                         </div>
 
                         <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
@@ -710,7 +758,7 @@
                             </div>
                             <div class="min-w-0 flex-1">
                                 <p class="text-sm font-extrabold text-slate-900 truncate" x-text="pembinaNama || 'Nama Guru / Pembina'"></p>
-                                <p class="text-[11px] text-slate-400 mt-0.5">Data lain diisi saat login</p>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Biodata diisi kesiswaan</p>
                                 <span class="inline-block mt-1 text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-lg">Role: Pembina Ekskul</span>
                             </div>
                         </div>
@@ -718,7 +766,7 @@
                         <div class="px-5 py-4">
                             <div class="p-3 bg-sky-50 border border-sky-100 rounded-2xl text-[11px] text-sky-700 leading-relaxed">
                                 <span class="font-bold block mb-1">â„¹ï¸ Info akun pembina:</span>
-                                Pembina akan diminta melengkapi NIP, jenis kelamin, kontak, dan data lainnya saat login pertama kali.
+                                Username dan password baru akan dibuat pembina saat login pertama kali.
                             </div>
                         </div>
                     </div>

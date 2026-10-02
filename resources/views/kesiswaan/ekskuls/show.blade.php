@@ -65,6 +65,11 @@
                         {{ $ekskul->deskripsi ?? 'Tidak ada deskripsi.' }}
                     </p>
                     <div class="flex items-center gap-2 mt-2 flex-wrap">
+                        @if ($ekskul->kategori)
+                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/20 text-white">
+                                {{ $ekskul->kategori }}
+                            </span>
+                        @endif
                         <span class="px-2.5 py-1 rounded-full text-[11px] font-bold {{ $ekskul->status ? 'bg-white/20 text-white' : 'bg-rose-500/30 text-white' }}">
                             {{ $ekskul->status ? '✓ Aktif' : '✕ Nonaktif' }}
                         </span>

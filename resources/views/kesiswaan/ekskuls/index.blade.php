@@ -42,11 +42,6 @@
             </div>
 
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
-                <div class="px-4 py-2.5 bg-white/15 backdrop-blur border border-white/20 rounded-2xl text-center">
-                    <div class="text-lg font-black leading-none">{{ $ekskuls->total() }}</div>
-                    <div class="text-[10px] font-bold text-white/80 uppercase tracking-wider mt-0.5">Total Ekskul</div>
-                </div>
-
                 <button onclick="document.getElementById('modal-create').showModal()"
                         class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,17 +53,6 @@
         </div>
     </div>
 
-    {{-- ALERT MESSAGES --}}
-    @if (session('success'))
-        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-2xl shadow-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if (session('error'))
-        <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-2xl shadow-sm">
-            {{ session('error') }}
-        </div>
-    @endif
     @if ($errors->any())
         <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-2xl shadow-sm">
             <ul class="list-disc list-inside space-y-1">
@@ -97,6 +81,13 @@
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama ekskul atau pembina..."
                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
             </div>
+
+            <select name="kategori" class="w-full lg:w-44 px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                <option value="">Semua Kategori</option>
+                @foreach (['Olahraga', 'Seni', 'Bela Diri', 'Bahasa', 'Lainnya'] as $kategori)
+                    <option value="{{ $kategori }}" {{ request('kategori') === $kategori ? 'selected' : '' }}>{{ $kategori }}</option>
+                @endforeach
+            </select>
 
             <select name="status" class="w-full lg:w-48 px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                 <option value="">Semua Status</option>
@@ -161,7 +152,16 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-xs">
-                    @forelse ($ekskuls as $ekskul)
+                    @php
+                        $kategoriTersedia = ['Olahraga', 'Seni', 'Bela Diri', 'Bahasa', 'Lainnya'];
+                        $kategoriDitampilkan = request('kategori') ? [request('kategori')] : $kategoriTersedia;
+                        $ekskulPerKategori = $ekskuls->getCollection()->groupBy(fn ($item) => $item->kategori ?: 'Lainnya');
+                    @endphp
+                    @foreach ($kategoriDitampilkan as $kategori)
+                        <tr class="bg-sky-50/70">
+                            <td colspan="7" class="px-5 py-3 text-xs font-extrabold uppercase tracking-wide text-sky-800">{{ $kategori }}</td>
+                        </tr>
+                        @forelse ($ekskulPerKategori->get($kategori, collect()) as $ekskul)
                         <tr class="hover:bg-sky-50/30 transition">
                             {{-- Ekskul --}}
                             <td class="py-3.5 px-5">
@@ -176,8 +176,12 @@
                                         @endif
                                     </div>
                                     <div class="min-w-0">
-                                        <div class="font-bold text-slate-900 leading-snug truncate">{{ $ekskul->nama_ekskul }}</div>
-                                        <div class="text-[11px] text-slate-400 truncate line-clamp-1">{{ $ekskul->deskripsi ?? 'Tanpa deskripsi' }}</div>
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <div class="font-bold text-slate-900 leading-snug truncate">{{ $ekskul->nama_ekskul }}</div>
+                                            @if ($ekskul->kategori)
+                                                <span class="shrink-0 rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-700">{{ $ekskul->kategori }}</span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </td>
@@ -242,7 +246,7 @@
 
                                     {{-- Edit --}}
                                     <button type="button"
-                                            onclick='openEdit({{ json_encode(["id" => $ekskul->id, "nama_ekskul" => $ekskul->nama_ekskul, "pembina_id" => $ekskul->pembina_id, "deskripsi" => $ekskul->deskripsi, "jadwal" => $ekskul->jadwal]) }})'
+                                            onclick='openEdit({{ json_encode(["id" => $ekskul->id, "nama_ekskul" => $ekskul->nama_ekskul, "kategori" => $ekskul->kategori, "pembina_id" => $ekskul->pembina_id, "deskripsi" => $ekskul->deskripsi, "jadwal" => $ekskul->jadwal]) }})'
                                             class="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition">
                                         <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                         Edit
@@ -261,24 +265,12 @@
                                 </div>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="py-12 text-center">
-                                <div class="flex flex-col items-center justify-center text-slate-400">
-                                    <svg class="w-10 h-10 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                    </svg>
-                                    <p class="text-xs font-semibold text-slate-600">Belum ada ekskul yang ditemukan.</p>
-                                    @if ($hasFilter)
-                                        <p class="text-[11px] text-slate-400 mt-0.5">Coba ubah kata kunci atau hapus filter.</p>
-                                        <a href="{{ route('kesiswaan.ekskuls.index') }}" class="mt-3 text-xs font-bold text-sky-600 hover:text-sky-700">
-                                            Tampilkan semua ekskul
-                                        </a>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
+                        @empty
+                            <tr>
+                                <td colspan="7" class="px-5 py-4 text-center text-xs text-slate-400">Belum ada ekskul pada kategori {{ $kategori }}.</td>
+                            </tr>
+                        @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -313,15 +305,13 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Deskripsi <span class="text-slate-300">(Opsional)</span></label>
-                <textarea name="deskripsi" rows="2" placeholder="Deskripsi singkat ekskul..."
-                          class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition resize-none"></textarea>
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Jadwal <span class="text-slate-300">(Opsional)</span></label>
-                <input type="text" name="jadwal" placeholder="Contoh: Senin & Rabu, 15:30–17:00"
-                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Kategori <span class="text-rose-500">*</span></label>
+                <select name="kategori" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                    <option value="" disabled {{ old('kategori') ? '' : 'selected' }}>Pilih kategori...</option>
+                    @foreach (['Olahraga', 'Seni', 'Bela Diri', 'Bahasa', 'Lainnya'] as $kategori)
+                        <option value="{{ $kategori }}" @selected(old('kategori') === $kategori)>{{ $kategori }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <div class="flex gap-2.5 pt-3 border-t border-slate-100">
@@ -356,6 +346,16 @@
                 <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Nama Ekskul <span class="text-rose-500">*</span></label>
                 <input type="text" name="nama_ekskul" required
                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Kategori <span class="text-rose-500">*</span></label>
+                <select name="kategori" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                    <option value="" disabled>Pilih kategori...</option>
+                    @foreach (['Olahraga', 'Seni', 'Bela Diri', 'Bahasa', 'Lainnya'] as $kategori)
+                        <option value="{{ $kategori }}">{{ $kategori }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <div>
@@ -403,6 +403,7 @@
         const form = document.getElementById('form-edit');
         form.action = '{{ url('kesiswaan/ekskuls') }}/' + data.id;
         form.querySelector('[name=nama_ekskul]').value = data.nama_ekskul || '';
+        form.querySelector('[name=kategori]').value = data.kategori || '';
         const selPembina = form.querySelector('[name=pembina_id]');
         selPembina.value = data.pembina_id || '';
         Array.from(selPembina.options).forEach(opt => {

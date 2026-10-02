@@ -54,6 +54,10 @@ class PembinaController extends Controller
 
         $ekskul = Ekskul::findOrFail($data['ekskul_id']);
 
+        if ($ekskul->pembina_id !== null) {
+            return back()->withErrors(['ekskul_id' => "Ekskul {$ekskul->nama_ekskul} sudah memiliki pembina."]);
+        }
+
         // Cek batas maksimal 4 ekskul per pembina
         if ($pembina->ekskuls()->count() >= 4) {
             return back()->withErrors(['ekskul_id' => "Pembina {$pembina->nama} sudah membina 4 ekskul (batas maksimal)."]);
@@ -75,4 +79,14 @@ class PembinaController extends Controller
 
         return back()->with('success', "Ekskul {$ekskul->nama_ekskul} berhasil dilepas dari {$pembina->nama}.");
     }
+
+    public function riwayatProfil(Pembina $pembina): View
+    {
+        $riwayat = $pembina->profileHistories()
+            ->with('changedBy.pembina')
+            ->paginate(30);
+
+        return view('kesiswaan.pembina.riwayat-profil', compact('pembina', 'riwayat'));
+    }
+
 }

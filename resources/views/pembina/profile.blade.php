@@ -16,7 +16,7 @@
             </div>
             <div>
                 <h2 class="text-sm font-extrabold text-amber-900">Lengkapi Data Diri</h2>
-                <p class="text-xs text-amber-700 mt-1">Nama Anda ditetapkan oleh kesiswaan. Cukup lengkapi <b>jenis kelamin</b> (dan email bila ada) di bawah agar profil lengkap.</p>
+                <p class="text-xs text-amber-700 mt-1">Data biodata yang belum lengkap perlu diperbarui oleh kesiswaan. Anda tetap dapat mengganti foto profil, nomor telepon, dan email di bawah.</p>
             </div>
         </div>
     @endif
@@ -57,7 +57,8 @@
         <div class="lg:col-span-2 space-y-6">
             <!-- UBAH / LENGKAPI DATA Diri -->
             <div class="bg-white p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 animate-fade-up" style="animation-delay: .12s">
-                <h2 class="text-sm font-extrabold text-slate-900 mb-4">{{ $profileComplete ? 'Ubah Data Pribadi' : 'Lengkapi Data Pribadi' }}</h2>
+                <h2 class="text-sm font-extrabold text-slate-900 mb-1">Data yang Dapat Diubah</h2>
+                <p class="text-[11px] text-slate-400 mb-4">Anda dapat mengubah foto profil, nomor telepon, dan email. Data biodata lainnya dikelola kesiswaan.</p>
                 <form method="POST" action="{{ route('pembina.profile.update') }}" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @csrf
                     <div>
@@ -86,8 +87,8 @@
                     </div>
 
                     <div>
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Jenis Kelamin <span class="text-red-500">*</span></label>
-                        <select name="jenis_kelamin" required
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Jenis Kelamin (dikelola kesiswaan)</label>
+                        <select disabled
                                 class="w-full px-4 py-2.5 bg-sky-50/60 border @error('jenis_kelamin') border-red-300 @else border-sky-100 @enderror rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                             <option value="" {{ !$pembina?->jenis_kelamin ? 'selected' : '' }} disabled>Pilih...</option>
                             <option value="laki-laki" {{ old('jenis_kelamin', $pembina?->jenis_kelamin) === 'laki-laki' ? 'selected' : '' }}>Laki-laki</option>
@@ -96,8 +97,8 @@
                     </div>
 
                     <div>
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Agama</label>
-                        <select name="agama"
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Agama (dikelola kesiswaan)</label>
+                        <select disabled
                                 class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                             <option value="">Pilih Agama...</option>
                             @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agm)
@@ -107,14 +108,14 @@
                     </div>
 
                     <div>
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tempat Lahir</label>
-                        <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $pembina->tempat_lahir) }}" placeholder="Kota kelahiran"
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tempat Lahir (dikelola kesiswaan)</label>
+                        <input disabled type="text" value="{{ $pembina->tempat_lahir }}" placeholder="Kota kelahiran"
                                class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                     </div>
 
                     <div>
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tanggal Lahir</label>
-                        <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $pembina->tanggal_lahir?->format('Y-m-d')) }}"
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tanggal Lahir (dikelola kesiswaan)</label>
+                        <input disabled type="date" value="{{ $pembina->tanggal_lahir?->format('Y-m-d') }}"
                                class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                     </div>
 
@@ -132,8 +133,8 @@
 
                     {{-- MEDIA SOSIAL DENGAN SISTEM ARAHAN --}}
                     <div class="md:col-span-2">
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Media Sosial</label>
-                        <input type="text" name="medsos" value="{{ old('medsos', $pembina->medsos) }}" placeholder="misal: @nama_pembina (Instagram) / link profil medsos"
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Media Sosial (dikelola kesiswaan)</label>
+                        <input disabled type="text" value="{{ $pembina->medsos }}" placeholder="misal: @nama_pembina (Instagram) / link profil medsos"
                                class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                         <div class="mt-2 p-2.5 bg-sky-50 border border-sky-100 rounded-xl text-[11px] text-sky-800 flex items-start gap-2">
                             <span>💡</span>
@@ -143,13 +144,13 @@
 
                     <div class="md:col-span-2">
                         <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Alamat Lengkap</label>
-                        <textarea name="alamat" rows="2" placeholder="Alamat domisili lengkap"
+                        <textarea disabled rows="2" placeholder="Alamat domisili lengkap"
                                   class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('alamat', $pembina->alamat) }}</textarea>
                     </div>
 
                     <div class="md:col-span-2 pt-2">
                         <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition hover:-translate-y-0.5">
-                            {{ $profileComplete ? 'Simpan Perubahan' : 'Simpan Data' }}
+                            Simpan Perubahan
                         </button>
                     </div>
                 </form>

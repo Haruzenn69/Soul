@@ -39,6 +39,7 @@ use App\Http\Controllers\Siswa\PengajuanController;
 use App\Http\Controllers\Siswa\PresensiController as SiswaPresensiController;
 use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
 use App\Http\Controllers\TestimoniController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -60,6 +61,21 @@ Route::get('/storage/{path}', function (string $path) {
     return response()->file($filePath);
 })->where('path', '.*')->name('storage.public');
 
+Route::middleware(['auth', 'role:kesiswaan,admin'])->get('/maintenance/clear-cache', function () {
+    $secret = env('MAINTENANCE_SECRET', '0192837465');
+
+    abort_unless(hash_equals($secret, request('token', '')), 403, 'Token tidak valid.');
+
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+
+    return response('Cache berhasil dibersihkan: '.implode(', ', [
+        'config', 'cache', 'view', 'route',
+    ]));
+})->name('maintenance.clear-cache');
+
 Route::get('/', [HomeController::class, 'landing'])->name('siswa.landing');
 
 Route::get('/ekskul/{ekskul}', [EkskulCatalogController::class, 'show'])->name('ekskul.detail');
@@ -76,8 +92,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::post('/onboarding/complete', [OnboardingController::class, 'complete'])->name('onboarding.complete');
     Route::post('/onboarding/setup', [OnboardingController::class, 'setup'])->name('onboarding.setup');
+    Route::post('/onboarding/login', [OnboardingController::class, 'returnToLogin'])->name('onboarding.login');
 });
 
 Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('kesiswaan.')->group(function () {
@@ -101,8 +117,10 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
     ]);
 
     Route::get('siswa', [SiswaController::class, 'index'])->name('siswa.index');
+    Route::get('siswa/{siswa}/riwayat-profil', [SiswaController::class, 'riwayatProfil'])->name('siswa.riwayat-profil');
 
     Route::get('pembina', [KesiswaanPembinaController::class, 'index'])->name('pembina.index');
+    Route::get('pembina/{pembina}/riwayat-profil', [KesiswaanPembinaController::class, 'riwayatProfil'])->name('pembina.riwayat-profil');
 
     Route::get('pelatih', [KesiswaanPelatihController::class, 'index'])->name('pelatih.index');
     Route::post('pelatih/{pelatih}/verifikasi', [KesiswaanPelatihController::class, 'verifikasi'])->name('pelatih.verifikasi');

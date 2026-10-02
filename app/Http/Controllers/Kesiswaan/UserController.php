@@ -194,11 +194,9 @@ class UserController extends Controller
     {
         $isStaff = in_array($request->input('role'), ['admin', 'kesiswaan']);
 
-        $isPembina = $request->input('role') === 'pembina';
-
         $rules = [
             'username' => [$isStaff ? 'required' : 'nullable', 'string', 'max:255', 'unique:users,username'],
-            'email'    => [$isPembina ? 'nullable' : 'required', 'nullable', 'email', 'max:255', 'unique:users,email'],
+            'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
             // Role admin hanya bisa dibuat oleh admin (kesiswaan tidak boleh)
             'role'     => ['required', 'in:' . $this->allowedRoles()],
         ];
@@ -226,13 +224,13 @@ class UserController extends Controller
             $rules += [
                 'pembina_nama' => ['required', 'string', 'max:255'],
                 'pembina_foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-                'nip'          => ['nullable', 'string', 'digits:18', 'unique:pembinas,nip'],
-                'pembina_tempat_lahir'    => ['nullable', 'string', 'max:100'],
-                'pembina_tanggal_lahir'   => ['nullable', 'date'],
-                'pembina_agama'           => ['nullable', 'string', 'max:50'],
-                'pembina_jenis_kelamin'   => ['nullable', 'in:laki-laki,perempuan'],
-                'pembina_no_telp'         => ['nullable', 'string', 'max:25'],
-                'pembina_alamat'          => ['nullable', 'string'],
+                'nip'          => ['required', 'string', 'digits:18', 'unique:pembinas,nip'],
+                'pembina_tempat_lahir'    => ['required', 'string', 'max:100'],
+                'pembina_tanggal_lahir'   => ['required', 'date'],
+                'pembina_agama'           => ['required', 'string', 'max:50'],
+                'pembina_jenis_kelamin'   => ['required', 'in:laki-laki,perempuan'],
+                'pembina_no_telp'         => ['required', 'string', 'max:25'],
+                'pembina_alamat'          => ['required', 'string'],
                 'pembina_medsos'          => ['nullable', 'string', 'max:255'],
             ];
         }
@@ -253,7 +251,7 @@ class UserController extends Controller
 
             $user = User::create([
                 'username' => ($isStaff && !empty($data['username'])) ? $data['username'] : null,
-                'email' => $data['email'],
+                'email' => $data['email'] ?? null,
                 'password' => Hash::make('password'),
                 'role' => $data['role'],
                 'email_verified_at' => now(),
@@ -370,12 +368,12 @@ class UserController extends Controller
                 'nip' => ['required', 'string', 'digits:18', 'unique:pembinas,nip'.$nipIgnore],
                 'pembina_nama' => ['required', 'string', 'max:255'],
                 'pembina_foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-                'pembina_tempat_lahir' => ['nullable', 'string', 'max:100'],
-                'pembina_tanggal_lahir' => ['nullable', 'date'],
-                'pembina_agama' => ['nullable', 'string', 'max:50'],
+                'pembina_tempat_lahir' => ['required', 'string', 'max:100'],
+                'pembina_tanggal_lahir' => ['required', 'date'],
+                'pembina_agama' => ['required', 'string', 'max:50'],
                 'pembina_jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
-                'pembina_no_telp' => ['nullable', 'string', 'max:25'],
-                'pembina_alamat' => ['nullable', 'string'],
+                'pembina_no_telp' => ['required', 'string', 'max:25'],
+                'pembina_alamat' => ['required', 'string'],
                 'pembina_medsos' => ['nullable', 'string', 'max:255'],
             ];
         }
