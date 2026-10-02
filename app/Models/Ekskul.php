@@ -12,6 +12,7 @@ class Ekskul extends Model
         'pembina_id',
         'pelatih_id',
         'nama_ekskul',
+        'kategori',
         'deskripsi',
         'tagline',
         'tujuan',

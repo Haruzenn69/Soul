@@ -7,48 +7,23 @@
             $namaLengkap = $currentModel?->nama ?? $authUser->username;
         @endphp
 
-        <style>
-            @keyframes modalPopIn {
-                from { opacity: 0; transform: translateY(20px) scale(0.96); }
-                to { opacity: 1; transform: translateY(0) scale(1); }
-            }
-            .modal-pop-in {
-                animation: modalPopIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
-            }
-        </style>
+        <div class="fixed inset-0 z-[120] flex items-center justify-center p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md"></div>
 
-        <div id="onboarding-setup-modal" class="fixed inset-0 z-[120] flex items-center justify-center p-4 overflow-y-auto">
-            {{-- Backdrop --}}
-            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity"></div>
-
-            {{-- Modal Card --}}
-            <div class="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-sky-100 overflow-hidden modal-pop-in my-8 z-10">
-                
-                {{-- Header Gradient --}}
-                <div class="relative px-6 pt-6 pb-5 bg-gradient-to-br from-sky-500 via-sky-600 to-blue-600 text-white overflow-hidden">
-                    <div class="absolute -right-8 -top-8 w-36 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
-                    <div class="absolute -left-6 -bottom-6 w-32 h-32 bg-sky-300/20 rounded-full blur-xl pointer-events-none"></div>
-
-                    <div class="relative flex items-center justify-between">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-white/20 backdrop-blur text-white text-[11px] font-bold tracking-wide uppercase">
-                            <span>✨ Login Pertama Kali</span>
-                            <span class="opacity-60">•</span>
-                            <span>{{ $roleLabel }}</span>
-                        </div>
-                    </div>
-
-                    <h2 class="relative text-lg md:text-xl font-extrabold mt-3 leading-tight">
-                        Selamat Datang, {{ $namaLengkap }}!
+            <section class="relative z-10 my-8 w-full max-w-md overflow-hidden rounded-3xl border border-sky-100 bg-white shadow-2xl">
+                <header class="bg-gradient-to-br from-sky-500 via-sky-600 to-blue-600 px-6 py-5 text-white">
+                    <p class="text-[11px] font-bold uppercase tracking-wide text-sky-100">Login pertama kali · {{ $roleLabel }}</p>
+                    <h2 id="onboarding-title" class="mt-2 text-lg font-extrabold leading-tight">
+                        Selamat datang, {{ $namaLengkap }}!
                     </h2>
-                    <p class="relative text-xs text-sky-100 mt-1 leading-relaxed">
-                        Silakan atur <b>Username Anda sendiri</b>, unggah <b>Foto Profil</b>, dan cantumkan <b>Media Sosial</b> untuk kemudahan interaksi dan kegiatan ekskul.
+                    <p class="mt-1 text-xs leading-relaxed text-sky-100">
+                        Buat username dan password baru untuk mengamankan akun Anda.
                     </p>
-                </div>
+                </header>
 
-                {{-- Validation Errors if any --}}
                 @if ($errors->any())
-                    <div class="mx-6 mt-4 p-3.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl text-xs font-semibold">
-                        <ul class="list-disc list-inside space-y-1">
+                    <div class="mx-6 mt-5 rounded-2xl border border-rose-200 bg-rose-50 p-3.5 text-xs font-semibold text-rose-700" role="alert">
+                        <ul class="list-inside list-disc space-y-1">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
@@ -56,130 +31,116 @@
                     </div>
                 @endif
 
-                {{-- Form Content --}}
-                <form method="POST" action="{{ route('onboarding.setup') }}" enctype="multipart/form-data" class="p-6 space-y-5">
+                <form id="onboarding-form" method="POST" action="{{ route('onboarding.setup') }}" class="space-y-4 p-6" novalidate>
                     @csrf
 
-                    {{-- 1. FOTO PROFILE UPLOAD --}}
                     <div>
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
-                            Foto Profil
-                        </label>
-                        <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
-                            {{-- Circle Preview --}}
-                            <div class="relative w-16 h-16 rounded-full bg-gradient-to-br from-sky-100 to-blue-200 border-2 border-sky-400 flex items-center justify-center shrink-0 overflow-hidden shadow-sm shadow-sky-100">
-                                <img id="onboarding-avatar-preview" src="" alt="Preview Foto" class="hidden w-full h-full object-cover">
-                                <span id="onboarding-avatar-fallback" class="text-xl font-black text-sky-600 uppercase">
-                                    {{ strtoupper(substr($namaLengkap ?? 'U', 0, 1)) }}
-                                </span>
-                            </div>
-
-                            <div class="flex-1">
-                                <input type="file" name="foto" id="onboarding-foto-input" accept="image/jpeg,image/png,image/jpg,image/webp" class="hidden" onchange="previewOnboardingPhoto(this)">
-                                <label for="onboarding-foto-input" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-sky-50 text-sky-700 border border-sky-200 rounded-xl text-xs font-bold cursor-pointer transition shadow-xs">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                                    </svg>
-                                    Pilih Foto
-                                </label>
-                                <p class="text-[10px] text-slate-400 mt-1">Format: JPG, PNG, atau WebP (Maks. 2MB). Foto formal atau sopan.</p>
-                            </div>
-                        </div>
+                        <label for="onboarding-username" class="mb-1.5 block text-xs font-bold text-slate-600">Username</label>
+                        <input type="text" name="username" id="onboarding-username" required minlength="3" maxlength="50" pattern="[A-Za-z0-9_-]+" autofocus autocomplete="username"
+                               value="{{ old('username', $authUser->username ?? '') }}" placeholder="Masukkan username"
+                               class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 focus:border-sky-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-sky-100">
+                        <p id="onboarding-username-alert" class="mt-2 hidden items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700" role="alert" aria-live="polite">
+                            <svg class="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm-.75-11a.75.75 0 0 1 1.5 0v3.5a.75.75 0 0 1-1.5 0V7Zm.75 7.25a.875.875 0 1 0 0-1.75.875.875 0 0 0 0 1.75Z" clip-rule="evenodd"/></svg>
+                            <span>Username kurang dari 3 karakter.</span>
+                        </p>
+                        <p class="mt-1 text-[11px] text-slate-400">Minimal 3 karakter; gunakan huruf, angka, tanda hubung, atau garis bawah.</p>
                     </div>
 
-                    {{-- 2. USERNAME MANDIRI --}}
                     <div>
-                        <div class="flex items-center justify-between mb-1.5">
-                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                                Tentukan Username Anda <span class="text-rose-500">*</span>
-                            </label>
-                            <span class="text-[10px] text-sky-600 font-semibold">Wajib diisi</span>
-                        </div>
-                        <div class="relative">
-                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">@</span>
-                            <input type="text" name="username" id="onboarding-username" required
-                                   value="{{ old('username', $authUser->username ?? '') }}"
-                                   placeholder="misal: fajar_rpl / ahmad.spd"
-                                   class="w-full pl-8 pr-4 py-2.5 bg-slate-50 border @error('username') border-rose-300 @else border-slate-200/80 @enderror rounded-2xl text-xs text-slate-800 font-semibold focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
-                        </div>
-                        <p class="text-[10px] text-slate-400 mt-1">
-                            Tentukan username yang mudah diingat untuk login berikutnya. Minimal 3 karakter, hanya huruf, angka, tanda hubung (-) dan garis bawah (_).
+                        <label for="onboarding-password" class="mb-1.5 block text-xs font-bold text-slate-600">Password baru</label>
+                        <input type="password" name="password" id="onboarding-password" required minlength="8" autocomplete="new-password" placeholder="Minimal 8 karakter"
+                               class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 focus:border-sky-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-sky-100">
+                        <p id="onboarding-password-alert" class="mt-2 hidden items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700" role="alert" aria-live="polite">
+                            <svg class="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm-.75-11a.75.75 0 0 1 1.5 0v3.5a.75.75 0 0 1-1.5 0V7Zm.75 7.25a.875.875 0 1 0 0-1.75.875.875 0 0 0 0 1.75Z" clip-rule="evenodd"/></svg>
+                            <span>Password baru harus minimal 8 karakter.</span>
                         </p>
                     </div>
 
-                    {{-- 3. MEDIA SOSIAL DENGAN SISTEM PENGARAH --}}
                     <div>
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
-                            Media Sosial (Instagram / Kontak)
-                        </label>
-                        <div class="relative">
-                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
-                                </svg>
-                            </span>
-                            <input type="text" name="medsos" id="onboarding-medsos"
-                                   value="{{ old('medsos', $currentModel?->medsos) }}"
-                                   placeholder="@nama_akun (Instagram) atau no. WhatsApp aktif"
-                                   class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
-                        </div>
-
-                        {{-- Kotak Arahan / Panduan Sistem --}}
-                        <div class="mt-2 p-3 bg-gradient-to-r from-sky-50 to-blue-50 border border-sky-100 rounded-2xl text-[11px] text-sky-800 leading-relaxed flex items-start gap-2.5">
-                            <span class="text-sm shrink-0">💡</span>
-                            <div>
-                                <span class="font-extrabold text-sky-900 block mb-0.5">Petunjuk Pengisian Media Sosial:</span>
-                                <span>Masukkan akun media sosial aktif (misal Instagram: <code class="bg-white/80 px-1 py-0.5 rounded text-sky-700 font-mono font-bold">@nama_kamu</code> atau link profil). Informasi ini mempermudah pembina dan ketua ekskul menghubungi Anda untuk konfirmasi jadwal dan kegiatan ekskul.</span>
-                            </div>
-                        </div>
+                        <label for="onboarding-password-confirmation" class="mb-1.5 block text-xs font-bold text-slate-600">Konfirmasi password baru</label>
+                        <input type="password" name="password_confirmation" id="onboarding-password-confirmation" required minlength="8" autocomplete="new-password" placeholder="Ulangi password baru"
+                               class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 focus:border-sky-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-sky-100">
+                        <p id="onboarding-password-confirmation-alert" class="mt-2 hidden items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700" role="alert" aria-live="polite">
+                            <svg class="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm-.75-11a.75.75 0 0 1 1.5 0v3.5a.75.75 0 0 1-1.5 0V7Zm.75 7.25a.875.875 0 1 0 0-1.75.875.875 0 0 0 0 1.75Z" clip-rule="evenodd"/></svg>
+                            <span>Konfirmasi password harus sama dengan password baru.</span>
+                        </p>
                     </div>
 
-                    {{-- Actions --}}
-                    <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center gap-2.5">
-                        <button type="submit"
-                                class="w-full sm:flex-1 py-3 px-5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-sky-200 transition hover:-translate-y-0.5 text-center">
-                            Simpan & Mulai Jelajahi
-                        </button>
-
-                        @if(!empty($authUser->username))
-                            <button type="button" onclick="skipOnboardingSetup()"
-                                    class="w-full sm:w-auto py-3 px-5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-2xl transition text-center">
-                                Lewati Dulu
-                            </button>
-                        @endif
-                    </div>
+                    <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-sky-200 transition hover:-translate-y-0.5 hover:from-sky-600 hover:to-blue-700">
+                        Simpan dan lanjutkan
+                    </button>
                 </form>
 
-                {{-- Hidden Form for Skip --}}
-                <form id="onboarding-skip-form" action="{{ route('onboarding.complete') }}" method="POST" class="hidden">
+                <form method="POST" action="{{ route('onboarding.login') }}" class="px-6 pb-6">
                     @csrf
+                    <button type="submit" class="w-full rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-600 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700">
+                        Kembali ke login
+                    </button>
                 </form>
-
-            </div>
+            </section>
         </div>
 
         <script>
-            function previewOnboardingPhoto(input) {
-                if (input.files && input.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        var img = document.getElementById('onboarding-avatar-preview');
-                        var fallback = document.getElementById('onboarding-avatar-fallback');
-                        if (img && fallback) {
-                            img.src = e.target.result;
-                            img.classList.remove('hidden');
-                            fallback.classList.add('hidden');
-                        }
-                    };
-                    reader.readAsDataURL(input.files[0]);
-                }
-            }
+            (() => {
+                const usernameInput = document.getElementById('onboarding-username');
+                const usernameAlert = document.getElementById('onboarding-username-alert');
+                const form = document.getElementById('onboarding-form');
+                const passwordInput = document.getElementById('onboarding-password');
+                const passwordAlert = document.getElementById('onboarding-password-alert');
+                const confirmationInput = document.getElementById('onboarding-password-confirmation');
+                const confirmationAlert = document.getElementById('onboarding-password-confirmation-alert');
 
-            function skipOnboardingSetup() {
-                if (confirm('Anda yakin ingin melewati pengaturan awal? Anda dapat mengubah username dan foto profil kapan saja di menu Profil.')) {
-                    document.getElementById('onboarding-skip-form').submit();
-                }
-            }
+                if (!usernameInput || !usernameAlert || !form || !passwordInput || !passwordAlert || !confirmationInput || !confirmationAlert) return;
+
+                const updateUsernameAlert = () => {
+                    const isTooShort = usernameInput.value.length > 0 && usernameInput.value.length < 3;
+                    usernameAlert.classList.toggle('hidden', !isTooShort);
+                    usernameAlert.classList.toggle('flex', isTooShort);
+                    usernameInput.setAttribute('aria-invalid', isTooShort ? 'true' : 'false');
+                };
+
+                const updatePasswordAlerts = () => {
+                    const passwordTooShort = passwordInput.value.length > 0 && passwordInput.value.length < 8;
+                    const confirmationMismatch = confirmationInput.value.length > 0 && confirmationInput.value !== passwordInput.value;
+
+                    passwordAlert.classList.toggle('hidden', !passwordTooShort);
+                    passwordAlert.classList.toggle('flex', passwordTooShort);
+                    confirmationAlert.classList.toggle('hidden', !confirmationMismatch);
+                    confirmationAlert.classList.toggle('flex', confirmationMismatch);
+                    passwordInput.setAttribute('aria-invalid', passwordTooShort ? 'true' : 'false');
+                    confirmationInput.setAttribute('aria-invalid', confirmationMismatch ? 'true' : 'false');
+                };
+
+                usernameInput.addEventListener('input', updateUsernameAlert);
+                passwordInput.addEventListener('input', updatePasswordAlerts);
+                confirmationInput.addEventListener('input', updatePasswordAlerts);
+                form.addEventListener('submit', (event) => {
+                    const username = usernameInput.value.trim();
+
+                    if (username.length < 3) {
+                        event.preventDefault();
+                        window.alert('Username harus minimal 3 karakter.');
+                        usernameInput.focus();
+                        return;
+                    }
+
+                    if (passwordInput.value.length < 8) {
+                        event.preventDefault();
+                        window.alert('Password baru harus minimal 8 karakter.');
+                        passwordInput.focus();
+                        return;
+                    }
+
+                    if (!confirmationInput.value || confirmationInput.value !== passwordInput.value) {
+                        event.preventDefault();
+                        window.alert('Konfirmasi password harus sama dengan password baru.');
+                        confirmationInput.focus();
+                    }
+                });
+
+                updateUsernameAlert();
+                updatePasswordAlerts();
+            })();
         </script>
     @endif
 @endauth

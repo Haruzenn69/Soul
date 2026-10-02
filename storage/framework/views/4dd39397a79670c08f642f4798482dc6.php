@@ -499,7 +499,18 @@
     }
     .ps-user-logout:hover { color: #ef4444; background: rgba(239, 68, 68, .08); }
     .ps-user-logout svg { width: 16px; height: 16px; }
-    body.ps-collapsed .ps-user { justify-content: center; padding: 6px; background: #f8fafc; }
+    /* Keep only the avatar in the compact rail; remove the profile card chrome. */
+    body.ps-collapsed .ps-user {
+        justify-content: center;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+    }
+    body.ps-collapsed .ps-user-link {
+        flex: 0 0 auto;
+        padding: 0;
+    }
     body.ps-collapsed .ps-user-txt,
     body.ps-collapsed .ps-user-logout { display: none; }
 
@@ -833,4 +844,5 @@
         dash.after(a);
     })();
 </script>
-<?php endif; ?><?php /**PATH C:\laragon\www\Soul\resources\views/partials/pill-sidebar.blade.php ENDPATH**/ ?>
+<?php endif; ?>
+<?php /**PATH C:\laragon\www\Soul\resources\views/partials/pill-sidebar.blade.php ENDPATH**/ ?>

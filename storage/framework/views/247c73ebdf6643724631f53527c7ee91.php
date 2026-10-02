@@ -1,9 +1,9 @@
-﻿@extends('layouts.kesiswaan')
+﻿
 
-@section('title', 'Buat Akun')
+<?php $__env->startSection('title', 'Buat Akun'); ?>
 
-@section('content')
-@php
+<?php $__env->startSection('content'); ?>
+<?php
     $initialStep = 1;
     if ($errors->has('kelas_id')) {
         $initialStep = 2;
@@ -15,36 +15,36 @@
 
     $currentRole = old('role', 'siswa');
     $currentJenisKelamin = old('jenis_kelamin', '');
-@endphp
+?>
 
 <div class="space-y-5 animate-fade-up"
      x-data="{
-        role: '{{ $currentRole }}',
-        step: {{ $initialStep }},
+        role: '<?php echo e($currentRole); ?>',
+        step: <?php echo e($initialStep); ?>,
         totalSteps: 4,
-        jenisKelamin: '{{ $currentJenisKelamin }}',
-        nama: '{{ old('nama', '') }}',
-        nis: '{{ old('nis', '') }}',
-        email: '{{ old('email', '') }}',
-        noTelp: '{{ old('no_telp', '') }}',
-        tanggalLahir: '{{ old('tanggal_lahir', '') }}',
-        tempatLahir: '{{ old('tempat_lahir', '') }}',
-        agama: '{{ old('agama', '') }}',
-        medsos: '{{ old('medsos', '') }}',
-        alamat: `{{ old('alamat', '') }}`,
+        jenisKelamin: '<?php echo e($currentJenisKelamin); ?>',
+        nama: '<?php echo e(old('nama', '')); ?>',
+        nis: '<?php echo e(old('nis', '')); ?>',
+        email: '<?php echo e(old('email', '')); ?>',
+        noTelp: '<?php echo e(old('no_telp', '')); ?>',
+        tanggalLahir: '<?php echo e(old('tanggal_lahir', '')); ?>',
+        tempatLahir: '<?php echo e(old('tempat_lahir', '')); ?>',
+        agama: '<?php echo e(old('agama', '')); ?>',
+        medsos: '<?php echo e(old('medsos', '')); ?>',
+        alamat: `<?php echo e(old('alamat', '')); ?>`,
         kelasText: '',
         photoPreview: null,
         pembinaPhotoPreview: null,
-        pembinaEmail: '{{ old('email', '') }}',
-        pembinaNip: '{{ old('nip', '') }}',
-        pembinaNama: '{{ old('pembina_nama', '') }}',
-        pembinaJenisKelamin: '{{ old('pembina_jenis_kelamin', '') }}',
-        pembinaAgama: '{{ old('pembina_agama', '') }}',
-        pembinaNoTelp: '{{ old('pembina_no_telp', '') }}',
-        pembinaTempatLahir: '{{ old('pembina_tempat_lahir', '') }}',
-        pembinaTanggalLahir: '{{ old('pembina_tanggal_lahir', '') }}',
-        pembinaMedsos: '{{ old('pembina_medsos', '') }}',
-        pembinaAlamat: `{{ old('pembina_alamat', '') }}`,
+        pembinaEmail: '<?php echo e(old('email', '')); ?>',
+        pembinaNip: '<?php echo e(old('nip', '')); ?>',
+        pembinaNama: '<?php echo e(old('pembina_nama', '')); ?>',
+        pembinaJenisKelamin: '<?php echo e(old('pembina_jenis_kelamin', '')); ?>',
+        pembinaAgama: '<?php echo e(old('pembina_agama', '')); ?>',
+        pembinaNoTelp: '<?php echo e(old('pembina_no_telp', '')); ?>',
+        pembinaTempatLahir: '<?php echo e(old('pembina_tempat_lahir', '')); ?>',
+        pembinaTanggalLahir: '<?php echo e(old('pembina_tanggal_lahir', '')); ?>',
+        pembinaMedsos: '<?php echo e(old('pembina_medsos', '')); ?>',
+        pembinaAlamat: `<?php echo e(old('pembina_alamat', '')); ?>`,
         calculatedAge: '',
 
         init() {
@@ -190,9 +190,9 @@
         }
      }">
 
-    {{-- HERO CARD BIRU (STYLE SAMA DENGAN INDEX AKUN PENGGUNA) --}}
+    
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200">
-        {{-- Ambient blur circles --}}
+        
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
             <div class="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
@@ -209,7 +209,7 @@
             </div>
 
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
-                <a href="{{ route('kesiswaan.users.index') }}"
+                <a href="<?php echo e(route('kesiswaan.users.index')); ?>"
                    class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/20 transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -220,32 +220,32 @@
         </div>
     </div>
 
-    {{-- VALIDATION ERRORS --}}
-    @if ($errors->any())
+    
+    <?php if($errors->any()): ?>
         <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl text-xs font-semibold">
             <ul class="list-disc list-inside space-y-1">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
+                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <li><?php echo e($error); ?></li>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </ul>
         </div>
-    @endif
+    <?php endif; ?>
 
-    {{-- FORM --}}
-    <form action="{{ route('kesiswaan.users.store') }}" method="POST" enctype="multipart/form-data" id="form-create-user">
-        @csrf
+    
+    <form action="<?php echo e(route('kesiswaan.users.store')); ?>" method="POST" enctype="multipart/form-data" id="form-create-user">
+        <?php echo csrf_field(); ?>
 
-        {{-- Hidden Jabatan Default: Siswa --}}
+        
         <input type="hidden" name="jabatan" value="siswa" :disabled="role !== 'siswa'">
 
-        {{-- PILIH ROLE --}}
+        
         <div class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-4 mb-5">
             <div>
                 <h2 class="text-sm font-extrabold text-slate-900">Pilih Role</h2>
                 <p class="text-xs text-slate-400 mt-0.5">Tentukan jenis akun yang akan dibuat.</p>
             </div>
 
-            @php
+            <?php
                 $roles = [
                     'siswa' => ['label' => 'Siswa', 'desc' => 'Akun siswa dengan biodata & kelas'],
                     'pembina' => ['label' => 'Guru / Pembina', 'desc' => 'Akun pembina ekskul dengan NIP'],
@@ -254,38 +254,39 @@
                 if (auth()->user()->role === 'admin') {
                     $roles['admin'] = ['label' => 'Administrator', 'desc' => 'Akses penuh manajemen sistem'];
                 }
-            @endphp
+            ?>
 
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                @foreach ($roles as $rVal => $rData)
+                <?php $__currentLoopData = $roles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rVal => $rData): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <label class="relative flex flex-col p-3 rounded-2xl border-2 cursor-pointer transition-all"
-                           :class="role === '{{ $rVal }}' ? 'border-sky-500 bg-sky-50/60' : 'border-slate-100 hover:border-slate-200 bg-slate-50/40'">
-                        <input type="radio" name="role" value="{{ $rVal }}" x-model="role" class="sr-only">
+                           :class="role === '<?php echo e($rVal); ?>' ? 'border-sky-500 bg-sky-50/60' : 'border-slate-100 hover:border-slate-200 bg-slate-50/40'">
+                        <input type="radio" name="role" value="<?php echo e($rVal); ?>" x-model="role" class="sr-only">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold" :class="role === '{{ $rVal }}' ? 'text-sky-900' : 'text-slate-800'">
-                                {{ $rData['label'] }}
+                            <span class="text-xs font-bold" :class="role === '<?php echo e($rVal); ?>' ? 'text-sky-900' : 'text-slate-800'">
+                                <?php echo e($rData['label']); ?>
+
                             </span>
                             <span class="w-4 h-4 rounded-full border flex items-center justify-center transition-colors"
-                                  :class="role === '{{ $rVal }}' ? 'border-sky-500 bg-sky-500' : 'border-slate-300'">
-                                <span class="w-1.5 h-1.5 rounded-full bg-white" x-show="role === '{{ $rVal }}'"></span>
+                                  :class="role === '<?php echo e($rVal); ?>' ? 'border-sky-500 bg-sky-500' : 'border-slate-300'">
+                                <span class="w-1.5 h-1.5 rounded-full bg-white" x-show="role === '<?php echo e($rVal); ?>'"></span>
                             </span>
                         </div>
-                        <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">{{ $rData['desc'] }}</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5 leading-snug"><?php echo e($rData['desc']); ?></p>
                     </label>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
 
-        {{-- =============================================================== --}}
-        {{-- ROLE: SISWA (TWO-COLUMN: FORM + PREVIEW)                        --}}
-        {{-- =============================================================== --}}
+        
+        
+        
         <div x-show="role === 'siswa'" x-cloak>
             <div class="flex flex-col lg:flex-row gap-5 items-stretch">
 
-                {{-- LEFT: FORM COLUMN --}}
+                
                 <div class="flex-1 min-w-0 space-y-5">
 
-                    {{-- STEPPER NAV --}}
+                    
                     <div class="bg-white rounded-3xl p-4 md:p-5 border border-sky-100 shadow-sm">
                         <div class="mb-4">
                             <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
@@ -298,42 +299,42 @@
                             </div>
                         </div>
 
-                        @php
+                        <?php
                             $steps = [
                                 1 => 'Akun & Identitas',
                                 2 => 'Data Akademik',
                                 3 => 'Biodata Diri',
                                 4 => 'Kontak & Alamat',
                             ];
-                        @endphp
+                        ?>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            @foreach ($steps as $sNum => $sLabel)
-                                <button type="button" @click="goToStep({{ $sNum }})"
+                            <?php $__currentLoopData = $steps; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sNum => $sLabel): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <button type="button" @click="goToStep(<?php echo e($sNum); ?>)"
                                         class="flex items-center gap-2 p-2.5 rounded-xl text-left transition-all border text-xs"
-                                        :class="step === {{ $sNum }} ? 'bg-sky-50 border-sky-300 font-bold text-sky-900' : (step > {{ $sNum }} ? 'bg-emerald-50/60 border-emerald-200 text-slate-700' : 'bg-slate-50/70 border-slate-100 text-slate-400')">
+                                        :class="step === <?php echo e($sNum); ?> ? 'bg-sky-50 border-sky-300 font-bold text-sky-900' : (step > <?php echo e($sNum); ?> ? 'bg-emerald-50/60 border-emerald-200 text-slate-700' : 'bg-slate-50/70 border-slate-100 text-slate-400')">
                                     <div class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 text-[10px] font-bold"
-                                         :class="step === {{ $sNum }} ? 'bg-sky-500 text-white' : (step > {{ $sNum }} ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600')">
-                                        <template x-if="step > {{ $sNum }}">
+                                         :class="step === <?php echo e($sNum); ?> ? 'bg-sky-500 text-white' : (step > <?php echo e($sNum); ?> ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600')">
+                                        <template x-if="step > <?php echo e($sNum); ?>">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                                         </template>
-                                        <template x-if="step <= {{ $sNum }}">
-                                            <span>{{ $sNum }}</span>
+                                        <template x-if="step <= <?php echo e($sNum); ?>">
+                                            <span><?php echo e($sNum); ?></span>
                                         </template>
                                     </div>
-                                    <span class="truncate">{{ $sLabel }}</span>
+                                    <span class="truncate"><?php echo e($sLabel); ?></span>
                                 </button>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
 
-                    {{-- STEP 1: AKUN & IDENTITAS --}}
+                    
                     <div x-show="step === 1" x-transition.opacity class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-5">
                         <div class="border-b border-slate-100 pb-3">
                             <h3 class="text-sm font-extrabold text-slate-900">Akun & Identitas Utama</h3>
                             <p class="text-xs text-slate-400 mt-0.5">Kredensial login dan identitas pokok siswa.</p>
                         </div>
 
-                        {{-- Foto Profil --}}
+                        
                         <div class="flex items-center gap-4 p-3 bg-slate-50/80 rounded-2xl border border-slate-200/80">
                             <div class="relative">
                                 <div class="w-14 h-14 rounded-2xl border-2 border-white shadow-sm overflow-hidden bg-sky-100 flex items-center justify-center shrink-0">
@@ -360,7 +361,7 @@
                             </div>
                         </div>
 
-                        {{-- Fields: Email, NIS, Nama --}}
+                        
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
@@ -403,7 +404,7 @@
                         </div>
                     </div>
 
-                    {{-- STEP 2: DATA AKADEMIK --}}
+                    
                     <div x-show="step === 2" x-transition.opacity class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-5">
                         <div class="border-b border-slate-100 pb-3">
                             <h3 class="text-sm font-extrabold text-slate-900">Data Akademik</h3>
@@ -415,11 +416,11 @@
                             <select name="kelas_id" id="kelas_id_select" @change="updateKelasText()"
                                     class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                                 <option value="">Pilih kelas...</option>
-                                @foreach ($kelas as $k)
-                                    <option value="{{ $k->id }}" {{ old('kelas_id') == $k->id ? 'selected' : '' }}>
-                                        {{ $k->nama }} ({{ config("kelas.tingkat.{$k->tingkat}") }})
+                                <?php $__currentLoopData = $kelas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $k): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($k->id); ?>" <?php echo e(old('kelas_id') == $k->id ? 'selected' : ''); ?>>
+                                        <?php echo e($k->nama); ?> (<?php echo e(config("kelas.tingkat.{$k->tingkat}")); ?>)
                                     </option>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
                         </div>
 
@@ -437,7 +438,7 @@
                         </div>
                     </div>
 
-                    {{-- STEP 3: BIODATA PRIBADI --}}
+                    
                     <div x-show="step === 3" x-transition.opacity class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-5">
                         <div class="border-b border-slate-100 pb-3">
                             <h3 class="text-sm font-extrabold text-slate-900">Biodata Pribadi</h3>
@@ -474,9 +475,9 @@
                                 <select name="agama" x-model="agama"
                                         class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                                     <option value="">Pilih Agama...</option>
-                                    @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agm)
-                                        <option value="{{ $agm }}" {{ old('agama') === $agm ? 'selected' : '' }}>{{ $agm }}</option>
-                                    @endforeach
+                                    <?php $__currentLoopData = ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $agm): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($agm); ?>" <?php echo e(old('agama') === $agm ? 'selected' : ''); ?>><?php echo e($agm); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                             </div>
                             <div>
@@ -509,7 +510,7 @@
                         </div>
                     </div>
 
-                    {{-- STEP 4: KONTAK & ALAMAT --}}
+                    
                     <div x-show="step === 4" x-transition.opacity class="space-y-5">
                         <div class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-5">
                             <div class="border-b border-slate-100 pb-3">
@@ -545,7 +546,7 @@
                                 Kembali
                             </button>
                             <div class="flex items-center gap-2">
-                                <a href="{{ route('kesiswaan.users.index') }}"
+                                <a href="<?php echo e(route('kesiswaan.users.index')); ?>"
                                    class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-2xl transition">Batal</a>
                                 <button type="submit"
                                         class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm shadow-sky-200 transition">
@@ -555,18 +556,18 @@
                         </div>
                     </div>
 
-                </div>{{-- END LEFT COLUMN --}}
+                </div>
 
-                {{-- RIGHT: LIVE PREVIEW CARD (MATCH HEIGHT WITH FORM) --}}
+                
                 <div class="lg:w-80 xl:w-96 shrink-0 flex flex-col">
                     <div class="bg-white rounded-3xl border border-sky-100 shadow-sm overflow-hidden flex flex-col h-full">
-                            {{-- Header --}}
+                            
                             <div class="px-5 py-3 bg-slate-50/80 border-b border-slate-100">
                                 <h4 class="text-xs font-extrabold text-slate-700">Pratinjau Akun</h4>
                                 <p class="text-[10px] text-slate-400">Data terisi otomatis dari form</p>
                             </div>
 
-                            {{-- Avatar + Name --}}
+                            
                             <div class="px-5 pt-5 pb-4 flex items-center gap-3 border-b border-slate-100">
                                 <div class="w-14 h-14 rounded-2xl border-2 border-sky-100 overflow-hidden bg-sky-50 flex items-center justify-center shrink-0">
                                     <template x-if="photoPreview">
@@ -583,53 +584,53 @@
                                 </div>
                             </div>
 
-                            {{-- Detail Rows --}}
+                            
                             <div class="px-5 py-3 divide-y divide-slate-100 text-xs flex-1 flex flex-col justify-between">
-                                {{-- NIS --}}
+                                
                                 <div class="flex items-center justify-between py-2.5">
                                     <span class="text-slate-400 font-semibold">NIS</span>
                                     <span class="font-bold text-slate-700 text-right" x-text="nis || '-'"></span>
                                 </div>
-                                {{-- Kelas --}}
+                                
                                 <div class="flex items-center justify-between py-2.5">
                                     <span class="text-slate-400 font-semibold">Kelas</span>
                                     <span class="font-bold text-slate-700 text-right truncate ml-3 max-w-[60%]" x-text="kelasText || '-'"></span>
                                 </div>
 
-                                {{-- Jenis Kelamin --}}
+                                
                                 <div class="flex items-center justify-between py-2.5">
                                     <span class="text-slate-400 font-semibold">Jenis Kelamin</span>
                                     <span class="font-bold text-slate-700 text-right capitalize" x-text="jenisKelamin || '-'"></span>
                                 </div>
-                                {{-- Agama --}}
+                                
                                 <div class="flex items-center justify-between py-2.5">
                                     <span class="text-slate-400 font-semibold">Agama</span>
                                     <span class="font-bold text-slate-700 text-right" x-text="agama || '-'"></span>
                                 </div>
-                                {{-- TTL --}}
+                                
                                 <div class="flex items-center justify-between py-2.5">
                                     <span class="text-slate-400 font-semibold">TTL</span>
                                     <span class="font-bold text-slate-700 text-right truncate ml-3 max-w-[60%]"
                                           x-text="(tempatLahir || tanggalLahir) ? ((tempatLahir || '-') + ', ' + (formatTanggalLahir() || '-')) : '-'"></span>
                                 </div>
-                                {{-- No. Telp --}}
+                                
                                 <div class="flex items-center justify-between py-2.5">
                                     <span class="text-slate-400 font-semibold">No. Telp</span>
                                     <span class="font-bold text-slate-700 text-right" x-text="noTelp || '-'"></span>
                                 </div>
-                                {{-- Medsos --}}
+                                
                                 <div class="flex items-center justify-between py-2.5">
                                     <span class="text-slate-400 font-semibold">Medsos</span>
                                     <span class="font-bold text-slate-700 text-right truncate ml-3 max-w-[60%]" x-text="medsos || '-'"></span>
                                 </div>
-                                {{-- Alamat --}}
+                                
                                 <div class="flex items-start justify-between py-2.5" x-show="alamat">
                                     <span class="text-slate-400 font-semibold shrink-0">Alamat</span>
                                     <span class="font-bold text-slate-700 text-right ml-3 text-[11px] leading-relaxed" x-text="alamat"></span>
                                 </div>
                             </div>
 
-                            {{-- Completeness indicator --}}
+                            
                             <div class="px-5 py-3.5 bg-slate-50/80 border-t border-slate-100 mt-auto">
                                 <div class="flex items-center justify-between text-[10px] text-slate-400 mb-1.5">
                                     <span class="font-semibold">Kelengkapan data</span>
@@ -654,18 +655,18 @@
                                 </div>
                             </div>
                         </div>
-                </div>{{-- END RIGHT COLUMN --}}
+                </div>
 
             </div>
         </div>
 
-        {{-- =============================================================== --}}
-        {{-- ROLE: PEMBINA (GURU) - SIMPLIFIED                               --}}
-        {{-- =============================================================== --}}
+        
+        
+        
         <div x-show="role === 'pembina'" x-cloak>
             <div class="flex flex-col lg:flex-row gap-5 items-stretch">
 
-                {{-- LEFT: FORM --}}
+                
                 <div class="flex-1 min-w-0">
                     <div class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-5">
                         <div class="border-b border-slate-100 pb-3">
@@ -680,48 +681,48 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">NIP (18 angka) *</label>
-                                <input required type="text" inputmode="numeric" name="nip" :disabled="role !== 'pembina'" value="{{ old('nip') }}" minlength="18" maxlength="18" pattern="[0-9]{18}" placeholder="18 digit NIP" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input required type="text" inputmode="numeric" name="nip" :disabled="role !== 'pembina'" value="<?php echo e(old('nip')); ?>" minlength="18" maxlength="18" pattern="[0-9]{18}" placeholder="18 digit NIP" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Email *</label>
-                                <input required type="email" name="email" :disabled="role !== 'pembina'" value="{{ old('email') }}" placeholder="guru@sekolah.sch.id" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input required type="email" name="email" :disabled="role !== 'pembina'" value="<?php echo e(old('email')); ?>" placeholder="guru@sekolah.sch.id" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Jenis Kelamin *</label>
                                 <select required name="pembina_jenis_kelamin" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                                     <option value="">Pilih jenis kelamin</option>
-                                    <option value="laki-laki" {{ old('pembina_jenis_kelamin') === 'laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                                    <option value="perempuan" {{ old('pembina_jenis_kelamin') === 'perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                    <option value="laki-laki" <?php echo e(old('pembina_jenis_kelamin') === 'laki-laki' ? 'selected' : ''); ?>>Laki-laki</option>
+                                    <option value="perempuan" <?php echo e(old('pembina_jenis_kelamin') === 'perempuan' ? 'selected' : ''); ?>>Perempuan</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tempat Lahir *</label>
-                                <input required type="text" name="pembina_tempat_lahir" :disabled="role !== 'pembina'" value="{{ old('pembina_tempat_lahir') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input required type="text" name="pembina_tempat_lahir" :disabled="role !== 'pembina'" value="<?php echo e(old('pembina_tempat_lahir')); ?>" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tanggal Lahir *</label>
-                                <input required type="date" name="pembina_tanggal_lahir" :disabled="role !== 'pembina'" value="{{ old('pembina_tanggal_lahir') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input required type="date" name="pembina_tanggal_lahir" :disabled="role !== 'pembina'" value="<?php echo e(old('pembina_tanggal_lahir')); ?>" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Agama *</label>
                                 <select required name="pembina_agama" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                                     <option value="">Pilih agama</option>
-                                    @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agama)
-                                        <option value="{{ $agama }}" {{ old('pembina_agama') === $agama ? 'selected' : '' }}>{{ $agama }}</option>
-                                    @endforeach
+                                    <?php $__currentLoopData = ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $agama): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($agama); ?>" <?php echo e(old('pembina_agama') === $agama ? 'selected' : ''); ?>><?php echo e($agama); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">No. Telp / WA *</label>
-                                <input required type="text" name="pembina_no_telp" :disabled="role !== 'pembina'" value="{{ old('pembina_no_telp') }}" placeholder="08xxxxxxxxxx" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input required type="text" name="pembina_no_telp" :disabled="role !== 'pembina'" value="<?php echo e(old('pembina_no_telp')); ?>" placeholder="08xxxxxxxxxx" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Media Sosial (opsional)</label>
-                                <input type="text" name="pembina_medsos" :disabled="role !== 'pembina'" value="{{ old('pembina_medsos') }}" placeholder="@username / tautan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input type="text" name="pembina_medsos" :disabled="role !== 'pembina'" value="<?php echo e(old('pembina_medsos')); ?>" placeholder="@username / tautan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Alamat *</label>
-                                <textarea required name="pembina_alamat" rows="2" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">{{ old('pembina_alamat') }}</textarea>
+                                <textarea required name="pembina_alamat" rows="2" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs"><?php echo e(old('pembina_alamat')); ?></textarea>
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Foto Profil (opsional)</label>
@@ -731,7 +732,7 @@
                         </div>
 
                         <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-                            <a href="{{ route('kesiswaan.users.index') }}"
+                            <a href="<?php echo e(route('kesiswaan.users.index')); ?>"
                                class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-2xl transition">Batal</a>
                             <button type="submit"
                                     class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm shadow-sky-200 transition">
@@ -739,9 +740,9 @@
                             </button>
                         </div>
                     </div>
-                </div>{{-- END LEFT COLUMN --}}
+                </div>
 
-                {{-- RIGHT: LIVE PREVIEW CARD --}}
+                
                 <div class="lg:w-72 shrink-0">
                     <div class="bg-white rounded-3xl border border-sky-100 shadow-sm overflow-hidden">
                         <div class="px-5 py-3.5 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between">
@@ -770,15 +771,15 @@
                             </div>
                         </div>
                     </div>
-                </div>{{-- END RIGHT COLUMN --}}
+                </div>
 
             </div>
         </div>
 
 
-        {{-- =============================================================== --}}
-        {{-- ROLE: STAF (KESISWAAN / ADMIN)                                  --}}
-        {{-- =============================================================== --}}
+        
+        
+        
         <div x-show="role === 'kesiswaan' || role === 'admin'" x-cloak class="space-y-5">
             <div class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-5">
                 <div class="border-b border-slate-100 pb-3">
@@ -789,21 +790,21 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Username <span class="text-rose-500">*</span></label>
-                        <input type="text" name="username" value="{{ old('username') }}" placeholder="Username untuk login"
+                        <input type="text" name="username" value="<?php echo e(old('username')); ?>" placeholder="Username untuk login"
                                :required="role === 'kesiswaan' || role === 'admin'"
                                :disabled="role !== 'kesiswaan' && role !== 'admin'"
                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                     </div>
                     <div>
                         <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Email <span class="text-rose-500">*</span></label>
-                        <input type="email" name="email" value="{{ old('email') }}" placeholder="staf@sekolah.sch.id"
+                        <input type="email" name="email" value="<?php echo e(old('email')); ?>" placeholder="staf@sekolah.sch.id"
                                :disabled="role !== 'kesiswaan' && role !== 'admin'"
                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                     </div>
                 </div>
 
                 <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-                    <a href="{{ route('kesiswaan.users.index') }}"
+                    <a href="<?php echo e(route('kesiswaan.users.index')); ?>"
                        class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-2xl transition">Batal</a>
                     <button type="submit"
                             class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm shadow-sky-200 transition">
@@ -815,4 +816,6 @@
 
     </form>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.kesiswaan', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\www\Soul\resources\views/kesiswaan/users/create.blade.php ENDPATH**/ ?>

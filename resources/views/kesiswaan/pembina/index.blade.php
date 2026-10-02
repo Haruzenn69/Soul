@@ -39,11 +39,6 @@
             </div>
 
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
-                <div class="px-4 py-2.5 bg-white/15 backdrop-blur border border-white/20 rounded-2xl text-center">
-                    <div class="text-lg font-black leading-none">{{ $pembinas->total() }}</div>
-                    <div class="text-[10px] font-bold text-white/80 uppercase tracking-wider mt-0.5">Total Pembina</div>
-                </div>
-
                 <a href="{{ route('kesiswaan.users.create') }}"
                    class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,17 +50,7 @@
         </div>
     </div>
 
-    {{-- ALERT MESSAGES --}}
-    @if (session('success'))
-        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-2xl shadow-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if (session('error'))
-        <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-2xl shadow-sm">
-            {{ session('error') }}
-        </div>
-    @endif
+    {{-- Notifikasi success/error ditampilkan oleh layouts.kesiswaan --}}
     @if ($errors->any())
         <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-2xl shadow-sm">
             <ul class="list-disc list-inside space-y-1">
@@ -188,37 +173,10 @@
                             {{-- Ekskul Dibina --}}
                             <td class="py-3.5 px-5">
                                 <div class="flex flex-wrap gap-1 items-center">
-                                    @foreach ($p->ekskuls->take(3) as $ekskul)
-                                        <div class="flex items-center gap-1 px-2.5 py-1 rounded-full font-bold text-[11px] bg-sky-50 text-sky-700 border border-sky-100 group">
-                                            <span>{{ $ekskul->nama_ekskul }}</span>
-                                            {{-- Tombol lepas ekskul --}}
-                                            <form action="{{ route('kesiswaan.pembina.remove-ekskul', [$p, $ekskul]) }}" method="POST"
-                                                  onsubmit="return confirm('Lepas {{ $ekskul->nama_ekskul }} dari {{ $p->nama }}?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" title="Lepas ekskul"
-                                                        class="w-3.5 h-3.5 rounded-full bg-sky-200 hover:bg-rose-400 text-sky-700 hover:text-white flex items-center justify-center transition ml-0.5 opacity-60 group-hover:opacity-100">
-                                                    <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    @endforeach
-                                    @if ($p->ekskuls->count() > 3)
-                                        <span class="px-2.5 py-1 rounded-full font-bold text-[11px] bg-slate-100 text-slate-500 border border-slate-200">
-                                            +{{ $p->ekskuls->count() - 3 }} lainnya
-                                        </span>
-                                    @endif
-                                    @if ($p->ekskuls->count() < 4)
-                                        {{-- Tombol assign ekskul --}}
-                                        <button type="button"
-                                                onclick="openAssign({{ $p->id }}, '{{ e($p->nama) }}')"
-                                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-bold text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                                            Tambah Ekskul
-                                        </button>
-                                    @else
-                                        <span class="px-2.5 py-1 rounded-full text-[11px] bg-amber-50 text-amber-600 border border-amber-200 font-bold">Penuh (4/4)</span>
-                                    @endif
+                                    <button type="button" onclick="document.getElementById('modal-kelola-{{ $p->id }}').showModal()"
+                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-bold text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition">
+                                        Kelola Ekskul
+                                    </button>
                                 </div>
                             </td>
 
@@ -269,55 +227,54 @@
 
 </div>
 
-{{-- MODAL ASSIGN EKSKUL --}}
-<dialog id="modal-assign-ekskul" class="rounded-3xl backdrop:bg-slate-900/40 p-0 w-full max-w-sm shadow-2xl border border-sky-100">
-    <form id="form-assign-ekskul" method="POST" class="p-6 space-y-4 bg-white">
-        @csrf
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div>
-                <h2 class="text-sm font-extrabold text-slate-900">Tugaskan Ekskul</h2>
-                <p id="assign-pembina-label" class="text-xs text-slate-400 mt-0.5">Pilih ekskul untuk ditugaskan</p>
+@foreach ($pembinas as $p)
+    <dialog id="modal-kelola-{{ $p->id }}" class="rounded-3xl backdrop:bg-slate-900/40 p-0 w-full max-w-lg shadow-2xl border border-sky-100">
+        <div class="p-6 space-y-4 bg-white">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div>
+                    <h2 class="text-sm font-extrabold text-slate-900">Kelola Ekskul</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">{{ $p->nama }} · {{ $p->ekskuls->count() }}/4 ekskul</p>
+                </div>
+                <button type="button" onclick="this.closest('dialog').close()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center">×</button>
             </div>
-            <button type="button" onclick="this.closest('dialog').close()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
 
-        <div>
-            <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Pilih Ekskul <span class="text-rose-500">*</span></label>
-            <select name="ekskul_id" required
-                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
-                <option value="" disabled selected>Pilih ekskul...</option>
-                @foreach ($ekskulList as $ekskul)
-                    <option value="{{ $ekskul->id }}"
-                            {{ $ekskul->pembina_id ? 'data-sudah-ada=true' : '' }}>
-                        {{ $ekskul->nama_ekskul }}{{ $ekskul->pembina_id ? ' (sudah ada pembina)' : '' }}
-                    </option>
-                @endforeach
-            </select>
-            <p class="text-[10px] text-slate-400 mt-1">Jika ekskul sudah punya pembina, pembina lama akan diganti.</p>
-        </div>
+            <div class="space-y-2">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wide">Ekskul yang dibina</h3>
+                @forelse ($p->ekskuls as $ekskul)
+                    <div class="flex items-center justify-between gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                        <div>
+                            <p class="text-xs font-bold text-slate-800">{{ $ekskul->nama_ekskul }}</p>
+                            <p class="text-[10px] mt-0.5 text-slate-400">Ditugaskan ke pembina ini</p>
+                        </div>
+                        <form action="{{ route('kesiswaan.pembina.remove-ekskul', [$p, $ekskul]) }}" method="POST" onsubmit="return confirm('Lepas penugasan {{ $ekskul->nama_ekskul }} dari {{ $p->nama }}?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="px-3 py-1.5 rounded-xl text-[11px] font-bold bg-rose-50 text-rose-600 hover:bg-rose-100">
+                                Tidak Membina Lagi
+                            </button>
+                        </form>
+                    </div>
+                @empty
+                    <p class="text-xs text-slate-400 py-2">Belum ada ekskul yang dibina.</p>
+                @endforelse
+            </div>
 
-        <div class="flex gap-2.5 pt-3 border-t border-slate-100">
-            <button type="button" onclick="this.closest('dialog').close()"
-                    class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-2xl transition">
-                Batal
-            </button>
-            <button type="submit"
-                    class="flex-1 px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm shadow-sky-200 transition">
-                Tugaskan
-            </button>
+            @if ($p->ekskuls->count() < 4)
+                <form action="{{ route('kesiswaan.pembina.assign-ekskul', $p) }}" method="POST" class="pt-3 border-t border-slate-100 space-y-3">
+                    @csrf
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide">Tambah ekskul</label>
+                    <select name="ekskul_id" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800">
+                        <option value="" disabled selected>Pilih ekskul...</option>
+                        @foreach ($ekskulList->whereNull('pembina_id') as $ekskul)
+                            <option value="{{ $ekskul->id }}">{{ $ekskul->nama_ekskul }}</option>
+                        @endforeach
+                    </select>
+                    <button type="submit" class="w-full px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl">Tambah Ekskul</button>
+                </form>
+            @else
+                <p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded-xl p-3">Batas maksimal 4 ekskul per pembina tercapai.</p>
+            @endif
         </div>
-    </form>
-</dialog>
-
-<script>
-    function openAssign(pembinaId, pembinaName) {
-        const form = document.getElementById('form-assign-ekskul');
-        form.action = '/kesiswaan/pembina/' + pembinaId + '/assign-ekskul';
-        document.getElementById('assign-pembina-label').textContent = 'Pilih ekskul untuk ' + pembinaName;
-        form.querySelector('[name=ekskul_id]').selectedIndex = 0;
-        document.getElementById('modal-assign-ekskul').showModal();
-    }
-</script>
+    </dialog>
+@endforeach
 @endsection

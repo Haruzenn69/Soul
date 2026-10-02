@@ -17,9 +17,12 @@ class EkskulController extends Controller
         $ekskuls = Ekskul::with(['pembina', 'pelatih'])
             ->when($request->filled('q'), function ($query) use ($request) {
                 $q = $request->input('q');
-                $query->where('nama_ekskul', 'like', "%{$q}%")
-                    ->orWhereHas('pembina', fn ($p) => $p->where('nama', 'like', "%{$q}%"));
+                $query->where(function ($search) use ($q) {
+                    $search->where('nama_ekskul', 'like', "%{$q}%")
+                        ->orWhereHas('pembina', fn ($p) => $p->where('nama', 'like', "%{$q}%"));
+                });
             })
+            ->when(in_array($request->input('kategori'), ['Olahraga', 'Seni', 'Bela Diri', 'Bahasa', 'Lainnya'], true), fn ($q) => $q->where('kategori', $request->input('kategori')))
             ->when($request->input('status') === 'aktif', fn ($q) => $q->where('status', true))
             ->when($request->input('status') === 'nonaktif', fn ($q) => $q->where('status', false))
             ->when($request->input('rekrutmen') === 'buka', fn ($q) => $q->where('is_open_recruitment', true))
@@ -57,25 +60,25 @@ class EkskulController extends Controller
     {
         $data = $request->validate([
             'nama_ekskul' => ['required', 'string', 'max:255'],
+            'kategori' => ['required', 'in:Olahraga,Seni,Bela Diri,Bahasa,Lainnya'],
             'pembina_id'  => ['nullable', 'exists:pembinas,id'],
             'deskripsi'   => ['nullable', 'string'],
             'jadwal'      => ['nullable', 'string', 'max:255'],
         ]);
-
         Ekskul::create($data);
 
-        return back()->with('success', "Ekskul {$data['nama_ekskul']} berhasil ditambahkan. Pembina dapat ditugaskan di halaman Data Pembina.");
+        return back()->with('success', "Ekskul {$data['nama_ekskul']} berhasil ditambahkan.");
     }
 
     public function update(Request $request, Ekskul $ekskul): RedirectResponse
     {
         $data = $request->validate([
             'nama_ekskul' => ['required', 'string', 'max:255'],
+            'kategori' => ['required', 'in:Olahraga,Seni,Bela Diri,Bahasa,Lainnya'],
             'pembina_id' => ['required', 'exists:pembinas,id'],
             'deskripsi' => ['nullable', 'string'],
             'jadwal' => ['nullable', 'string', 'max:255'],
         ]);
-
         if ($ekskul->pembina_id != $data['pembina_id']) {
             $pembina = Pembina::findOrFail($data['pembina_id']);
             $pembinaEkskulCount = Ekskul::where('pembina_id', $pembina->id)->count();
