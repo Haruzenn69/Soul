@@ -3,10 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\URL; // 1. Tambahkan import ini
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL; // 1. Tambahkan import ini
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -73,33 +72,48 @@ class AppServiceProvider extends ServiceProvider
 
     private function runPendingMigrations(): void
     {
+        $migrator = $this->app['migrator'];
+        $migrator->setConnection($this->app['db']->getDefaultConnection());
+        $repository = $migrator->getRepository();
+        $files = $migrator->getMigrationFiles([$this->app->databasePath('migrations')]);
+
+        if ($repository->repositoryExists()
+            && array_diff(array_keys($files), $repository->getRan()) === []) {
+            return;
+        }
+
+        $lock = @fopen(storage_path('framework/auto-migrate.lock'), 'c');
+
+        if ($lock === false) {
+            throw new \RuntimeException('Unable to open the automatic migration lock file.');
+        }
+
         try {
-            $lock = Cache::lock('auto-migrate', 120);
-
-            if (! $lock->get()) {
-                return;
+            if (! flock($lock, LOCK_EX)) {
+                throw new \RuntimeException('Unable to acquire the automatic migration lock.');
             }
 
-            try {
-                $migrator = $this->app['migrator'];
-                $migrator->setConnection($this->app['db']->getDefaultConnection());
-                $migrator->repository()->ensureRepository();
+            if (! $repository->repositoryExists()) {
+                $repository->createRepository();
+            }
 
-                $files = $migrator->getMigrationFiles([$this->app->databasePath('migrations')]);
-                $ran = $migrator->repository()->getRan();
+            $ran = $repository->getRan();
+            $pending = array_diff(array_keys($files), $ran);
 
-                $hasPending = collect($files)
-                    ->keys()
-                    ->contains(fn ($name) => ! in_array($name, $ran, true));
+            if ($pending !== []) {
+                $exitCode = Artisan::call('migrate', ['--force' => true]);
 
-                if ($hasPending) {
-                    Artisan::call('migrate', ['--force' => true]);
+                if ($exitCode !== 0) {
+                    $output = trim(Artisan::output());
+                    throw new \RuntimeException(
+                        'Automatic database migration failed.'
+                        .($output !== '' ? "\n".$output : ''),
+                    );
                 }
-            } finally {
-                $lock->release();
             }
-        } catch (\Throwable $e) {
-            report($e);
+        } finally {
+            flock($lock, LOCK_UN);
+            fclose($lock);
         }
     }
 }

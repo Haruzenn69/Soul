@@ -145,19 +145,19 @@ class RekapAbsensiService
     /**
      * Daftar bulan Y-m yang memiliki data presensi di ekskul tersebut.
      * Dipakai seragam oleh ketua, pembina, dan siswa.
+     *
+     * Query bulan unik langsung di level database (tanpa memuat seluruh
+     * baris presensi) supaya tetap ringan walau data bertambah banyak.
      */
     protected function availableMonths(Ekskul $ekskul): Collection
     {
-        $bulanTersedia = Presensi::whereHas('pendaftaran', function ($query) use ($ekskul) {
-            $query->where('ekskul_id', $ekskul->id);
-        })
-            ->whereHas('kegiatan')
-            ->with('kegiatan')
-            ->get()
-            ->map(fn (Presensi $p) => $p->kegiatan->tanggal_kegiatan->format('Y-m'))
-            ->unique()
-            ->sortDesc()
-            ->values();
+        $bulanTersedia = Presensi::query()
+            ->join('kegiatans', 'kegiatans.id', '=', 'presensis.kegiatan_id')
+            ->whereHas('pendaftaran', fn ($query) => $query->where('ekskul_id', $ekskul->id))
+            ->selectRaw("DATE_FORMAT(kegiatans.tanggal_kegiatan, '%Y-%m') as bulan")
+            ->distinct()
+            ->orderByDesc('bulan')
+            ->pluck('bulan');
 
         return $bulanTersedia->isEmpty() ? collect([now()->format('Y-m')]) : $bulanTersedia;
     }
