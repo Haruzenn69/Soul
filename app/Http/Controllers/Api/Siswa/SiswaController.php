@@ -364,6 +364,7 @@ class SiswaController extends ApiController
             'ekskul' => $ekskul ? (new EkskulResource($ekskul))->resolve() : null,
             'periode' => $periode,
             'penilaian' => $penilaian ? (new PenilaianResource($penilaian))->resolve() : null,
+            'rekap' => $pendaftaran ? Penilaian::kehadiran($pendaftaran, $periode) : null,
         ]);
     }
 

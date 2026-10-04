@@ -15,14 +15,18 @@ class FaqController extends ApiController
 
     public function index(Request $request): JsonResponse
     {
-        $faqs = $this->ekskul()->faqs()
+        $base = $this->ekskul()->faqs();
+
+        $faqs = (clone $base)
             ->when($request->filled('status') && $request->input('status') !== 'semua', fn ($query) => $query->where('status', $request->input('status')))
             ->orderByRaw("CASE status WHEN 'pending' THEN 0 ELSE 1 END")
             ->latest()->paginate(25);
 
         return $this->ok([
+            'total' => (clone $base)->count(),
+            'pending_count' => (clone $base)->where('status', Faq::STATUS_PENDING)->count(),
+            'answered_count' => (clone $base)->where('status', Faq::STATUS_ANSWERED)->count(),
             'faqs' => $faqs,
-            'pending_count' => (clone $this->ekskul()->faqs())->where('status', Faq::STATUS_PENDING)->count(),
         ]);
     }
 
