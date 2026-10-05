@@ -8,8 +8,12 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
                 <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Tahun Ajaran</h1>
-                <p class="text-xs text-slate-400 mt-0.5">Kelola tahun ajaran, kelas, dan proses kenaikan kelas siswa</p>
+                <p class="text-xs text-slate-400 mt-0.5">Kelola tahun ajaran, pantau kelas, dan proses kenaikan kelas siswa</p>
             </div>
+            <a href="{{ route('kesiswaan.kelas.index') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-sky-100 rounded-xl text-xs font-bold text-sky-700 hover:bg-sky-50 shadow-sm transition">
+                <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                Kelola & Buat Kelas di Data Kelas
+            </a>
         </div>
 
         {{-- STATISTIK --}}
@@ -163,60 +167,9 @@
                                 @endif
                             @endforeach
                         </div>
-
-                        {{-- Add Kelas Button (only for aktif/nonaktif) --}}
-                        @if($ta->status !== 'historis')
-                            <div class="px-5 py-3 border-t border-sky-50 bg-sky-50/30">
-                                <button type="button" onclick="document.getElementById('add-kelas-{{ $ta->id }}').classList.toggle('hidden')"
-                                    class="text-xs font-bold text-sky-600 hover:text-sky-800 flex items-center gap-1 transition">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                                    Tambah Kelas
-                                </button>
-                                <form id="add-kelas-{{ $ta->id }}" method="POST" action="{{ route('kesiswaan.tahun-ajaran.kelas.store', $ta) }}"
-                                    class="hidden mt-3 flex flex-col sm:flex-row gap-2">
-                                    @csrf
-                                    <select name="tingkat" required class="px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs">
-                                        <option value="">Tingkat</option>
-                                        @foreach(config('kelas.tingkat') as $code => $label)
-                                            <option value="{{ $code }}">{{ $label }}</option>
-                                        @endforeach
-                                    </select>
-                                    <select name="jurusan" required class="px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs">
-                                        <option value="">Jurusan</option>
-                                        @foreach(config('kelas.jurusan') as $code => $labels)
-                                            <option value="{{ $code }}">{{ strtoupper($code) }}</option>
-                                        @endforeach
-                                    </select>
-                                    <input type="number" name="rombel" min="1" required placeholder="Rombel" class="w-20 px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs">
-                                    <button type="submit" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-xl transition whitespace-nowrap">Tambah</button>
-                                </form>
-                            </div>
-                        @endif
                     @else
                         <div class="p-8 text-center text-xs text-slate-400">
                             Belum ada kelas di tahun ajaran ini.
-                            @if($ta->status !== 'historis')
-                                <button type="button" onclick="document.getElementById('add-kelas-{{ $ta->id }}').classList.toggle('hidden')"
-                                    class="text-sky-600 hover:text-sky-800 font-bold underline ml-1">Tambah kelas</button>
-                                <form id="add-kelas-{{ $ta->id }}" method="POST" action="{{ route('kesiswaan.tahun-ajaran.kelas.store', $ta) }}"
-                                    class="hidden mt-3 flex flex-col sm:flex-row gap-2 justify-center">
-                                    @csrf
-                                    <select name="tingkat" required class="px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs">
-                                        <option value="">Tingkat</option>
-                                        @foreach(config('kelas.tingkat') as $code => $label)
-                                            <option value="{{ $code }}">{{ $label }}</option>
-                                        @endforeach
-                                    </select>
-                                    <select name="jurusan" required class="px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs">
-                                        <option value="">Jurusan</option>
-                                        @foreach(config('kelas.jurusan') as $code => $labels)
-                                            <option value="{{ $code }}">{{ strtoupper($code) }}</option>
-                                        @endforeach
-                                    </select>
-                                    <input type="number" name="rombel" min="1" required placeholder="Rombel" class="w-20 px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs">
-                                    <button type="submit" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-xl transition whitespace-nowrap">Tambah</button>
-                                </form>
-                            @endif
                         </div>
                     @endif
                 </div>

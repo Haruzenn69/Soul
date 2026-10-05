@@ -312,57 +312,5 @@ class TahunAjaranController extends Controller
         return back()->with('success', "{$result} siswa berhasil ditempatkan ke kelas {$kela->nama}.");
     }
 
-    /**
-     * Add a new kelas to a tahun ajaran.
-     */
-    public function storeKelas(Request $request, TahunAjaran $tahunAjaran): RedirectResponse
-    {
-        abort_unless($tahunAjaran->status !== 'historis', 403, 'Tidak bisa menambah kelas ke tahun ajaran historis.');
 
-        $data = Validator::make($request->all(), [
-            'tingkat' => ['required', 'in:'.implode(',', array_keys(config('kelas.tingkat')))],
-            'jurusan' => ['required', Rule::in(array_keys(config('kelas.jurusan')))],
-            'rombel' => ['required', 'integer', 'min:1'],
-        ])->validate();
-
-        $labelTingkat = config("kelas.tingkat.{$data['tingkat']}");
-        $labelJurusan = config("kelas.jurusan.{$data['jurusan']}.{$data['tingkat']}");
-        $nama = trim("{$labelTingkat} {$labelJurusan} {$data['rombel']}");
-
-        $exists = Kelas::where('nama', $nama)
-            ->where('tahun_ajaran_id', $tahunAjaran->id)
-            ->exists();
-
-        if ($exists) {
-            return back()->with('error', "Kelas {$nama} sudah ada di tahun ajaran ini.");
-        }
-
-        Kelas::create([
-            'nama' => $nama,
-            'tingkat' => $data['tingkat'],
-            'jurusan' => $data['jurusan'],
-            'rombel' => $data['rombel'],
-            'tahun_ajaran_id' => $tahunAjaran->id,
-        ]);
-
-        return back()->with('success', "Kelas {$nama} berhasil ditambahkan.");
-    }
-
-    /**
-     * Delete a kelas from a tahun ajaran.
-     */
-    public function destroyKelas(TahunAjaran $tahunAjaran, Kelas $kela): RedirectResponse
-    {
-        abort_unless((int) $kela->tahun_ajaran_id === (int) $tahunAjaran->id, 404);
-        abort_unless($tahunAjaran->status !== 'historis', 403);
-
-        if ($kela->siswas()->exists()) {
-            return back()->with('error', "Kelas {$kela->nama} masih memiliki siswa.");
-        }
-
-        $nama = $kela->nama;
-        $kela->delete();
-
-        return back()->with('success', "Kelas {$nama} berhasil dihapus.");
-    }
 }

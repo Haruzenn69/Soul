@@ -28,7 +28,8 @@
         ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('kesiswaan.dashboard'), 'is' => 'kesiswaan.dashboard'],
         ['icon' => 'users', 'label' => 'Akun Pengguna', 'url' => route('kesiswaan.users.index'), 'is' => 'kesiswaan.users.*'],
         ['icon' => 'building', 'label' => 'Data Ekskul', 'url' => route('kesiswaan.ekskuls.index'), 'is' => 'kesiswaan.ekskuls.*'],
-        ['icon' => 'calendar', 'label' => 'Tahun Ajaran', 'url' => route('kesiswaan.tahun-ajaran.index'), 'is' => ['kesiswaan.tahun-ajaran.*', 'kesiswaan.kelas.*']],
+        ['icon' => 'document', 'label' => 'Data Kelas', 'url' => route('kesiswaan.kelas.index'), 'is' => 'kesiswaan.kelas.*'],
+        ['icon' => 'calendar', 'label' => 'Tahun Ajaran', 'url' => route('kesiswaan.tahun-ajaran.index'), 'is' => 'kesiswaan.tahun-ajaran.*'],
         ['icon' => 'users', 'label' => 'Data Siswa', 'url' => route('kesiswaan.siswa.index'), 'is' => 'kesiswaan.siswa.*'],
         ['icon' => 'user', 'label' => 'Data Pembina', 'url' => route('kesiswaan.pembina.index'), 'is' => 'kesiswaan.pembina.*'],
         ['icon' => 'user-check', 'label' => 'Data Pelatih', 'url' => route('kesiswaan.pelatih.index'), 'is' => 'kesiswaan.pelatih.*'],
@@ -92,6 +93,16 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                     </span>
                     Data Ekskul
+                </a>
+
+                <a href="{{ route('kesiswaan.kelas.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('kesiswaan.kelas.*') ? 'bg-sky-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                    @if(request()->routeIs('kesiswaan.kelas.*'))
+                        <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-blue-500"></span>
+                    @endif
+                    <span class="text-base flex items-center justify-center w-4 h-4">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    </span>
+                    Data Kelas
                 </a>
 
                 <a href="{{ route('kesiswaan.tahun-ajaran.index') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('kesiswaan.tahun-ajaran.*') ? 'bg-sky-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">

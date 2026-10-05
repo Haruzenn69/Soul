@@ -93,6 +93,7 @@ class EkskulController extends Controller
                     'pembina_id' => "Pembina {$pembina->nama} sudah membina 4 ekskul (batas maksimal 4 ekskul per pembina).",
                 ])->withInput();
             }
+        }
 
         Ekskul::create($data);
 
