@@ -152,6 +152,17 @@
     }
     .ps-logo:hover { background: rgba(240, 249, 255, .7); }
     .ps-logo:focus-visible { outline: 2px solid rgba(56, 189, 248, .6); outline-offset: 2px; }
+    body.ps-collapsed .ps-logo {
+        justify-content: center;
+        padding: 2px 0 8px;
+    }
+    body.ps-collapsed .ps-logo-box {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+    body.ps-collapsed .ps-pill { border-radius: 22px; }
     .ps-logo-box {
         width: 42px;
         height: 42px;
@@ -210,6 +221,7 @@
         transition: transform .18s ease;
     }
     .ps-group[open] .ps-group-chevron { transform: rotate(180deg); }
+    body.ps-collapsed .ps-group-chevron { display: none; }
     .ps-submenu {
         display: flex;
         flex-direction: column;
@@ -293,9 +305,8 @@
     body.ps-collapsed .ps-group[open] {
         position: relative;
         width: 100%;
-        height: 36px;
         min-height: 36px;
-        flex: 0 0 36px;
+        flex: 0 0 auto;
     }
     body.ps-collapsed .ps-group .ps-submenu {
         position: absolute;
@@ -389,10 +400,17 @@
         border-radius: 0 9999px 9999px 0;
         background: #3b82f6;
     }
-    body.ps-collapsed .ps-item { justify-content: center; padding: 10px 0; }
+    body.ps-collapsed .ps-item {
+        justify-content: center;
+        gap: 0;
+        height: 36px;
+        min-height: 36px;
+        padding: 0;
+    }
     body.ps-collapsed .ps-item:hover { transform: none; }
     body.ps-collapsed .ps-item .ps-bar { display: none; }
     body.ps-collapsed .ps-item .ps-lb { display: none; }
+    body.ps-collapsed .ps-nav { gap: 6px; }
 
     .ps-tip {
         position: absolute;
@@ -571,6 +589,7 @@
     /* Keep only the avatar in the compact rail; remove the profile card chrome. */
     body.ps-collapsed .ps-user {
         justify-content: center;
+        min-height: 36px;
         padding: 0;
         background: transparent;
         border: 0;

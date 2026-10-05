@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Models\Pendaftaran;
 use App\Models\PengajuanKeluar;
+use App\Models\RiwayatJabatan;
 use App\Models\Siswa;
+use App\Services\ArsipEkskulService;
 use App\Services\NotifikasiService;
 use App\Support\TableKit;
 use Illuminate\Http\Request;
@@ -68,7 +70,22 @@ class PengajuanKeluarController extends Controller
             $pengajuanKeluar->update($validated);
 
             if ($validated['status'] === PengajuanKeluar::STATUS_DITERIMA) {
+                $ekskul = $pengajuanKeluar->ekskul;
+
                 $pengajuanKeluar->siswa->update(['jabatan' => 'siswa']);
+
+                // Kalau yang keluar adalah ketua, periodenya ditutup supaya
+                // tidak menggantung aktif dan masuk daftar arsip.
+                if ($ekskul) {
+                    app(ArsipEkskulService::class)
+                        ->akhiriPeriodeKetua(
+                            $ekskul,
+                            $pengajuanKeluar->siswa,
+                            null,
+                            RiwayatJabatan::ALASAN_KELUAR
+                        );
+                }
+
                 Pendaftaran::where('siswa_id', $pengajuanKeluar->siswa_id)
                     ->where('ekskul_id', $pengajuanKeluar->ekskul_id)
                     ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])

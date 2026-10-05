@@ -63,7 +63,7 @@
     </style>
     @include('partials.responsive-tables')
 </head>
-<body class="ketua-layout bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased flex min-h-screen overflow-x-hidden selection:bg-sky-100 selection:text-sky-700">
+<body class="ketua-layout bg-gradient-to-br from-sky-50 via-white to-amber-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 text-slate-800 dark:text-slate-200 font-sans antialiased flex min-h-screen overflow-x-hidden selection:bg-sky-100 dark:selection:bg-sky-900 selection:text-sky-700 dark:selection:text-sky-300">
 
     @php $namaEkskul = auth()->user()->siswa?->pendaftarans()->where('status', 'diterima')->first()?->ekskul->nama_ekskul ?? ''; @endphp@include('partials.pill-sidebar', [
     'psTitle' => 'Menu Ketua',
@@ -98,10 +98,10 @@
     <div id="sidebar-overlay" aria-hidden="true" class="hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-[2px] md:hidden" onclick="closeSidebar()"></div>
 
     <!-- MOBILE SIDEBAR -->
-    <div id="sidebar-mobile" role="dialog" aria-modal="true" aria-label="Menu navigasi Ketua" class="hidden fixed inset-y-0 left-0 z-50 w-[min(21rem,88vw)] bg-white border-r border-sky-100 overflow-hidden flex flex-col justify-between p-4 md:p-5 md:hidden shadow-2xl">
+    <div id="sidebar-mobile" role="dialog" aria-modal="true" aria-label="Menu navigasi Ketua" class="hidden fixed inset-y-0 left-0 z-50 w-[min(21rem,88vw)] bg-white dark:bg-neutral-900 border-r border-sky-100 dark:border-neutral-800 overflow-hidden flex flex-col justify-between p-4 md:p-5 md:hidden shadow-2xl">
         <div class="absolute inset-0 pointer-events-none">
-            <div class="absolute -top-24 -right-16 w-64 h-64 rounded-full bg-sky-100/80 blur-3xl animate-blob"></div>
-            <div class="absolute -bottom-24 -left-16 w-64 h-64 rounded-full bg-amber-100/80 blur-3xl animate-blob" style="animation-delay: 3s"></div>
+            <div class="absolute -top-24 -right-16 w-64 h-64 rounded-full bg-sky-100/80 dark:bg-sky-900/30 blur-3xl animate-blob"></div>
+            <div class="absolute -bottom-24 -left-16 w-64 h-64 rounded-full bg-amber-100/80 dark:bg-amber-900/30 blur-3xl animate-blob" style="animation-delay: 3s"></div>
         </div>
 
         <div class="relative h-full flex flex-col overflow-y-auto">
@@ -111,11 +111,11 @@
                         SOUL
                     </div>
                     <div>
-                        <h1 class="font-extrabold text-sm tracking-tight text-slate-900 leading-none">SOUL</h1>
+                        <h1 class="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white leading-none">SOUL</h1>
                         <span class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Panel Ketua {{ $namaEkskul }}</span>
                     </div>
                 </div>
-                <button type="button" aria-label="Tutup menu navigasi" onclick="closeSidebar()" class="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors">
+                <button type="button" aria-label="Tutup menu navigasi" onclick="closeSidebar()" class="w-8 h-8 rounded-full bg-slate-50 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-neutral-700 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
@@ -125,7 +125,7 @@
                 <span class="text-[9px] font-semibold text-slate-300">PANEL KETUA</span>
             </div>
             <nav aria-label="Menu utama mobile" class="space-y-1.5">
-                <a href="{{ route('ketua.dashboard') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.dashboard') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                <a href="{{ route('ketua.dashboard') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('ketua.dashboard') ? 'bg-gradient-to-r from-sky-100 to-blue-100 dark:from-sky-950/30 dark:to-blue-950/30 text-sky-800 dark:text-sky-300 rounded-xl font-semibold shadow-sm shadow-sky-100 dark:shadow-sky-900/30' : 'text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-sky-950/30 hover:text-sky-700 dark:hover:text-sky-300 rounded-xl font-medium' }} text-xs transition-all">
                     @if(request()->routeIs('ketua.dashboard'))
                         <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                     @endif
@@ -339,7 +339,7 @@
     <div class="flex-1 flex flex-col min-w-0 w-full ps-page">
 
         <!-- TOP NAVBAR HEADER -->
-        <header class="px-4 md:px-8 py-4 bg-white/70 backdrop-blur-lg border-b border-sky-100 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
+        <header class="px-4 md:px-8 py-4 bg-white/70 dark:bg-neutral-900/70 backdrop-blur-lg border-b border-sky-100 dark:border-neutral-800 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
             <!-- KIRI: Hamburger (Mobile) + Logo + Search -->
             <div class="flex items-center gap-3 flex-1 min-w-0">
                 <button type="button" aria-label="Buka menu navigasi" aria-controls="sidebar-mobile" aria-expanded="false" onclick="openSidebar()" class="w-9 h-9 rounded-full bg-white border border-sky-100 flex items-center justify-center text-slate-500 md:hidden shadow-sm shrink-0">
@@ -359,16 +359,16 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </span>
-                    <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari kegiatan, anggota, pendaftaran..." class="w-full pl-10 pr-4 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+                    <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari kegiatan, anggota, pendaftaran..." class="w-full pl-10 pr-4 py-2 bg-sky-50/70 dark:bg-neutral-800/70 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition-all">
                 </form>
             </div>
 
             <!-- KANAN: Info User + Notifikasi + Logout -->
             <div class="flex items-center gap-2 md:gap-3 shrink-0">
-                <div class="bg-sky-50 text-sky-700 border border-sky-100 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 hidden sm:block">
+                <div class="bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-800/50 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 hidden sm:block">
                     <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Ketua
                 </div>
-                <a href="{{ route('ketua.notifikasi') }}" aria-label="Buka notifikasi" class="w-9 h-9 rounded-xl bg-white border border-sky-100 flex items-center justify-center text-xs relative text-slate-600 hover:bg-sky-50 hover:border-sky-200 transition-all shadow-sm">
+                <a href="{{ route('ketua.notifikasi') }}" aria-label="Buka notifikasi" class="w-9 h-9 rounded-xl bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 flex items-center justify-center text-xs relative text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-700 hover:border-sky-200 dark:hover:border-neutral-700 transition-all shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                     </svg>
@@ -378,7 +378,7 @@
                 </a>
                 <form method="POST" action="{{ route('logout') }}" class="hidden sm:block">
                     @csrf
-                    <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-400 px-4 py-2 rounded-lg text-xs font-semibold border border-red-100 transition shadow-sm">
+                    <button type="submit" class="bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-950/50 text-red-500 dark:text-red-400 px-4 py-2 rounded-lg text-xs font-semibold border border-red-100 dark:border-red-900/50 transition shadow-sm">
                         Logout
                     </button>
                 </form>
@@ -387,12 +387,12 @@
 
         <main class="w-full min-w-0 p-4 md:p-8 space-y-6 overflow-y-auto">
             @if(session('success'))
-                <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-xl">
+                <div class="p-4 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-semibold rounded-xl">
                     {{ session('success') }}
                 </div>
             @endif
             @if(session('error'))
-                <div class="p-4 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-xl">
+                <div class="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-xs font-semibold rounded-xl">
                     {{ session('error') }}
                 </div>
             @endif

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\EkskulInfo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -78,6 +79,38 @@ class Ekskul extends Model
         return $this->hasMany(EkskulGaleri::class)->latest();
     }
 
+    public function riwayatJabatans(): HasMany
+    {
+        return $this->hasMany(RiwayatJabatan::class);
+    }
+
+    public function riwayatKetua(): HasMany
+    {
+        return $this->riwayatJabatans()->where('jabatan', RiwayatJabatan::JABATAN_KETUA);
+    }
+
+    /**
+     * Periode ketua yang masih berjalan, bila ada.
+     */
+    public function periodeKetuaAktif(): ?RiwayatJabatan
+    {
+        return $this->riwayatKetua()
+            ->whereNull('selesai')
+            ->orderByDesc('mulai')
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    /**
+     * Semua periode ketua yang sudah selesai (data arsip).
+     */
+    public function periodeKetuaSelesai(): HasMany
+    {
+        return $this->riwayatKetua()
+            ->whereNotNull('selesai')
+            ->orderByDesc('selesai');
+    }
+
     public function ketua(): ?Siswa
     {
         return $this->pendaftarans()
@@ -89,6 +122,6 @@ class Ekskul extends Model
 
     public function getBidangAttribute(): string
     {
-        return \App\Support\EkskulInfo::bidang($this->nama_ekskul);
+        return EkskulInfo::bidang($this->nama_ekskul);
     }
 }
