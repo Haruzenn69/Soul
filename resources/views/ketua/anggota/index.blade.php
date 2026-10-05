@@ -10,13 +10,36 @@
         </div>
     </div>
 
-    @include('partials.table-filters', [
-        'action' => route('ketua.anggota.index'),
-        'placeholder' => 'Cari nama / NIS anggota...',
-        'filters' => [
-            ['name' => 'status', 'allLabel' => 'Semua Status', 'options' => ['diterima' => 'Aktif', 'peringatan' => 'Peringatan', 'nonaktif' => 'Nonaktif', 'keluar' => 'Keluar']],
-        ],
-    ])
+    @php
+        $statusOptions = ['diterima' => 'Aktif', 'peringatan' => 'Peringatan', 'nonaktif' => 'Nonaktif', 'keluar' => 'Keluar'];
+        $hasFilter = request()->filled('cari') || request()->filled('status') || $tampilArsip;
+    @endphp
+    <form method="GET" action="{{ route('ketua.anggota.index') }}" class="white-card-filter bg-white p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 flex flex-wrap items-center gap-3">
+        <div class="relative flex-1 min-w-[220px]">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </span>
+            <input type="search" name="cari" value="{{ request('cari') }}" placeholder="Cari nama / NIS anggota..."
+                class="w-full pl-9 pr-4 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+        </div>
+
+        <select name="status" onchange="this.form.submit()" class="px-3 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+            <option value="">Anggota Aktif</option>
+            @foreach ($statusOptions as $value => $label)
+                <option value="{{ $value }}" {{ request('status') === $value ? 'selected' : '' }}>{{ $label }}</option>
+            @endforeach
+            <option value="semua" {{ request('status') === 'semua' ? 'selected' : '' }}>Semua Status</option>
+        </select>
+
+        <select name="arsip" onchange="this.form.submit()" class="px-3 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+            <option value="0" {{ ! $tampilArsip ? 'selected' : '' }}>Tanpa Arsip</option>
+            <option value="1" {{ $tampilArsip ? 'selected' : '' }}>Tampilkan Arsip ({{ $arsipTotal }})</option>
+        </select>
+
+        @if($hasFilter)
+            <a href="{{ route('ketua.anggota.index') }}" class="px-3 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition">Reset</a>
+        @endif
+    </form>
 
     <div class="bg-white p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 mb-4">
         <p class="text-xs font-bold text-slate-500 mb-3 flex items-center gap-2">
@@ -148,7 +171,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-10 text-center text-slate-400">Belum ada anggota aktif atau nonaktif.</td>
+                        <td colspan="6" class="px-6 py-10 text-center text-slate-400">Tidak ada anggota yang sesuai dengan filter yang dipilih.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -156,5 +179,17 @@
         </div>
         @include('partials.table-pagination', ['rows' => $anggotas, 'label' => 'anggota'])
     </div>
+
+    {{-- ARSIP: hanya muncul saat filter "Tampilkan Arsip" aktif --}}
+    @if($tampilArsip)
+        <div class="h-6"></div>
+        @include('partials.anggota-arsip', [
+            'arsip' => $arsip,
+            'tampilArsip' => $tampilArsip,
+            'arsipAction' => route('ketua.anggota.index'),
+            'arsipShowEkskul' => false,
+            'arsipPeriodeRoute' => null,
+        ])
+    @endif
 </div>
 @endsection

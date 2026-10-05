@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Models\Pendaftaran;
 use App\Models\Siswa;
+use App\Services\ArsipEkskulService;
 use App\Services\NotifikasiService;
 use App\Support\TableKit;
 use Illuminate\Http\Request;
@@ -21,16 +22,22 @@ class AnggotaController extends Controller
 
         $totalAnggotas = (clone $base)->count();
 
+        // Tanpa filter status, hanya anggota aktif yang ditampilkan.
+        $statusDipilih = $request->input('status');
+        $scopeAktif = ! $request->filled('status') || $statusDipilih === 'semua';
+
+        // Angka legenda dihitung dari seluruh anggota agar tidak ikut terfilter.
+        $peringatanCount = (clone $base)->where('status', Pendaftaran::STATUS_PERINGATAN)->count();
+        $nonaktifCount = (clone $base)->where('status', Pendaftaran::STATUS_NONAKTIF)->count();
+        $keluarCount = (clone $base)->where('status', Pendaftaran::STATUS_KELUAR)->count();
+
         $query = (clone $base)
+            ->when($scopeAktif, fn ($query) => $query->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN]))
             ->when($request->filled('cari'), function ($query) use ($request) {
                 $cari = $request->input('cari');
                 $query->whereHas('siswa', fn ($s) => $s->where('nama', 'like', "%{$cari}%")->orWhere('nis', 'like', "%{$cari}%"));
             })
-            ->when($request->filled('status') && $request->input('status') !== 'semua', fn ($query) => $query->where('status', $request->input('status')));
-
-        $peringatanCount = (clone $query)->where('status', 'peringatan')->count();
-        $nonaktifCount = (clone $query)->where('status', 'nonaktif')->count();
-        $keluarCount = (clone $query)->where('status', 'keluar')->count();
+            ->when($request->filled('status') && $statusDipilih !== 'semua', fn ($query) => $query->where('status', $statusDipilih));
 
         [$sort, $direction] = TableKit::sort(['nama', 'nis', 'status', 'tanggal_daftar'], 'tanggal_daftar', 'desc');
 
@@ -40,7 +47,17 @@ class AnggotaController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('ketua.anggota.index', compact('anggotas', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'sort', 'direction'));
+        // Arsip hanya dirakit ketika filter diaktifkan; label filter memakai
+        // hitungan ringan yang tidak memuat detail.
+        $tampilArsip = $request->boolean('arsip');
+        $arsipService = app(ArsipEkskulService::class);
+        $arsipTotal = $arsipService->hitungTotal($ekskul);
+
+        $arsip = $tampilArsip
+            ? $arsipService->arsip($ekskul)
+            : ['ketuaSelesai' => collect(), 'anggotaNonaktif' => collect(), 'total' => $arsipTotal];
+
+        return view('ketua.anggota.index', compact('anggotas', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal'));
     }
 
     public function updateStatus(Request $request, Pendaftaran $pendaftaran)

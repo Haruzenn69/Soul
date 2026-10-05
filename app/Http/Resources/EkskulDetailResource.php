@@ -2,11 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Ekskul;
+use App\Models\Testimoni;
 use App\Support\MediaUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\Ekskul */
+/** @mixin Ekskul */
 class EkskulDetailResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -21,7 +23,12 @@ class EkskulDetailResource extends JsonResource
             'faqs' => FaqResource::collection($this->whenLoaded('faqs', $this->faqs, collect()))->resolve(),
             'kegiatans' => KegiatanResource::collection($this->whenLoaded('kegiatans', $this->kegiatans, collect()))->resolve(),
             'galeri_fotos' => collect($this->whenLoaded('galeris', $this->galeris, collect()))->pluck('foto')->map(fn ($p) => MediaUrl::for($p))->values(),
-            'has_submitted_testimoni' => false,
+            'has_submitted_testimoni' => $request->user()
+                ? $this->testimoniss()
+                    ->where('user_id', $request->user()->id)
+                    ->whereIn('status', [Testimoni::STATUS_PENDING, Testimoni::STATUS_APPROVED])
+                    ->exists()
+                : false,
         ];
     }
 }

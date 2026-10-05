@@ -2,11 +2,12 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Ekskul;
 use App\Support\MediaUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\Ekskul */
+/** @mixin Ekskul */
 class EkskulResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -34,6 +35,7 @@ class EkskulResource extends JsonResource
                 'id' => $this->pelatih->id,
                 'nama' => $this->pelatih->nama,
                 'no_hp' => $this->pelatih->no_hp,
+                'is_terverifikasi' => $this->pelatih->isTerverifikasi(),
             ] : null),
             'anggota_count' => $pendaftarans !== null
                 ? $pendaftarans->count()

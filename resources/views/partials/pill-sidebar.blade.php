@@ -152,6 +152,17 @@
     }
     .ps-logo:hover { background: rgba(240, 249, 255, .7); }
     .ps-logo:focus-visible { outline: 2px solid rgba(56, 189, 248, .6); outline-offset: 2px; }
+    body.ps-collapsed .ps-logo {
+        justify-content: center;
+        padding: 2px 0 8px;
+    }
+    body.ps-collapsed .ps-logo-box {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+    body.ps-collapsed .ps-pill { border-radius: 22px; }
     .ps-logo-box {
         width: 42px;
         height: 42px;
@@ -210,6 +221,7 @@
         transition: transform .18s ease;
     }
     .ps-group[open] .ps-group-chevron { transform: rotate(180deg); }
+    body.ps-collapsed .ps-group-chevron { display: none; }
     .ps-submenu {
         display: flex;
         flex-direction: column;
@@ -237,14 +249,64 @@
         height: 15px;
         flex: 0 0 auto;
     }
-    body.ps-collapsed .ps-group-chevron { display: none; }
+
+    /* Level 3: sub-sub-menu */
+    .ps-submenu3 {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin: 2px 0 2px 16px;
+        padding-left: 10px;
+        border-left: 1px dashed #bae6fd;
+    }
+    .ps-submenu3 a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 8px;
+        border-radius: 8px;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color .15s ease, color .15s ease;
+    }
+    .ps-submenu3 a:hover,
+    .ps-submenu3 a.ps-active { background: #f0f9ff; color: #0369a1; }
+    .ps-submenu3 a svg { width: 13px; height: 13px; flex: 0 0 auto; }
+    .ps-submenu details.ps-subgroup { position: relative; }
+    .ps-submenu details.ps-subgroup summary {
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 7px 10px;
+        border-radius: 9px;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color .15s ease, color .15s ease;
+    }
+    .ps-submenu details.ps-subgroup summary::-webkit-details-marker { display: none; }
+    .ps-submenu details.ps-subgroup summary:hover { background: #f0f9ff; color: #0369a1; }
+    .ps-submenu details.ps-subgroup[open] summary { background: #f0f9ff; color: #0369a1; }
+    .ps-submenu details.ps-subgroup summary svg { width: 15px; height: 15px; flex: 0 0 auto; }
+    .ps-sub-chevron {
+        margin-left: auto;
+        width: 12px !important;
+        height: 12px !important;
+        transition: transform .18s ease;
+        flex: 0 0 auto;
+    }
+    .ps-submenu details.ps-subgroup[open] .ps-sub-chevron { transform: rotate(180deg); }
+
     body.ps-collapsed .ps-group,
     body.ps-collapsed .ps-group[open] {
         position: relative;
         width: 100%;
-        height: 36px;
         min-height: 36px;
-        flex: 0 0 36px;
+        flex: 0 0 auto;
     }
     body.ps-collapsed .ps-group .ps-submenu {
         position: absolute;
@@ -338,10 +400,17 @@
         border-radius: 0 9999px 9999px 0;
         background: #3b82f6;
     }
-    body.ps-collapsed .ps-item { justify-content: center; padding: 10px 0; }
+    body.ps-collapsed .ps-item {
+        justify-content: center;
+        gap: 0;
+        height: 36px;
+        min-height: 36px;
+        padding: 0;
+    }
     body.ps-collapsed .ps-item:hover { transform: none; }
     body.ps-collapsed .ps-item .ps-bar { display: none; }
     body.ps-collapsed .ps-item .ps-lb { display: none; }
+    body.ps-collapsed .ps-nav { gap: 6px; }
 
     .ps-tip {
         position: absolute;
@@ -520,6 +589,7 @@
     /* Keep only the avatar in the compact rail; remove the profile card chrome. */
     body.ps-collapsed .ps-user {
         justify-content: center;
+        min-height: 36px;
         padding: 0;
         background: transparent;
         border: 0;
@@ -574,8 +644,18 @@
             @foreach ($psItems as $psItem)
                 @php
                     $psActive = isset($psItem['children'])
-                        ? collect($psItem['children'])->contains(fn ($child) => request()->routeIs((array) $child['is']))
-                        : request()->routeIs((array) $psItem['is']);
+                        ? collect($psItem['children'])->contains(function ($child) {
+                            // Check direct child
+                            if (isset($child['is']) && request()->routeIs((array) $child['is'])) return true;
+                            // Check grandchildren (level 3)
+                            if (isset($child['children'])) {
+                                return collect($child['children'])->contains(
+                                    fn ($gc) => isset($gc['is']) && request()->routeIs((array) $gc['is'])
+                                );
+                            }
+                            return false;
+                          })
+                        : (isset($psItem['is']) && request()->routeIs((array) $psItem['is']));
                 @endphp
                 @if (isset($psItem['children']))
                     <details class="ps-group" {{ $psActive ? 'open' : '' }}>
@@ -592,13 +672,42 @@
                         </summary>
                         <div class="ps-submenu" data-label="{{ $psItem['label'] }}">
                             @foreach ($psItem['children'] as $psChild)
-                                @php $psChildActive = request()->routeIs((array) $psChild['is']); @endphp
-                                <a href="{{ $psChild['url'] }}" class="{{ $psChildActive ? 'ps-active' : '' }}" aria-current="{{ $psChildActive ? 'page' : 'false' }}">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        {!! $psIconSvg[$psChild['icon']] ?? '' !!}
-                                    </svg>
-                                    <span>{{ $psChild['label'] }}</span>
-                                </a>
+                                @php $psChildActive = isset($psChild['is']) && request()->routeIs((array) $psChild['is']); @endphp
+                                @if (isset($psChild['children']))
+                                    {{-- Level 3: nested sub-menu --}}
+                                    @php
+                                        $psSubActive = collect($psChild['children'])->contains(
+                                            fn ($gc) => isset($gc['is']) && request()->routeIs((array) $gc['is'])
+                                        ) || $psChildActive;
+                                    @endphp
+                                    <details class="ps-subgroup" {{ $psSubActive ? 'open' : '' }}>
+                                        <summary class="{{ $psSubActive ? 'ps-active' : '' }}">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                {!! $psIconSvg[$psChild['icon']] ?? '' !!}
+                                            </svg>
+                                            <span>{{ $psChild['label'] }}</span>
+                                            <svg class="ps-sub-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                                        </summary>
+                                        <div class="ps-submenu3">
+                                            @foreach ($psChild['children'] as $psGc)
+                                                @php $psGcActive = isset($psGc['is']) && request()->routeIs((array) $psGc['is']); @endphp
+                                                <a href="{{ $psGc['url'] ?? '#' }}" class="{{ $psGcActive ? 'ps-active' : '' }}" aria-current="{{ $psGcActive ? 'page' : 'false' }}">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                        {!! $psIconSvg[$psGc['icon'] ?? 'users'] ?? '' !!}
+                                                    </svg>
+                                                    <span>{{ $psGc['label'] }}</span>
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    </details>
+                                @else
+                                    <a href="{{ $psChild['url'] ?? '#' }}" class="{{ $psChildActive ? 'ps-active' : '' }}" aria-current="{{ $psChildActive ? 'page' : 'false' }}">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            {!! $psIconSvg[$psChild['icon']] ?? '' !!}
+                                        </svg>
+                                        <span>{{ $psChild['label'] }}</span>
+                                    </a>
+                                @endif
                             @endforeach
                         </div>
                     </details>
@@ -709,8 +818,8 @@
                 @foreach ($psItems as $psMobileItem)
                     @php
                         $psMobileActive = isset($psMobileItem['children'])
-                            ? collect($psMobileItem['children'])->contains(fn ($child) => request()->routeIs((array) $child['is']))
-                            : request()->routeIs((array) $psMobileItem['is']);
+                            ? collect($psMobileItem['children'])->contains(fn ($child) => isset($child['is']) && request()->routeIs((array) $child['is']))
+                            : (isset($psMobileItem['is']) && request()->routeIs((array) $psMobileItem['is']));
                     @endphp
                     @if (isset($psMobileItem['children']))
                         <details class="group" {{ $psMobileActive ? 'open' : '' }}>
@@ -721,8 +830,8 @@
                             </summary>
                             <div class="ml-7 mt-1 space-y-1 border-l border-sky-100 pl-4">
                                 @foreach ($psMobileItem['children'] as $psMobileChild)
-                                    @php $psMobileChildActive = request()->routeIs((array) $psMobileChild['is']); @endphp
-                                    <a href="{{ $psMobileChild['url'] }}" class="flex min-h-[40px] items-center gap-2.5 rounded-lg px-3 py-2 text-xs {{ $psMobileChildActive ? 'bg-sky-50 font-semibold text-sky-700' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
+                                    @php $psMobileChildActive = isset($psMobileChild['is']) && request()->routeIs((array) $psMobileChild['is']); @endphp
+                                    <a href="{{ $psMobileChild['url'] ?? '#' }}" class="flex min-h-[40px] items-center gap-2.5 rounded-lg px-3 py-2 text-xs {{ $psMobileChildActive ? 'bg-sky-50 font-semibold text-sky-700' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
                                         <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg[$psMobileChild['icon']] ?? '' !!}</svg>
                                         <span>{{ $psMobileChild['label'] }}</span>
                                     </a>

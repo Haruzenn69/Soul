@@ -83,11 +83,18 @@
                 <option value="perempuan" {{ request('jenis_kelamin') === 'perempuan' ? 'selected' : '' }}>Perempuan</option>
             </select>
 
+            <select name="kategori" class="w-full lg:w-44 px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                <option value="">Semua Kategori</option>
+                @foreach (['Olahraga', 'Seni', 'Bahasa', 'Lainnya'] as $kat)
+                    <option value="{{ $kat }}" {{ request('kategori') === $kat ? 'selected' : '' }}>{{ $kat }}</option>
+                @endforeach
+            </select>
+
             <div class="flex items-center gap-2 shrink-0">
                 <button type="submit" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
                     Filter
                 </button>
-                @if ($hasFilter || $sort !== 'nama' || $direction !== 'asc')
+                @if ($hasFilter || request('kategori') || $sort !== 'nama' || $direction !== 'asc')
                     <a href="{{ route('kesiswaan.pembina.index') }}"
                        class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-2xl transition">
                         Reset
@@ -127,7 +134,7 @@
                                 </svg>
                             </a>
                         </th>
-                        <th class="py-3.5 px-5">No. Telp</th>
+                        <th class="py-3.5 px-5">Kategori Binaan</th>
                         <th class="py-3.5 px-5">Ekskul Dibina</th>
                         <th class="py-3.5 px-5 text-right">Aksi</th>
                     </tr>
@@ -140,7 +147,7 @@
                                 <div class="flex items-center gap-3">
                                     <div class="w-9 h-9 rounded-xl bg-sky-100 text-sky-700 font-extrabold flex items-center justify-center text-xs uppercase shrink-0 overflow-hidden">
                                         @if ($p->foto_url)
-                                            <img src="{{ $p->foto_url }}" alt="{{ $p->nama }}" class="w-full h-full object-cover">
+                                             <img src="{{ $p->foto_url }}" alt="{{ $p->nama }}" class="w-full h-full object-cover">
                                         @else
                                             {{ strtoupper(substr($p->nama ?? '?', 0, 2)) }}
                                         @endif
@@ -165,18 +172,46 @@
                                 </span>
                             </td>
 
-                            {{-- No Telp --}}
-                            <td class="py-3.5 px-5 whitespace-nowrap text-slate-600">
-                                {{ $p->no_telp ?? '-' }}
+                            {{-- Kategori Binaan & Riwayat --}}
+                            <td class="py-3.5 px-5 whitespace-nowrap">
+                                @if ($p->kategori_aktif)
+                                    <div>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-bold text-[11px] bg-sky-50 text-sky-700 border border-sky-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                                            {{ $p->kategori_aktif }}
+                                        </span>
+                                        <span class="block text-[10px] text-slate-400 mt-0.5">Membina {{ $p->ekskuls->count() }} ekskul</span>
+                                    </div>
+                                @elseif ($p->kategori_pernah_dibina)
+                                    <div>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-bold text-[11px] bg-amber-50 text-amber-700 border border-amber-200" title="Data riwayat: pernah membina kategori ini">
+                                            <svg class="w-3 h-3 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            Pernah: {{ $p->kategori_pernah_dibina }}
+                                        </span>
+                                        <span class="block text-[10px] text-amber-600/80 mt-0.5 font-medium">Tidak membina (Riwayat)</span>
+                                    </div>
+                                @else
+                                    <span class="text-[11px] text-slate-400 italic">Belum ada kategori</span>
+                                @endif
                             </td>
 
                             {{-- Ekskul Dibina --}}
                             <td class="py-3.5 px-5">
-                                <div class="flex flex-wrap gap-1 items-center">
+                                <div class="flex flex-col gap-1.5 items-start">
+                                    <div class="flex flex-wrap gap-1 items-center">
+                                        @forelse ($p->ekskuls as $ek)
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                                {{ $ek->nama_ekskul }}
+                                            </span>
+                                        @empty
+                                            <span class="text-[11px] text-slate-400 italic">0 Ekskul</span>
+                                        @endforelse
+                                    </div>
                                     <button type="button" onclick="document.getElementById('modal-kelola-{{ $p->id }}').showModal()"
-                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold text-[11px] bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                        Kelola Ekskul
+                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-bold text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition">
+                                        Kelola Ekskul ({{ $p->ekskuls->count() }}/4)
                                     </button>
                                 </div>
                             </td>
@@ -209,7 +244,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                                     </svg>
                                     <p class="text-xs font-semibold text-slate-600">Tidak ada pembina yang sesuai kriteria.</p>
-                                    @if ($hasFilter)
+                                    @if ($hasFilter || request('kategori'))
                                         <p class="text-[11px] text-slate-400 mt-0.5">Coba ubah kata kunci atau hapus filter.</p>
                                         <a href="{{ route('kesiswaan.pembina.index') }}" class="mt-3 text-xs font-bold text-sky-600 hover:text-sky-700">
                                             Tampilkan semua pembina
@@ -238,21 +273,41 @@
         <div class="p-6 space-y-4 bg-white">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div>
-                    <h2 class="text-sm font-extrabold text-slate-900">Kelola Ekskul</h2>
+                    <h2 class="text-sm font-extrabold text-slate-900">Kelola Ekskul Pembina</h2>
                     <p class="text-xs text-slate-400 mt-0.5">{{ $p->nama }} · {{ $p->ekskuls->count() }}/4 ekskul</p>
                 </div>
                 <button type="button" onclick="this.closest('dialog').close()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center">×</button>
             </div>
 
+            {{-- KATEGORI BADGE STATUS --}}
+            @if ($p->kategori_aktif)
+                <div class="p-3 bg-sky-50/80 rounded-2xl border border-sky-100 text-xs">
+                    <p class="font-bold text-sky-900">Kategori Binaan: <span class="text-sky-700 font-extrabold">{{ $p->kategori_aktif }}</span></p>
+                    <p class="text-[11px] text-sky-700/80 mt-0.5">Sesuai aturan, pembina ini hanya dapat ditugaskan pada ekskul berkategori <strong>{{ $p->kategori_aktif }}</strong>.</p>
+                </div>
+            @elseif ($p->kategori_pernah_dibina)
+                <div class="p-3 bg-amber-50/80 rounded-2xl border border-amber-100 text-xs">
+                    <p class="font-bold text-amber-900">Riwayat Kategori: <span class="text-amber-800 font-extrabold">Pernah Membina {{ $p->kategori_pernah_dibina }}</span></p>
+                    <p class="text-[11px] text-amber-700/80 mt-0.5">Pembina ini saat ini tidak membina ekskul, namun memiliki riwayat pembinaan di kategori <strong>{{ $p->kategori_pernah_dibina }}</strong>.</p>
+                </div>
+            @else
+                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 text-xs">
+                    <p class="font-bold text-slate-700">Belum Ada Kategori</p>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Ekskul pertama yang ditugaskan akan menentukan kategori pembinaan pembina ini.</p>
+                </div>
+            @endif
+
             <div class="space-y-2">
-                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wide">Ekskul yang dibina</h3>
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wide">Ekskul yang dibina saat ini</h3>
                 @forelse ($p->ekskuls as $ekskul)
                     <div class="flex items-center justify-between gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
                         <div>
                             <p class="text-xs font-bold text-slate-800">{{ $ekskul->nama_ekskul }}</p>
-                            <p class="text-[10px] mt-0.5 text-slate-400">Ditugaskan ke pembina ini</p>
+                            <span class="inline-block mt-0.5 px-2 py-0.5 bg-sky-100 text-sky-700 font-bold text-[10px] rounded-md">
+                                Kategori: {{ $ekskul->kategori ?: 'Lainnya' }}
+                            </span>
                         </div>
-                        <form action="{{ route('kesiswaan.pembina.remove-ekskul', [$p, $ekskul]) }}" method="POST" onsubmit="return confirm('Lepas penugasan {{ $ekskul->nama_ekskul }} dari {{ $p->nama }}?')">
+                        <form action="{{ route('kesiswaan.pembina.remove-ekskul', [$p, $ekskul]) }}" method="POST" onsubmit="return confirm('Lepas penugasan {{ $ekskul->nama_ekskul }} dari {{ $p->nama }}? Kategori akan disimpan sebagai riwayat pembina.')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="px-3 py-1.5 rounded-xl text-[11px] font-bold bg-rose-50 text-rose-600 hover:bg-rose-100">
@@ -261,21 +316,32 @@
                         </form>
                     </div>
                 @empty
-                    <p class="text-xs text-slate-400 py-2">Belum ada ekskul yang dibina.</p>
+                    <p class="text-xs text-slate-400 py-2">Belum ada ekskul yang sedang dibina.</p>
                 @endforelse
             </div>
 
             @if ($p->ekskuls->count() < 4)
+                @php
+                    $availableEkskuls = $ekskulList->whereNull('pembina_id');
+                    $activeKat = $p->kategori_aktif;
+                @endphp
                 <form action="{{ route('kesiswaan.pembina.assign-ekskul', $p) }}" method="POST" class="pt-3 border-t border-slate-100 space-y-3">
                     @csrf
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide">Tambah ekskul</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide">Tambah ekskul yang sesuai kategori</label>
                     <select name="ekskul_id" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800">
                         <option value="" disabled selected>Pilih ekskul...</option>
-                        @foreach ($ekskulList->whereNull('pembina_id') as $ekskul)
-                            <option value="{{ $ekskul->id }}">{{ $ekskul->nama_ekskul }}</option>
+                        @foreach ($availableEkskuls as $ekskul)
+                            @php
+                                $isKatMatch = !$activeKat || $ekskul->kategori === $activeKat;
+                            @endphp
+                            <option value="{{ $ekskul->id }}" {{ !$isKatMatch ? 'disabled' : '' }}>
+                                {{ $ekskul->nama_ekskul }} · Kategori: {{ $ekskul->kategori ?: 'Lainnya' }} {{ !$isKatMatch ? ' (Beda Kategori)' : '' }}
+                            </option>
                         @endforeach
                     </select>
-                    <button type="submit" class="w-full px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl">Tambah Ekskul</button>
+                    <button type="submit" class="w-full px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl">
+                        Tugaskan Ekskul
+                    </button>
                 </form>
             @else
                 <p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded-xl p-3">Batas maksimal 4 ekskul per pembina tercapai.</p>

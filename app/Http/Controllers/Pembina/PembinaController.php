@@ -8,16 +8,20 @@ use App\Models\Faq;
 use App\Models\Kegiatan;
 use App\Models\LaporanBulanan;
 use App\Models\Pelatih;
-use App\Models\Pendaftaran;
 use App\Models\PembinaProfileHistory;
+use App\Models\Pendaftaran;
+use App\Models\Presensi;
+use App\Models\RiwayatJabatan;
 use App\Models\Siswa;
 use App\Models\Testimoni;
+use App\Services\ArsipEkskulService;
 use App\Services\NotifikasiService;
 use App\Services\RekapAbsensiService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class PembinaController extends Controller
@@ -120,16 +124,23 @@ class PembinaController extends Controller
         $ekskuls = $this->getEkskuls();
         $ekskulIds = $ekskuls->pluck('id');
 
+        $selectedEkskul = $request->input('ekskul');
+        if (! $selectedEkskul || $selectedEkskul === 'semua' || ! $ekskulIds->contains((int) $selectedEkskul)) {
+            if ($ekskuls->isNotEmpty()) {
+                $selectedEkskul = $ekskuls->first()->id;
+            } else {
+                $selectedEkskul = null;
+            }
+        }
+
         $query = Pendaftaran::whereIn('ekskul_id', $ekskulIds)
             ->with(['siswa.kelas', 'ekskul'])
             ->withCount([
-                'presensis as hadir_count' => fn ($q) => $q->where('status', \App\Models\Presensi::STATUS_HADIR),
+                'presensis as hadir_count' => fn ($q) => $q->where('status', Presensi::STATUS_HADIR),
                 'presensis as total_presensi',
             ]);
 
-        // 1. Dropdown Filter Ekskul
-        $selectedEkskul = $request->input('ekskul');
-        if ($selectedEkskul && $selectedEkskul !== 'semua' && $ekskulIds->contains($selectedEkskul)) {
+        if ($selectedEkskul) {
             $query->where('ekskul_id', $selectedEkskul);
         }
 
@@ -210,6 +221,7 @@ class PembinaController extends Controller
                 if ($selectedStatusKeaktifan === 'peringatan') {
                     return $item->status === Pendaftaran::STATUS_PERINGATAN;
                 }
+
                 return $item->status_keaktifan === $selectedStatusKeaktifan;
             });
         }
@@ -242,6 +254,21 @@ class PembinaController extends Controller
         $jurusans = config('kelas.jurusan', []);
         $tingkats = config('kelas.tingkat', []);
 
+        // Arsip sengaja disembunyikan sampai filter diaktifkan. Total hanya dipakai
+        // untuk label filter, data detail baru dirakit saat filter menyala.
+        $tampilArsip = $request->boolean('arsip');
+
+        $ekskulArsip = $selectedEkskul && $ekskulIds->contains((int) $selectedEkskul)
+            ? $ekskuls->where('id', $selectedEkskul)->values()
+            : $ekskuls;
+
+        $arsipService = app(ArsipEkskulService::class);
+        $arsipTotal = $arsipService->hitungTotal($ekskulArsip);
+
+        $arsip = $tampilArsip
+            ? $arsipService->arsip($ekskulArsip)
+            : ['ketuaSelesai' => collect(), 'anggotaNonaktif' => collect(), 'total' => $arsipTotal];
+
         return view('pembina.anggota', compact(
             'anggota',
             'ekskuls',
@@ -254,8 +281,39 @@ class PembinaController extends Controller
             'selectedJenisKelamin',
             'selectedTingkat',
             'selectedStatusKeaktifan',
-            'cari'
+            'cari',
+            'tampilArsip',
+            'arsip',
+            'arsipTotal'
         ));
+    }
+
+    /**
+     * Koreksi tanggal periode ketua pada arsip (mis. periode yang dicatat
+     * otomatis tanggalnya kurang tepat).
+     */
+    public function updatePeriodeKetua(Request $request, RiwayatJabatan $riwayat)
+    {
+        $ekskulIds = $this->getEkskuls()->pluck('id');
+        abort_unless($ekskulIds->contains($riwayat->ekskul_id), 403);
+
+        $validated = $request->validate([
+            'mulai' => ['required', 'date'],
+            'selesai' => ['nullable', 'date', 'after_or_equal:mulai'],
+        ], [
+            'mulai.required' => 'Tanggal mulai periode wajib diisi.',
+            'mulai.date' => 'Tanggal mulai periode tidak valid.',
+            'selesai.date' => 'Tanggal selesai periode tidak valid.',
+            'selesai.after_or_equal' => 'Tanggal selesai tidak boleh lebih awal dari tanggal mulai.',
+        ]);
+
+        $riwayat->update([
+            'mulai' => $validated['mulai'],
+            'selesai' => $validated['selesai'] ?: null,
+            'alasan_selesai' => $validated['selesai'] ? ($riwayat->alasan_selesai ?: RiwayatJabatan::ALASAN_DIEDIT) : null,
+        ]);
+
+        return back()->with('success', 'Periode jabatan Ketua Ekskul '.$riwayat->ekskul->nama_ekskul.' atas nama '.$riwayat->siswa->nama.' berhasil diperbarui.');
     }
 
     public function pilihKetua(Request $request, Ekskul $ekskul, Siswa $siswa)
@@ -278,7 +336,7 @@ class PembinaController extends Controller
             ->where('jabatan', 'ketua')
             ->whereHas('pendaftarans', function ($q) use ($ekskul) {
                 $q->where('ekskul_id', '!=', $ekskul->id)
-                  ->where('status', 'diterima');
+                    ->where('status', 'diterima');
             })
             ->exists();
 
@@ -287,20 +345,28 @@ class PembinaController extends Controller
         }
 
         DB::transaction(function () use ($ekskul, $siswa) {
+            $arsip = app(ArsipEkskulService::class);
+
             // Turunkan ketua lama di ekskul ini (jika ada) kembali menjadi siswa biasa
             $ketuaLamas = Siswa::where('jabatan', 'ketua')
                 ->whereHas('pendaftarans', function ($q) use ($ekskul) {
                     $q->where('ekskul_id', $ekskul->id)
-                      ->where('status', 'diterima');
+                        ->where('status', 'diterima');
                 })
                 ->get();
 
             foreach ($ketuaLamas as $lama) {
                 $lama->update(['jabatan' => 'siswa']);
+
+                // Digantikan, bukan dicopot, sehingga arsipnya beralasan "diganti".
+                $arsip->akhiriPeriodeKetua($ekskul, $lama, null, RiwayatJabatan::ALASAN_DIGANTI);
             }
 
             // Angkat siswa terpilih menjadi ketua
             $siswa->update(['jabatan' => 'ketua']);
+
+            // Buka periode baru agar riwayat ketua lama tersimpan sebagai arsip
+            $arsip->mulaiPeriodeKetua($ekskul, $siswa);
         });
 
         return back()->with('success', "Berhasil menetapkan {$siswa->nama} ({$siswa->nis}) sebagai Ketua Ekskul {$ekskul->nama_ekskul}.");
@@ -312,7 +378,11 @@ class PembinaController extends Controller
         abort_unless($pembina && $ekskul->pembina_id === $pembina->id, 403);
 
         if ($siswa->jabatan === 'ketua') {
-            $siswa->update(['jabatan' => 'siswa']);
+            DB::transaction(function () use ($ekskul, $siswa) {
+                $siswa->update(['jabatan' => 'siswa']);
+
+                app(ArsipEkskulService::class)->akhiriPeriodeKetua($ekskul, $siswa);
+            });
         }
 
         return back()->with('success', "Jabatan Ketua Ekskul {$ekskul->nama_ekskul} untuk {$siswa->nama} telah dicopot. Siswa kembali menjadi anggota biasa.");
@@ -373,7 +443,7 @@ class PembinaController extends Controller
         $ekskulIds = $ekskuls->pluck('id');
 
         $allowedSorts = ['bulan', 'status'];
-        $sort      = in_array($request->input('sort'), $allowedSorts, true) ? $request->input('sort') : 'bulan';
+        $sort = in_array($request->input('sort'), $allowedSorts, true) ? $request->input('sort') : 'bulan';
         $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
 
         $query = LaporanBulanan::whereIn('ekskul_id', $ekskulIds)
@@ -385,7 +455,7 @@ class PembinaController extends Controller
             $cari = $request->input('cari');
             $query->where(function ($q) use ($cari) {
                 $q->where('bulan', 'like', "%{$cari}%")
-                  ->orWhereHas('ekskul', fn ($e) => $e->where('nama_ekskul', 'like', "%{$cari}%"));
+                    ->orWhereHas('ekskul', fn ($e) => $e->where('nama_ekskul', 'like', "%{$cari}%"));
             });
         }
 
@@ -402,9 +472,9 @@ class PembinaController extends Controller
 
         $laporans = $query->orderBy($sort, $direction)->paginate(10)->withQueryString();
 
-        $kegiatans = \App\Models\Kegiatan::whereIn('ekskul_id', $ekskulIds)
+        $kegiatans = Kegiatan::whereIn('ekskul_id', $ekskulIds)
             ->withCount(['presensis as hadir_count' => fn ($q) => $q->where('status', 'hadir')])
-            ->withCount(['presensis as izin_count'  => fn ($q) => $q->where('status', 'izin')])
+            ->withCount(['presensis as izin_count' => fn ($q) => $q->where('status', 'izin')])
             ->withCount(['presensis as sakit_count' => fn ($q) => $q->where('status', 'sakit')])
             ->withCount(['presensis as alpha_count' => fn ($q) => $q->where('status', 'alpha')])
             ->orderBy('tanggal_kegiatan', 'desc')
@@ -489,7 +559,7 @@ class PembinaController extends Controller
             $cari = $request->input('cari');
             $query->where(function ($q) use ($cari) {
                 $q->where('materi', 'like', "%{$cari}%")
-                  ->orWhereHas('presensis.pendaftaran.siswa', fn ($s) => $s->where('nama', 'like', "%{$cari}%"));
+                    ->orWhereHas('presensis.pendaftaran.siswa', fn ($s) => $s->where('nama', 'like', "%{$cari}%"));
             });
         }
 
@@ -502,7 +572,14 @@ class PembinaController extends Controller
         return view('pembina.presensi', compact('kegiatans', 'ekskuls', 'sort', 'direction'));
     }
 
-    public function rekap(Request $request)
+    /**
+     * Susun data rekap absensi untuk ekskul yang dipilih (atau ekskul pertama
+     * yang dibina bila tidak ada filter), dipakai bersama oleh halaman rekap
+     * dan unduhan PDF.
+     *
+     * @return array{0: Collection<int, Ekskul>, 1: int, 2: array}
+     */
+    private function rekapData(Request $request): array
     {
         $ekskuls = $this->getEkskuls();
         $ekskulIds = $ekskuls->pluck('id');
@@ -534,11 +611,31 @@ class PembinaController extends Controller
                 'availableMonths' => collect([now()->format('Y-m')]),
             ];
 
+        return [$ekskuls, $ekskulId, $rekap];
+    }
+
+    public function rekap(Request $request)
+    {
+        [$ekskuls, $ekskulId, $rekap] = $this->rekapData($request);
+
         return view('pembina.rekap', array_merge($rekap, [
             'ekskuls' => $ekskuls,
             'ekskulId' => $ekskulId,
-            'bulan' => $bulan,
+            'bulan' => $rekap['bulan'],
         ]));
+    }
+
+    public function rekapPdf(Request $request)
+    {
+        [, , $rekap] = $this->rekapData($request);
+
+        abort_if($rekap['ekskul'] === null, 404, 'Ekskul tidak ditemukan atau tidak anda bina.');
+
+        $pdf = Pdf::loadView('ketua.presensi.rekap-pdf', $rekap);
+
+        $filename = 'rekap-absensi-'.str_replace('/', '-', $rekap['bulan']).'-'.Str::slug($rekap['ekskul']->nama_ekskul ?? 'ekskul').'.pdf';
+
+        return $pdf->download($filename);
     }
 
     public function profile()
@@ -583,14 +680,14 @@ class PembinaController extends Controller
 
         DB::transaction(function () use ($pembina, $user, $validated, $oldUsername, $oldEmail, $oldFoto, $oldNoTelp, $newUsername, $newEmail, $newNoTelp, $fotoPath, &$changedFields) {
             $userUpdates = [];
-            if (!empty($validated['username']) && $validated['username'] !== $user->username) {
+            if (! empty($validated['username']) && $validated['username'] !== $user->username) {
                 $userUpdates['username'] = $validated['username'];
             }
             if ($newEmail !== $oldEmail) {
                 $userUpdates['email'] = $newEmail;
                 $userUpdates['email_verified_at'] = null;
             }
-            if (!empty($userUpdates)) {
+            if (! empty($userUpdates)) {
                 $user->update($userUpdates);
             }
 
@@ -660,5 +757,56 @@ class PembinaController extends Controller
         $last = $labels->pop();
 
         return $labels->implode(', ').', dan '.$last;
+    }
+
+    public function anggotaShow(Pendaftaran $pendaftaran)
+    {
+        $ekskuls = $this->getEkskuls();
+        abort_unless($ekskuls->pluck('id')->contains($pendaftaran->ekskul_id), 403);
+
+        $pendaftaran->load([
+            'siswa.kelas',
+            'ekskul.pembina.user',
+            'ekskul.pelatih',
+            'siswa.pendaftarans.ekskul',
+            'siswa.pengajuanKeluars.ekskul',
+            'siswa.riwayatJabatans.ekskul',
+        ]);
+
+        // Hitung statistik kehadiran untuk ekskul ini
+        $presensiStats = Presensi::where('pendaftaran_id', $pendaftaran->id)
+            ->selectRaw('
+                count(*) as total,
+                sum(case when status = "hadir" then 1 else 0 end) as hadir,
+                sum(case when status = "izin" then 1 else 0 end) as izin,
+                sum(case when status = "sakit" then 1 else 0 end) as sakit,
+                sum(case when status = "alpha" then 1 else 0 end) as alpha
+            ')
+            ->first();
+
+        $totalPresensi = (int) ($presensiStats->total ?? 0);
+        $hadir = (int) ($presensiStats->hadir ?? 0);
+        $persentase = $totalPresensi > 0 ? round(($hadir / $totalPresensi) * 100, 1) : 0;
+
+        return view('pembina.anggota.show', compact(
+            'pendaftaran',
+            'ekskuls',
+            'totalPresensi',
+            'hadir',
+            'persentase'
+        ));
+    }
+
+    public function anggotaByEkskul(Request $request, Ekskul $ekskul)
+    {
+        $ekskuls = $this->getEkskuls();
+        abort_unless($ekskuls->pluck('id')->contains($ekskul->id), 403);
+
+        // Redirect ke halaman anggota utama dengan ekskul sudah dipilih
+        // agar semua filter/sort/search tetap konsisten di satu tempat
+        return redirect()->route('pembina.anggota', array_merge(
+            $request->only(['cari', 'sort', 'status_keanggotaan', 'jurusan', 'jenis_kelamin', 'tingkat', 'status_keaktifan']),
+            ['ekskul' => $ekskul->id]
+        ));
     }
 }

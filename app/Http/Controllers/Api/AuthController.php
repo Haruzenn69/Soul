@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends ApiController
@@ -46,6 +47,20 @@ class AuthController extends ApiController
         $request->user()->currentAccessToken()?->delete();
 
         return $this->noContent('Logout berhasil.');
+    }
+
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'email', 'max:255'],
+        ]);
+
+        Password::sendResetLink(['email' => $validated['email']]);
+
+        return $this->ok(
+            [],
+            'Jika email terdaftar, tautan untuk mengatur ulang kata sandi akan dikirim.',
+        );
     }
 
     public function me(Request $request): JsonResponse

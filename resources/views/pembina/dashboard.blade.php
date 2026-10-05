@@ -112,20 +112,20 @@
 
     {{-- STATS CARDS - MOBILE/TABLET --}}
     <div class="grid grid-cols-3 gap-3 lg:hidden">
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-3 md:p-5 shadow-md shadow-sky-100 animate-fade-up" style="animation-delay: .1s">
-            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Ekskul Dibina</p>
-            <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $ekskuls->count() }}</h3>
-            <p class="text-[11px] font-semibold {{ $ekskuls->count() > 0 ? 'text-emerald-600' : 'text-amber-600' }} mt-0.5 md:mt-1">{{ $ekskuls->count() > 0 ? 'Aktif' : 'Belum' }}</p>
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white dark:from-sky-950/30 dark:to-neutral-800 border border-sky-200 dark:border-neutral-700 p-3 md:p-5 shadow-md shadow-sky-100 dark:shadow-sky-900/30 animate-fade-up" style="animation-delay: .1s">
+            <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Ekskul Dibina</p>
+            <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700 dark:text-sky-300">{{ $ekskuls->count() }}</h3>
+            <p class="text-[11px] font-semibold {{ $ekskuls->count() > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400' }} mt-0.5 md:mt-1">{{ $ekskuls->count() > 0 ? 'Aktif' : 'Belum' }}</p>
         </div>
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 to-yellow-50 border border-amber-200 p-3 md:p-5 shadow-md shadow-amber-100 animate-fade-up" style="animation-delay: .2s">
-            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Anggota Aktif</p>
-            <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-amber-600">{{ $anggotaAktifCount ?? 0 }}</h3>
-            <p class="text-[11px] font-semibold text-amber-700 mt-0.5 md:mt-1">Siswa</p>
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 to-yellow-50 dark:from-amber-950/30 dark:to-amber-900/30 border border-amber-200 dark:border-amber-800 p-3 md:p-5 shadow-md shadow-amber-100 dark:shadow-amber-900/30 animate-fade-up" style="animation-delay: .2s">
+            <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Anggota Aktif</p>
+            <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-amber-600 dark:text-amber-400">{{ $anggotaAktifCount ?? 0 }}</h3>
+            <p class="text-[11px] font-semibold text-amber-700 dark:text-amber-300 mt-0.5 md:mt-1">Siswa</p>
         </div>
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-3 md:p-5 shadow-md shadow-sky-100 animate-fade-up" style="animation-delay: .3s">
-            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Pendaftaran</p>
-            <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ count($pendaftaranPending ?? []) }}</h3>
-            <p class="text-[11px] font-semibold text-sky-600 mt-0.5 md:mt-1">Menunggu</p>
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white dark:from-sky-950/30 dark:to-neutral-800 border border-sky-200 dark:border-neutral-700 p-3 md:p-5 shadow-md shadow-sky-100 dark:shadow-sky-900/30 animate-fade-up" style="animation-delay: .3s">
+            <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Pendaftaran</p>
+            <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700 dark:text-sky-300">{{ count($pendaftaranPending ?? []) }}</h3>
+            <p class="text-[11px] font-semibold text-sky-600 dark:text-sky-400 mt-0.5 md:mt-1">Menunggu</p>
         </div>
     </div>
 
@@ -144,8 +144,8 @@
                         $totalAktifBidang += \App\Models\Pendaftaran::where('ekskul_id', $eksB->id)->where('status', 'diterima')->count();
                     }
                 @endphp
-                <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .15s">
-                    <div class="px-6 py-4 flex items-center justify-between border-b border-sky-50">
+                <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-lg shadow-sky-100/60 dark:shadow-sky-900/30 overflow-hidden animate-fade-up" style="animation-delay: .15s">
+                    <div class="px-6 py-4 flex items-center justify-between border-b border-sky-50 dark:border-neutral-800">
                         <div class="flex items-center gap-3">
                             <span class="px-2.5 py-1 rounded-xl border text-[11px] font-bold {{ $badgeClass }}">{{ $bidangNama }}</span>
                             <div>
@@ -153,11 +153,11 @@
                                 <p class="text-[11px] text-slate-400">{{ $ekskulBidangList->count() }} ekskul · {{ $totalAktifBidang }} anggota aktif</p>
                             </div>
                         </div>
-                        <a href="{{ route('pembina.anggota') }}" class="text-[11px] font-bold text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-full transition shrink-0">
+                        <a href="{{ route('pembina.anggota') }}" class="text-[11px] font-bold text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 px-3 py-1.5 rounded-full transition shrink-0">
                             Kelola Anggota →
                         </a>
                     </div>
-                    <div class="divide-y divide-slate-50">
+                    <div class="divide-y divide-sky-50 dark:divide-neutral-800">
                         @foreach($ekskulBidangList as $eksB)
                         @php
                             $ketuaEksB = $eksB->ketua();
@@ -169,8 +169,8 @@
                                     {{ strtoupper(substr($eksB->nama_ekskul, 0, 2)) }}
                                 </div>
                                 <div class="min-w-0">
-                                    <h4 class="text-xs font-extrabold text-slate-900 truncate">{{ $eksB->nama_ekskul }}</h4>
-                                    <p class="text-[11px] text-slate-400 mt-0.5">
+                                    <h4 class="text-xs font-extrabold text-slate-900 dark:text-white truncate">{{ $eksB->nama_ekskul }}</h4>
+<p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
                                         {{ $anggotaCount }} Anggota Aktif
                                         @if($ketuaEksB) · Ketua: <span class="font-semibold text-amber-700">{{ $ketuaEksB->nama }}</span>@endif
                                     </p>
@@ -178,12 +178,12 @@
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
                                 @if($eksB->status)
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Aktif</span>
+                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">Aktif</span>
                                 @else
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">Nonaktif</span>
+                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-50 dark:bg-neutral-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-neutral-700">Nonaktif</span>
                                 @endif
                                 @if($eksB->is_open_recruitment)
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">Buka Rekrutmen</span>
+                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/50">Buka Rekrutmen</span>
                                 @endif
                             </div>
                         </div>
@@ -202,20 +202,20 @@
             @endif
 
             <!-- AGENDA KEGIATAN MENDATANG -->
-            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .2s">
-                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
+            <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-lg shadow-sky-100/60 dark:shadow-sky-900/30 overflow-hidden animate-fade-up" style="animation-delay: .2s">
+                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50 dark:border-neutral-800">
                     <div>
-                        <h2 class="text-sm font-extrabold text-slate-900">Kegiatan Mendatang</h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Semua agenda ekskul yang akan datang</p>
+                        <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Kegiatan Mendatang</h2>
+                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Semua agenda ekskul yang akan datang</p>
                     </div>
-                    <span class="text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">{{ $kegiatanMendatang->count() ?? 0 }} Agenda</span>
+                    <span class="text-[11px] font-semibold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-800/50 px-3 py-1.5 rounded-full">{{ $kegiatanMendatang->count() ?? 0 }} Agenda</span>
                 </div>
 
                 @if(($kegiatanMendatang ?? collect())->count() > 0)
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
                             <thead>
-                                <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                <tr class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                                     <th class="px-6 py-3">Kegiatan</th>
                                     <th class="px-6 py-3">Tanggal</th>
                                     <th class="px-6 py-3">Status</th>
@@ -223,7 +223,7 @@
                             </thead>
                             <tbody>
                                 @foreach($kegiatanMendatang as $index => $kegiatan)
-                                    <tr class="border-t border-sky-50 hover:bg-sky-50/50 transition-colors">
+                                    <tr class="border-t border-sky-50 dark:border-neutral-800 hover:bg-sky-50/50 dark:hover:bg-sky-950/30 transition-colors">
                                         <td class="px-6 py-3.5">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex flex-col items-center justify-center shadow-sm shadow-sky-200">
@@ -231,19 +231,19 @@
                                                     <span class="text-[7px] font-bold uppercase leading-tight opacity-80">{{ \Carbon\Carbon::parse($kegiatan->tanggal_kegiatan)->format('M') }}</span>
                                                 </div>
                                                 <div class="min-w-0">
-                                                    <span class="text-xs font-bold text-slate-800">{{ $kegiatan->materi ?? 'Kegiatan' }}</span>
-                                                    <p class="text-[10px] text-slate-400 mt-0.5">{{ $kegiatan->ekskul->nama_ekskul ?? 'Ekskul' }}</p>
+                                                    <span class="text-xs font-bold text-slate-800 dark:text-white">{{ $kegiatan->materi ?? 'Kegiatan' }}</span>
+                                                    <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{{ $kegiatan->ekskul->nama_ekskul ?? 'Ekskul' }}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="px-6 py-3.5">
-                                            <span class="text-[11px] text-slate-500">{{ \Carbon\Carbon::parse($kegiatan->tanggal_kegiatan)->isoFormat('dddd, DD MMM Y') }}</span>
+                                            <span class="text-[11px] text-slate-500 dark:text-slate-400">{{ \Carbon\Carbon::parse($kegiatan->tanggal_kegiatan)->isoFormat('dddd, DD MMM Y') }}</span>
                                         </td>
                                         <td class="px-6 py-3.5">
                                             @if($index === 0)
-                                                <span class="inline-flex px-2.5 py-1 rounded-full bg-amber-100 border border-amber-200 text-amber-700 text-[10px] font-bold">Terdekat</span>
+                                                <span class="inline-flex px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-300 text-[10px] font-bold">Terdekat</span>
                                             @else
-                                                <span class="inline-flex px-2.5 py-1 rounded-full bg-sky-50 border border-sky-100 text-sky-600 text-[10px] font-bold">Terjadwal</span>
+                                                <span class="inline-flex px-2.5 py-1 rounded-full bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-800/50 text-sky-600 dark:text-sky-400 text-[10px] font-bold">Terjadwal</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -253,13 +253,13 @@
                     </div>
                 @else
                     <div class="text-center py-10">
-                        <div class="mx-auto w-16 h-16 rounded-2xl bg-sky-50 flex items-center justify-center text-sky-300 border border-sky-100">
+                        <div class="mx-auto w-16 h-16 rounded-2xl bg-sky-50 dark:bg-sky-950/30 flex items-center justify-center text-sky-300 dark:text-sky-600 border border-sky-100 dark:border-sky-800/50">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
                         </div>
-                        <p class="text-xs font-semibold text-slate-500 mt-3">Belum ada agenda mendatang</p>
-                        <p class="text-[11px] text-slate-400 mt-1">Agenda ekskul akan muncul di sini.</p>
+                        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-3">Belum ada agenda mendatang</p>
+                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Agenda ekskul akan muncul di sini.</p>
                     </div>
                 @endif
             </div>
@@ -267,15 +267,15 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             <!-- PELATIH EKSRUL -->
-            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .25s">
-                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
+            <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-lg shadow-sky-100/60 dark:shadow-sky-900/30 overflow-hidden animate-fade-up" style="animation-delay: .25s">
+                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50 dark:border-neutral-800">
                     <div>
-                        <h2 class="text-sm font-extrabold text-slate-900">Pelatih Ekskul</h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Tentukan pelatih terverifikasi untuk ekskul binaanmu</p>
+                        <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Pelatih Ekskul</h2>
+                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Tentukan pelatih terverifikasi untuk ekskul binaanmu</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <a href="{{ route('pembina.pelatih.index') }}"
-                           class="text-[11px] font-bold text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-100 px-3 py-1.5 rounded-full transition inline-flex items-center gap-1">
+                           class="text-[11px] font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-800/50 px-3 py-1.5 rounded-full transition inline-flex items-center gap-1">
                             Kelola Pelatih
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         </a>
@@ -284,14 +284,14 @@
 
                 @forelse($ekskuls ?? collect() as $ekskulBinaan)
                     <div class="p-5">
-                        <form method="POST" action="{{ route('pembina.ekskul.pelatih', $ekskulBinaan) }}" class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-xl border border-sky-100 hover:border-sky-200 transition">
+                        <form method="POST" action="{{ route('pembina.ekskul.pelatih', $ekskulBinaan) }}" class="p-3.5 bg-gradient-to-r from-sky-50 to-white dark:from-sky-950/30 dark:to-neutral-800/30 rounded-xl border border-sky-100 dark:border-neutral-700 hover:border-sky-200 dark:hover:border-neutral-600 transition">
                             @csrf
                             @method('PATCH')
                             <p class="text-xs font-bold text-slate-800 mb-1">{{ $ekskulBinaan->nama_ekskul }}</p>
-                            <p class="text-[10px] text-slate-400 mb-3">Pelatih saat ini: <span class="font-bold text-slate-600">{{ $ekskulBinaan->pelatih?->nama ?? '-' }}</span></p>
+                            <p class="text-[10px] text-slate-400 dark:text-slate-500 mb-3">Pelatih saat ini: <span class="font-bold text-slate-600 dark:text-slate-400">{{ $ekskulBinaan->pelatih?->nama ?? '-' }}</span></p>
                             <div class="flex gap-2">
                                 <select name="pelatih_id"
-                                    class="flex-1 min-w-0 px-3 py-2.5 bg-white border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 transition">
+                                    class="flex-1 min-w-0 px-3 py-2.5 bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition">
                                     <option value="" {{ $ekskulBinaan->pelatih_id ? '' : 'selected' }}>Tanpa pelatih</option>
                                     @foreach ($pelatihs as $pl)
                                         <option value="{{ $pl->id }}" {{ $ekskulBinaan->pelatih_id == $pl->id ? 'selected' : '' }}>{{ $pl->nama }} ({{ $pl->status }})</option>
@@ -317,13 +317,13 @@
             </div>
 
             <!-- LAPORAN BULANAN -->
-            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .3s">
-                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
+            <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-lg shadow-sky-100/60 dark:shadow-sky-900/30 overflow-hidden animate-fade-up" style="animation-delay: .3s">
+                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50 dark:border-neutral-800">
                     <div>
-                        <h2 class="text-sm font-extrabold text-slate-900">Laporan Bulanan</h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Draft laporan ekskul</p>
+                        <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Laporan Bulanan</h2>
+                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Draft laporan ekskul</p>
                     </div>
-                    <a href="{{ route('pembina.laporan.index') }}" class="text-xs font-bold text-sky-600 hover:underline flex items-center gap-1">
+                    <a href="{{ route('pembina.laporan.index') }}" class="text-xs font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1">
                         Cetak
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     </a>
@@ -331,27 +331,27 @@
 
                 <div class="p-5">
                     @forelse($laporanDraft ?? [] as $laporan)
-                        <div class="p-3.5 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl border border-amber-100 flex items-center justify-between mb-3 gap-3 hover:border-amber-200 transition">
+                        <div class="p-3.5 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-amber-900/30 rounded-xl border border-amber-100 dark:border-amber-800/50 flex items-center justify-between mb-3 gap-3 hover:border-amber-200 dark:hover:border-amber-800/50 transition">
                             <div class="flex items-center gap-3 min-w-0">
-                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 flex items-center justify-center text-xs font-extrabold shadow-md shadow-amber-200 shrink-0">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 flex items-center justify-center text-xs font-extrabold shadow-md shadow-amber-200 dark:shadow-amber-900/30 shrink-0">
                                     {{ \Carbon\Carbon::createFromFormat('Y-m', $laporan->bulan)->format('m') }}
                                 </div>
                                 <div class="min-w-0">
-                                    <h4 class="text-xs font-bold text-slate-800 truncate">{{ \Carbon\Carbon::createFromFormat('Y-m', $laporan->bulan)->translatedFormat('F Y') }}</h4>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">{{ $laporan->ekskul->nama_ekskul ?? 'Ekskul' }}</p>
+<h4 class="text-xs font-bold text-slate-800 dark:text-white truncate">{{ \Carbon\Carbon::createFromFormat('Y-m', $laporan->bulan)->translatedFormat('F Y') }}</h4>
+<p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{{ $laporan->ekskul->nama_ekskul ?? 'Ekskul' }}</p>
                                 </div>
                             </div>
-                            <span class="px-2.5 py-1 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 text-[10px] font-bold rounded-full border border-amber-200 shrink-0">Draft</span>
+                            <span class="px-2.5 py-1 bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-950/30 dark:to-amber-900/30 text-amber-700 dark:text-amber-300 text-[10px] font-bold rounded-full border border-amber-200 dark:border-amber-800/50 shrink-0">Draft</span>
                         </div>
                     @empty
                         <div class="text-center py-8">
-                            <div class="mx-auto w-16 h-16 rounded-2xl bg-sky-50 flex items-center justify-center text-sky-300 border border-sky-100">
+                            <div class="mx-auto w-16 h-16 rounded-2xl bg-sky-50 dark:bg-sky-950/30 flex items-center justify-center text-sky-300 dark:text-sky-600 border border-sky-100 dark:border-sky-800/50">
                                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477 4.5 1.253"/>
                                 </svg>
                             </div>
-                            <p class="text-xs font-semibold text-slate-500 mt-3">Belum ada laporan</p>
-                            <p class="text-[11px] text-slate-400 mt-1">Laporan bulanan akan muncul di sini</p>
+                            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-3">Belum ada laporan</p>
+                            <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Laporan bulanan akan muncul di sini</p>
                         </div>
                     @endforelse
                 </div>
@@ -363,73 +363,73 @@
         <div class="space-y-6">
 
             <!-- MODERASI TESTIMONI & FAQ -->
-            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .2s">
-                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
+            <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-lg shadow-sky-100/60 dark:shadow-sky-900/30 overflow-hidden animate-fade-up" style="animation-delay: .2s">
+                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50 dark:border-neutral-800">
                     <div>
-                        <h2 class="text-sm font-extrabold text-slate-900">Testimoni & FAQ</h2>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Moderasi kontribusi siswa</p>
+                        <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Testimoni & FAQ</h2>
+                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Moderasi kontribusi siswa</p>
                     </div>
                     <span class="text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">Moderasi</span>
                 </div>
 
                 <div class="p-5 grid grid-cols-2 gap-3">
-                    <a href="{{ route('pembina.testimoni.index') }}" class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-xl border border-sky-100 hover:border-sky-300 transition">
+                    <a href="{{ route('pembina.testimoni.index') }}" class="p-3.5 bg-gradient-to-r from-sky-50 to-white dark:from-sky-950/30 dark:to-neutral-800/30 rounded-xl border border-sky-100 dark:border-neutral-700 hover:border-sky-300 dark:hover:border-neutral-600 transition">
                         <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-bold text-slate-600">Testimoni</span>
+                            <span class="text-[11px] font-bold text-slate-600 dark:text-slate-400">Testimoni</span>
                             @if($testimoniPendingCount > 0)
                                 <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                             @endif
                         </div>
-                        <p class="text-2xl font-extrabold text-sky-700 mt-1">{{ $testimoniPendingCount }}</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">{{ $testimoniPendingCount > 0 ? 'menunggu persetujuan' : 'tidak ada antrian' }}</p>
+                        <p class="text-2xl font-extrabold text-sky-700 dark:text-sky-400 mt-1">{{ $testimoniPendingCount }}</p>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{{ $testimoniPendingCount > 0 ? 'menunggu persetujuan' : 'tidak ada antrian' }}</p>
                     </a>
-                    <a href="{{ route('pembina.faq.index') }}" class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-xl border border-amber-100 hover:border-amber-300 transition">
+                    <a href="{{ route('pembina.faq.index') }}" class="p-3.5 bg-gradient-to-r from-amber-50 to-white dark:from-amber-950/30 dark:to-amber-900/30 rounded-xl border border-amber-100 dark:border-amber-800/50 hover:border-amber-300 dark:hover:border-amber-800/50 transition">
                         <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-bold text-slate-600">FAQ</span>
+                            <span class="text-[11px] font-bold text-slate-600 dark:text-slate-400">FAQ</span>
                             @if($faqPendingCount > 0)
                                 <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                             @endif
                         </div>
-                        <p class="text-2xl font-extrabold text-amber-600 mt-1">{{ $faqPendingCount }}</p>
-                        <p class="text-[10px] text-slate-400 mt-0.5">{{ $faqPendingCount > 0 ? 'menunggu jawaban' : 'tidak ada antrian' }}</p>
+                        <p class="text-2xl font-extrabold text-amber-600 dark:text-amber-400 mt-1">{{ $faqPendingCount }}</p>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{{ $faqPendingCount > 0 ? 'menunggu jawaban' : 'tidak ada antrian' }}</p>
                     </a>
                 </div>
 
                 @if($ekskuls->isNotEmpty())
                 <div class="px-5 pb-5 space-y-4">
-                    <form action="{{ route('pembina.testimoni.store') }}" method="POST" class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-xl border border-sky-100 space-y-2.5">
+                    <form action="{{ route('pembina.testimoni.store') }}" method="POST" class="p-3.5 bg-gradient-to-r from-sky-50 to-white dark:from-sky-950/30 dark:to-neutral-800/30 rounded-xl border border-sky-100 dark:border-neutral-700 space-y-2.5">
                         @csrf
                         <p class="text-[11px] font-bold text-slate-700">Tambah Testimoni</p>
                         <select name="ekskul_id" required
-                            class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition">
+                            class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition">
                             @foreach($ekskuls as $ex)
                                 <option value="{{ $ex->id }}">{{ $ex->nama_ekskul }}</option>
                             @endforeach
                         </select>
                         <div class="grid grid-cols-2 gap-2">
                             <input type="text" name="nama" required placeholder="Nama"
-                                class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition">
+                                class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition">
                             <input type="text" name="kelas" placeholder="Kelas (opsional)"
-                                class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition">
+                                class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition">
                         </div>
                         <textarea name="quote" rows="2" required placeholder="Isi testimoni..."
-                            class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition"></textarea>
+                            class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition"></textarea>
                         <button type="submit" class="px-3.5 py-2 bg-sky-600 hover:bg-sky-700 text-white text-[10px] font-bold rounded-xl transition">Simpan Testimoni</button>
                     </form>
 
-                    <form action="{{ route('pembina.faq.store') }}" method="POST" class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-xl border border-amber-100 space-y-2.5">
+                    <form action="{{ route('pembina.faq.store') }}" method="POST" class="p-3.5 bg-gradient-to-r from-amber-50 to-white dark:from-amber-950/30 dark:to-amber-900/30 rounded-xl border border-amber-100 dark:border-amber-800/50 space-y-2.5">
                         @csrf
                         <p class="text-[11px] font-bold text-slate-700">Tambah FAQ</p>
                         <select name="ekskul_id" required
-                            class="w-full px-3 py-2 bg-white border border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 transition">
+                            class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-amber-100 dark:border-amber-800/50 rounded-xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100 dark:focus:ring-amber-900/30 transition">
                             @foreach($ekskuls as $ex)
                                 <option value="{{ $ex->id }}">{{ $ex->nama_ekskul }}</option>
                             @endforeach
                         </select>
                         <input type="text" name="pertanyaan" required placeholder="Pertanyaan umum..."
-                            class="w-full px-3 py-2 bg-white border border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 transition">
+                            class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-amber-100 dark:border-amber-800/50 rounded-xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100 dark:focus:ring-amber-900/30 transition">
                         <textarea name="jawaban" rows="2" required placeholder="Jawaban..."
-                            class="w-full px-3 py-2 bg-white border border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 transition"></textarea>
+                            class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-amber-100 dark:border-amber-800/50 rounded-xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100 dark:focus:ring-amber-900/30 transition"></textarea>
                         <button type="submit" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-xl transition">Simpan FAQ</button>
                     </form>
                 </div>
@@ -437,10 +437,10 @@
             </div>
 
             <!-- PENDAFTARAN SISWA -->
-            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .25s">
-                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
+            <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-lg shadow-sky-100/60 dark:shadow-sky-900/30 overflow-hidden animate-fade-up" style="animation-delay: .25s">
+                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50 dark:border-neutral-800">
                     <div>
-                        <h2 class="text-sm font-extrabold text-slate-900">Pendaftaran Siswa</h2>
+                        <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Pendaftaran Siswa</h2>
                         <p class="text-[11px] text-slate-400 mt-0.5">Menunggu verifikasi</p>
                     </div>
                     <span class="text-[11px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-3 py-1.5 rounded-full">{{ count($pendaftaranPending ?? []) }} Pending</span>
@@ -449,17 +449,17 @@
                 @if(isset($pendaftaranPending) && count($pendaftaranPending) > 0)
                     <div class="p-5">
                         @foreach($pendaftaranPending as $item)
-                        <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-xl flex items-center justify-between mb-3 border border-sky-100 gap-3 hover:border-sky-200 transition">
+                        <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white dark:from-sky-950/30 dark:to-neutral-800/30 rounded-xl flex items-center justify-between mb-3 border border-sky-100 dark:border-neutral-700 gap-3 hover:border-sky-200 dark:hover:border-neutral-600 transition">
                             <div class="flex items-center gap-3 min-w-0">
-                                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-sky-400 to-blue-500 text-white font-extrabold flex items-center justify-center text-xs uppercase shadow-md shadow-sky-200 shrink-0">
+                                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-sky-400 to-blue-500 text-white font-extrabold flex items-center justify-center text-xs uppercase shadow-md shadow-sky-200 dark:shadow-sky-900/30 shrink-0">
                                     {{ substr($item->siswa->nama ?? 'A', 0, 1) }}
                                 </div>
                                 <div class="min-w-0">
-                                    <h4 class="text-xs font-bold text-slate-800 truncate">{{ $item->siswa->nama ?? '-' }}</h4>
-                                    <p class="text-[10px] text-slate-400">{{ $item->siswa->kelas->nama ?? '-' }}</p>
+<h4 class="text-xs font-bold text-slate-800 dark:text-white truncate">{{ $item->siswa->nama ?? '-' }}</h4>
+<p class="text-[10px] text-slate-400 dark:text-slate-500">{{ $item->siswa->kelas->nama ?? '-' }}</p>
                                 </div>
                             </div>
-                            <span class="px-2.5 py-1 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 text-[10px] font-bold rounded-full border border-amber-200 shrink-0">Pending</span>
+                            <span class="px-2.5 py-1 bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-950/30 dark:to-amber-900/30 text-amber-700 dark:text-amber-300 text-[10px] font-bold rounded-full border border-amber-200 dark:border-amber-800/50 shrink-0">Pending</span>
                         </div>
                         @endforeach
                         <div class="p-3 bg-gradient-to-r from-sky-50 to-blue-50 rounded-xl border border-sky-200">
@@ -468,13 +468,13 @@
                     </div>
                 @else
                     <div class="text-center py-10">
-                        <div class="mx-auto w-16 h-16 rounded-2xl bg-sky-50 flex items-center justify-center text-sky-300 border border-sky-100">
+                        <div class="mx-auto w-16 h-16 rounded-2xl bg-sky-50 dark:bg-sky-950/30 flex items-center justify-center text-sky-300 dark:text-sky-600 border border-sky-100 dark:border-sky-800/50">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                         </div>
-                        <p class="text-xs font-semibold text-slate-500 mt-3">Tidak ada pendaftaran baru</p>
-                        <p class="text-[11px] text-slate-400 mt-1">Semua pendaftaran sudah diproses</p>
+                        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-3">Tidak ada pendaftaran baru</p>
+                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Semua pendaftaran sudah diproses</p>
                     </div>
                 @endif
             </div>

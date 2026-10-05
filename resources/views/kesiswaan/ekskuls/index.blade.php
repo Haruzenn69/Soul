@@ -84,7 +84,7 @@
 
             <select name="kategori" class="w-full lg:w-44 px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                 <option value="">Semua Kategori</option>
-                @foreach (['Olahraga', 'Seni', 'Bela Diri', 'Bahasa', 'Lainnya'] as $kategori)
+                @foreach (['Olahraga', 'Seni', 'Bahasa', 'Lainnya'] as $kategori)
                     <option value="{{ $kategori }}" {{ request('kategori') === $kategori ? 'selected' : '' }}>{{ $kategori }}</option>
                 @endforeach
             </select>
@@ -153,7 +153,7 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-xs">
                     @php
-                        $kategoriTersedia = ['Olahraga', 'Seni', 'Bela Diri', 'Bahasa', 'Lainnya'];
+                        $kategoriTersedia = ['Olahraga', 'Seni', 'Bahasa', 'Lainnya'];
                         $kategoriDitampilkan = request('kategori') ? [request('kategori')] : $kategoriTersedia;
                         $ekskulPerKategori = $ekskuls->getCollection()->groupBy(fn ($item) => $item->kategori ?: 'Lainnya');
                     @endphp
@@ -305,7 +305,7 @@
                 <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Kategori <span class="text-rose-500">*</span></label>
                 <select name="kategori" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                     <option value="" disabled {{ old('kategori') ? '' : 'selected' }}>Pilih kategori...</option>
-                    @foreach (['Olahraga', 'Seni', 'Bela Diri', 'Bahasa', 'Lainnya'] as $kategori)
+                    @foreach (['Olahraga', 'Seni', 'Bahasa', 'Lainnya'] as $kategori)
                         <option value="{{ $kategori }}" @selected(old('kategori') === $kategori)>{{ $kategori }}</option>
                     @endforeach
                 </select>
@@ -347,9 +347,9 @@
 
             <div>
                 <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Kategori <span class="text-rose-500">*</span></label>
-                <select name="kategori" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                <select name="kategori" id="edit_kategori" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                     <option value="" disabled>Pilih kategori...</option>
-                    @foreach (['Olahraga', 'Seni', 'Bela Diri', 'Bahasa', 'Lainnya'] as $kategori)
+                    @foreach (['Olahraga', 'Seni', 'Bahasa', 'Lainnya'] as $kategori)
                         <option value="{{ $kategori }}">{{ $kategori }}</option>
                     @endforeach
                 </select>
@@ -361,8 +361,8 @@
                         class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                     <option value="" disabled>Pilih pembina...</option>
                     @foreach ($pembinas as $p)
-                        <option value="{{ $p->id }}" data-count="{{ $p->ekskuls_count }}">
-                            {{ $p->nama }} ({{ $p->ekskuls_count }}/4)
+                        <option value="{{ $p->id }}" data-count="{{ $p->ekskuls_count }}" data-kategori="{{ $p->kategori_binaan ?? '' }}">
+                            {{ $p->nama }} ({{ $p->kategori_binaan ? $p->kategori_binaan . ' · ' : '' }}{{ $p->ekskuls_count }}/4)
                         </option>
                     @endforeach
                 </select>
