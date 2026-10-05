@@ -53,12 +53,12 @@ class LoginRequest extends FormRequest
 
         // 1. Coba sebagai email jika formatnya valid
         if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
-            $attempted = Auth::attempt(['email' => $identifier, 'password' => $password], $remember);
+            $attempted = Auth::attempt(['email' => $identifier, 'password' => $password, 'is_active' => true], $remember);
         }
 
         // 2. Coba sebagai username
         if (! $attempted) {
-            $attempted = Auth::attempt(['username' => $identifier, 'password' => $password], $remember);
+            $attempted = Auth::attempt(['username' => $identifier, 'password' => $password, 'is_active' => true], $remember);
         }
 
         // 3. Coba sebagai NIS (siswa) atau NIP (pembina)
@@ -70,7 +70,7 @@ class LoginRequest extends FormRequest
                 $user = User::find($userId);
 
                 if ($user) {
-                    $attempted = Auth::attempt(['id' => $user->id, 'password' => $password], $remember);
+                    $attempted = Auth::attempt(['id' => $user->id, 'password' => $password, 'is_active' => true], $remember);
                 }
             }
         }

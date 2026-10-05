@@ -37,15 +37,7 @@
         </div>
     </div>
 
-    {{-- FLASH SUCCESS MESSAGE --}}
-    @if(session('success'))
-        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between shadow-sm animate-fade-up">
-            <div class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold text-sm shrink-0">✓</span>
-                <span class="font-semibold">{{ session('success') }}</span>
-            </div>
-        </div>
-    @endif
+
 
     {{-- STATS CARDS --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">

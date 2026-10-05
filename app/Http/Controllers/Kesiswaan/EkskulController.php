@@ -94,31 +94,6 @@ class EkskulController extends Controller
                 ])->withInput();
             }
 
-            $kategoriBaru = $data['kategori'];
-            $namaPembinaLower = strtolower(trim($pembina->nama ?? ''));
-            if (str_contains($namaPembinaLower, 'nurianti') || str_contains($namaPembinaLower, 'nuri anti') || str_contains($namaPembinaLower, 'bu nuri')) {
-                return back()->withErrors(['pembina_id' => 'Bu Nurianti tidak diperbolehkan membina ekskul.'])->withInput();
-            }
-            if ($kategoriBaru === 'Olahraga') {
-                if (! (str_contains($namaPembinaLower, 'ahmad') && str_contains($namaPembinaLower, 'pak'))) {
-                    return back()->withErrors(['pembina_id' => 'Kategori Olahraga hanya boleh dibina oleh Pak Ahmad.'])->withInput();
-                }
-            }
-            $adaPembinaLain = Pembina::whereHas('ekskuls', fn ($q) => $q->where('kategori', $kategoriBaru))
-                ->where('id', '!=', $pembina->id)
-                ->exists();
-            if ($adaPembinaLain) {
-                return back()->withErrors(['pembina_id' => "Kategori {$kategoriBaru} sudah dibina oleh pembina lain. Setiap kategori hanya boleh memiliki 1 pembina."])->withInput();
-            }
-            $existingKategori = $pembina->ekskuls->first()?->kategori;
-            if ($existingKategori && $existingKategori !== $kategoriBaru) {
-                return back()->withErrors([
-                    'pembina_id' => "Pembina {$pembina->nama} membina kategori {$existingKategori}. Ekskul baru yang ditugaskan harus berkategori sama ({$existingKategori}).",
-                ])->withInput();
-            }
-
-            $pembina->update(['kategori_pernah_dibina' => $data['kategori']]);
-        }
         Ekskul::create($data);
 
         return back()->with('success', "Ekskul {$data['nama_ekskul']} berhasil ditambahkan.");

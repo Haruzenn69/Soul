@@ -59,16 +59,28 @@
                             <span class="text-xs text-slate-400 shrink-0 whitespace-nowrap">{{ $notif->created_at->diffForHumans() }}</span>
                         </div>
                         <p class="text-xs text-slate-600 mt-2 leading-relaxed">{{ $notif->pesan }}</p>
-                        @if(!$notif->is_read)
-                            <div class="mt-2.5 flex justify-end">
+                        <div class="mt-2.5 flex items-center justify-end gap-2 flex-wrap">
+                            @if($notif->siswa_id)
+                                <a href="{{ route('kesiswaan.siswa.riwayat-profil', $notif->siswa_id) }}" class="text-xs font-bold text-sky-700 hover:text-sky-800 px-3 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg shadow-sm transition inline-flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    Lihat Riwayat Profil
+                                </a>
+                            @elseif($notif->pembina_id)
+                                <a href="{{ route('kesiswaan.pembina.riwayat-profil', $notif->pembina_id) }}" class="text-xs font-bold text-sky-700 hover:text-sky-800 px-3 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg shadow-sm transition inline-flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    Lihat Riwayat Profil
+                                </a>
+                            @endif
+
+                            @if(!$notif->is_read)
                                 <form method="POST" action="{{ route('kesiswaan.notifikasi.read', $notif) }}" class="w-full sm:w-auto">
                                     @csrf
-                                    <button type="submit" class="text-xs font-semibold text-sky-600 hover:text-sky-700 px-3 py-1.5 bg-white border border-sky-200 rounded-lg w-full sm:w-auto text-center shadow-sm">
+                                    <button type="submit" class="text-xs font-semibold text-slate-600 hover:text-slate-800 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg w-full sm:w-auto text-center shadow-sm transition">
                                         Tandai dibaca
                                     </button>
                                 </form>
-                            </div>
-                        @endif
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>

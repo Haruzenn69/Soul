@@ -77,28 +77,7 @@
         </div>
     </header>
 
-    {{-- ALERT MESSAGES --}}
-    @if (session('success'))
-        <div class="mx-auto max-w-6xl px-4 pt-4 md:px-8">
-            <div class="flex items-center gap-3 rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/90 dark:bg-emerald-950/40 p-4 text-xs font-semibold text-emerald-800 dark:text-emerald-300 shadow-sm">
-                <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                </div>
-                <span>{{ session('success') }}</span>
-            </div>
-        </div>
-    @endif
 
-    @if (session('error'))
-        <div class="mx-auto max-w-6xl px-4 pt-4 md:px-8">
-            <div class="flex items-center gap-3 rounded-2xl border border-red-200 dark:border-red-800 bg-red-50/90 dark:bg-red-950/40 p-4 text-xs font-semibold text-red-800 dark:text-red-300 shadow-sm">
-                <div class="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center shrink-0">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                </div>
-                <span>{{ session('error') }}</span>
-            </div>
-        </div>
-    @endif
 
     <main class="pb-16">
         {{-- HERO SECTION --}}

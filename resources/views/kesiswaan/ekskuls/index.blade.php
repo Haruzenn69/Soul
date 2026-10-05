@@ -178,9 +178,6 @@
                                     <div class="min-w-0">
                                         <div class="flex items-center gap-2 min-w-0">
                                             <div class="font-bold text-slate-900 leading-snug truncate">{{ $ekskul->nama_ekskul }}</div>
-                                            @if ($ekskul->kategori)
-                                                <span class="shrink-0 rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-700">{{ $ekskul->kategori }}</span>
-                                            @endif
                                         </div>
                                     </div>
                                 </div>

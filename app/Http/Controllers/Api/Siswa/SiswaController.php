@@ -135,20 +135,23 @@ class SiswaController extends ApiController
 
         $oldEmail = $user->email;
         $oldFoto = $siswa->foto;
+        $oldNoTelp = $siswa->no_telp;
         $newEmail = $validated['email'] ?? null;
         $newNoTelp = $validated['no_telp'] ?? null;
         $fotoPath = $request->hasFile('foto')
             ? $request->file('foto')->store('profile-photos', 'public')
             : $oldFoto;
 
-        DB::transaction(function () use ($user, $siswa, $oldEmail, $oldFoto, $newEmail, $newNoTelp, $fotoPath) {
+        $changedFields = [];
+
+        DB::transaction(function () use ($user, $siswa, $oldEmail, $oldFoto, $oldNoTelp, $newEmail, $newNoTelp, $fotoPath, &$changedFields) {
             if ($newEmail !== $oldEmail) {
                 $user->update(['email' => $newEmail, 'email_verified_at' => null]);
             }
 
             $changes = [
                 'email' => [$oldEmail, $newEmail],
-                'no_telp' => [$siswa->no_telp, $newNoTelp],
+                'no_telp' => [$oldNoTelp, $newNoTelp],
                 'foto' => [$oldFoto, $fotoPath],
             ];
 
@@ -160,6 +163,7 @@ class SiswaController extends ApiController
 
             foreach ($changes as $field => [$oldValue, $newValue]) {
                 if ($oldValue !== $newValue) {
+                    $changedFields[] = $field;
                     SiswaProfileHistory::create([
                         'siswa_id' => $siswa->id,
                         'changed_by_user_id' => $user->id,
@@ -168,6 +172,10 @@ class SiswaController extends ApiController
                         'new_value' => $newValue,
                     ]);
                 }
+            }
+
+            if (!empty($changedFields)) {
+                NotifikasiService::profilSiswaDiubah($siswa, $changedFields);
             }
         });
 

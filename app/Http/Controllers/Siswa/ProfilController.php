@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
 use App\Models\SiswaProfileHistory;
+use App\Services\NotifikasiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -46,15 +47,20 @@ class ProfilController extends Controller
             'foto.max' => 'Ukuran foto maksimal 2MB.',
         ]);
 
+        $oldUsername = $user->username;
         $oldEmail = $user->email;
         $oldFoto = $siswa->foto;
+        $oldNoTelp = $siswa->no_telp;
+        $newUsername = !empty($validated['username']) ? $validated['username'] : $oldUsername;
         $newEmail = $validated['email'] ?? null;
         $newNoTelp = $validated['no_telp'] ?? null;
         $fotoPath = $request->hasFile('foto')
             ? $request->file('foto')->store('profile-photos', 'public')
             : $oldFoto;
 
-        DB::transaction(function () use ($user, $siswa, $validated, $oldEmail, $oldFoto, $newEmail, $newNoTelp, $fotoPath) {
+        $changedFields = [];
+
+        DB::transaction(function () use ($user, $siswa, $validated, $oldUsername, $oldEmail, $oldFoto, $oldNoTelp, $newUsername, $newEmail, $newNoTelp, $fotoPath, &$changedFields) {
             $userUpdates = [];
             if (!empty($validated['username']) && $validated['username'] !== $user->username) {
                 $userUpdates['username'] = $validated['username'];
@@ -68,8 +74,9 @@ class ProfilController extends Controller
             }
 
             $changes = [
+                'username' => [$oldUsername, $newUsername],
                 'email' => [$oldEmail, $newEmail],
-                'no_telp' => [$siswa->no_telp, $newNoTelp],
+                'no_telp' => [$oldNoTelp, $newNoTelp],
                 'foto' => [$oldFoto, $fotoPath],
             ];
 
@@ -81,6 +88,7 @@ class ProfilController extends Controller
 
             foreach ($changes as $field => [$oldValue, $newValue]) {
                 if ($oldValue !== $newValue) {
+                    $changedFields[] = $field;
                     SiswaProfileHistory::create([
                         'siswa_id' => $siswa->id,
                         'changed_by_user_id' => $user->id,
@@ -89,6 +97,10 @@ class ProfilController extends Controller
                         'new_value' => $newValue,
                     ]);
                 }
+            }
+
+            if (!empty($changedFields)) {
+                NotifikasiService::profilSiswaDiubah($siswa, $changedFields);
             }
 
             if ($siswa->isProfileComplete()) {

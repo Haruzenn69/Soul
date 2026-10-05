@@ -232,17 +232,7 @@
                 <p class="text-xs text-slate-400 mt-1 font-medium">Kelola informasi akun dan data diri kamu</p>
             </div>
 
-            @if(session('success'))
-                <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-2xl shadow-sm animate-fade-up">
-                    {{ session('success') }}
-                </div>
-            @endif
 
-            @if(session('error'))
-                <div class="p-4 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-2xl shadow-sm animate-fade-up">
-                    {{ session('error') }}
-                </div>
-            @endif
 
             @php $profilLengkap = $siswa && $siswa->isProfileComplete(); @endphp
 

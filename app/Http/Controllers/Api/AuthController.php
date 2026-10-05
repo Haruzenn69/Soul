@@ -28,7 +28,7 @@ class AuthController extends ApiController
         $identifier = $validated['identifier'];
         $user = $this->resolveUser($identifier);
 
-        if (! $user || ! Hash::check($validated['password'], $user->password)) {
+        if (! $user || ! $user->is_active || ! Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'identifier' => 'Kredensial yang kamu masukkan tidak cocok.',
             ]);

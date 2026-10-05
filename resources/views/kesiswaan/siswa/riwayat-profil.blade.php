@@ -35,7 +35,7 @@
                     <tbody class="divide-y divide-slate-100 text-xs">
                         @foreach ($riwayat as $item)
                             @php
-                                $label = ['foto' => 'Foto profil', 'no_telp' => 'Nomor telepon', 'email' => 'Email'][$item->field] ?? ucfirst($item->field);
+                                $label = ['foto' => 'Foto profil', 'no_telp' => 'Nomor telepon', 'email' => 'Email', 'username' => 'Username login'][$item->field] ?? ucfirst($item->field);
                             @endphp
                             <tr class="align-top">
                                 <td class="px-5 py-4 whitespace-nowrap text-slate-600">{{ $item->created_at->isoFormat('D MMM YYYY, HH:mm') }}</td>

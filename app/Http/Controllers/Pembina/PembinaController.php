@@ -665,15 +665,20 @@ class PembinaController extends Controller
         ]);
 
         $user = auth()->user();
+        $oldUsername = $user->username;
         $oldEmail = $user->email;
         $oldFoto = $pembina->foto;
+        $oldNoTelp = $pembina->no_telp;
+        $newUsername = !empty($validated['username']) ? $validated['username'] : $oldUsername;
         $newEmail = $validated['email'] ?? null;
         $newNoTelp = $validated['no_telp'] ?? null;
         $fotoPath = $request->hasFile('foto')
             ? $request->file('foto')->store('profile-photos', 'public')
             : $oldFoto;
 
-        DB::transaction(function () use ($pembina, $user, $validated, $oldEmail, $oldFoto, $newEmail, $newNoTelp, $fotoPath) {
+        $changedFields = [];
+
+        DB::transaction(function () use ($pembina, $user, $validated, $oldUsername, $oldEmail, $oldFoto, $oldNoTelp, $newUsername, $newEmail, $newNoTelp, $fotoPath, &$changedFields) {
             $userUpdates = [];
             if (! empty($validated['username']) && $validated['username'] !== $user->username) {
                 $userUpdates['username'] = $validated['username'];
@@ -687,8 +692,9 @@ class PembinaController extends Controller
             }
 
             $changes = [
+                'username' => [$oldUsername, $newUsername],
                 'email' => [$oldEmail, $newEmail],
-                'no_telp' => [$pembina->no_telp, $newNoTelp],
+                'no_telp' => [$oldNoTelp, $newNoTelp],
                 'foto' => [$oldFoto, $fotoPath],
             ];
 
@@ -700,6 +706,7 @@ class PembinaController extends Controller
 
             foreach ($changes as $field => [$oldValue, $newValue]) {
                 if ($oldValue !== $newValue) {
+                    $changedFields[] = $field;
                     PembinaProfileHistory::create([
                         'pembina_id' => $pembina->id,
                         'changed_by_user_id' => $user->id,
@@ -708,6 +715,10 @@ class PembinaController extends Controller
                         'new_value' => $newValue,
                     ]);
                 }
+            }
+
+            if (!empty($changedFields)) {
+                NotifikasiService::profilPembinaDiubah($pembina, $changedFields);
             }
 
             if ($pembina->isProfileComplete()) {

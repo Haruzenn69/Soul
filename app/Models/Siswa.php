@@ -18,6 +18,7 @@ class Siswa extends Model
         'agama',
         'kelas_id',
         'angkatan',
+        'status',
         'jenis_kelamin',
         'email',
         'no_telp',
@@ -93,6 +94,11 @@ class Siswa extends Model
     public function profileHistories(): HasMany
     {
         return $this->hasMany(SiswaProfileHistory::class)->latest();
+    }
+
+    public function classHistories(): HasMany
+    {
+        return $this->hasMany(SiswaRiwayatKelas::class)->orderByDesc('diproses_pada');
     }
 
     public function pengajuanKeluar(): HasMany
