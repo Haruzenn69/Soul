@@ -138,7 +138,7 @@
                             {{-- Pembina / Avatar --}}
                             <td class="py-3.5 px-5">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 font-extrabold flex items-center justify-center text-xs uppercase shrink-0 overflow-hidden">
+                                    <div class="w-9 h-9 rounded-xl bg-sky-100 text-sky-700 font-extrabold flex items-center justify-center text-xs uppercase shrink-0 overflow-hidden">
                                         @if ($p->foto_url)
                                             <img src="{{ $p->foto_url }}" alt="{{ $p->nama }}" class="w-full h-full object-cover">
                                         @else
@@ -159,7 +159,7 @@
 
                             {{-- Jenis Kelamin --}}
                             <td class="py-3.5 px-5 whitespace-nowrap">
-                                <span class="inline-flex items-center gap-1.5 font-semibold {{ $p->jenis_kelamin === 'perempuan' ? 'text-rose-600' : 'text-sky-700' }}">
+                                <span class="inline-flex items-center gap-1.5 font-semibold text-sky-700">
                                     <span class="text-sm leading-none">{{ $p->jenis_kelamin === 'perempuan' ? '♀' : '♂' }}</span>
                                     {{ ucfirst($p->jenis_kelamin ?? '-') }}
                                 </span>
@@ -174,7 +174,8 @@
                             <td class="py-3.5 px-5">
                                 <div class="flex flex-wrap gap-1 items-center">
                                     <button type="button" onclick="document.getElementById('modal-kelola-{{ $p->id }}').showModal()"
-                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-bold text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition">
+                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold text-[11px] bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                                         Kelola Ekskul
                                     </button>
                                 </div>
@@ -183,12 +184,13 @@
                             {{-- Aksi --}}
                             <td class="py-3.5 px-5 text-right whitespace-nowrap">
                                 <a href="{{ route('kesiswaan.pembina.riwayat-profil', $p) }}"
-                                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold rounded-xl transition text-xs mr-1">
-                                    Riwayat Profil
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:border-sky-300 hover:bg-sky-50 text-slate-600 hover:text-sky-700 font-medium rounded-lg transition text-xs mr-1" title="Riwayat Profil">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Riwayat
                                 </a>
                                 @if ($p->user_id)
                                     <a href="{{ route('kesiswaan.users.edit', $p->user_id) }}"
-                                       class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold rounded-xl transition text-xs">
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:border-sky-300 hover:bg-sky-50 text-slate-600 hover:text-sky-700 font-medium rounded-lg transition text-xs">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                         </svg>

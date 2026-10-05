@@ -14,7 +14,7 @@ class SiswaTemplateExport implements FromArray, WithColumnFormatting, WithColumn
 {
     public function headings(): array
     {
-        return ['NIS', 'Nama', 'Jabatan'];
+        return ['NIS', 'Nama', 'Email', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir', 'Agama', 'No. Telp', 'Alamat', 'Media Sosial'];
     }
 
     public function array(): array
@@ -28,6 +28,13 @@ class SiswaTemplateExport implements FromArray, WithColumnFormatting, WithColumn
             'A' => NumberFormat::FORMAT_TEXT,
             'B' => NumberFormat::FORMAT_TEXT,
             'C' => NumberFormat::FORMAT_TEXT,
+            'D' => NumberFormat::FORMAT_TEXT,
+            'E' => NumberFormat::FORMAT_TEXT,
+            'F' => NumberFormat::FORMAT_TEXT,
+            'G' => NumberFormat::FORMAT_TEXT,
+            'H' => NumberFormat::FORMAT_TEXT,
+            'I' => NumberFormat::FORMAT_TEXT,
+            'J' => NumberFormat::FORMAT_TEXT,
         ];
     }
 
@@ -36,7 +43,14 @@ class SiswaTemplateExport implements FromArray, WithColumnFormatting, WithColumn
         return [
             'A' => 20,
             'B' => 30,
-            'C' => 14,
+            'C' => 30,
+            'D' => 20,
+            'E' => 22,
+            'F' => 18,
+            'G' => 16,
+            'H' => 18,
+            'I' => 32,
+            'J' => 28,
         ];
     }
 

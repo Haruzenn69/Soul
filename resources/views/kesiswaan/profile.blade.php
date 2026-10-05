@@ -7,11 +7,7 @@
         <p class="text-xs text-slate-400 mt-0.5">Informasi akun Staff Kesiswaan</p>
     </div>
 
-    @if(session('success'))
-        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-xl animate-fade-up">
-            {{ session('success') }}
-        </div>
-    @endif
+
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- KOLOM KIRI: Foto & Info Singkat -->

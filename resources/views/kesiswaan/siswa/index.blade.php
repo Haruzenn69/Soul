@@ -16,7 +16,7 @@
         return $direction === 'asc' ? 'M8 15l4 4 4-4' : 'M8 9l4-4 4 4';
     };
 
-    $hasFilter = request()->filled(['q', 'kelas_id', 'angkatan', 'jenis_kelamin', 'jabatan']);
+    $hasFilter = request()->filled(['q', 'kelas_id', 'angkatan', 'jenis_kelamin', 'jabatan', 'status']);
 @endphp
 
 <div class="space-y-5 animate-fade-up">
@@ -34,11 +34,18 @@
                     Data Siswa
                 </h1>
                 <p class="text-xs text-white/80 mt-1.5 max-w-xl leading-relaxed">
-                    Daftar seluruh siswa di sekolah. Gunakan pencarian, filter kelas, angkatan, dan urutan kolom untuk menemukan data yang dibutuhkan.
+                    Daftar siswa aktif dan arsip alumni. Gunakan filter status, kelas, dan angkatan untuk menemukan data.
                 </p>
             </div>
 
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
+                <a href="{{ route('kesiswaan.siswa.riwayat-profil-all') }}"
+                   class="inline-flex items-center justify-center gap-2 px-4 py-3 bg-white/15 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/25 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Riwayat Perubahan Profil
+                </a>
                 <a href="{{ route('kesiswaan.users.create') }}"
                    class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +73,12 @@
                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-1">
+            <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2 flex-1">
+                <select name="status" class="px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700">
+                    <option value="aktif" {{ $selectedStatus === 'aktif' ? 'selected' : '' }}>Siswa Aktif</option>
+                    <option value="menunggu_penempatan" {{ $selectedStatus === 'menunggu_penempatan' ? 'selected' : '' }}>Menunggu Penempatan</option>
+                    <option value="nonaktif" {{ $selectedStatus === 'nonaktif' ? 'selected' : '' }}>Arsip Alumni</option>
+                </select>
                 <select name="kelas_id" class="px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                     <option value="">Semua Kelas</option>
                     @foreach ($kelasList as $k)
@@ -149,6 +161,7 @@
                         </th>
                         <th class="py-3.5 px-5">Jenis Kelamin</th>
                         <th class="py-3.5 px-5">Jabatan</th>
+                        <th class="py-3.5 px-5">Status</th>
                         <th class="py-3.5 px-5 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -198,11 +211,18 @@
                                 @endif
                             </td>
 
+                            <td class="py-3.5 px-5 whitespace-nowrap">
+                                <span class="rounded-full px-2.5 py-1 text-[11px] font-bold {{ $s->status === 'nonaktif' ? 'bg-slate-100 text-slate-600' : ($s->status === 'menunggu_penempatan' ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700') }}">
+                                    {{ $s->status === 'nonaktif' ? 'Alumni / Nonaktif' : ($s->status === 'menunggu_penempatan' ? 'Menunggu Penempatan' : 'Aktif') }}
+                                </span>
+                            </td>
+
                             <td class="py-3.5 px-5 text-right whitespace-nowrap">
                                 <a href="{{ route('kesiswaan.siswa.riwayat-profil', $s) }}"
                                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold rounded-xl transition text-xs mr-1">
                                     Riwayat Profil
                                 </a>
+                                <a href="{{ route('kesiswaan.siswa.riwayat-kelas', $s) }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-xl transition text-xs mr-1">Riwayat Kelas</a>
                                 @if ($s->user_id)
                                     <a href="{{ route('kesiswaan.users.edit', $s->user_id) }}"
                                        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold rounded-xl transition text-xs"
@@ -219,7 +239,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-12 text-center">
+                            <td colspan="8" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-slate-400">
                                     <svg class="w-10 h-10 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>

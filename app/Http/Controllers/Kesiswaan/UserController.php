@@ -12,6 +12,7 @@ use App\Models\Kelas;
 use App\Models\Pembina;
 use App\Models\Pendaftaran;
 use App\Models\Siswa;
+use App\Models\TahunAjaran;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\Failure;
 
@@ -76,18 +78,18 @@ class UserController extends Controller
         return Excel::download(new PembinaTemplateExport, 'template-akun-pembina.xlsx');
     }
 
-    public function importPage(): View
+    public function importPage(string $jenis): View
     {
-        $kelas = Kelas::with('tahunAjaran')->orderBy('nama')->get();
+        $kelas = Kelas::with('tahunAjaran')->whereHas('tahunAjaran', fn ($query) => $query->where('status', 'aktif'))->orderBy('nama')->get();
 
-        return view('kesiswaan.users.import', compact('kelas'));
+        return view('kesiswaan.users.import', compact('jenis', 'kelas'));
     }
 
     public function import(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'jenis' => ['required', 'in:siswa,pembina'],
-            'kelas_id' => ['required_if:jenis,siswa', 'nullable', 'integer', 'exists:kelas,id'],
+            'kelas_id' => ['required_if:jenis,siswa', 'nullable', 'integer', Rule::exists('kelas', 'id')->where('tahun_ajaran_id', TahunAjaran::where('status', 'aktif')->value('id'))],
             'file' => ['required', 'file', 'mimes:xlsx,xls,csv'],
         ], [
             'jenis.required' => 'Pilih jenis akun (siswa/pembina) terlebih dahulu.',
@@ -185,7 +187,7 @@ class UserController extends Controller
     public function create(): View
     {
         return view('kesiswaan.users.create', [
-            'kelas' => Kelas::with('tahunAjaran')->orderBy('nama')->get(),
+            'kelas' => Kelas::with('tahunAjaran')->whereHas('tahunAjaran', fn ($query) => $query->where('status', 'aktif'))->orderBy('nama')->get(),
             'ekskuls' => $this->getEskulsWithKetuaStatus(),
         ]);
     }
@@ -209,7 +211,7 @@ class UserController extends Controller
                 'tempat_lahir' => ['nullable', 'string', 'max:100'],
                 'tanggal_lahir' => ['nullable', 'date'],
                 'agama' => ['nullable', 'string', 'max:50'],
-                'kelas_id' => ['required', 'exists:kelas,id'],
+                'kelas_id' => ['required', Rule::exists('kelas', 'id')->where('tahun_ajaran_id', TahunAjaran::where('status', 'aktif')->value('id'))],
                 'angkatan' => ['nullable', 'string', 'max:20'],
                 'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
                 'no_telp' => ['nullable', 'string', 'max:25'],
@@ -324,7 +326,7 @@ class UserController extends Controller
 
         return view('kesiswaan.users.edit', [
             'user' => $user,
-            'kelas' => Kelas::with('tahunAjaran')->orderBy('nama')->get(),
+            'kelas' => Kelas::with('tahunAjaran')->whereHas('tahunAjaran', fn ($query) => $query->where('status', 'aktif'))->orderBy('nama')->get(),
             'ekskuls' => $this->getEskulsWithKetuaStatus($user->id),
         ]);
     }
@@ -351,7 +353,7 @@ class UserController extends Controller
                 'tempat_lahir' => ['nullable', 'string', 'max:100'],
                 'tanggal_lahir' => ['nullable', 'date'],
                 'agama' => ['nullable', 'string', 'max:50'],
-                'kelas_id' => ['required', 'exists:kelas,id'],
+                'kelas_id' => ['required', Rule::exists('kelas', 'id')->where('tahun_ajaran_id', TahunAjaran::where('status', 'aktif')->value('id'))],
                 'angkatan' => ['nullable', 'string', 'max:20'],
                 'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
                 'no_telp' => ['nullable', 'string', 'max:25'],

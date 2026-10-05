@@ -50,7 +50,7 @@ class DashboardController extends Controller
 
         return view('kesiswaan.dashboard', [
             'totalUsers' => User::count(),
-            'totalSiswa' => Siswa::count(),
+            'totalSiswa' => Siswa::whereIn('status', ['aktif', 'menunggu_penempatan'])->count(),
             'totalEkskul' => Ekskul::count(),
             'ekskulBuka' => Ekskul::where('is_open_recruitment', true)->count(),
             'totalKelas' => Kelas::count(),

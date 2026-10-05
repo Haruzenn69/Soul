@@ -8,8 +8,10 @@ use App\Models\Kegiatan;
 use App\Models\LaporanBulanan;
 use App\Models\Notifikasi;
 use App\Models\Pelatih;
+use App\Models\Pembina;
 use App\Models\Pendaftaran;
 use App\Models\PengajuanKeluar;
+use App\Models\Siswa;
 use App\Models\Testimoni;
 use App\Models\User;
 use Carbon\Carbon;
@@ -383,6 +385,48 @@ class NotifikasiService
                 'tipe' => 'ditolak',
             ]);
         }
+    }
+
+    public static function profilSiswaDiubah(Siswa $siswa, array $changedFields): void
+    {
+        $fieldLabels = [
+            'foto' => 'foto profil',
+            'email' => 'email',
+            'no_telp' => 'nomor telepon',
+            'username' => 'username login',
+        ];
+
+        $labels = array_map(fn ($f) => $fieldLabels[$f] ?? $f, $changedFields);
+        $labelsText = implode(', ', $labels);
+
+        $asal = "{$siswa->nama}".($siswa->kelas ? " dari kelas {$siswa->kelas->nama}" : '');
+
+        self::untukKesiswaan([
+            'siswa_id' => $siswa->id,
+            'judul' => 'Perubahan Profil Siswa',
+            'pesan' => "{$asal} telah memperbarui data: {$labelsText}.",
+            'tipe' => 'info',
+        ]);
+    }
+
+    public static function profilPembinaDiubah(Pembina $pembina, array $changedFields): void
+    {
+        $fieldLabels = [
+            'foto' => 'foto profil',
+            'email' => 'email',
+            'no_telp' => 'nomor telepon',
+            'username' => 'username login',
+        ];
+
+        $labels = array_map(fn ($f) => $fieldLabels[$f] ?? $f, $changedFields);
+        $labelsText = implode(', ', $labels);
+
+        self::untukKesiswaan([
+            'pembina_id' => $pembina->id,
+            'judul' => 'Perubahan Profil Pembina',
+            'pesan' => "Pembina {$pembina->nama} telah memperbarui data: {$labelsText}.",
+            'tipe' => 'info',
+        ]);
     }
 
     private static function untukKesiswaan(array $data): void

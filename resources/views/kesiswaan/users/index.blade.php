@@ -43,13 +43,6 @@
             </div>
 
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
-                <a href="{{ route('kesiswaan.users.import-area') }}"
-                   class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/20 transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                    </svg>
-                    Import Excel
-                </a>
                 <a href="{{ route('kesiswaan.users.create') }}"
                    class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,8 +181,15 @@
                             {{-- Pengguna / Nama --}}
                             <td class="py-3.5 px-5">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 font-extrabold flex items-center justify-center text-xs uppercase shrink-0">
-                                        {{ strtoupper(substr($user->siswa?->nama ?? $user->pembina?->nama ?? $user->username ?? 'U', 0, 2)) }}
+                                    <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 font-extrabold flex items-center justify-center text-xs uppercase shrink-0 overflow-hidden">
+                                        @php
+                                            $userFoto = $user->siswa?->foto_url ?? ($user->pembina?->foto ? asset('storage/'.$user->pembina->foto) : null);
+                                        @endphp
+                                        @if($userFoto)
+                                            <img src="{{ $userFoto }}" alt="Avatar" class="w-full h-full object-cover">
+                                        @else
+                                            {{ strtoupper(substr($user->siswa?->nama ?? $user->pembina?->nama ?? $user->username ?? 'U', 0, 2)) }}
+                                        @endif
                                     </div>
                                     <div>
                                         <div class="font-bold text-slate-900 leading-snug">

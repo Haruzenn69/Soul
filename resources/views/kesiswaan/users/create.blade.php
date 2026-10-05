@@ -13,7 +13,7 @@
         $initialStep = 4;
     }
 
-    $currentRole = old('role', 'siswa');
+    $currentRole = old('role', old('jenis') === 'pembina' ? 'pembina' : 'siswa');
     $currentJenisKelamin = old('jenis_kelamin', '');
 @endphp
 
@@ -231,6 +231,16 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl text-xs font-semibold" role="status">
+            {{ session('error') }}
+            @foreach (session('import_errors', []) as $importError)
+                <p class="mt-1">{{ $importError }}</p>
+            @endforeach
+        </div>
+    @endif
+    @endif
+
     {{-- FORM --}}
     <form action="{{ route('kesiswaan.users.store') }}" method="POST" enctype="multipart/form-data" id="form-create-user">
         @csrf
@@ -284,6 +294,10 @@
 
                 {{-- LEFT: FORM COLUMN --}}
                 <div class="flex-1 min-w-0 space-y-5">
+
+                    <a href="{{ route('kesiswaan.users.import-form', 'siswa') }}" class="inline-flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-xs font-bold text-emerald-800 hover:bg-emerald-100">
+                        Import Akun Siswa dengan Excel
+                    </a>
 
                     {{-- STEPPER NAV --}}
                     <div class="bg-white rounded-3xl p-4 md:p-5 border border-sky-100 shadow-sm">
@@ -667,6 +681,9 @@
 
                 {{-- LEFT: FORM --}}
                 <div class="flex-1 min-w-0">
+                    <a href="{{ route('kesiswaan.users.import-form', 'pembina') }}" class="mb-5 inline-flex items-center gap-2 rounded-2xl border border-blue-200 bg-blue-50 px-5 py-3 text-xs font-bold text-blue-800 hover:bg-blue-100">
+                        Import Akun Guru dengan Excel
+                    </a>
                     <div class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-5">
                         <div class="border-b border-slate-100 pb-3">
                             <h3 class="text-sm font-extrabold text-slate-900">Data Guru / Pembina Ekskul</h3>

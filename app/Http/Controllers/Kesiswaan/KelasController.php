@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Kesiswaan;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
+use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,12 +34,23 @@ class KelasController extends Controller
             ->paginate(12)
             ->withQueryString();
 
+        foreach ($kelas as $class) {
+            if ($class->tahunAjaran?->status !== 'aktif' && $class->tahunAjaran) {
+                $class->siswas_count = Siswa::query()->where(function ($query) use ($class) {
+                    $query->where('kelas_id', $class->id)
+                        ->orWhereHas('classHistories', fn ($history) => $history
+                            ->where('tahun_ajaran', $class->tahunAjaran->nama)
+                            ->where('kelas_asal', $class->nama));
+                })->distinct()->count('siswas.id');
+            }
+        }
+
         $counts = [
             'all' => Kelas::count(),
             'x' => Kelas::where('tingkat', 'x')->count(),
             'xi' => Kelas::where('tingkat', 'xi')->count(),
             'xii' => Kelas::where('tingkat', 'xii')->count(),
-            'total_siswa' => \App\Models\Siswa::whereNotNull('kelas_id')->count(),
+            'total_siswa' => Siswa::whereIn('status', ['aktif', 'menunggu_penempatan'])->count(),
         ];
 
         return view('kesiswaan.kelas.index', [
@@ -58,7 +70,17 @@ class KelasController extends Controller
         $sort = in_array($request->input('sort'), ['nama', 'nis', 'created_at'], true) ? $request->input('sort') : 'nama';
         $direction = $request->input('direction') === 'desc' ? 'desc' : 'asc';
 
-        $siswas = $kela->siswas()
+        $historicalYear = $kela->tahunAjaran?->status !== 'aktif' && $kela->tahunAjaran;
+        $siswaQuery = Siswa::query()->where(function ($query) use ($kela, $historicalYear) {
+            $query->where('kelas_id', $kela->id);
+            if ($historicalYear) {
+                $query->orWhereHas('classHistories', fn ($history) => $history
+                    ->where('tahun_ajaran', $kela->tahunAjaran->nama)
+                    ->where('kelas_asal', $kela->nama));
+            }
+        });
+
+        $siswas = (clone $siswaQuery)
             ->when($request->filled('q'), function ($query) use ($request) {
                 $q = '%'.$request->input('q').'%';
                 $query->where(function ($sub) use ($q) {
@@ -74,10 +96,10 @@ class KelasController extends Controller
             ->withQueryString();
 
         $stats = [
-            'total' => $kela->siswas()->count(),
-            'laki' => $kela->siswas()->where('jenis_kelamin', 'laki-laki')->count(),
-            'perempuan' => $kela->siswas()->where('jenis_kelamin', 'perempuan')->count(),
-            'ketua' => $kela->siswas()->where('jabatan', 'ketua')->count(),
+            'total' => (clone $siswaQuery)->count(),
+            'laki' => (clone $siswaQuery)->where('jenis_kelamin', 'laki-laki')->count(),
+            'perempuan' => (clone $siswaQuery)->where('jenis_kelamin', 'perempuan')->count(),
+            'ketua' => (clone $siswaQuery)->where('jabatan', 'ketua')->count(),
         ];
 
         return view('kesiswaan.kelas.show', [

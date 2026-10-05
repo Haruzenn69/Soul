@@ -85,9 +85,6 @@ class EkskulController extends Controller
             'deskripsi'   => ['nullable', 'string'],
             'jadwal'      => ['nullable', 'string', 'max:255'],
         ]);
-<<<<<<< HEAD
-=======
-
         if (!empty($data['pembina_id'])) {
             $pembina = Pembina::findOrFail($data['pembina_id']);
             $count = Ekskul::where('pembina_id', $pembina->id)->count();
@@ -98,7 +95,6 @@ class EkskulController extends Controller
             }
         }
 
->>>>>>> origin/main
         Ekskul::create($data);
 
         return back()->with('success', "Ekskul {$data['nama_ekskul']} berhasil ditambahkan.");

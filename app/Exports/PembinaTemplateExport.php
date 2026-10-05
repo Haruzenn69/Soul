@@ -14,7 +14,7 @@ class PembinaTemplateExport implements FromArray, WithColumnFormatting, WithColu
 {
     public function headings(): array
     {
-        return ['NIP', 'Username', 'Nama'];
+        return ['NIP', 'Username', 'Nama Lengkap', 'Email', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir', 'Agama', 'No. Telp', 'Alamat', 'Media Sosial'];
     }
 
     public function array(): array
@@ -28,6 +28,14 @@ class PembinaTemplateExport implements FromArray, WithColumnFormatting, WithColu
             'A' => NumberFormat::FORMAT_TEXT,
             'B' => NumberFormat::FORMAT_TEXT,
             'C' => NumberFormat::FORMAT_TEXT,
+            'D' => NumberFormat::FORMAT_TEXT,
+            'E' => NumberFormat::FORMAT_TEXT,
+            'F' => NumberFormat::FORMAT_TEXT,
+            'G' => NumberFormat::FORMAT_TEXT,
+            'H' => NumberFormat::FORMAT_TEXT,
+            'I' => NumberFormat::FORMAT_TEXT,
+            'J' => NumberFormat::FORMAT_TEXT,
+            'K' => NumberFormat::FORMAT_TEXT,
         ];
     }
 
@@ -37,6 +45,14 @@ class PembinaTemplateExport implements FromArray, WithColumnFormatting, WithColu
             'A' => 26,
             'B' => 24,
             'C' => 30,
+            'D' => 30,
+            'E' => 20,
+            'F' => 22,
+            'G' => 18,
+            'H' => 16,
+            'I' => 18,
+            'J' => 32,
+            'K' => 28,
         ];
     }
 

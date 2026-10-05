@@ -20,63 +20,67 @@ class SiswaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHeadin
 
     protected array $seenNis = [];
 
+    protected array $seenEmails = [];
+
     public function __construct(protected int $kelasId) {}
 
     public function rules(): array
     {
         return [
-            'nis' => [
-                'required',
-                'string',
-                'digits:10',
-                function (string $attribute, $value, $fail): void {
-                    $nis = trim((string) $value);
-
-                    if (isset($this->seenNis[$nis])) {
-                        $fail("NIS {$nis} duplikat di dalam file.");
-
-                        return;
-                    }
-
-                    if (Siswa::where('nis', $nis)->exists() || User::where('username', $nis)->exists()) {
-                        $fail("NIS {$nis} sudah terdaftar.");
-                    }
-
-                    $this->seenNis[$nis] = true;
-                },
-            ],
-            'jabatan' => ['required', 'string', 'in:siswa,ketua'],
+            'nis' => ['required', 'string', 'digits:10', 'distinct', function (string $attribute, $value, $fail): void {
+                $nis = trim((string) $value);
+                if (Siswa::where('nis', $nis)->exists() || User::where('username', $nis)->exists()) {
+                    $fail("NIS {$nis} sudah terdaftar.");
+                }
+            }],
             'nama' => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255', 'distinct', function (string $attribute, $value, $fail): void {
+                if ($value && User::where('email', trim((string) $value))->exists()) {
+                    $fail('Email '.trim((string) $value).' sudah digunakan.');
+                }
+            }],
+            'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
+            'tempat_lahir' => ['required', 'string', 'max:100'],
+            'tanggal_lahir' => ['required', 'date'],
+            'agama' => ['required', 'string', 'max:50'],
+            'no_telp' => ['nullable', 'string', 'max:25'],
+            'alamat' => ['required', 'string'],
+            'media_sosial' => ['nullable', 'string', 'max:255'],
         ];
     }
 
     public function prepareForValidation(array $row): array
     {
-        return [
-            'nis' => trim((string) ($row['nis'] ?? '')),
-            'nama' => trim((string) ($row['nama'] ?? '')),
-            'jabatan' => strtolower(trim((string) ($row['jabatan'] ?? ''))),
-        ];
+        $clean = [];
+        foreach (['nis', 'nama', 'email', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'agama', 'no_telp', 'alamat', 'media_sosial'] as $key) {
+            $value = trim((string) ($row[$key] ?? ''));
+            $clean[$key] = $value === '' ? null : $value;
+        }
+        $clean['jenis_kelamin'] = SpreadsheetProfileValue::gender($clean['jenis_kelamin']);
+        $clean['tanggal_lahir'] = SpreadsheetProfileValue::date($clean['tanggal_lahir']);
+
+        return $clean;
     }
 
     public function model(array $row): null
     {
-        $this->count++;
-
         $user = User::create([
             'username' => $row['nis'],
-            'email' => null,
+            'email' => $row['email'],
             'password' => Hash::make('password'),
             'role' => 'siswa',
             'email_verified_at' => now(),
         ]);
 
         $user->siswa()->create([
-            'nis' => $row['nis'],
-            'nama' => $row['nama'],
-            'kelas_id' => $this->kelasId,
-            'jabatan' => $row['jabatan'],
+            'nis' => $row['nis'], 'nama' => $row['nama'], 'kelas_id' => $this->kelasId,
+            'jenis_kelamin' => $row['jenis_kelamin'], 'tempat_lahir' => $row['tempat_lahir'] ?? null,
+            'tanggal_lahir' => $row['tanggal_lahir'], 'agama' => $row['agama'],
+            'angkatan' => null, 'email' => $row['email'] ?? null, 'no_telp' => $row['no_telp'] ?? null,
+            'alamat' => $row['alamat'] ?? null, 'medsos' => $row['media_sosial'] ?? null, 'jabatan' => 'siswa',
         ]);
+
+        $this->count++;
 
         return null;
     }

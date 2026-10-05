@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Kesiswaan;
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
 use App\Models\Siswa;
+use App\Models\SiswaProfileHistory;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -17,7 +18,12 @@ class SiswaController extends Controller
         $sort = in_array($request->input('sort'), self::SORTABLE, true) ? $request->input('sort') : 'nama';
         $direction = $request->input('direction') === 'desc' ? 'desc' : 'asc';
 
+        $selectedStatus = in_array($request->input('status'), ['aktif', 'menunggu_penempatan', 'nonaktif'], true)
+            ? $request->input('status')
+            : 'aktif';
+
         $siswas = Siswa::with('kelas')
+            ->where('status', $selectedStatus)
             ->when($request->filled('q'), function ($query) use ($request) {
                 $q = '%'.$request->input('q').'%';
                 $query->where(function ($sub) use ($q) {
@@ -42,6 +48,7 @@ class SiswaController extends Controller
                 ->distinct()->orderBy('angkatan', 'desc')->pluck('angkatan'),
             'sort' => $sort,
             'direction' => $direction,
+            'selectedStatus' => $selectedStatus,
         ]);
     }
 
@@ -52,5 +59,21 @@ class SiswaController extends Controller
             ->paginate(30);
 
         return view('kesiswaan.siswa.riwayat-profil', compact('siswa', 'riwayat'));
+    }
+
+    public function riwayatProfilAll(): View
+    {
+        $riwayat = SiswaProfileHistory::with(['siswa.kelas', 'changedBy.siswa'])
+            ->latest()
+            ->paginate(30);
+
+        return view('kesiswaan.siswa.riwayat-profil-all', compact('riwayat'));
+    }
+
+    public function riwayatKelas(Siswa $siswa): View
+    {
+        $riwayatKelas = $siswa->classHistories()->paginate(30);
+
+        return view('kesiswaan.siswa.riwayat-kelas', compact('siswa', 'riwayatKelas'));
     }
 }

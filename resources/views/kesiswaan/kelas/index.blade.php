@@ -114,16 +114,6 @@
     </div>
 
     {{-- ALERT MESSAGES --}}
-    @if (session('success'))
-        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-2xl shadow-sm">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if (session('error'))
-        <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-2xl shadow-sm">
-            {{ session('error') }}
-        </div>
-    @endif
     @if ($errors->any())
         <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-2xl shadow-sm">
             <ul class="list-disc list-inside space-y-1">

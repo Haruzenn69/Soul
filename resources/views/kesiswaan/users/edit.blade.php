@@ -3,10 +3,36 @@
 @section('title', 'Edit Akun')
 
 @section('content')
-<div class="space-y-5 animate-fade-up max-w-3xl">
-    <div>
-        <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">Edit Akun: {{ $user->username }}</h1>
-        <p class="text-xs text-slate-400 mt-1">Ubah data login, ganti role, atau kelola status akun ini.</p>
+<div class="space-y-5 animate-fade-up">
+
+    {{-- HERO CARD BIRU (STYLE SAMA DENGAN HALAMAN LAIN) --}}
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200">
+        {{-- Ambient blur circles --}}
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
+            <div class="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
+        </div>
+
+        <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">
+                    Edit Akun: {{ $user->username ?: $user->email }}
+                </h1>
+                <p class="text-xs text-white/80 mt-1.5 max-w-xl leading-relaxed">
+                    Ubah data login, ganti role, atau kelola status akun ini melalui panel kesiswaan.
+                </p>
+            </div>
+
+            <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
+                <a href="{{ route('kesiswaan.users.index') }}"
+                   class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/20 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Kembali ke Daftar Akun
+                </a>
+            </div>
+        </div>
     </div>
 
     @if ($errors->any())

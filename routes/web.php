@@ -8,6 +8,8 @@ use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\Kesiswaan\DashboardController as KesiswaanDashboardController;
 use App\Http\Controllers\Kesiswaan\EkskulController;
 use App\Http\Controllers\Kesiswaan\KelasController;
+use App\Http\Controllers\Kesiswaan\KenaikanKelasController;
+use App\Http\Controllers\Kesiswaan\TahunAjaranController;
 use App\Http\Controllers\Kesiswaan\LaporanPenilaianController as KesiswaanLaporanPenilaianController;
 use App\Http\Controllers\Kesiswaan\NotifikasiController as KesiswaanNotifikasiController;
 use App\Http\Controllers\Kesiswaan\PelatihController as KesiswaanPelatihController;
@@ -99,7 +101,8 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('kesiswaan.')->group(function () {
     Route::get('/dashboard', [KesiswaanDashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('users/import', [UserController::class, 'importPage'])->name('users.import-area');
+    Route::get('users/import/{jenis}', [UserController::class, 'importPage'])->whereIn('jenis', ['siswa', 'pembina'])->name('users.import-form');
+    Route::get('users/import', fn () => redirect()->route('kesiswaan.users.create'))->name('users.import-area');
     Route::get('users/template-siswa', [UserController::class, 'templateSiswa'])->name('users.template-siswa');
     Route::get('users/template-pembina', [UserController::class, 'templatePembina'])->name('users.template-pembina');
     Route::post('users/import', [UserController::class, 'import'])->name('users.import');
@@ -116,7 +119,24 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
         'kelas' => 'kela',
     ]);
 
+    // === TAHUN AJARAN (unified page) ===
+    Route::get('tahun-ajaran', [TahunAjaranController::class, 'index'])->name('tahun-ajaran.index');
+    Route::post('tahun-ajaran', [TahunAjaranController::class, 'store'])->name('tahun-ajaran.store');
+    Route::delete('tahun-ajaran/{tahunAjaran}', [TahunAjaranController::class, 'destroy'])->name('tahun-ajaran.destroy');
+    Route::post('tahun-ajaran/{tahunAjaran}/activate', [TahunAjaranController::class, 'activate'])->name('tahun-ajaran.activate');
+    Route::post('tahun-ajaran/{tahunAjaran}/deactivate', [TahunAjaranController::class, 'deactivate'])->name('tahun-ajaran.deactivate');
+    Route::get('tahun-ajaran/{tahunAjaran}/historis', [TahunAjaranController::class, 'historis'])->name('tahun-ajaran.historis');
+    Route::get('tahun-ajaran/{tahunAjaran}/kelas/{kela}', [TahunAjaranController::class, 'showKelas'])->name('tahun-ajaran.kelas.show');
+    Route::post('tahun-ajaran/{tahunAjaran}/kelas/{kela}/assign', [TahunAjaranController::class, 'assignSiswa'])->name('tahun-ajaran.kelas.assign');
+    Route::post('tahun-ajaran/{tahunAjaran}/kelas', [TahunAjaranController::class, 'storeKelas'])->name('tahun-ajaran.kelas.store');
+    Route::delete('tahun-ajaran/{tahunAjaran}/kelas/{kela}', [TahunAjaranController::class, 'destroyKelas'])->name('tahun-ajaran.kelas.destroy');
+
+    Route::get('kenaikan-kelas', [KenaikanKelasController::class, 'index'])->name('kenaikan-kelas.index');
+    Route::post('kenaikan-kelas', [KenaikanKelasController::class, 'assign'])->name('kenaikan-kelas.assign');
+
     Route::get('siswa', [SiswaController::class, 'index'])->name('siswa.index');
+    Route::get('siswa/riwayat-profil', [SiswaController::class, 'riwayatProfilAll'])->name('siswa.riwayat-profil-all');
+    Route::get('siswa/{siswa}/riwayat-kelas', [SiswaController::class, 'riwayatKelas'])->name('siswa.riwayat-kelas');
     Route::get('siswa/{siswa}/riwayat-profil', [SiswaController::class, 'riwayatProfil'])->name('siswa.riwayat-profil');
 
     Route::get('pembina', [KesiswaanPembinaController::class, 'index'])->name('pembina.index');
