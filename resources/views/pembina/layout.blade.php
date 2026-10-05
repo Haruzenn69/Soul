@@ -18,19 +18,17 @@
 </head>
 <body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased flex min-h-screen overflow-x-hidden selection:bg-sky-100 selection:text-sky-700">@php
     $__pembinaEkskuls = auth()->user()?->pembina?->ekskuls ?? collect();
-    $__anggotaItem = $__pembinaEkskuls->count() > 1
-        ? [
-            'icon'     => 'users',
-            'label'    => 'Data Anggota',
-            'is'       => 'pembina.anggota*',
-            'children' => $__pembinaEkskuls->map(fn ($e) => [
-                'icon'  => 'users',
-                'label' => $e->nama_ekskul,
-                'url'   => route('pembina.anggota', ['ekskul' => $e->id]),
-                'is'    => 'pembina.anggota',
-            ])->toArray(),
-          ]
-        : ['icon' => 'users', 'label' => 'Data Anggota', 'url' => route('pembina.anggota'), 'is' => 'pembina.anggota*'];
+    $__anggotaItem = [
+        'icon'     => 'users',
+        'label'    => 'Data Anggota',
+        'is'       => 'pembina.anggota*',
+        'children' => $__pembinaEkskuls->map(fn ($e) => [
+            'icon'  => 'users',
+            'label' => $e->nama_ekskul,
+            'url'   => route('pembina.anggota', ['ekskul' => $e->id]),
+            'is'    => request()->routeIs('pembina.anggota') && (int) request()->input('ekskul') === $e->id ? 'pembina.anggota' : null,
+        ])->toArray(),
+    ];
 @endphp
 @include('partials.pill-sidebar', [
     'psTitle' => 'Menu Pembina',

@@ -148,7 +148,7 @@
                     <select name="ekskul" id="select-ekskul" onchange="this.form.submit()"
                         class="pl-4 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all appearance-none">
                         @if($ekskuls->count() > 1)
-                            <option value="">ðŸ“‹ Semua Ekskul</option>
+                            <option value="">Semua Ekskul</option>
                         @endif
                         @foreach($ekskuls as $e)
                             <option value="{{ $e->id }}" @selected($selectedEkskul == $e->id || $ekskuls->count() === 1)>
@@ -183,7 +183,7 @@
                         class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-2xl transition shadow-sm shadow-sky-200">
                         Cari
                     </button>
-                    @if($cari || $selectedEkskul || $selectedJurusan || $selectedJenisKelamin || $selectedTingkat || $selectedStatusKeaktifan || $statusKeanggotaan !== 'aktif')
+                    @if($cari || $selectedEkskul || $selectedJurusan || $selectedJenisKelamin || $selectedTingkat || $selectedStatusKeaktifan || $statusKeanggotaan !== 'aktif' || $tampilArsip)
                         <a href="{{ route('pembina.anggota') }}"
                             class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-2xl transition">
                             Reset
@@ -212,8 +212,8 @@
                     <select name="status_keaktifan" id="select-status-keaktifan" onchange="this.form.submit()"
                         class="pl-3 pr-7 py-1.5 bg-white border border-slate-200 rounded-xl text-[11px] text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition-all appearance-none font-semibold">
                         <option value=""           @selected(!$selectedStatusKeaktifan)>Semua Keaktifan</option>
-                        <option value="sangat_aktif" @selected($selectedStatusKeaktifan === 'sangat_aktif')>Sangat Aktif (Ã¢â€°Â¥80%)</option>
-                        <option value="cukup_aktif"  @selected($selectedStatusKeaktifan === 'cukup_aktif')>Cukup Aktif (Ã¢â€°Â¥50%)</option>
+                        <option value="sangat_aktif" @selected($selectedStatusKeaktifan === 'sangat_aktif')>Sangat Aktif (>=80%)</option>
+                        <option value="cukup_aktif"  @selected($selectedStatusKeaktifan === 'cukup_aktif')>Cukup Aktif (>=50%)</option>
                         <option value="kurang_aktif" @selected($selectedStatusKeaktifan === 'kurang_aktif')>Kurang Aktif (&lt;50%)</option>
                         <option value="pasif"         @selected($selectedStatusKeaktifan === 'pasif')>Pasif (0%)</option>
                         <option value="peringatan"    @selected($selectedStatusKeaktifan === 'peringatan')>Peringatan</option>
@@ -242,6 +242,16 @@
                             @php $label = is_array($labels) ? reset($labels) : $labels; @endphp
                             <option value="{{ $kode }}" @selected($selectedJurusan === $kode)>{{ strtoupper($kode) }}</option>
                         @endforeach
+                    </select>
+                    <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></span>
+                </div>
+
+                {{-- Tampilkan Arsip --}}
+                <div class="relative">
+                    <select name="arsip" id="select-arsip" onchange="this.form.submit()"
+                        class="pl-3 pr-7 py-1.5 bg-white border border-slate-200 rounded-xl text-[11px] text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition-all appearance-none font-semibold">
+                        <option value="0" @selected(!$tampilArsip)>Tanpa Arsip</option>
+                        <option value="1" @selected($tampilArsip)>Tampilkan Arsip ({{ $arsipTotal }})</option>
                     </select>
                     <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></span>
                 </div>
@@ -424,6 +434,17 @@
             </div>
         @endif
     </div>
+
+    {{-- ARSIP: hanya muncul saat filter "Tampilkan Arsip" aktif --}}
+    @if($tampilArsip)
+        @include('partials.anggota-arsip', [
+            'arsip' => $arsip,
+            'tampilArsip' => $tampilArsip,
+            'arsipAction' => route('pembina.anggota'),
+            'arsipShowEkskul' => $ekskuls->count() > 1,
+            'arsipPeriodeRoute' => 'pembina.arsip.periode-ketua',
+        ])
+    @endif
 
 </div>
 @endsection

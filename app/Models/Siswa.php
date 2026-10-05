@@ -28,7 +28,7 @@ class Siswa extends Model
 
     public function getFotoUrlAttribute(): ?string
     {
-        return $this->foto ? asset('storage/' . $this->foto) : null;
+        return $this->foto ? asset('storage/'.$this->foto) : null;
     }
 
     protected function casts(): array
@@ -56,6 +56,33 @@ class Siswa extends Model
     public function pengajuanKeluars(): HasMany
     {
         return $this->hasMany(PengajuanKeluar::class);
+    }
+
+    public function riwayatJabatans(): HasMany
+    {
+        return $this->hasMany(RiwayatJabatan::class);
+    }
+
+    /**
+     * Riwayat jabatan ketua pada satu ekskul, termasuk periode yang sedang berjalan.
+     */
+    public function riwayatKetua(Ekskul|int $ekskul): HasMany
+    {
+        return $this->riwayatJabatans()
+            ->where('jabatan', RiwayatJabatan::JABATAN_KETUA)
+            ->where('ekskul_id', $ekskul instanceof Ekskul ? $ekskul->id : $ekskul);
+    }
+
+    /**
+     * Periode ketua yang sudah selesai pada ekskul tertentu (data arsip).
+     */
+    public function selesaiSebagaiKetua(Ekskul|int $ekskul): ?RiwayatJabatan
+    {
+        return $this->riwayatKetua($ekskul)
+            ->whereNotNull('selesai')
+            ->orderByDesc('selesai')
+            ->orderByDesc('id')
+            ->first();
     }
 
     public function notifikasis(): HasMany

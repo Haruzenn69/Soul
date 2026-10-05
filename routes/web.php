@@ -196,6 +196,7 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::get('/anggota/{pendaftaran}', [PembinaController::class, 'anggotaShow'])->name('anggota.show');
     Route::post('/ekskuls/{ekskul}/pilih-ketua/{siswa}', [PembinaController::class, 'pilihKetua'])->name('ekskul.pilih-ketua');
     Route::post('/ekskuls/{ekskul}/copot-ketua/{siswa}', [PembinaController::class, 'copotKetua'])->name('ekskul.copot-ketua');
+    Route::patch('/arsip/periode-ketua/{riwayat}', [PembinaController::class, 'updatePeriodeKetua'])->name('arsip.periode-ketua');
     Route::get('/pendaftaran', [PembinaController::class, 'pendaftaran'])->name('pendaftaran');
     Route::get('/laporan', [PembinaController::class, 'laporan'])->name('laporan.index');
     Route::get('/laporan/{laporanBulanan}/detail', [PembinaController::class, 'laporanShow'])->name('laporan.show');
@@ -204,6 +205,7 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::post('/laporan/{laporanBulanan}/reject', [PembinaController::class, 'laporanReject'])->name('laporan.reject');
     Route::get('/presensi', [PembinaController::class, 'presensi'])->name('presensi');
     Route::get('/rekap-absensi', [PembinaController::class, 'rekap'])->name('rekap');
+    Route::get('/rekap-absensi/download', [PembinaController::class, 'rekapPdf'])->name('rekap.download');
     Route::get('/testimoni', [PembinaTestimoniController::class, 'index'])->name('testimoni.index');
     Route::post('/testimoni', [PembinaTestimoniController::class, 'store'])->name('testimoni.store');
     Route::patch('/testimoni/{testimoni}/approve', [PembinaTestimoniController::class, 'approve'])->name('testimoni.approve');

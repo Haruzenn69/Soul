@@ -12,6 +12,7 @@ class Pembina extends Model
         'user_id',
         'nip',
         'foto',
+        'kategori_pernah_dibina',
         'nama',
         'tempat_lahir',
         'tanggal_lahir',
@@ -25,7 +26,23 @@ class Pembina extends Model
 
     public function getFotoUrlAttribute(): ?string
     {
-        return $this->foto ? asset('storage/' . $this->foto) : null;
+        return $this->foto ? asset('storage/'.$this->foto) : null;
+    }
+
+    /**
+     * Kategori ekskul yang saat ini aktif dibina (jika membina ekskul).
+     */
+    public function getKategoriAktifAttribute(): ?string
+    {
+        return $this->ekskuls->first()?->kategori;
+    }
+
+    /**
+     * Kategori yang terafiliasi dengan pembina: kategori aktif jika sedang membina, atau riwayat pernah membina.
+     */
+    public function getKategoriBinaanAttribute(): ?string
+    {
+        return $this->kategori_aktif ?: $this->kategori_pernah_dibina;
     }
 
     protected function casts(): array

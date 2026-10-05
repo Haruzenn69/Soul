@@ -7,6 +7,9 @@ use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Http\Resources\PendaftaranResource;
 use App\Models\Pendaftaran;
 use App\Models\PengajuanKeluar;
+use App\Models\RiwayatJabatan;
+use App\Models\Siswa;
+use App\Services\ArsipEkskulService;
 use App\Services\NotifikasiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,16 +28,21 @@ class MembershipController extends ApiController
 
         $total = (clone $query)->count();
 
+        // Tanpa filter status, hanya anggota aktif yang dikembalikan
+        // (data arsip disembunyikan sampai diminta lewat ?arsip=1).
+        $status = $request->input('status');
+        $tampilArsip = $request->boolean('arsip');
+
+        if (! $request->filled('status') || $status === 'semua') {
+            $query->whereIn('status', ['diterima', 'peringatan']);
+        } else {
+            $query->where('status', $status);
+        }
+
         if ($cari = $request->input('cari')) {
             $query->whereHas('siswa', fn ($s) => $s
                 ->where('nama', 'like', "%{$cari}%")
                 ->orWhere('nis', 'like', "%{$cari}%"));
-        }
-
-        if ($status = $request->input('status')) {
-            if ($status !== 'semua') {
-                $query->where('status', $status);
-            }
         }
 
         $peringatanCount = (clone $query)->where('status', 'peringatan')->count();
@@ -45,11 +53,15 @@ class MembershipController extends ApiController
             ->orderBy('tanggal_daftar', 'desc')
             ->paginate(10);
 
+        $arsipService = app(ArsipEkskulService::class);
+
         return $this->ok([
             'total' => $total,
             'peringatan_count' => $peringatanCount,
             'nonaktif_count' => $nonaktifCount,
             'keluar_count' => $keluarCount,
+            'arsip_total' => $arsipService->hitungTotal($ekskul),
+            'arsip' => $tampilArsip ? $arsipService->arsip($ekskul) : null,
             'anggotas' => PendaftaranResource::collection($anggotas)->resolve(),
             'pagination' => [
                 'current' => $anggotas->currentPage(),
@@ -170,7 +182,7 @@ class MembershipController extends ApiController
 
         DB::transaction(function () use ($pendaftaran, $validated) {
             $pendaftaran = Pendaftaran::lockForUpdate()->findOrFail($pendaftaran->id);
-            $siswa = \App\Models\Siswa::lockForUpdate()->findOrFail($pendaftaran->siswa_id);
+            $siswa = Siswa::lockForUpdate()->findOrFail($pendaftaran->siswa_id);
 
             abort_unless($pendaftaran->status === Pendaftaran::STATUS_PENDING, 422, 'Pendaftaran ini sudah diproses.');
 
@@ -255,7 +267,16 @@ class MembershipController extends ApiController
             $pengajuanKeluar->update(['status' => $validated['status']]);
 
             if ($validated['status'] === PengajuanKeluar::STATUS_DITERIMA) {
+                $ekskul = $pengajuanKeluar->ekskul;
+
                 $pengajuanKeluar->siswa->update(['jabatan' => 'siswa']);
+
+                // Kalau yang keluar adalah ketua, periodenya ditutup supaya
+                // tidak menggantung aktif dan masuk daftar arsip.
+                if ($ekskul) {
+                    app(ArsipEkskulService::class)
+                        ->akhiriPeriodeKetua($ekskul, $pengajuanKeluar->siswa, null, RiwayatJabatan::ALASAN_KELUAR);
+                }
 
                 Pendaftaran::where('siswa_id', $pengajuanKeluar->siswa_id)
                     ->where('ekskul_id', $pengajuanKeluar->ekskul_id)
