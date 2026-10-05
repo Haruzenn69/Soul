@@ -27,6 +27,10 @@ class PenilaianResource extends JsonResource
             'catatan' => $this->catatan,
             'status' => $this->status,
             'dikirim_at' => $this->dikirim_at?->toIso8601String(),
+            'penilai' => $this->penilai ? [
+                'id' => $this->penilai->id,
+                'nama' => $this->penilai->nama,
+            ] : null,
         ];
     }
 }

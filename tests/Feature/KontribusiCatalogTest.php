@@ -3,9 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Faq;
-use App\Models\Notifikasi;
+use App\Models\Pelatih;
 use App\Models\Testimoni;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -74,6 +73,35 @@ class KontribusiCatalogTest extends TestCase
 
         $response->assertStatus(422);
         $this->assertSame(1, Testimoni::count());
+    }
+
+    public function test_catalog_detail_api_reports_verified_trainer_and_existing_testimoni(): void
+    {
+        $ekskul = $this->makeEkskul();
+        $ekskul->pelatih->update([
+            'status_verifikasi' => Pelatih::VERIFIKASI_TERVERIFIKASI,
+        ]);
+        $siswaUser = $this->makeUser('siswa');
+        $siswa = $this->makeSiswa($siswaUser, $this->makeKelas('xii'));
+
+        $this->actingAs($siswaUser)
+            ->getJson('/api/catalog/'.$ekskul->id)
+            ->assertOk()
+            ->assertJsonPath('data.ekskul.ekskul.pelatih.is_terverifikasi', true)
+            ->assertJsonPath('data.ekskul.has_submitted_testimoni', false);
+
+        $ekskul->testimoniss()->create([
+            'user_id' => $siswaUser->id,
+            'nama' => $siswa->nama,
+            'kelas' => $siswa->kelas->nama,
+            'quote' => 'Pengalaman yang menyenangkan.',
+            'status' => Testimoni::STATUS_PENDING,
+        ]);
+
+        $this->actingAs($siswaUser)
+            ->getJson('/api/catalog/'.$ekskul->id)
+            ->assertOk()
+            ->assertJsonPath('data.ekskul.has_submitted_testimoni', true);
     }
 
     public function test_kesiswaan_diblokir_dari_mengirim_testimoni(): void

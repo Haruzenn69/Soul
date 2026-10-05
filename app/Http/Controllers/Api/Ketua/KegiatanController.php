@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Ketua;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Concerns\KetuaEkskul;
+use App\Http\Resources\EkskulResource;
 use App\Http\Resources\KegiatanResource;
 use App\Http\Resources\PendaftaranResource;
 use App\Models\Kegiatan;
@@ -12,9 +13,12 @@ use App\Models\Presensi;
 use App\Models\PresensiPelatih;
 use App\Services\NotifikasiService;
 use App\Services\RekapAbsensiService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class KegiatanController extends ApiController
 {
@@ -259,7 +263,7 @@ class KegiatanController extends ApiController
         ])->values();
 
         return $this->ok([
-            'ekskul' => (new \App\Http\Resources\EkskulResource($data['ekskul']))->resolve(),
+            'ekskul' => (new EkskulResource($data['ekskul']))->resolve(),
             'bulan' => $data['bulan'],
             'kegiatans' => KegiatanResource::collection($data['kegiatans'])->resolve(),
             'event_kegiatans' => KegiatanResource::collection($data['eventKegiatans'])->resolve(),
@@ -274,6 +278,21 @@ class KegiatanController extends ApiController
                 'nama' => $data['pelatih']->nama,
             ] : null,
             'presensi_pelatih' => $data['presensiPelatih'],
+        ]);
+    }
+
+    public function downloadRekapPdf(Request $request): Response
+    {
+        $data = (new RekapAbsensiService)->rekap(
+            $this->ekskul(),
+            (new RekapAbsensiService)->normalizeBulan($request->input('bulan')),
+        );
+        $pdf = Pdf::loadView('ketua.presensi.rekap-pdf', $data);
+        $filename = 'rekap-absensi-'.str_replace('/', '-', $data['bulan']).'-'.Str::slug($data['ekskul']->nama_ekskul ?? 'ekskul').'.pdf';
+
+        return response($pdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 

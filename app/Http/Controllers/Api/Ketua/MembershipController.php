@@ -215,6 +215,9 @@ class MembershipController extends ApiController
         $query = PengajuanKeluar::where('ekskul_id', $ekskul->id);
 
         $total = (clone $query)->count();
+        $pendingCount = (clone $query)->where('status', 'pending')->count();
+        $diterimaCount = (clone $query)->where('status', 'diterima')->count();
+        $ditolakCount = (clone $query)->where('status', 'ditolak')->count();
 
         if ($cari = $request->input('cari')) {
             $query->where(fn ($q) => $q
@@ -232,6 +235,9 @@ class MembershipController extends ApiController
 
         return $this->ok([
             'total' => $total,
+            'pending_count' => $pendingCount,
+            'diterima_count' => $diterimaCount,
+            'ditolak_count' => $ditolakCount,
             'pengajuans' => $pengajuans->map(fn ($p) => [
                 'id' => $p->id,
                 'nama' => $p->siswa->nama ?? '-',

@@ -85,10 +85,9 @@ class EkskulController extends Controller
             'deskripsi' => ['nullable', 'string'],
             'jadwal' => ['nullable', 'string', 'max:255'],
         ]);
-
         if (! empty($data['pembina_id'])) {
-            $pembina = Pembina::with('ekskuls')->findOrFail($data['pembina_id']);
-            $count = $pembina->ekskuls->count();
+            $pembina = Pembina::findOrFail($data['pembina_id']);
+            $count = Ekskul::where('pembina_id', $pembina->id)->count();
             if ($count >= 4) {
                 return back()->withErrors([
                     'pembina_id' => "Pembina {$pembina->nama} sudah membina 4 ekskul (batas maksimal 4 ekskul per pembina).",
@@ -120,7 +119,6 @@ class EkskulController extends Controller
 
             $pembina->update(['kategori_pernah_dibina' => $data['kategori']]);
         }
-
         Ekskul::create($data);
 
         return back()->with('success', "Ekskul {$data['nama_ekskul']} berhasil ditambahkan.");
@@ -135,12 +133,13 @@ class EkskulController extends Controller
             'deskripsi' => ['nullable', 'string'],
             'jadwal' => ['nullable', 'string', 'max:255'],
         ]);
-
         if (! empty($data['pembina_id'])) {
-            $pembina = Pembina::with('ekskuls')->findOrFail($data['pembina_id']);
-            if ($ekskul->pembina_id != $data['pembina_id']) {
-                $pembinaEkskulCount = $pembina->ekskuls->count();
-                if ($pembinaEkskulCount >= 4) {
+            $pembina = Pembina::findOrFail($data['pembina_id']);
+
+            // Skip count check if same pembina
+            if ($ekskul->pembina_id != $pembina->id) {
+                $count = Ekskul::where('pembina_id', $pembina->id)->count();
+                if ($count >= 4) {
                     return back()->withErrors([
                         'pembina_id' => "Pembina {$pembina->nama} sudah membina 4 ekskul (batas maksimal 4 ekskul per pembina).",
                     ])->withInput();
@@ -163,10 +162,10 @@ class EkskulController extends Controller
             if ($adaPembinaLain) {
                 return back()->withErrors(['pembina_id' => "Kategori {$kategoriBaru} sudah dibina oleh pembina lain. Setiap kategori hanya boleh memiliki 1 pembina."])->withInput();
             }
-            $otherEkskul = $pembina->ekskuls->where('id', '!=', $ekskul->id)->first();
-            if ($otherEkskul && $otherEkskul->kategori && $otherEkskul->kategori !== $kategoriBaru) {
+            $existingKategori = $pembina->ekskuls->first()?->kategori;
+            if ($existingKategori && $existingKategori !== $kategoriBaru) {
                 return back()->withErrors([
-                    'pembina_id' => "Pembina {$pembina->nama} membina ekskul berkategori {$otherEkskul->kategori}. Ekskul yang dibina harus dalam kategori yang sama ({$otherEkskul->kategori}).",
+                    'pembina_id' => "Pembina {$pembina->nama} membina kategori {$existingKategori}. Ekskul yang ditugaskan harus berkategori sama ({$existingKategori}).",
                 ])->withInput();
             }
 
