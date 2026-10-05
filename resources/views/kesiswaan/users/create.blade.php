@@ -238,8 +238,7 @@
                 <p class="mt-1">{{ $importError }}</p>
             @endforeach
         </div>
-    @endif
-    @endif
+@endif
 
     {{-- FORM --}}
     <form action="{{ route('kesiswaan.users.store') }}" method="POST" enctype="multipart/form-data" id="form-create-user">

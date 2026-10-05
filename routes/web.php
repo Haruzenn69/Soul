@@ -128,8 +128,6 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
     Route::get('tahun-ajaran/{tahunAjaran}/historis', [TahunAjaranController::class, 'historis'])->name('tahun-ajaran.historis');
     Route::get('tahun-ajaran/{tahunAjaran}/kelas/{kela}', [TahunAjaranController::class, 'showKelas'])->name('tahun-ajaran.kelas.show');
     Route::post('tahun-ajaran/{tahunAjaran}/kelas/{kela}/assign', [TahunAjaranController::class, 'assignSiswa'])->name('tahun-ajaran.kelas.assign');
-    Route::post('tahun-ajaran/{tahunAjaran}/kelas', [TahunAjaranController::class, 'storeKelas'])->name('tahun-ajaran.kelas.store');
-    Route::delete('tahun-ajaran/{tahunAjaran}/kelas/{kela}', [TahunAjaranController::class, 'destroyKelas'])->name('tahun-ajaran.kelas.destroy');
 
     Route::get('kenaikan-kelas', [KenaikanKelasController::class, 'index'])->name('kenaikan-kelas.index');
     Route::post('kenaikan-kelas', [KenaikanKelasController::class, 'assign'])->name('kenaikan-kelas.assign');
