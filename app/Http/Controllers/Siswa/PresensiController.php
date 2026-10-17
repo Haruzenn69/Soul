@@ -17,7 +17,7 @@ class PresensiController extends Controller
         $siswa = $user->siswa;
 
         $pendaftarans = $siswa ? $siswa->activePendaftarans()->with('ekskul')->orderByDesc('id')->get() : collect();
-        $pendaftaran = $siswa ? $this->pilihPendaftaran($pendaftarans, $request->input('ekskul')) : null;
+        $pendaftaran = $siswa ? $this->pilihPendaftaran($pendaftarans, $request->input('ekskul'), $siswa) : null;
 
         if (! $pendaftaran) {
             return view('siswa.presensi', [
@@ -92,7 +92,7 @@ class PresensiController extends Controller
         $siswa = $user->siswa;
 
         $pendaftarans = $siswa ? $siswa->activePendaftarans()->with('ekskul')->orderByDesc('id')->get() : collect();
-        $pendaftaran = $siswa ? $this->pilihPendaftaran($pendaftarans, $request->input('ekskul')) : null;
+        $pendaftaran = $siswa ? $this->pilihPendaftaran($pendaftarans, $request->input('ekskul'), $siswa) : null;
         $ekskul = $pendaftaran?->ekskul;
 
         $service = app(RekapAbsensiService::class);
@@ -124,11 +124,15 @@ class PresensiController extends Controller
     }
 
     /**
-     * Pilih pendaftaran aktif sesuai ekskul yang diminta (id), dengan fallback
-     * ke pendaftaran terbaru bila tidak dipilih/tidak ditemukan.
+     * Pilih pendaftaran aktif sesuai ekskul yang diminta (id) atau dari session active dashboard,
+     * dengan fallback ke resolveActivePendaftaran siswa.
      */
-    private function pilihPendaftaran($pendaftarans, $ekskulId): ?\App\Models\Pendaftaran
+    private function pilihPendaftaran($pendaftarans, $ekskulId, $siswa = null): ?\App\Models\Pendaftaran
     {
+        if ($siswa) {
+            return $siswa->resolveActivePendaftaran($ekskulId ? (int) $ekskulId : null);
+        }
+
         if ($ekskulId) {
             return $pendaftarans->firstWhere('ekskul_id', (int) $ekskulId) ?? $pendaftarans->first();
         }

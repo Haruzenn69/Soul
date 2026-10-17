@@ -163,6 +163,55 @@ class Siswa extends Model
         return $this->activePendaftaran()?->ekskul;
     }
 
+    /**
+     * Dapatkan ekskul yang sedang aktif dipilih dalam session (atau requested),
+     * dengan fallback cerdas: jika siswa adalah ketua di satu ekskul dan anggota di ekskul lain,
+     * secara otomatis default ke ekskul anggota saat berada di area siswa.
+     */
+    public function resolveActiveEkskul(?int $requestedEkskulId = null): ?Ekskul
+    {
+        $aktif = $this->activeEkskuls();
+        if ($aktif->isEmpty()) {
+            return null;
+        }
+
+        if ($requestedEkskulId && $aktif->contains('id', (int) $requestedEkskulId)) {
+            session(['siswa_dashboard_ekskul_id' => (int) $requestedEkskulId]);
+            return $aktif->firstWhere('id', (int) $requestedEkskulId);
+        }
+
+        $sessionEkskulId = session('siswa_dashboard_ekskul_id');
+        if ($sessionEkskulId && $aktif->contains('id', (int) $sessionEkskulId)) {
+            return $aktif->firstWhere('id', (int) $sessionEkskulId);
+        }
+
+        // Default: jika user adalah ketua di salah satu ekskul, defaultkan ke ekskul anggota biasa
+        $ledEkskul = $this->ekskulDipimpin();
+        $memberEkskul = $ledEkskul
+            ? $aktif->firstWhere('id', '!=', $ledEkskul->id)
+            : null;
+
+        $chosen = $memberEkskul ?? $aktif->first();
+        if ($chosen) {
+            session(['siswa_dashboard_ekskul_id' => $chosen->id]);
+        }
+
+        return $chosen;
+    }
+
+    /**
+     * Dapatkan pendaftaran aktif sesuai ekskul yang sedang dipilih.
+     */
+    public function resolveActivePendaftaran(?int $requestedEkskulId = null): ?Pendaftaran
+    {
+        $ekskul = $this->resolveActiveEkskul($requestedEkskulId);
+        if (! $ekskul) {
+            return $this->activePendaftaran();
+        }
+
+        return $this->activePendaftaranUntuk($ekskul);
+    }
+
     public function pendingPendaftarans(): HasMany
     {
         return $this->pendaftarans()->where('status', Pendaftaran::STATUS_PENDING);

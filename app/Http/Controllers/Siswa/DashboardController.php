@@ -18,30 +18,17 @@ class DashboardController extends Controller
         $hasMultipleEkskul = $activeEkskuls->count() >= 2;
 
         // Determine selected ekskul for switch-dashboard
-        $selectedEkskulId = null;
-        if ($hasMultipleEkskul) {
-            $requested = request('ekskul');
-            if ($requested && $activeEkskuls->contains('id', (int) $requested)) {
-                $selectedEkskulId = (int) $requested;
-                session(['siswa_dashboard_ekskul_id' => $selectedEkskulId]);
-            } elseif (session()->has('siswa_dashboard_ekskul_id') && $activeEkskuls->contains('id', session('siswa_dashboard_ekskul_id'))) {
-                $selectedEkskulId = session('siswa_dashboard_ekskul_id');
-            } else {
-                // Default to first ekskul
-                $selectedEkskulId = $activeEkskuls->first()?->id;
-                session(['siswa_dashboard_ekskul_id' => $selectedEkskulId]);
+        if ($hasMultipleEkskul && request('ekskul')) {
+            $ledEkskul = $siswa ? $siswa->ekskulDipimpin() : null;
+            if ($ledEkskul && (int) request('ekskul') === (int) $ledEkskul->id) {
+                return redirect()->route('ketua.dashboard');
             }
         }
 
-        // Resolve the "active" ekskul for this dashboard view
-        if ($hasMultipleEkskul && $selectedEkskulId) {
-            $ekskul = $activeEkskuls->firstWhere('id', $selectedEkskulId);
-            $otherEkskul = $activeEkskuls->firstWhere('id', '!=', $selectedEkskulId);
-        } else {
-            $pendaftaran = $siswa ? $siswa->activePendaftaran() : null;
-            $ekskul = $pendaftaran ? $pendaftaran->ekskul : null;
-            $otherEkskul = null;
-        }
+        $ekskul = $siswa ? $siswa->resolveActiveEkskul(request('ekskul') ? (int) request('ekskul') : null) : null;
+        $selectedEkskulId = $ekskul?->id;
+        $otherEkskul = $hasMultipleEkskul && $ekskul ? $activeEkskuls->firstWhere('id', '!=', $ekskul->id) : null;
+        $pendaftaran = $siswa ? $siswa->activePendaftaranUntuk($ekskul) : null;
 
         // Status: peringatan for the selected ekskul only
         if ($hasMultipleEkskul && $ekskul) {
