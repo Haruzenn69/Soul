@@ -13,9 +13,9 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         $siswa = $user->siswa;
-        $pendaftaran = $siswa ? $siswa->activePendaftaran() : null;
+        $ekskul = $siswa?->ekskulDipimpin() ?? $siswa?->activeEkskul();
 
-        if (! $pendaftaran || ! $pendaftaran->ekskul) {
+        if (! $ekskul) {
             return view('ketua.dashboard', [
                 'ekskul' => null,
                 'totalAnggota' => 0,
@@ -31,8 +31,6 @@ class DashboardController extends Controller
                 'faqPendingCount' => 0,
             ]);
         }
-
-        $ekskul = $pendaftaran->ekskul;
 
         $kegiatanBulanIni = $ekskul->kegiatans()
             ->whereYear('tanggal_kegiatan', now()->year)

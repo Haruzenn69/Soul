@@ -36,7 +36,7 @@ class EkskulController extends Controller
             ->when($request->input('rekrutmen') === 'buka', fn ($q) => $q->where('is_open_recruitment', true))
             ->when($request->input('rekrutmen') === 'tutup', fn ($q) => $q->where('is_open_recruitment', false))
             ->orderBy($sortColumn, $direction)
-            ->paginate(15)
+            ->paginate(50)
             ->withQueryString();
 
         return view('kesiswaan.ekskuls.index', [

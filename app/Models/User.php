@@ -44,8 +44,7 @@ class User extends Authenticatable
 
     public function needsOnboarding(): bool
     {
-        return in_array($this->role, ['siswa', 'pembina'], true)
-            && (is_null($this->onboarding_completed_at) || empty($this->username));
+        return false;
     }
 
     protected $fillable = [

@@ -13,18 +13,14 @@ use Illuminate\Support\Facades\DB;
 
 class PendaftaranController extends Controller
 {
+    private const PROFIL_BELUM_LENGKAP = 'Lengkapi data diri (nama, kelas, jenis kelamin) terlebih dahulu sebelum mendaftar ekskul.';
+
     public function daftar(Request $request)
     {
-        $user = auth()->user();
-        $siswa = $user->siswa;
+        $siswa = auth()->user()->siswa;
 
         if ($siswa && ! $siswa->isProfileComplete()) {
-            return redirect()->route('siswa.profile.edit')->with('error', 'Lengkapi data diri (nama, kelas, jenis kelamin) terlebih dahulu sebelum mendaftar ekskul.');
-        }
-
-        $pendaftaran = $siswa ? $siswa->activePendaftaran() : null;
-        if ($pendaftaran) {
-            return redirect()->route('siswa.dashboard')->with('error', 'Kamu sudah terdaftar di ekskul.');
+            return redirect()->route('siswa.profile.edit')->with('error', self::PROFIL_BELUM_LENGKAP);
         }
 
         $ekskuls = Ekskul::with('pembina')
@@ -39,28 +35,29 @@ class PendaftaranController extends Controller
             })
             ->get();
 
-        return view('siswa.daftar-ekskul', compact('ekskuls', 'siswa'));
+        $alasanDaftar = $siswa?->alasanTidakBisaDaftar();
+        $ekskulAktifs = $siswa ? $siswa->activeEkskuls() : collect();
+        $alasanPerEkskul = $siswa
+            ? $ekskuls->mapWithKeys(fn (Ekskul $e) => [$e->id => $siswa->alasanTidakBisaDaftar($e)])
+            : collect();
+
+        return view('siswa.daftar-ekskul', compact('ekskuls', 'siswa', 'alasanDaftar', 'ekskulAktifs', 'alasanPerEkskul'));
     }
 
     public function formDaftar(Ekskul $ekskul)
     {
-        $user = auth()->user();
-        $siswa = $user->siswa;
+        $siswa = auth()->user()->siswa;
 
         if ($siswa && ! $siswa->isProfileComplete()) {
-            return redirect()->route('siswa.profile.edit')->with('error', 'Lengkapi data diri (nama, kelas, jenis kelamin) terlebih dahulu sebelum mendaftar ekskul.');
-        }
-
-        if ($siswa?->activePendaftaran()) {
-            return redirect()->route('siswa.dashboard')->with('error', 'Kamu sudah terdaftar di ekskul.');
-        }
-
-        if ($siswa && $siswa->pendingPendaftaran()) {
-            return redirect()->route('siswa.dashboard')->with('error', 'Kamu sudah mengajukan pendaftaran. Tunggu verifikasi dari ketua ekskul.');
+            return redirect()->route('siswa.profile.edit')->with('error', self::PROFIL_BELUM_LENGKAP);
         }
 
         if (! $ekskul->status || ! $ekskul->is_open_recruitment) {
             return redirect()->route('siswa.daftar-ekskul')->with('error', 'Pendaftaran ekskul ini sedang ditutup.');
+        }
+
+        if ($siswa && ($alasan = $siswa->alasanTidakBisaDaftar($ekskul))) {
+            return redirect()->route('siswa.daftar-ekskul')->with('error', $alasan);
         }
 
         $ekskul->load('pembina');
@@ -70,21 +67,12 @@ class PendaftaranController extends Controller
 
     public function store(Request $request)
     {
-        $user = auth()->user();
-        $siswa = $user->siswa;
+        $siswa = auth()->user()->siswa;
 
         abort_unless($siswa, 403, 'Profil siswa belum tersedia. Hubungi kesiswaan.');
 
-        if ($siswa->activePendaftaran()) {
-            return redirect()->back()->with('error', 'Kamu sudah terdaftar di ekskul.');
-        }
-
-        if ($siswa->pendingPendaftaran()) {
-            return redirect()->back()->with('error', 'Kamu sudah mengajukan pendaftaran. Tunggu verifikasi dari ketua ekskul.');
-        }
-
-        if (! $siswa?->isProfileComplete()) {
-            return redirect()->route('siswa.profile.edit')->with('error', 'Lengkapi data diri (nama, kelas, jenis kelamin) terlebih dahulu sebelum mendaftar ekskul.');
+        if (! $siswa->isProfileComplete()) {
+            return redirect()->route('siswa.profile.edit')->with('error', self::PROFIL_BELUM_LENGKAP);
         }
 
         $validated = $request->validate([
@@ -97,17 +85,24 @@ class PendaftaranController extends Controller
             'alasan.max' => 'Alasan bergabung maksimal 1000 karakter.',
         ]);
 
-        $pendaftaran = DB::transaction(function () use ($siswa, $validated) {
+        $ekskul = Ekskul::findOrFail($validated['ekskul_id']);
+
+        if ($alasan = $siswa->alasanTidakBisaDaftar($ekskul)) {
+            return redirect()->back()->with('error', $alasan);
+        }
+
+        $pendaftaran = DB::transaction(function () use ($siswa, $ekskul, $validated) {
             // Serialize submissions for this student so concurrent requests
-            // cannot both pass the active/pending enrollment checks.
+            // cannot both pass the enrollment rules.
             Siswa::whereKey($siswa->id)->lockForUpdate()->firstOrFail();
 
-            $ekskul = Ekskul::query()->whereKey($validated['ekskul_id'])->firstOrFail();
+            $ekskul = Ekskul::query()->lockForUpdate()->findOrFail($ekskul->id);
+
             if (! $ekskul->status || ! $ekskul->is_open_recruitment) {
                 abort(422, 'Pendaftaran ekskul ini sedang ditutup.');
             }
 
-            if ($siswa->activePendaftaran() || $siswa->pendingPendaftaran()) {
+            if ($siswa->fresh()->alasanTidakBisaDaftar($ekskul)) {
                 return false;
             }
 
@@ -120,12 +115,8 @@ class PendaftaranController extends Controller
             ]);
         });
 
-        if ($pendaftaran === null) {
-            return redirect()->back()->with('error', 'Pendaftaran ekskul ini sedang ditutup.');
-        }
-
         if ($pendaftaran === false) {
-            return redirect()->back()->with('error', 'Kamu sudah mengajukan pendaftaran atau terdaftar di ekskul.');
+            return redirect()->back()->with('error', $siswa->fresh()->alasanTidakBisaDaftar($ekskul) ?? 'Kamu tidak dapat mendaftar ke ekskul ini.');
         }
 
         NotifikasiService::pendaftaranMasuk($pendaftaran);

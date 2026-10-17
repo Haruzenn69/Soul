@@ -187,18 +187,17 @@ class MembershipController extends ApiController
             abort_unless($pendaftaran->status === Pendaftaran::STATUS_PENDING, 422, 'Pendaftaran ini sudah diproses.');
 
             if ($validated['status'] === Pendaftaran::STATUS_DITERIMA) {
-                $exists = Pendaftaran::where('siswa_id', $pendaftaran->siswa_id)
-                    ->where('id', '!=', $pendaftaran->id)
-                    ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
-                    ->exists();
+                $alasan = $siswa->alasanTidakDapatMenerima($pendaftaran);
 
-                abort_if($exists, 422, 'Siswa ini sudah aktif di ekskul lain.');
+                abort_if($alasan !== null, 422, $alasan);
             }
 
             $pendaftaran->update(['status' => $validated['status']]);
 
             if ($validated['status'] === Pendaftaran::STATUS_DITERIMA) {
-                $siswa->update(['jabatan' => 'anggota']);
+                if ($siswa->jabatan !== 'ketua') {
+                    $siswa->update(['jabatan' => 'anggota']);
+                }
                 NotifikasiService::pendaftaranDiterima($pendaftaran);
             } else {
                 NotifikasiService::pendaftaranDitolak($pendaftaran);

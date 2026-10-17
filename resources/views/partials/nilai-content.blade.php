@@ -14,6 +14,8 @@
         <p class="text-xs text-slate-400 mt-0.5">Nilai akhir kamu pada periode berjalan</p>
     </div>
 
+    @include('siswa.partials.pemilih-ekskul')
+
     @if (! $pendaftaran || ! $ekskul)
         <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-12 md:p-16 text-center">
             <div class="w-14 h-14 mx-auto rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 mb-4">

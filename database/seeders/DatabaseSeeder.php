@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         // Tahun Ajaran
         $tahunAjaran = TahunAjaran::create([
             'nama' => '2026/2027',
-            'is_active' => true,
+            'status' => 'aktif',
         ]);
 
         // Kelas

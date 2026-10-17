@@ -51,6 +51,9 @@ class AcademicYearRolloverService
             foreach ($currentClasses->where('tingkat', 'x') as $class) {
                 $this->copyClass($class, 'x', $newYear);
                 $this->copyClass($class, 'xi', $newYear);
+                if ($class->jurusan === 'mp') {
+                    $this->findTargetClassByIdentity('mlog', (string) $class->rombel, 'xi', $newYear);
+                }
             }
             foreach ($currentClasses->where('tingkat', 'xi') as $class) {
                 $this->copyClass($class, 'xii', $newYear);
@@ -84,9 +87,13 @@ class AcademicYearRolloverService
                         $graduated++;
                     }
                 } elseif ($class->tingkat === 'x') {
-                    // 10 → waiting for manual placement
-                    $pending += $students->count();
-                    Siswa::query()->whereKey($students->modelKeys())->update(['status' => 'menunggu_penempatan', 'updated_at' => $now]);
+                    // 10 → 11 automatic promotion to corresponding class
+                    $target = $this->findTargetClass($class, 'xi', $newYear);
+                    foreach ($students as $student) {
+                        $this->recordHistory($student, $currentYear->nama, $class->nama, $target->nama, 'kenaikan', $now);
+                        $student->update(['kelas_id' => $target->id, 'status' => 'aktif']);
+                        $promoted++;
+                    }
                 }
             }
 

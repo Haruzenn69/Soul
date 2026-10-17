@@ -467,8 +467,10 @@
         const jurusan = @json(config('kelas.jurusan'));
         Object.entries(jurusan).forEach(([kode, labels]) => {
             Object.keys(tingkatLabels).forEach((tingkat) => {
-                map[tingkat] = map[tingkat] || [];
-                map[tingkat].push({ value: kode, label: labels[tingkat] || kode });
+                if (labels[tingkat]) {
+                    map[tingkat] = map[tingkat] || [];
+                    map[tingkat].push({ value: kode, label: labels[tingkat] });
+                }
             });
         });
         return map;

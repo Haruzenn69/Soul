@@ -10,16 +10,20 @@ use Illuminate\Http\Request;
 
 class PengajuanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
         $siswa = $user->siswa;
 
-        $pendaftaran = $siswa ? $siswa->activePendaftaran()->load('ekskul') : null;
+        $pendaftarans = $siswa ? $siswa->activePendaftarans()->with('ekskul')->orderByDesc('id')->get() : collect();
+        $ekskulId = $request->input('ekskul');
+        $pendaftaran = $ekskulId
+            ? ($pendaftarans->firstWhere('ekskul_id', (int) $ekskulId) ?? $pendaftarans->first())
+            : $pendaftarans->first();
         $ekskul = $pendaftaran ? $pendaftaran->ekskul : null;
-        $pengajuan = $siswa ? $siswa->pengajuanKeluars()->latest('tanggal_pengajuan')->get() : collect();
+        $pengajuan = $siswa ? $siswa->pengajuanKeluars()->with('ekskul')->latest('tanggal_pengajuan')->get() : collect();
 
-        return view('siswa.pengajuan-keluar', compact('siswa', 'ekskul', 'pengajuan'));
+        return view('siswa.pengajuan-keluar', compact('siswa', 'ekskul', 'pendaftaran', 'pendaftarans', 'pengajuan'));
     }
 
     public function store(Request $request)
@@ -27,22 +31,38 @@ class PengajuanController extends Controller
         $user = auth()->user();
         $siswa = $user->siswa;
 
-        $pendaftaran = $siswa ? $siswa->activePendaftaran() : null;
-        if (! $pendaftaran) {
+        if (! $siswa) {
+            return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
+        }
+
+        $pendaftarans = $siswa->activePendaftarans()->with('ekskul')->orderByDesc('id')->get();
+
+        if ($pendaftarans->isEmpty()) {
             return redirect()->back()->with('error', 'Kamu belum terdaftar di ekskul manapun.');
         }
 
-        $pending = $siswa->pengajuanKeluars()->where('status', PengajuanKeluar::STATUS_PENDING)->first();
-        if ($pending) {
-            return redirect()->back()->with('error', 'Kamu masih memiliki permohonan keluar yang berstatus pending.');
-        }
-
         $validated = $request->validate([
+            'ekskul_id' => ['required', 'integer', 'exists:ekskuls,id'],
             'alasan' => ['required', 'string', 'max:1000', new AlasanValid],
         ], [
+            'ekskul_id.required' => 'Silakan pilih ekskul yang ingin kamu ajukan untuk keluar.',
+            'ekskul_id.exists' => 'Ekskul yang dipilih tidak valid.',
             'alasan.required' => 'Alasan keluar wajib diisi.',
             'alasan.max' => 'Alasan keluar maksimal 1000 karakter.',
         ]);
+
+        $pendaftaran = $pendaftarans->firstWhere('ekskul_id', (int) $validated['ekskul_id']);
+        if (! $pendaftaran) {
+            return redirect()->back()->with('error', 'Kamu tidak terdaftar aktif di ekskul yang dipilih.');
+        }
+
+        $pending = $siswa->pengajuanKeluars()
+            ->where('status', PengajuanKeluar::STATUS_PENDING)
+            ->where('ekskul_id', $pendaftaran->ekskul_id)
+            ->exists();
+        if ($pending) {
+            return redirect()->back()->with('error', 'Kamu masih memiliki permohonan keluar yang berstatus pending untuk ekskul ' . $pendaftaran->ekskul->nama_ekskul . '.');
+        }
 
         $pengajuanKeluar = PengajuanKeluar::create([
             'siswa_id' => $siswa->id,

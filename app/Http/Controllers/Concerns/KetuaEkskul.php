@@ -15,7 +15,11 @@ trait KetuaEkskul
     protected function ekskul(): Ekskul
     {
         if (! $this->ketuaEkskulCache) {
-            $ekskul = auth()->user()->siswa?->activeEkskul();
+            $siswa = auth()->user()->siswa;
+
+            // Ketua bisa mengikuti lebih dari satu ekskul, jadi utamakan ekskul
+            // yang benar-benar dipimpin, baru jatuh ke ekskul aktif terakhir.
+            $ekskul = $siswa?->ekskulDipimpin() ?? $siswa?->activeEkskul();
 
             abort_unless($ekskul, 404, 'Anda belum tergabung dalam ekskul mana pun.');
 
