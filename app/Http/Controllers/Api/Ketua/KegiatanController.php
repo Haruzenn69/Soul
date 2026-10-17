@@ -13,6 +13,7 @@ use App\Models\Presensi;
 use App\Models\PresensiPelatih;
 use App\Services\NotifikasiService;
 use App\Services\RekapAbsensiService;
+use App\Support\MediaUrl;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -83,6 +84,7 @@ class KegiatanController extends ApiController
                 'pendaftaran_id' => $p->pendaftaran_id,
                 'status' => $p->status,
                 'nama' => $p->pendaftaran->siswa->nama ?? '-',
+                'foto' => MediaUrl::for($p->pendaftaran->siswa?->foto),
             ])->values(),
             'pelatih_presensi_status' => $kegiatan->presensiPelatihs->first()?->status,
         ]);
@@ -252,6 +254,7 @@ class KegiatanController extends ApiController
         $rows = $data['rows']->map(fn ($r) => [
             'pendaftaran_id' => $r->pendaftaran->id,
             'nama' => $r->pendaftaran->siswa->nama ?? '-',
+            'foto' => MediaUrl::for($r->pendaftaran->siswa?->foto),
             'kelas' => $r->pendaftaran->siswa->kelas->nama ?? '-',
             'sel' => $r->sel,
             'hadir' => $r->hadir,

@@ -23,6 +23,8 @@ Route::get('/catalog/{ekskul}', [CatalogController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
+    Route::post('/auth/onboarding/setup', [AuthController::class, 'setupOnboarding'])
+        ->middleware('throttle:5,1');
 
     Route::post('/catalog/{ekskul}/testimoni', [CatalogController::class, 'storeTestimoni'])
         ->middleware('throttle:5,1');
@@ -47,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/pengajuan-keluar', [SiswaController::class, 'storePengajuan'])->name('pengajuan.store');
         Route::get('/notifikasi', [SiswaController::class, 'notifikasiIndex'])->name('notifikasi');
         Route::post('/notifikasi/{notifikasi}/read', [SiswaController::class, 'bacaNotifikasi'])->name('notifikasi.read');
+        Route::delete('/notifikasi/{notifikasi}', [SiswaController::class, 'hapusNotifikasi'])->name('notifikasi.delete');
         Route::post('/notifikasi/read-all', [SiswaController::class, 'bacaSemuaNotifikasi'])->name('notifikasi.read-all');
         Route::get('/profile', [SiswaController::class, 'profil'])->name('profile');
         Route::post('/profile', [SiswaController::class, 'updateProfil'])->name('profile.update');

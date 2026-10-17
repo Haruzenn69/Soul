@@ -11,6 +11,7 @@ use App\Models\RiwayatJabatan;
 use App\Models\Siswa;
 use App\Services\ArsipEkskulService;
 use App\Services\NotifikasiService;
+use App\Support\MediaUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -240,6 +241,7 @@ class MembershipController extends ApiController
             'pengajuans' => $pengajuans->map(fn ($p) => [
                 'id' => $p->id,
                 'nama' => $p->siswa->nama ?? '-',
+                'foto' => MediaUrl::for($p->siswa?->foto),
                 'alasan' => $p->alasan,
                 'status' => $p->status,
                 'tanggal_pengajuan' => $p->tanggal_pengajuan?->toDateString(),
