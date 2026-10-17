@@ -16,12 +16,15 @@ class PresensiController extends Controller
         $user = auth()->user();
         $siswa = $user->siswa;
 
-        $pendaftaran = $siswa ? $siswa->activePendaftaran() : null;
+        $pendaftarans = $siswa ? $siswa->activePendaftarans()->with('ekskul')->orderByDesc('id')->get() : collect();
+        $pendaftaran = $siswa ? $this->pilihPendaftaran($pendaftarans, $request->input('ekskul')) : null;
 
         if (! $pendaftaran) {
             return view('siswa.presensi', [
                 'presensis' => collect(),
                 'siswa' => $siswa,
+                'pendaftarans' => $pendaftarans,
+                'pendaftaran' => null,
                 'availableMonths' => collect(),
                 'stats' => ['hadir' => 0, 'izin' => 0, 'sakit' => 0, 'alpha' => 0, 'total' => 0],
                 'sort' => 'tanggal',
@@ -80,7 +83,7 @@ class PresensiController extends Controller
 
         $presensis = $query->paginate(10)->withQueryString();
 
-        return view('siswa.presensi', compact('presensis', 'siswa', 'availableMonths', 'stats', 'sort', 'direction'));
+        return view('siswa.presensi', compact('presensis', 'siswa', 'pendaftarans', 'pendaftaran', 'availableMonths', 'stats', 'sort', 'direction'));
     }
 
     public function rekap(Request $request)
@@ -88,7 +91,8 @@ class PresensiController extends Controller
         $user = auth()->user();
         $siswa = $user->siswa;
 
-        $pendaftaran = $siswa ? $siswa->activePendaftaran() : null;
+        $pendaftarans = $siswa ? $siswa->activePendaftarans()->with('ekskul')->orderByDesc('id')->get() : collect();
+        $pendaftaran = $siswa ? $this->pilihPendaftaran($pendaftarans, $request->input('ekskul')) : null;
         $ekskul = $pendaftaran?->ekskul;
 
         $service = app(RekapAbsensiService::class);
@@ -112,9 +116,23 @@ class PresensiController extends Controller
 
         return view('siswa.rekap', array_merge($data, [
             'siswa' => $siswa,
+            'pendaftarans' => $pendaftarans,
             'pendaftaran' => $pendaftaran,
             'rekapSiswa' => $rekapSiswa,
             'unreadNotifCount' => $unreadNotifCount,
         ]));
+    }
+
+    /**
+     * Pilih pendaftaran aktif sesuai ekskul yang diminta (id), dengan fallback
+     * ke pendaftaran terbaru bila tidak dipilih/tidak ditemukan.
+     */
+    private function pilihPendaftaran($pendaftarans, $ekskulId): ?\App\Models\Pendaftaran
+    {
+        if ($ekskulId) {
+            return $pendaftarans->firstWhere('ekskul_id', (int) $ekskulId) ?? $pendaftarans->first();
+        }
+
+        return $pendaftarans->first();
     }
 }

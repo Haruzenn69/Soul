@@ -321,7 +321,7 @@
             <p>Bandung, {{ now()->translatedFormat('d F Y') }}</p>
             <p>Pelatih Ekskul {{ $ekskul->nama_ekskul }}</p>
             <div class="space"></div>
-            <p><strong>{{ $ekskul->pembina->nama ?? '-' }}</strong></p>
+            <p><strong>{{ $pelatihData->nama ?? $ekskul->pembina->nama ?? '-' }}</strong></p>
         </div>
         <div style="clear: both;"></div>
     </div>

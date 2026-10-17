@@ -19,11 +19,13 @@ use App\Models\Pendaftaran;
 use App\Models\Siswa;
 use App\Models\SiswaProfileHistory;
 use App\Rules\AlasanValid;
+use App\Support\AturanEkskul;
 use App\Services\NotifikasiService;
 use App\Services\RekapAbsensiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class SiswaController extends ApiController
@@ -122,10 +124,19 @@ class SiswaController extends ApiController
         $user = $request->user();
 
         $validated = $request->validate([
+            'username' => ['nullable', 'string', 'max:255', Rule::unique('users', 'username')->ignore($user->id)],
             'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'no_telp' => ['nullable', 'string', 'max:25'],
             'foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'jenis_kelamin' => ['nullable', Rule::in(['laki-laki', 'perempuan'])],
+            'tempat_lahir' => ['nullable', 'string', 'max:255'],
+            'tanggal_lahir' => ['nullable', 'date'],
+            'agama' => ['nullable', 'string', 'max:50'],
+            'angkatan' => ['nullable', 'string', 'max:20'],
+            'alamat' => ['nullable', 'string'],
+            'medsos' => ['nullable', 'string', 'max:255'],
         ], [
+            'username.unique' => 'Username sudah dipakai akun lain.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah dipakai akun lain.',
             'foto.image' => 'File foto harus berupa gambar.',
@@ -134,33 +145,68 @@ class SiswaController extends ApiController
         ]);
 
         $oldEmail = $user->email;
+        $oldUsername = $user->username;
+        $newEmail = array_key_exists('email', $validated) ? $validated['email'] : $oldEmail;
+        $newUsername = array_key_exists('username', $validated) ? $validated['username'] : $oldUsername;
+
         $oldFoto = $siswa->foto;
-        $oldNoTelp = $siswa->no_telp;
-        $newEmail = $validated['email'] ?? null;
-        $newNoTelp = $validated['no_telp'] ?? null;
         $fotoPath = $request->hasFile('foto')
             ? $request->file('foto')->store('profile-photos', 'public')
             : $oldFoto;
 
-        $changedFields = [];
+        $siswaFields = [
+            'no_telp',
+            'jenis_kelamin',
+            'tempat_lahir',
+            'tanggal_lahir',
+            'agama',
+            'angkatan',
+            'alamat',
+            'medsos',
+        ];
 
-        DB::transaction(function () use ($user, $siswa, $oldEmail, $oldFoto, $oldNoTelp, $newEmail, $newNoTelp, $fotoPath, &$changedFields) {
+        DB::transaction(function () use ($user, $siswa, $oldEmail, $newEmail, $oldUsername, $newUsername, $oldFoto, $fotoPath, $validated, $siswaFields) {
+            $userUpdate = [];
             if ($newEmail !== $oldEmail) {
-                $user->update(['email' => $newEmail, 'email_verified_at' => null]);
+                $userUpdate['email'] = $newEmail;
+                $userUpdate['email_verified_at'] = null;
+            }
+            if ($newUsername !== $oldUsername) {
+                $userUpdate['username'] = $newUsername;
+            }
+            if (!empty($userUpdate)) {
+                $user->update($userUpdate);
             }
 
-            $changes = [
-                'email' => [$oldEmail, $newEmail],
-                'no_telp' => [$oldNoTelp, $newNoTelp],
-                'foto' => [$oldFoto, $fotoPath],
-            ];
+            $siswaUpdate = [];
+            if (array_key_exists('email', $validated)) {
+                $siswaUpdate['email'] = $newEmail;
+            }
+            if ($fotoPath !== $oldFoto) {
+                $siswaUpdate['foto'] = $fotoPath;
+            }
+            foreach ($siswaFields as $field) {
+                if (array_key_exists($field, $validated)) {
+                    $siswaUpdate[$field] = $validated[$field];
+                }
+            }
 
-            $siswa->update([
-                'email' => $newEmail,
-                'no_telp' => $newNoTelp,
-                'foto' => $fotoPath,
-            ]);
+            $changes = [];
+            if (array_key_exists('email', $validated) && $oldEmail !== $newEmail) {
+                $changes['email'] = [$oldEmail, $newEmail];
+            }
+            if (array_key_exists('no_telp', $validated) && $siswa->no_telp !== ($validated['no_telp'] ?? null)) {
+                $changes['no_telp'] = [$siswa->no_telp, $validated['no_telp'] ?? null];
+            }
+            if ($oldFoto !== $fotoPath) {
+                $changes['foto'] = [$oldFoto, $fotoPath];
+            }
 
+            if (!empty($siswaUpdate)) {
+                $siswa->update($siswaUpdate);
+            }
+
+            $changedFields = [];
             foreach ($changes as $field => [$oldValue, $newValue]) {
                 if ($oldValue !== $newValue) {
                     $changedFields[] = $field;
@@ -180,6 +226,26 @@ class SiswaController extends ApiController
         });
 
         return $this->ok([], 'Profil berhasil diperbarui.');
+    }
+
+    public function updatePassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ], [
+            'current_password.required' => 'Password saat ini wajib diisi.',
+            'current_password.current_password' => 'Password saat ini tidak cocok dengan akun Anda.',
+            'password.required' => 'Password baru wajib diisi.',
+            'password.min' => 'Password baru minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+        ]);
+
+        $request->user()->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return $this->ok([], 'Password berhasil diperbarui.');
     }
 
     public function onboardingComplete(Request $request): JsonResponse
@@ -208,6 +274,8 @@ class SiswaController extends ApiController
             'profile_complete' => $siswa ? $siswa->isProfileComplete() : false,
             'pendaftaran' => $pendaftaran ? (new PendaftaranResource($pendaftaran->loadMissing('ekskul')))->resolve() : null,
             'pending' => $pending ? (new PendaftaranResource($pending->loadMissing('ekskul')))->resolve() : null,
+            'active_ekskuls' => $siswa ? EkskulResource::collection($siswa->activeEkskuls())->resolve() : [],
+            'bisa_daftar' => $siswa ? $siswa->alasanTidakBisaDaftar() === null : false,
             'joinable' => EkskulResource::collection($joinable)->resolve(),
         ]);
     }
@@ -215,20 +283,15 @@ class SiswaController extends ApiController
     public function daftar(Request $request): JsonResponse
     {
         $siswa = $this->siswa();
-        $pendaftaran = $siswa->activePendaftaran();
-
-        if ($pendaftaran) {
-            return $this->error('Kamu sudah terdaftar di ekskul.', 422);
-        }
-
-        $pending = $siswa->pendingPendaftaran();
-
-        if ($pending) {
-            return $this->error('Kamu sudah terdaftar di ekskul.', 422);
-        }
 
         if (! $siswa->isProfileComplete()) {
             return $this->error('Lengkapi data diri (nama, kelas, jenis kelamin) terlebih dahulu sebelum mendaftar ekskul.', 422);
+        }
+
+        $terpakai = $siswa->activePendaftarans()->count() + $siswa->pendingPendaftarans()->count();
+
+        if ($terpakai >= AturanEkskul::MAKS_EKSKUL) {
+            return $this->error('Kamu sudah terdaftar di '.AturanEkskul::MAKS_EKSKUL.' ekskul.', 422);
         }
 
         return $this->ok([
@@ -252,12 +315,14 @@ class SiswaController extends ApiController
             'alasan.max' => 'Alasan bergabung maksimal 1000 karakter.',
         ]);
 
-        if ($siswa->activePendaftaran() || $siswa->pendingPendaftaran()) {
-            return $this->error('Kamu sudah terdaftar di ekskul.', 422);
-        }
-
         if (! $siswa->isProfileComplete()) {
             return $this->error('Lengkapi data diri terlebih dahulu sebelum mendaftar ekskul.', 422);
+        }
+
+        $target = Ekskul::findOrFail($validated['ekskul_id']);
+
+        if ($alasan = $siswa->alasanTidakBisaDaftar($target)) {
+            return $this->error($alasan, 422);
         }
 
         $pendaftaran = DB::transaction(function () use ($siswa, $validated) {
@@ -268,7 +333,7 @@ class SiswaController extends ApiController
                 abort(422, 'Pendaftaran ekskul ini sedang ditutup.');
             }
 
-            if ($siswa->activePendaftaran() || $siswa->pendingPendaftaran()) {
+            if ($siswa->alasanTidakBisaDaftar($ekskul)) {
                 return null;
             }
 
@@ -295,7 +360,8 @@ class SiswaController extends ApiController
     public function presensi(Request $request): JsonResponse
     {
         $siswa = $this->siswa();
-        $pendaftaran = $siswa->activePendaftaran();
+        $targetEkskulId = $request->input('ekskul_id') ?? $request->input('ekskul');
+        $pendaftaran = $targetEkskulId ? $siswa->activePendaftaranUntuk((int) $targetEkskulId) : $siswa->activePendaftaran();
 
         $presensis = collect();
 
@@ -318,6 +384,7 @@ class SiswaController extends ApiController
 
         return $this->ok([
             'pendaftaran' => $pendaftaran ? (new PendaftaranResource($pendaftaran->loadMissing('ekskul')))->resolve() : null,
+            'active_ekskuls' => EkskulResource::collection($siswa->activeEkskuls())->resolve(),
             'presensi' => $presensis->map(fn ($p) => [
                 'id' => $p->id,
                 'status' => $p->status,
@@ -329,7 +396,8 @@ class SiswaController extends ApiController
     public function rekap(Request $request): JsonResponse
     {
         $siswa = $this->siswa();
-        $pendaftaran = $siswa->activePendaftaran();
+        $targetEkskulId = $request->input('ekskul_id') ?? $request->input('ekskul');
+        $pendaftaran = $targetEkskulId ? $siswa->activePendaftaranUntuk((int) $targetEkskulId) : $siswa->activePendaftaran();
         $ekskul = $pendaftaran?->ekskul;
 
         $bulan = (new RekapAbsensiService)->normalizeBulan($request->input('bulan'));
@@ -339,6 +407,7 @@ class SiswaController extends ApiController
                 'ekskul' => null,
                 'bulan' => $bulan,
                 'rekap' => null,
+                'active_ekskuls' => EkskulResource::collection($siswa->activeEkskuls())->resolve(),
             ]);
         }
 
@@ -346,13 +415,17 @@ class SiswaController extends ApiController
 
         $rekapSiswa = $data['rows']->firstWhere('pendaftaran.id', $pendaftaran->id);
 
-        return $this->ok($this->serializeRekap($data, $rekapSiswa));
+        return $this->ok(array_merge(
+            $this->serializeRekap($data, $rekapSiswa),
+            ['active_ekskuls' => EkskulResource::collection($siswa->activeEkskuls())->resolve()]
+        ));
     }
 
-    public function nilai(): JsonResponse
+    public function nilai(Request $request): JsonResponse
     {
         $siswa = $this->siswa();
-        $pendaftaran = $siswa->activePendaftaran();
+        $targetEkskulId = $request->input('ekskul_id') ?? $request->input('ekskul');
+        $pendaftaran = $targetEkskulId ? $siswa->activePendaftaranUntuk((int) $targetEkskulId) : $siswa->activePendaftaran();
         $ekskul = $pendaftaran?->ekskul;
         $periode = Penilaian::periodeSekarang();
 
@@ -370,23 +443,28 @@ class SiswaController extends ApiController
         return $this->ok([
             'pendaftaran' => $pendaftaran ? (new PendaftaranResource($pendaftaran->loadMissing('ekskul')))->resolve() : null,
             'ekskul' => $ekskul ? (new EkskulResource($ekskul))->resolve() : null,
+            'active_ekskuls' => EkskulResource::collection($siswa->activeEkskuls())->resolve(),
             'periode' => $periode,
             'penilaian' => $penilaian ? (new PenilaianResource($penilaian))->resolve() : null,
             'rekap' => $pendaftaran ? Penilaian::kehadiran($pendaftaran, $periode) : null,
         ]);
     }
 
-    public function pengajuanIndex(): JsonResponse
+    public function pengajuanIndex(Request $request): JsonResponse
     {
         $siswa = $this->siswa();
-        $pendaftaran = $siswa->activePendaftaran()?->loadMissing('ekskul');
-        $pengajuans = $siswa->pengajuanKeluars()->latest('tanggal_pengajuan')->get();
+        $targetEkskulId = $request->input('ekskul_id') ?? $request->input('ekskul');
+        $pendaftaran = $targetEkskulId ? $siswa->activePendaftaranUntuk((int) $targetEkskulId) : $siswa->activePendaftaran();
+        $pendaftaran?->loadMissing('ekskul');
+        $pengajuans = $siswa->pengajuanKeluars()->with('ekskul')->latest('tanggal_pengajuan')->get();
 
         return $this->ok([
             'siswa' => (new SiswaResource($siswa->loadMissing('kelas')))->resolve(),
             'ekskul' => $pendaftaran?->ekskul ? (new EkskulResource($pendaftaran->ekskul))->resolve() : null,
+            'active_ekskuls' => EkskulResource::collection($siswa->activeEkskuls())->resolve(),
             'pengajuans' => $pengajuans->map(fn ($p) => [
                 'id' => $p->id,
+                'ekskul' => $p->ekskul ? (new EkskulResource($p->ekskul))->resolve() : null,
                 'alasan' => $p->alasan,
                 'status' => $p->status,
                 'tanggal_pengajuan' => $p->tanggal_pengajuan?->toDateString(),
@@ -397,7 +475,8 @@ class SiswaController extends ApiController
     public function storePengajuan(Request $request): JsonResponse
     {
         $siswa = $this->siswa();
-        $pendaftaran = $siswa->activePendaftaran();
+        $targetEkskulId = $request->input('ekskul_id') ?? $request->input('ekskul');
+        $pendaftaran = $targetEkskulId ? $siswa->activePendaftaranUntuk((int) $targetEkskulId) : $siswa->activePendaftaran();
 
         if (! $pendaftaran) {
             return $this->error('Kamu belum terdaftar di ekskul manapun.', 422);
@@ -405,10 +484,11 @@ class SiswaController extends ApiController
 
         $existsPending = $siswa->pengajuanKeluars()
             ->where('status', PengajuanKeluar::STATUS_PENDING)
+            ->where('ekskul_id', $pendaftaran->ekskul_id)
             ->exists();
 
         if ($existsPending) {
-            return $this->error('Kamu masih memiliki permohonan keluar yang berstatus pending.', 422);
+            return $this->error('Kamu masih memiliki permohonan keluar yang berstatus pending untuk ekskul ini.', 422);
         }
 
         $validated = $request->validate([

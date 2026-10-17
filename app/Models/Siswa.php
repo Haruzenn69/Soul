@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Support\AturanEkskul;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 class Siswa extends Model
 {
@@ -106,12 +108,54 @@ class Siswa extends Model
         return $this->pengajuanKeluars();
     }
 
-    public function activePendaftaran(): ?Pendaftaran
+    /**
+     * Semua pendaftaran yang sedang aktif (diterima atau peringatan).
+     */
+    public function activePendaftarans(): HasMany
     {
         return $this->pendaftarans()
-            ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
-            ->latest('id')
-            ->first();
+            ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN]);
+    }
+
+    /**
+     * Semua ekskul yang sedang diikuti. Sejak aturan multi-ekskul, seorang
+     * siswa bisa punya lebih dari satu.
+     *
+     * @return Collection<int, Ekskul>
+     */
+    public function activeEkskuls(): Collection
+    {
+        return $this->activePendaftarans()
+            ->with('ekskul')
+            ->get()
+            ->pluck('ekskul')
+            ->filter()
+            ->values();
+    }
+
+    public function activeEkskulCount(): int
+    {
+        return $this->activePendaftarans()->count();
+    }
+
+    /**
+     * Ambil pendaftaran aktif pada satu ekskul tertentu (opsional). Tanpa
+     * parameter, mengembalikan yang paling baru untuk kompatibilitas lama.
+     */
+    public function activePendaftaranUntuk(Ekskul|int|null $ekskul = null): ?Pendaftaran
+    {
+        $query = $this->activePendaftarans()->with('ekskul');
+
+        if ($ekskul !== null) {
+            $query->where('ekskul_id', $ekskul instanceof Ekskul ? $ekskul->id : $ekskul);
+        }
+
+        return $query->latest('id')->first();
+    }
+
+    public function activePendaftaran(): ?Pendaftaran
+    {
+        return $this->activePendaftaranUntuk();
     }
 
     public function activeEkskul(): ?Ekskul
@@ -119,12 +163,105 @@ class Siswa extends Model
         return $this->activePendaftaran()?->ekskul;
     }
 
+    public function pendingPendaftarans(): HasMany
+    {
+        return $this->pendaftarans()->where('status', Pendaftaran::STATUS_PENDING);
+    }
+
     public function pendingPendaftaran(): ?Pendaftaran
     {
-        return $this->pendaftarans()
-            ->where('status', Pendaftaran::STATUS_PENDING)
-            ->latest('id')
+        return $this->pendingPendaftarans()->latest('id')->first();
+    }
+
+    /**
+     * Ekskul yang benar-benar dipimpin (jabatan ketua).
+     *
+     * Sumber utama adalah riwayat jabatan yang periodenya masih berjalan.
+     * Kalau data lama belum punya riwayat, jatuh ke ekskul aktif terakhir
+     * supaya tetap kompatibel.
+     */
+    public function ekskulDipimpin(): ?Ekskul
+    {
+        $periode = $this->riwayatJabatans()
+            ->where('jabatan', RiwayatJabatan::JABATAN_KETUA)
+            ->whereNull('selesai')
+            ->with('ekskul')
+            ->orderByDesc('mulai')
+            ->orderByDesc('id')
             ->first();
+
+        if ($periode?->ekskul) {
+            return $periode->ekskul;
+        }
+
+        return $this->isKetua() ? $this->activeEkskul() : null;
+    }
+
+    /**
+     * Kenapa siswa ini belum/tidak boleh mendaftar (opsional ke ekskul
+     * tertentu). Mengembalikan null kalau boleh mendaftar.
+     */
+    public function alasanTidakBisaDaftar(?Ekskul $target = null): ?string
+    {
+        $aktif = $this->activeEkskuls();
+        $pending = $this->pendingPendaftarans()->with('ekskul')->get();
+
+        if ($target) {
+            $sudah = $aktif->contains(fn (Ekskul $e) => $e->id === $target->id)
+                || $pending->contains(fn (Pendaftaran $p) => $p->ekskul_id === $target->id);
+
+            if ($sudah) {
+                return 'Kamu sudah terdaftar atau mengajukan pendaftaran di ekskul ini.';
+            }
+        }
+
+        $terpakai = $aktif->count() + $pending->count();
+
+        if ($terpakai >= AturanEkskul::MAKS_EKSKUL) {
+            return 'Kamu sudah terdaftar di '.$terpakai.' ekskul. Maksimal '.AturanEkskul::MAKS_EKSKUL.' ekskul per siswa.';
+        }
+
+        if ($target && AturanEkskul::isP1i($target->nama_ekskul)) {
+            $bentrokAktif = $aktif->first(fn (Ekskul $e) => AturanEkskul::isP1i($e->nama_ekskul));
+
+            if ($bentrokAktif) {
+                return 'Kamu sudah mengikuti '.$bentrokAktif->nama_ekskul.'. Ekskul '.AturanEkskul::LABEL_P1I.' hanya boleh dipilih satu.';
+            }
+
+            $bentrokPending = $pending->first(fn (Pendaftaran $p) => $p->ekskul && AturanEkskul::isP1i($p->ekskul->nama_ekskul));
+
+            if ($bentrokPending) {
+                return 'Kamu sedang mengajukan '.$bentrokPending->ekskul->nama_ekskul.'. Ekskul '.AturanEkskul::LABEL_P1I.' hanya boleh dipilih satu.';
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Kenapa ketua tidak boleh menerima pendaftaran ini (maksimal ekskul atau
+     * bentrok sesama 4P1I). Mengembalikan null kalau aman diterima.
+     */
+    public function alasanTidakDapatMenerima(Pendaftaran $target): ?string
+    {
+        $lain = $this->activePendaftarans()
+            ->where('id', '!=', $target->id)
+            ->with('ekskul')
+            ->get();
+
+        if ($lain->count() >= AturanEkskul::MAKS_EKSKUL) {
+            return 'Siswa ini sudah aktif di '.AturanEkskul::MAKS_EKSKUL.' ekskul.';
+        }
+
+        if ($target->ekskul && AturanEkskul::isP1i($target->ekskul->nama_ekskul)) {
+            $bentrok = $lain->first(fn (Pendaftaran $p) => $p->ekskul && AturanEkskul::isP1i($p->ekskul->nama_ekskul));
+
+            if ($bentrok) {
+                return 'Siswa ini sudah aktif di ekskul '.AturanEkskul::LABEL_P1I.' ('.$bentrok->ekskul->nama_ekskul.').';
+            }
+        }
+
+        return null;
     }
 
     public function isKetua(): bool

@@ -316,6 +316,55 @@ class PembinaController extends Controller
         return back()->with('success', 'Periode jabatan Ketua Ekskul '.$riwayat->ekskul->nama_ekskul.' atas nama '.$riwayat->siswa->nama.' berhasil diperbarui.');
     }
 
+    public function pilihKetuaPage(Request $request, Ekskul $ekskul)
+    {
+        $ekskulIds = $this->getEkskuls()->pluck('id');
+        abort_unless($ekskulIds->contains($ekskul->id), 403);
+
+        $currentKetua = $ekskul->ketua();
+
+        $cari = trim((string) $request->input('cari'));
+
+        $query = Pendaftaran::where('ekskul_id', $ekskul->id)
+            ->where('status', Pendaftaran::STATUS_DITERIMA)
+            ->with(['siswa.kelas', 'siswa.riwayatJabatans.ekskul'])
+            ->withCount([
+                'presensis as hadir_count' => fn ($q) => $q->where('status', Presensi::STATUS_HADIR),
+                'presensis as total_presensi',
+            ]);
+
+        if ($cari !== '') {
+            $query->whereHas('siswa', function ($q) use ($cari) {
+                $q->where('nama', 'like', "%{$cari}%")
+                    ->orWhere('nis', 'like', "%{$cari}%");
+            });
+        }
+
+        $anggotaCollection = $query->get();
+
+        $anggotaCollection->each(function ($item) use ($ekskul, $currentKetua) {
+            $total = (int) $item->total_presensi;
+            $hadir = (int) $item->hadir_count;
+            $item->persentase_kehadiran = $total > 0 ? round(($hadir / $total) * 100, 1) : 0.0;
+
+            $siswa = $item->siswa;
+            $item->is_current_ketua = $currentKetua && $item->siswa_id === $currentKetua->id;
+
+            $ekskulDipimpin = $siswa?->ekskulDipimpin();
+            $item->is_ketua_di_lain = $ekskulDipimpin && $ekskulDipimpin->id !== $ekskul->id;
+            $item->ekskul_dipimpin_lain = $item->is_ketua_di_lain ? $ekskulDipimpin : null;
+        });
+
+        // Urutkan: Ketua ekskul ini paling atas, lalu siswa nama ASC
+        $anggota = $anggotaCollection->sort(function ($a, $b) {
+            if ($a->is_current_ketua && ! $b->is_current_ketua) return -1;
+            if (! $a->is_current_ketua && $b->is_current_ketua) return 1;
+            return strcasecmp($a->siswa?->nama ?? '', $b->siswa?->nama ?? '');
+        })->values();
+
+        return view('pembina.pilih-ketua', compact('ekskul', 'anggota', 'currentKetua', 'cari'));
+    }
+
     public function pilihKetua(Request $request, Ekskul $ekskul, Siswa $siswa)
     {
         $pembina = auth()->user()?->pembina;
@@ -332,16 +381,11 @@ class PembinaController extends Controller
         }
 
         // Cek apakah siswa ini sudah menjadi ketua di ekskul lain
-        $isKetuaDiLain = Siswa::where('id', $siswa->id)
-            ->where('jabatan', 'ketua')
-            ->whereHas('pendaftarans', function ($q) use ($ekskul) {
-                $q->where('ekskul_id', '!=', $ekskul->id)
-                    ->where('status', 'diterima');
-            })
-            ->exists();
+        $ekskulDipimpin = $siswa->ekskulDipimpin();
+        $isKetuaDiLain = $ekskulDipimpin && $ekskulDipimpin->id !== $ekskul->id;
 
         if ($isKetuaDiLain) {
-            return back()->with('error', "{$siswa->nama} saat ini sudah menjabat sebagai Ketua di ekskul lain. Satu siswa hanya dapat menjadi ketua pada 1 ekskul.");
+            return back()->with('error', "{$siswa->nama} saat ini sudah menjabat sebagai Ketua di ekskul {$ekskulDipimpin->nama_ekskul}. Satu siswa hanya dapat menjadi ketua pada 1 ekskul.");
         }
 
         DB::transaction(function () use ($ekskul, $siswa) {

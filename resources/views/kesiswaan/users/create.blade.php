@@ -1,4 +1,4 @@
-﻿@extends('layouts.kesiswaan')
+@extends('layouts.kesiswaan')
 
 @section('title', 'Buat Akun')
 
@@ -17,48 +17,46 @@
     $currentJenisKelamin = old('jenis_kelamin', '');
 @endphp
 
-<div class="space-y-5 animate-fade-up"
-     x-data="{
-        role: '{{ $currentRole }}',
+<script>
+function userCreateForm() {
+    return {
+        role: @json($currentRole),
         step: {{ $initialStep }},
         totalSteps: 4,
-        jenisKelamin: '{{ $currentJenisKelamin }}',
-        nama: '{{ old('nama', '') }}',
-        nis: '{{ old('nis', '') }}',
-        email: '{{ old('email', '') }}',
-        noTelp: '{{ old('no_telp', '') }}',
-        tanggalLahir: '{{ old('tanggal_lahir', '') }}',
-        tempatLahir: '{{ old('tempat_lahir', '') }}',
-        agama: '{{ old('agama', '') }}',
-        medsos: '{{ old('medsos', '') }}',
-        alamat: `{{ old('alamat', '') }}`,
-        kelasText: '',
+        jenisKelamin: @json($currentJenisKelamin),
+        nama: @json(old('nama', '')),
+        nis: @json(old('nis', '')),
+        email: @json(old('email', '')),
+        noTelp: @json(old('no_telp', '')),
+        tanggalLahir: @json(old('tanggal_lahir', '')),
+        tempatLahir: @json(old('tempat_lahir', '')),
+        agama: @json(old('agama', '')),
+        medsos: @json(old('medsos', '')),
+        alamat: @json(old('alamat', '')),
+        kelasId: @json(old('kelas_id', '')),
+        existingClasses: @json($kelas),
         photoPreview: null,
         pembinaPhotoPreview: null,
-        pembinaEmail: '{{ old('email', '') }}',
-        pembinaNip: '{{ old('nip', '') }}',
-        pembinaNama: '{{ old('pembina_nama', '') }}',
-        pembinaJenisKelamin: '{{ old('pembina_jenis_kelamin', '') }}',
-        pembinaAgama: '{{ old('pembina_agama', '') }}',
-        pembinaNoTelp: '{{ old('pembina_no_telp', '') }}',
-        pembinaTempatLahir: '{{ old('pembina_tempat_lahir', '') }}',
-        pembinaTanggalLahir: '{{ old('pembina_tanggal_lahir', '') }}',
-        pembinaMedsos: '{{ old('pembina_medsos', '') }}',
-        pembinaAlamat: `{{ old('pembina_alamat', '') }}`,
+        pembinaEmail: @json(old('email', '')),
+        pembinaNip: @json(old('nip', '')),
+        pembinaNama: @json(old('pembina_nama', '')),
+        pembinaJenisKelamin: @json(old('pembina_jenis_kelamin', '')),
+        pembinaAgama: @json(old('pembina_agama', '')),
+        pembinaNoTelp: @json(old('pembina_no_telp', '')),
+        pembinaTempatLahir: @json(old('pembina_tempat_lahir', '')),
+        pembinaTanggalLahir: @json(old('pembina_tanggal_lahir', '')),
+        pembinaMedsos: @json(old('pembina_medsos', '')),
+        pembinaAlamat: @json(old('pembina_alamat', '')),
         calculatedAge: '',
+
+        get selectedKelasNama() {
+            if (!this.kelasId) return '-';
+            const k = (this.existingClasses || []).find(c => String(c.id) === String(this.kelasId));
+            return k ? k.nama : '-';
+        },
 
         init() {
             this.calculateAge();
-            this.updateKelasText();
-        },
-
-        updateKelasText() {
-            const sel = document.getElementById('kelas_id_select');
-            if (sel && sel.selectedIndex > 0) {
-                this.kelasText = sel.options[sel.selectedIndex].text;
-            } else {
-                this.kelasText = '';
-            }
         },
 
         calculateAge() {
@@ -109,10 +107,9 @@
                 }
             }
             if (this.step === 2 && targetStep > 2) {
-                const selKelas = document.getElementById('kelas_id_select');
-                if (!selKelas || !selKelas.value) {
+                if (!this.kelasId) {
                     alert('Mohon pilih Kelas siswa.');
-                    selKelas?.focus();
+                    document.getElementById('kelas_id_select')?.focus();
                     return false;
                 }
             }
@@ -188,7 +185,11 @@
             const input = document.getElementById('input-foto-pembina');
             if (input) input.value = '';
         }
-     }">
+    };
+}
+</script>
+
+<div class="space-y-5 animate-fade-up" x-data="userCreateForm()">
 
     {{-- HERO CARD BIRU (STYLE SAMA DENGAN INDEX AKUN PENGGUNA) --}}
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200">
@@ -420,12 +421,12 @@
                     <div x-show="step === 2" x-transition.opacity class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-5">
                         <div class="border-b border-slate-100 pb-3">
                             <h3 class="text-sm font-extrabold text-slate-900">Data Akademik</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">Pilih kelas siswa saat ini.</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Pilih kelas yang akan dimasuki siswa.</p>
                         </div>
 
                         <div>
                             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Kelas <span class="text-rose-500">*</span></label>
-                            <select name="kelas_id" id="kelas_id_select" @change="updateKelasText()"
+                            <select name="kelas_id" id="kelas_id_select" x-model="kelasId" required
                                     class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                                 <option value="">Pilih kelas...</option>
                                 @foreach ($kelas as $k)
@@ -434,6 +435,7 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <p class="text-[10px] text-slate-400 mt-1.5">Hanya menampilkan daftar kelas dari tahun ajaran yang sedang aktif.</p>
                         </div>
 
                         <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
@@ -444,7 +446,7 @@
                             </button>
                             <button type="button" @click="nextStep()"
                                     class="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
-                                Lanjut
+                                <span>Lanjut</span>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </button>
                         </div>
@@ -483,7 +485,7 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Agama</label>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Agama <span class="text-rose-500">*</span></label>
                                 <select name="agama" x-model="agama"
                                         class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                                     <option value="">Pilih Agama...</option>
@@ -493,14 +495,14 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Tempat Lahir</label>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Tempat Lahir <span class="text-rose-500">*</span></label>
                                 <input type="text" name="tempat_lahir" x-model="tempatLahir"
                                        placeholder="Kota / Kabupaten"
                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
-                                    Tanggal Lahir
+                                    Tanggal Lahir <span class="text-rose-500">*</span>
                                     <span x-show="calculatedAge" class="text-[10px] text-sky-600 font-semibold normal-case float-right" x-text="calculatedAge"></span>
                                 </label>
                                 <input type="date" name="tanggal_lahir" x-model="tanggalLahir" @change="calculateAge()"
@@ -606,7 +608,7 @@
                                 {{-- Kelas --}}
                                 <div class="flex items-center justify-between py-2.5">
                                     <span class="text-slate-400 font-semibold">Kelas</span>
-                                    <span class="font-bold text-slate-700 text-right truncate ml-3 max-w-[60%]" x-text="kelasText || '-'"></span>
+                                    <span class="font-bold text-slate-700 text-right truncate ml-3 max-w-[60%]" x-text="selectedKelasNama"></span>
                                 </div>
 
                                 {{-- Jenis Kelamin --}}

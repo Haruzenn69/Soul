@@ -17,8 +17,15 @@ class KelasController extends Controller
     public function index(Request $request): View
     {
         $currentTingkat = $request->input('tingkat');
-        $currentTahunAjaranId = $request->input('tahun_ajaran_id');
         $q = $request->input('q');
+
+        // Mengikuti tahun ajaran aktif secara default jika tidak dipilih secara eksplisit
+        $activeYear = TahunAjaran::where('status', 'aktif')->first();
+        if ($request->has('tahun_ajaran_id')) {
+            $currentTahunAjaranId = $request->input('tahun_ajaran_id') === 'semua' ? null : (int) $request->input('tahun_ajaran_id');
+        } else {
+            $currentTahunAjaranId = $activeYear?->id;
+        }
 
         $sort = in_array($request->input('sort'), ['nama', 'tingkat', 'siswas_count', 'created_at'], true) ? $request->input('sort') : 'nama';
         $direction = $request->input('direction') === 'desc' ? 'desc' : 'asc';
@@ -37,20 +44,28 @@ class KelasController extends Controller
         foreach ($kelas as $class) {
             if ($class->tahunAjaran?->status !== 'aktif' && $class->tahunAjaran) {
                 $class->siswas_count = Siswa::query()->where(function ($query) use ($class) {
-                    $query->where('kelas_id', $class->id)
-                        ->orWhereHas('classHistories', fn ($history) => $history
+                    $query->whereHas('classHistories', fn ($history) => $history
                             ->where('tahun_ajaran', $class->tahunAjaran->nama)
-                            ->where('kelas_asal', $class->nama));
+                            ->where('kelas_asal', $class->nama))
+                        ->orWhere(function ($sub) use ($class) {
+                            $sub->where('kelas_id', $class->id)
+                                ->whereDoesntHave('classHistories', fn ($h) => $h->where('tahun_ajaran', $class->tahunAjaran->nama));
+                        });
                 })->distinct()->count('siswas.id');
+            } else {
+                $class->siswas_count = Siswa::query()->where('kelas_id', $class->id)->count();
             }
         }
 
+        $classFilter = Kelas::query()->when($currentTahunAjaranId, fn ($query) => $query->where('tahun_ajaran_id', $currentTahunAjaranId));
         $counts = [
-            'all' => Kelas::count(),
-            'x' => Kelas::where('tingkat', 'x')->count(),
-            'xi' => Kelas::where('tingkat', 'xi')->count(),
-            'xii' => Kelas::where('tingkat', 'xii')->count(),
-            'total_siswa' => Siswa::whereIn('status', ['aktif', 'menunggu_penempatan'])->count(),
+            'all' => (clone $classFilter)->count(),
+            'x' => (clone $classFilter)->where('tingkat', 'x')->count(),
+            'xi' => (clone $classFilter)->where('tingkat', 'xi')->count(),
+            'xii' => (clone $classFilter)->where('tingkat', 'xii')->count(),
+            'total_siswa' => Siswa::whereHas('kelas', fn ($query) => $query->when($currentTahunAjaranId, fn ($q) => $q->where('tahun_ajaran_id', $currentTahunAjaranId)))
+                ->whereIn('status', ['aktif', 'menunggu_penempatan'])
+                ->count(),
         ];
 
         return view('kesiswaan.kelas.index', [
@@ -58,6 +73,8 @@ class KelasController extends Controller
             'counts' => $counts,
             'tahunAjarans' => TahunAjaran::orderBy('nama', 'desc')->get(),
             'activeTingkat' => $currentTingkat,
+            'currentTahunAjaranId' => $currentTahunAjaranId,
+            'activeYear' => $activeYear,
             'sort' => $sort,
             'direction' => $direction,
         ]);
@@ -72,11 +89,16 @@ class KelasController extends Controller
 
         $historicalYear = $kela->tahunAjaran?->status !== 'aktif' && $kela->tahunAjaran;
         $siswaQuery = Siswa::query()->where(function ($query) use ($kela, $historicalYear) {
-            $query->where('kelas_id', $kela->id);
             if ($historicalYear) {
-                $query->orWhereHas('classHistories', fn ($history) => $history
+                $query->whereHas('classHistories', fn ($history) => $history
                     ->where('tahun_ajaran', $kela->tahunAjaran->nama)
-                    ->where('kelas_asal', $kela->nama));
+                    ->where('kelas_asal', $kela->nama))
+                ->orWhere(function ($sub) use ($kela) {
+                    $sub->where('kelas_id', $kela->id)
+                        ->whereDoesntHave('classHistories', fn ($h) => $h->where('tahun_ajaran', $kela->tahunAjaran->nama));
+                });
+            } else {
+                $query->where('kelas_id', $kela->id);
             }
         });
 

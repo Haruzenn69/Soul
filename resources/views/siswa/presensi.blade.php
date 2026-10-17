@@ -19,6 +19,8 @@
         <p class="text-xs text-slate-400 mt-1 font-medium">Catatan kehadiranmu di setiap kegiatan ekskul</p>
     </div>
 
+    @include('siswa.partials.pemilih-ekskul')
+
     <!-- Statistik Presensi -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <!-- Card 1: Hadir -->

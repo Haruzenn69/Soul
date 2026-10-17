@@ -1,4 +1,4 @@
-﻿@extends('pembina.layout')
+@extends('pembina.layout')
 @section('title', 'Data Anggota & Ketua Ekskul')
 
 @section('content')
@@ -76,16 +76,25 @@
                                         <span class="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-amber-500 text-white">Ketua</span>
                                     </div>
                                     <h4 class="text-xs font-extrabold text-slate-900 truncate mt-1" title="{{ $ketua->nama }}">{{ $ketua->nama }}</h4>
-                                    <p class="text-[10px] text-slate-400">NIS: {{ $ketua->nis }} Ã‚Â· {{ $ketua->kelas->nama ?? '-' }}</p>
+                                    <p class="text-[10px] text-slate-400">NIS: {{ $ketua->nis }} · {{ $ketua->kelas->nama ?? '-' }}</p>
                                 </div>
                             </div>
                         @else
-                            <div class="my-3 p-3 bg-amber-50/60 border border-dashed border-amber-300/80 rounded-2xl text-center">
-                                <span class="text-xl block mb-1">Ã°Å¸â€˜â€˜</span>
-                                <span class="text-[11px] font-bold text-amber-800 block">Belum Ada Ketua</span>
-                                <p class="text-[10px] text-amber-700/80 mt-0.5 leading-snug">
-                                    Pilih salah satu siswa dari tabel anggota di bawah untuk dijadikan Ketua.
+                            <div class="my-3 p-3 bg-slate-50 border border-dashed border-slate-300 rounded-2xl text-center">
+                                <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto mb-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                                </div>
+                                <span class="text-xs font-bold text-slate-800 block">Tambah Ketua</span>
+                                <p class="text-[10px] text-slate-400 mt-0.5 leading-snug">
+                                    Klik tombol di bawah untuk membuka halaman pemilihan Ketua.
                                 </p>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-center">
+                                <a href="{{ route('pembina.ekskul.pilih-ketua-page', $eks) }}"
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-bold text-[11px] shadow-sm transition">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                    <span>Tambah Ketua</span>
+                                </a>
                             </div>
                         @endif
                     </div>
@@ -93,14 +102,22 @@
                     @if($ketua)
                         <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
                             <span class="text-[10px] text-slate-400">Status Aktif</span>
-                            <form action="{{ route('pembina.ekskul.copot-ketua', ['ekskul' => $eks->id, 'siswa' => $ketua->id]) }}" method="POST"
-                                  onsubmit="return confirm('Apakah Anda yakin ingin mencopot jabatan Ketua Ekskul {{ $eks->nama_ekskul }} dari {{ $ketua->nama }}? Siswa akan kembali berstatus anggota biasa.')">
-                                @csrf
-                                <button type="submit" class="inline-flex items-center gap-1 text-[11px] font-bold text-rose-500 hover:text-rose-700 transition">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                    <span>Copot Ketua</span>
-                                </button>
-                            </form>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('pembina.ekskul.pilih-ketua-page', $eks) }}"
+                                   class="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 hover:text-amber-700 transition"
+                                   title="Ganti Ketua Ekskul">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    <span>Ganti Ketua</span>
+                                </a>
+                                <form action="{{ route('pembina.ekskul.copot-ketua', ['ekskul' => $eks->id, 'siswa' => $ketua->id]) }}" method="POST"
+                                      onsubmit="return confirm('Apakah Anda yakin ingin mencopot jabatan Ketua Ekskul {{ $eks->nama_ekskul }} dari {{ $ketua->nama }}? Siswa akan kembali berstatus anggota biasa.')">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center gap-1 text-[11px] font-bold text-rose-500 hover:text-rose-700 transition">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        <span>Copot Ketua</span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -254,7 +271,7 @@
     </div>
 
     {{-- TABEL ANGGOTA --}}
-    <div class="bg-white p-6 rounded-3xl border border-sky-100 shadow-sm animate-fade-up">
+    <div id="tabel-anggota" class="bg-white p-6 rounded-3xl border border-sky-100 shadow-sm animate-fade-up">
         <div class="flex flex-wrap justify-between items-center gap-2 mb-5">
             <div>
                 <h3 class="text-sm font-extrabold text-slate-900">
