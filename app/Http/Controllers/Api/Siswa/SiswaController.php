@@ -21,6 +21,7 @@ use App\Models\SiswaProfileHistory;
 use App\Rules\AlasanValid;
 use App\Services\NotifikasiService;
 use App\Services\RekapAbsensiService;
+use App\Support\MediaUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -452,6 +453,17 @@ class SiswaController extends ApiController
         return $this->noContent();
     }
 
+    public function hapusNotifikasi(Notifikasi $notifikasi): JsonResponse
+    {
+        $siswa = $this->siswa();
+
+        abort_unless($notifikasi->siswa_id === $siswa->id, 403, 'Akses ditolak.');
+
+        $notifikasi->delete();
+
+        return $this->noContent();
+    }
+
     public function bacaSemuaNotifikasi(): JsonResponse
     {
         $siswa = $this->siswa();
@@ -465,6 +477,7 @@ class SiswaController extends ApiController
         $row = fn (object $r) => [
             'pendaftaran_id' => $r->pendaftaran->id,
             'nama' => $r->pendaftaran->siswa->nama ?? '-',
+            'foto' => MediaUrl::for($r->pendaftaran->siswa?->foto),
             'kelas' => $r->pendaftaran->siswa->kelas->nama ?? '-',
             'sel' => $r->sel,
             'hadir' => $r->hadir,
