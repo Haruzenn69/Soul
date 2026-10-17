@@ -113,9 +113,21 @@ class Ekskul extends Model
 
     public function ketua(): ?Siswa
     {
+        $aktif = $this->periodeKetuaAktif()?->siswa;
+        if ($aktif) {
+            return $aktif;
+        }
+
         return $this->pendaftarans()
             ->where('status', Pendaftaran::STATUS_DITERIMA)
-            ->whereHas('siswa', fn ($q) => $q->where('jabatan', 'ketua'))
+            ->whereHas('siswa', function ($q) {
+                $q->where('jabatan', 'ketua')
+                    ->whereDoesntHave('riwayatJabatans', function ($rq) {
+                        $rq->where('ekskul_id', '!=', $this->id)
+                            ->where('jabatan', RiwayatJabatan::JABATAN_KETUA)
+                            ->whereNull('selesai');
+                    });
+            })
             ->first()
             ?->siswa;
     }

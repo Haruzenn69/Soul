@@ -36,13 +36,15 @@
             </svg>
         </div>
         <div class="pt-1">
-            <p class="text-xs text-sky-800">Kamu hanya bisa mendaftar ke <span class="font-semibold">1 ekskul</span> dalam satu periode. Pilih dengan baik sesuai minat dan bakatmu.</p>
+            <p class="text-xs text-sky-800">Kamu bisa mengikuti maksimal <span class="font-semibold">{{ \App\Support\AturanEkskul::MAKS_EKSKUL }} ekskul</span>, dan hanya <span class="font-semibold">satu</span> dari kelompok {{ \App\Support\AturanEkskul::LABEL_P1I }} (Paskibra, Polsis, Pramuka, PMR, IRMA). Pilih dengan baik sesuai minat dan bakatmu.</p>
         </div>
     </div>
 
     <!-- Daftar Ekskul -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+        @php $ekskulAktifIds = ($ekskulAktifs ?? collect())->pluck('id')->all(); @endphp
         @forelse($ekskuls as $ekskul)
+        @php $alasanEkskul = $alasanPerEkskul[$ekskul->id] ?? null; @endphp
         <div class="bg-white p-4 md:p-5 rounded-2xl border border-sky-100 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-sky-200 transition-all duration-300">
             <div class="flex items-center gap-3 mb-3">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white font-bold flex items-center justify-center text-sm shadow-lg shadow-sky-200 uppercase shrink-0">
@@ -55,7 +57,15 @@
             </div>
             <p class="text-xs text-slate-600 mb-3 line-clamp-2">{{ $ekskul->deskripsi ?? 'Deskripsi belum tersedia' }}</p>
 
-            @if($ekskul->is_open_recruitment)
+            @if (in_array($ekskul->id, $ekskulAktifIds, true))
+                <div class="flex items-center justify-between gap-2 mb-3 flex-wrap">
+                    <span class="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded-full">Ekskul Kamu</span>
+                    <span class="text-[10px] text-slate-400">{{ $ekskul->jadwal ?? 'Jadwal belum diatur' }}</span>
+                </div>
+                <span class="block w-full py-2.5 bg-amber-50 text-amber-700 text-xs font-semibold rounded-lg border border-amber-200 text-center select-none">
+                    Sudah Terdaftar
+                </span>
+            @elseif($ekskul->is_open_recruitment && $alasanEkskul === null)
                 <div class="flex items-center justify-between gap-2 mb-3 flex-wrap">
                     <span class="recruitment-open-badge text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full">Buka Pendaftaran</span>
                     <span class="text-[10px] text-slate-400">{{ $ekskul->jadwal ?? 'Jadwal belum diatur' }}</span>
@@ -63,7 +73,7 @@
                 <a href="{{ route('siswa.form-daftar', $ekskul->id) }}" class="block w-full py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-semibold rounded-lg transition shadow-md shadow-sky-200 text-center hover:-translate-y-0.5">
                     Daftar Sekarang
                 </a>
-            @else
+            @elseif(! $ekskul->is_open_recruitment)
                 <div class="flex items-center justify-between gap-2 mb-3 flex-wrap">
                     <span class="text-xs font-semibold text-red-500 bg-red-50 border border-red-100 px-2 py-1 rounded-full">Tidak Membuka Pendaftaran</span>
                     <span class="text-[10px] text-slate-400">{{ $ekskul->jadwal ?? 'Jadwal belum diatur' }}</span>
@@ -71,6 +81,15 @@
                 <button class="w-full py-2.5 bg-slate-100 text-slate-400 text-xs font-semibold rounded-lg cursor-not-allowed border border-slate-100" disabled>
                     Tidak Tersedia
                 </button>
+            @else
+                <div class="flex items-center justify-between gap-2 mb-3 flex-wrap">
+                    <span class="recruitment-open-badge text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full">Buka Pendaftaran</span>
+                    <span class="text-[10px] text-slate-400">{{ $ekskul->jadwal ?? 'Jadwal belum diatur' }}</span>
+                </div>
+                <button class="w-full py-2.5 bg-slate-100 text-slate-400 text-xs font-semibold rounded-lg cursor-not-allowed border border-slate-100" disabled title="{{ $alasanEkskul }}">
+                    Tidak Tersedia
+                </button>
+                <p class="text-[10px] text-amber-600 mt-2 leading-relaxed">{{ $alasanEkskul }}</p>
             @endif
         </div>
         @empty

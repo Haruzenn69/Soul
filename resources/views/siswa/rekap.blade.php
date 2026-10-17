@@ -18,8 +18,13 @@
         <p class="text-xs text-slate-400 mt-1 font-medium">Ringkasan kehadiranmu per bulan di {{ $ekskul->nama_ekskul ?? 'ekskul' }}</p>
     </div>
 
+    @include('siswa.partials.pemilih-ekskul')
+
     <!-- Filter Bulan -->
     <form method="GET" action="{{ route('siswa.rekap') }}" class="bg-white p-4 rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 flex flex-wrap items-center gap-3 animate-fade-up" style="animation-delay: .1s">
+        @if($pendaftaran?->ekskul_id)
+            <input type="hidden" name="ekskul" value="{{ $pendaftaran->ekskul_id }}">
+        @endif
         <span class="text-xs font-bold text-slate-600 flex items-center gap-1.5">
             <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>

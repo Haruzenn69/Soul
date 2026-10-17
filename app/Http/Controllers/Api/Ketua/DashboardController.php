@@ -15,9 +15,10 @@ class DashboardController extends ApiController
 
     public function index(): JsonResponse
     {
-        $pendaftaran = auth()->user()->siswa?->activePendaftaran();
+        $siswa = auth()->user()->siswa;
+        $ekskul = $siswa?->ekskulDipimpin() ?? $siswa?->activeEkskul();
 
-        if (! $pendaftaran || ! $pendaftaran->ekskul) {
+        if (! $ekskul) {
             return $this->ok([
                 'ekskul' => null,
                 'total_anggota' => 0,
@@ -30,8 +31,6 @@ class DashboardController extends ApiController
                 'chart_kelas' => ['labels' => ['Kelas 10', 'Kelas 11', 'Kelas 12'], 'data' => [0, 0, 0]],
             ]);
         }
-
-        $ekskul = $pendaftaran->ekskul;
 
         $kegiatanBulanIni = $ekskul->kegiatans()
             ->whereYear('tanggal_kegiatan', now()->year)

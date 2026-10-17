@@ -196,9 +196,11 @@ class UserController extends Controller
     {
         $isStaff = in_array($request->input('role'), ['admin', 'kesiswaan']);
 
+        $isPembina = $request->input('role') === 'pembina';
+
         $rules = [
             'username' => [$isStaff ? 'required' : 'nullable', 'string', 'max:255', 'unique:users,username'],
-            'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
+            'email'    => [$isPembina ? 'nullable' : 'required', 'nullable', 'email', 'max:255', 'unique:users,email'],
             // Role admin hanya bisa dibuat oleh admin (kesiswaan tidak boleh)
             'role'     => ['required', 'in:' . $this->allowedRoles()],
         ];
@@ -208,9 +210,9 @@ class UserController extends Controller
                 'nis' => ['required', 'string', 'digits:10', 'unique:siswas,nis'],
                 'nama' => ['required', 'string', 'max:255'],
                 'foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-                'tempat_lahir' => ['nullable', 'string', 'max:100'],
-                'tanggal_lahir' => ['nullable', 'date'],
-                'agama' => ['nullable', 'string', 'max:50'],
+                'tempat_lahir' => ['required', 'string', 'max:100'],
+                'tanggal_lahir' => ['required', 'date'],
+                'agama' => ['required', 'string', 'max:50'],
                 'kelas_id' => ['required', Rule::exists('kelas', 'id')->where('tahun_ajaran_id', TahunAjaran::where('status', 'aktif')->value('id'))],
                 'angkatan' => ['nullable', 'string', 'max:20'],
                 'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
@@ -227,12 +229,12 @@ class UserController extends Controller
                 'pembina_nama' => ['required', 'string', 'max:255'],
                 'pembina_foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
                 'nip'          => ['required', 'string', 'digits:18', 'unique:pembinas,nip'],
-                'pembina_tempat_lahir'    => ['required', 'string', 'max:100'],
-                'pembina_tanggal_lahir'   => ['required', 'date'],
-                'pembina_agama'           => ['required', 'string', 'max:50'],
-                'pembina_jenis_kelamin'   => ['required', 'in:laki-laki,perempuan'],
-                'pembina_no_telp'         => ['required', 'string', 'max:25'],
-                'pembina_alamat'          => ['required', 'string'],
+                'pembina_tempat_lahir'    => ['nullable', 'string', 'max:100'],
+                'pembina_tanggal_lahir'   => ['nullable', 'date'],
+                'pembina_agama'           => ['nullable', 'string', 'max:50'],
+                'pembina_jenis_kelamin'   => ['nullable', 'in:laki-laki,perempuan'],
+                'pembina_no_telp'         => ['nullable', 'string', 'max:25'],
+                'pembina_alamat'          => ['nullable', 'string'],
                 'pembina_medsos'          => ['nullable', 'string', 'max:255'],
             ];
         }
@@ -240,6 +242,7 @@ class UserController extends Controller
         $data = $request->validate($rules, [
             'nis.digits' => 'Periksa NIS. NIS harus terdiri dari tepat 10 angka.',
             'nip.digits' => 'Periksa NIP. NIP harus terdiri dari tepat 18 angka.',
+            'kelas_id.required' => 'Pilih kelas siswa.',
             'foto.image' => 'File foto siswa harus berupa gambar.',
             'foto.max' => 'Ukuran foto siswa maksimal 2MB.',
             'pembina_foto.image' => 'File foto pembina harus berupa gambar.',
@@ -317,6 +320,45 @@ class UserController extends Controller
             ->with('success', $user->username
                 ? "Akun {$user->username} berhasil dibuat dengan password default: password"
                 : "Akun berhasil dibuat. Siswa/Pembina akan mengisi username secara mandiri saat login pertama kali. Password default: password");
+    }
+
+    public function show(User $user): View
+    {
+        $user->load([
+            'siswa.kelas.tahunAjaran',
+            'siswa.pendaftarans.ekskul.pembina',
+            'siswa.pendaftarans.ekskul.pelatih',
+            'siswa.riwayatJabatans.ekskul',
+            'siswa.pengajuanKeluars.ekskul',
+            'siswa.classHistories',
+            'siswa.profileHistories',
+            'pembina.ekskuls.pelatih',
+            'pembina.profileHistories',
+        ]);
+
+        $ekskuls = $user->role === 'siswa'
+            ? $user->siswa?->pendaftarans()
+                ->with('ekskul.pembina', 'ekskul.pelatih')
+                ->where('status', 'diterima')
+                ->get()
+                ->pluck('ekskul')
+                ->filter()
+                ->values()
+            : ($user->pembina?->ekskuls()->with('pelatih')->get() ?? collect());
+
+        $pendaftaranAktif = $user->role === 'siswa'
+            ? ($user->siswa?->pendaftarans()->where('status', 'diterima')->count() ?? 0)
+            : ($user->pembina?->ekskuls()->count() ?? 0);
+
+        $presensi = null;
+        if ($user->role === 'siswa' && $user->siswa) {
+            $presensi = \App\Models\Presensi::whereIn(
+                'pendaftaran_id',
+                $user->siswa->pendaftarans()->pluck('id')
+            )->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
+        }
+
+        return view('kesiswaan.users.show', compact('user', 'ekskuls', 'pendaftaranAktif', 'presensi'));
     }
 
     public function edit(User $user): View

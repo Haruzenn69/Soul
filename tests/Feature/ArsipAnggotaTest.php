@@ -143,7 +143,7 @@ class ArsipAnggotaTest extends TestCase
 
     public function test_halaman_anggota_ketua_menampilkan_arsip(): void
     {
-        [$ketuaUser, $ekskul, $ketua] = $this->setupEkskulDenganDuaSiswa();
+        [, $ekskul, $ketua] = $this->setupEkskulDenganDuaSiswa();
         app(ArsipEkskulService::class)->mulaiPeriodeKetua($ekskul, $ketua);
 
         // Copot + tutup periode agar ada satu periode selesai.
@@ -152,7 +152,7 @@ class ArsipAnggotaTest extends TestCase
         $nonaktif = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
         $this->daftarkan($nonaktif, $ekskul, Pendaftaran::STATUS_NONAKTIF);
 
-        $this->actingAs($ketuaUser)
+        $this->actingAs($ketua->user)
             ->get(route('ketua.anggota.index', ['arsip' => 1]))
             ->assertOk()
             ->assertSee('Arsip Anggota &amp; Ketua Sebelumnya', false)
@@ -161,11 +161,11 @@ class ArsipAnggotaTest extends TestCase
 
     public function test_anggota_nonaktif_tidak_ditampilkan_tanpa_filter(): void
     {
-        [$ketuaUser, $ekskul] = $this->setupEkskulDenganKetua();
+        [, $ekskul] = $this->setupEkskulDenganKetua();
         $nonaktif = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
         $this->daftarkan($nonaktif, $ekskul, Pendaftaran::STATUS_NONAKTIF);
 
-        $this->actingAs($ketuaUser)
+        $this->actingAs($ekskul->ketua()->user)
             ->get(route('ketua.anggota.index'))
             ->assertOk()
             ->assertDontSee('Arsip Anggota &amp; Ketua Sebelumnya')
