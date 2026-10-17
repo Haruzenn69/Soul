@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Support\MediaUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,6 +16,7 @@ class SiswaResource extends JsonResource
             'nama' => $this->nama,
             'nis' => $this->nis,
             'jenis_kelamin' => $this->jenis_kelamin,
+            'foto' => MediaUrl::for($this->foto),
             'jabatan' => $this->jabatan,
             'is_ketua' => $this->isKetua(),
             'is_profile_complete' => $this->isProfileComplete(),
