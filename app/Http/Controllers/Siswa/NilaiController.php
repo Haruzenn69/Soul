@@ -15,9 +15,7 @@ class NilaiController extends Controller
         $pendaftarans = $siswa->activePendaftarans()->with('ekskul')->orderByDesc('id')->get();
 
         $ekskulId = request()->input('ekskul');
-        $pendaftaran = $ekskulId
-            ? ($pendaftarans->firstWhere('ekskul_id', (int) $ekskulId) ?? $pendaftarans->first())
-            : $pendaftarans->first();
+        $pendaftaran = $siswa->resolveActivePendaftaran($ekskulId ? (int) $ekskulId : null);
 
         $periode = Penilaian::periodeSekarang();
         $ekskul = $pendaftaran?->ekskul;

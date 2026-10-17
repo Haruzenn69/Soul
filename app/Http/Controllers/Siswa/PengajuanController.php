@@ -17,9 +17,7 @@ class PengajuanController extends Controller
 
         $pendaftarans = $siswa ? $siswa->activePendaftarans()->with('ekskul')->orderByDesc('id')->get() : collect();
         $ekskulId = $request->input('ekskul');
-        $pendaftaran = $ekskulId
-            ? ($pendaftarans->firstWhere('ekskul_id', (int) $ekskulId) ?? $pendaftarans->first())
-            : $pendaftarans->first();
+        $pendaftaran = $siswa ? $siswa->resolveActivePendaftaran($ekskulId ? (int) $ekskulId : null) : null;
         $ekskul = $pendaftaran ? $pendaftaran->ekskul : null;
         $pengajuan = $siswa ? $siswa->pengajuanKeluars()->with('ekskul')->latest('tanggal_pengajuan')->get() : collect();
 

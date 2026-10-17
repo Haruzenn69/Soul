@@ -47,25 +47,9 @@
             }
         }
 
-        // Hero gradient & colors per ekskul (cycles through palettes)
-        $heroGradients = [
-            'from-sky-400 via-blue-400 to-blue-600',
-            'from-violet-500 via-purple-500 to-indigo-600',
-            'from-emerald-400 via-teal-400 to-cyan-600',
-            'from-rose-400 via-pink-400 to-fuchsia-600',
-        ];
-        $heroShadows = [
-            'shadow-sky-200',
-            'shadow-violet-200',
-            'shadow-emerald-200',
-            'shadow-rose-200',
-        ];
-        // Pick gradient based on selected ekskul index
-        $ekskulIdx = $hasMultipleEkskul && $selectedEkskulId
-            ? $activeEkskuls->search(fn($e) => $e->id === $selectedEkskulId)
-            : 0;
-        $heroGrad = $heroGradients[$ekskulIdx % count($heroGradients)] ?? $heroGradients[0];
-        $heroShadow = $heroShadows[$ekskulIdx % count($heroShadows)] ?? $heroShadows[0];
+        // Signature blue hero gradient & shadow matching all other dashboards
+        $heroGrad = 'from-sky-400 via-blue-400 to-blue-600';
+        $heroShadow = 'shadow-sky-200';
     @endphp
 
     {{-- HERO CARD --}}
@@ -134,14 +118,19 @@
 
                     {{-- SWITCH DASHBOARD BUTTON: only shown when user has 2+ ekskuls --}}
                     @if($hasMultipleEkskul && $otherEkskul)
-                        <a href="{{ route('siswa.dashboard', ['ekskul' => $otherEkskul->id]) }}"
+                        @php
+                            $__isOthKetuaHero = $siswa && $siswa->riwayatKetua($otherEkskul)->whereNull('selesai')->exists();
+                            $__switchUrlHero  = $__isOthKetuaHero ? route('ketua.dashboard') : route('siswa.dashboard', ['ekskul' => $otherEkskul->id]);
+                            $__switchTxtHero  = $__isOthKetuaHero ? 'Switch ke Dashboard Ketua (' . $otherEkskul->nama_ekskul . ')' : 'Switch ke ' . $otherEkskul->nama_ekskul;
+                        @endphp
+                        <a href="{{ $__switchUrlHero }}"
                            id="switch-dashboard-btn"
                            class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/20 backdrop-blur border-2 border-white/40 text-white font-bold text-xs rounded-2xl hover:bg-white/30 hover:-translate-y-0.5 transition-all group relative overflow-hidden">
                             <span class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 pointer-events-none"></span>
                             <svg class="w-4 h-4 transition-transform group-hover:rotate-180 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                             </svg>
-                            Switch ke {{ $otherEkskul->nama_ekskul }}
+                            {{ $__switchTxtHero }}
                         </a>
                     @endif
                 </div>
@@ -252,29 +241,29 @@
 
     {{-- SWITCH DASHBOARD BANNER (multi-ekskul indicator) --}}
     @if($hasMultipleEkskul && $ekskul && $otherEkskul)
-        <div class="relative overflow-hidden rounded-2xl border border-violet-200 dark:border-violet-800/50 bg-gradient-to-r from-violet-50 to-indigo-50 dark:from-violet-950/30 dark:to-indigo-950/30 p-4">
-            <div class="absolute top-0 right-0 w-32 h-32 rounded-full bg-violet-300/20 blur-2xl pointer-events-none -translate-y-1/2 translate-x-1/4"></div>
+        <div class="relative overflow-hidden rounded-2xl border border-sky-100 dark:border-sky-900/50 bg-gradient-to-r from-sky-50 to-blue-50 dark:from-sky-950/30 dark:to-blue-950/30 p-4 shadow-sm">
+            <div class="absolute top-0 right-0 w-32 h-32 rounded-full bg-sky-300/20 blur-2xl pointer-events-none -translate-y-1/2 translate-x-1/4"></div>
             <div class="flex items-center gap-3 flex-wrap">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white shadow-md shrink-0">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center text-white shadow-md shadow-sky-300/30 shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-bold text-violet-800 dark:text-violet-300">Kamu terdaftar di 2 ekskul</p>
-                    <p class="text-[11px] text-violet-600/80 dark:text-violet-400/80 mt-0.5">
+                    <p class="text-xs font-bold text-sky-900 dark:text-sky-200">Kamu terdaftar di 2 ekskul</p>
+                    <p class="text-[11px] text-sky-700/80 dark:text-sky-400/80 mt-0.5">
                         Sedang melihat: <strong>{{ $ekskul->nama_ekskul }}</strong> · Ekskul lain: <strong>{{ $otherEkskul->nama_ekskul }}</strong>
                     </p>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
                     {{-- Pill switcher --}}
-                    <div class="flex items-center gap-1 bg-white dark:bg-neutral-900 border border-violet-200 dark:border-violet-800 rounded-xl p-1 shadow-sm">
+                    <div class="flex items-center gap-1 bg-white dark:bg-neutral-900 border border-sky-200 dark:border-sky-800 rounded-xl p-1 shadow-sm">
                         <a href="{{ route('siswa.dashboard', ['ekskul' => $ekskul->id]) }}"
-                           class="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all {{ $selectedEkskulId === $ekskul->id ? 'bg-violet-600 text-white shadow-sm' : 'text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/40' }}">
+                           class="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all {{ $selectedEkskulId === $ekskul->id ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-sm' : 'text-sky-700 dark:text-sky-300 hover:bg-sky-50 dark:hover:bg-sky-950/40' }}">
                             {{ $ekskul->nama_ekskul }}
                         </a>
                         <a href="{{ route('siswa.dashboard', ['ekskul' => $otherEkskul->id]) }}"
-                           class="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all {{ $selectedEkskulId === $otherEkskul->id ? 'bg-violet-600 text-white shadow-sm' : 'text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/40' }}">
+                           class="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all {{ $selectedEkskulId === $otherEkskul->id ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-sm' : 'text-sky-700 dark:text-sky-300 hover:bg-sky-50 dark:hover:bg-sky-950/40' }}">
                             {{ $otherEkskul->nama_ekskul }}
                         </a>
                     </div>
