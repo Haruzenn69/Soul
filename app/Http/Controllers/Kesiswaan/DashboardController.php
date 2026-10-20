@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Kesiswaan;
 use App\Http\Controllers\Controller;
 use App\Models\Ekskul;
 use App\Models\Kelas;
+use App\Models\Notifikasi;
+use App\Models\Pendaftaran;
 use App\Models\Siswa;
+use App\Models\TahunAjaran;
 use App\Models\User;
 
 class DashboardController extends Controller
@@ -48,6 +51,22 @@ class DashboardController extends Controller
             ->orderBy('nama_ekskul')
             ->get();
 
+        // Notifications for dashboard
+        $notifikasis = Notifikasi::where('user_id', auth()->id())
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $unreadCount = Notifikasi::where('user_id', auth()->id())
+            ->where('is_read', false)
+            ->count();
+
+        // Pending pendaftaran
+        $pendingPendaftaran = Pendaftaran::where('status', Pendaftaran::STATUS_PENDING)->count();
+
+        // Active tahun ajaran
+        $tahunAjaranAktif = TahunAjaran::getActive();
+
         return view('kesiswaan.dashboard', [
             'totalUsers' => User::count(),
             'totalSiswa' => Siswa::whereIn('status', ['aktif', 'menunggu_penempatan'])->count(),
@@ -59,6 +78,10 @@ class DashboardController extends Controller
             'ekskulPerBulan' => $ekskulPerBulan,
             'ekskulStatus' => $ekskulStatus,
             'ekskulDetail' => $ekskulDetail,
+            'notifikasis' => $notifikasis,
+            'unreadCount' => $unreadCount,
+            'pendingPendaftaran' => $pendingPendaftaran,
+            'tahunAjaranAktif' => $tahunAjaranAktif,
         ]);
     }
 }

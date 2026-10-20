@@ -41,10 +41,16 @@ class TahunAjaranController extends Controller
                 ->get()
             : collect();
 
-        // Count pending students (from old kelas 10, waiting placement)
+        // Count active students in Kelas 10 (can be promoted to Kelas 11)
+        $siswaKelas10 = $activeTA
+            ? Siswa::whereHas('kelas', fn ($q) => $q->where('tahun_ajaran_id', $activeTA->id)->where('tingkat', 'x'))
+                ->where('status', 'aktif')
+                ->count()
+            : 0;
+
         $pendingSiswa = Siswa::where('status', 'menunggu_penempatan')->count();
 
-        return view('kesiswaan.tahun-ajaran.index', compact('tahunAjarans', 'activeTA', 'activeKelas', 'pendingSiswa'));
+        return view('kesiswaan.tahun-ajaran.index', compact('tahunAjarans', 'activeTA', 'activeKelas', 'pendingSiswa', 'siswaKelas10'));
     }
 
     /**
@@ -112,7 +118,7 @@ class TahunAjaranController extends Controller
 
             $msg = "Tahun ajaran {$result['to']} berhasil diaktifkan.";
             if ($result['from']) {
-                $msg .= " {$result['promoted']} siswa naik ke kelas 12, {$result['graduated']} siswa lulus, {$result['pending']} siswa menunggu penempatan kelas 11.";
+                $msg .= " {$result['promoted']} siswa naik ke kelas 12, {$result['graduated']} siswa lulus, dan {$result['pending']} siswa kelas 10 tetap di kelas 10 tahun ajaran baru (siap dinaikkan ke kelas 11).";
             }
 
             return back()->with('success', $msg);
@@ -242,20 +248,41 @@ class TahunAjaranController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        // For empty kelas 11 or penempatan: get available students from old kelas 10
+        // For kelas 11: allow taking students from an active kelas 10
+        $sourceKelasOptions = collect();
+        $selectedSourceKelas = null;
         $availableSiswa = collect();
-        $allPendingSiswa = collect();
-        $pendingSiswaForKelas = collect();
 
         if ($tahunAjaran->isAktif() && $kela->tingkat === 'xi') {
-            $allPendingSiswa = Siswa::where('status', 'menunggu_penempatan')
-                ->with('kelas')
-                ->orderBy('nama')
+            $sourceKelasOptions = Kelas::where('tahun_ajaran_id', $tahunAjaran->id)
+                ->where('tingkat', 'x')
+                ->withCount('siswas')
+                ->orderByRaw("FIELD(jurusan, '{$kela->jurusan}') DESC")
+                ->orderBy('jurusan')
+                ->orderBy('rombel')
                 ->get();
 
-            $matching = $allPendingSiswa->filter(fn ($s) => $s->kelas?->jurusan === $kela->jurusan);
-            $pendingSiswaForKelas = $matching->isNotEmpty() ? $matching : $allPendingSiswa;
-            $availableSiswa = $pendingSiswaForKelas;
+            $selectedSourceId = $request->input('source_kelas_id') ?: ($sourceKelasOptions->firstWhere('jurusan', $kela->jurusan)?->id ?? $sourceKelasOptions->first()?->id);
+            $selectedSourceKelas = $sourceKelasOptions->firstWhere('id', (int) $selectedSourceId);
+
+            if ($selectedSourceKelas) {
+                $availableSiswa = Siswa::where('kelas_id', $selectedSourceKelas->id)
+                    ->where('status', 'aktif')
+                    ->orderBy('nama')
+                    ->get();
+            }
+        }
+
+        // For kelas 10: allow promoting students to a kelas 11
+        $targetKelasOptions = collect();
+        if ($tahunAjaran->isAktif() && $kela->tingkat === 'x') {
+            $targetKelasOptions = Kelas::where('tahun_ajaran_id', $tahunAjaran->id)
+                ->where('tingkat', 'xi')
+                ->withCount('siswas')
+                ->orderByRaw("FIELD(jurusan, '{$kela->jurusan}') DESC")
+                ->orderBy('jurusan')
+                ->orderBy('rombel')
+                ->get();
         }
 
         $stats = [
@@ -264,24 +291,39 @@ class TahunAjaranController extends Controller
             'perempuan' => Siswa::where('kelas_id', $kela->id)->where('jenis_kelamin', 'perempuan')->count(),
         ];
 
-        return view('kesiswaan.tahun-ajaran.show', compact('tahunAjaran', 'kela', 'siswas', 'stats', 'availableSiswa', 'pendingSiswaForKelas', 'allPendingSiswa', 'sort', 'direction'));
+        return view('kesiswaan.tahun-ajaran.show', compact(
+            'tahunAjaran',
+            'kela',
+            'siswas',
+            'stats',
+            'availableSiswa',
+            'sourceKelasOptions',
+            'selectedSourceKelas',
+            'targetKelasOptions',
+            'sort',
+            'direction'
+        ));
     }
 
     /**
-     * Assign students (from old kelas 10) to a kelas 11 in the active tahun ajaran.
+     * Promote / assign students from a kelas 10 to a kelas 11.
      */
     public function assignSiswa(Request $request, TahunAjaran $tahunAjaran, Kelas $kela): RedirectResponse
     {
         abort_unless($tahunAjaran->isAktif(), 403, 'Tahun ajaran tidak aktif.');
-        abort_unless($kela->tingkat === 'xi', 403, 'Penempatan hanya untuk kelas 11.');
         abort_unless((int) $kela->tahun_ajaran_id === (int) $tahunAjaran->id, 404);
 
         $data = $request->validate([
             'siswa_ids' => ['required', 'array', 'min:1'],
             'siswa_ids.*' => ['required', 'integer', 'distinct', 'exists:siswas,id'],
+            'target_kelas_id' => ['nullable', 'integer', 'exists:kelas,id'],
         ]);
 
-        $result = DB::transaction(function () use ($data, $kela, $tahunAjaran) {
+        $targetKelas = $kela->tingkat === 'xi'
+            ? $kela
+            : Kelas::where('id', $data['target_kelas_id'] ?? null)->where('tahun_ajaran_id', $tahunAjaran->id)->where('tingkat', 'xi')->firstOrFail();
+
+        $result = DB::transaction(function () use ($data, $targetKelas, $tahunAjaran) {
             $siswas = Siswa::with('kelas.tahunAjaran')->whereIn('id', $data['siswa_ids'])->lockForUpdate()->get();
 
             if ($siswas->count() !== count($data['siswa_ids'])) {
@@ -290,26 +332,22 @@ class TahunAjaranController extends Controller
 
             $now = now('Asia/Jakarta');
             foreach ($siswas as $siswa) {
-                if ($siswa->status !== 'menunggu_penempatan') {
-                    throw ValidationException::withMessages(['siswa_ids' => "{$siswa->nama} tidak dalam status menunggu penempatan."]);
-                }
-
                 SiswaRiwayatKelas::create([
                     'siswa_id' => $siswa->id,
-                    'tahun_ajaran' => $siswa->kelas?->tahunAjaran?->nama ?? '-',
+                    'tahun_ajaran' => $tahunAjaran->nama,
                     'kelas_asal' => $siswa->kelas?->nama ?? '-',
-                    'kelas_tujuan' => $kela->nama,
-                    'jenis' => 'penempatan',
+                    'kelas_tujuan' => $targetKelas->nama,
+                    'jenis' => 'kenaikan',
                     'diproses_pada' => $now,
                 ]);
 
-                $siswa->update(['kelas_id' => $kela->id, 'status' => 'aktif']);
+                $siswa->update(['kelas_id' => $targetKelas->id, 'status' => 'aktif']);
             }
 
             return $siswas->count();
         }, 3);
 
-        return back()->with('success', "{$result} siswa berhasil ditempatkan ke kelas {$kela->nama}.");
+        return back()->with('success', "{$result} siswa berhasil dinaikkan ke kelas {$targetKelas->nama}.");
     }
 
 

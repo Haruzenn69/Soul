@@ -84,9 +84,13 @@ class AcademicYearRolloverService
                         $graduated++;
                     }
                 } elseif ($class->tingkat === 'x') {
-                    // 10 → waiting for manual placement
-                    $pending += $students->count();
-                    Siswa::query()->whereKey($students->modelKeys())->update(['status' => 'menunggu_penempatan', 'updated_at' => $now]);
+                    // Kelas 10 lama tetap berada di kelas 10 yang bersesuaian di tahun ajaran baru (misal 10 PPLG 1 ke 10 PPLG 1 baru)
+                    // Siswa tidak hilang, tetap ada di kelas itu dan status tetap aktif
+                    $targetX = $this->findTargetClass($class, 'x', $newYear);
+                    foreach ($students as $student) {
+                        $student->update(['kelas_id' => $targetX->id, 'status' => 'aktif']);
+                        $pending++;
+                    }
                 }
             }
 
