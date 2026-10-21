@@ -54,7 +54,7 @@
     $psNilaiItem = null;
     if (($psUser->role ?? null) === 'siswa') {
         $psIsKetua = str_contains(strtolower((string) $psTitle), 'ketua') || request()->routeIs('ketua.*');
-        $psActiveEkskulId = session('siswa_dashboard_ekskul_id');
+        $psActiveEkskulId = request('ekskul') ?: session('siswa_dashboard_ekskul_id');
         $psNilaiUrl = $psIsKetua
             ? route('ketua.nilai')
             : route('siswa.nilai', $psActiveEkskulId ? ['ekskul' => $psActiveEkskulId] : []);

@@ -28,9 +28,13 @@
             </button>
         </div>
 
+        @php
+            $__mEkskul = $ekskul ?? (auth()->user()?->siswa ? auth()->user()->siswa->resolveActiveEkskul() : null);
+            $__mParam = $__mEkskul ? ['ekskul' => $__mEkskul->id] : [];
+        @endphp
         <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-2 px-3 shrink-0">Menu Utama</div>
         <nav class="space-y-1.5">
-            <a href="{{ route('siswa.dashboard') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('siswa.dashboard') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+            <a href="{{ route('siswa.dashboard', $__mParam) }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('siswa.dashboard') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                 @if(request()->routeIs('siswa.dashboard'))
                     <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                 @endif
@@ -40,7 +44,7 @@
                 Dashboard
             </a>
 
-            <a href="{{ route('siswa.nilai') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('siswa.nilai') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+            <a href="{{ route('siswa.nilai', $__mParam) }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('siswa.nilai') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                 @if(request()->routeIs('siswa.nilai'))
                     <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                 @endif
@@ -60,7 +64,7 @@
                 Katalog Ekskul
             </a>
 
-            <a href="{{ route('siswa.presensi') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('siswa.presensi') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+            <a href="{{ route('siswa.presensi', $__mParam) }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('siswa.presensi') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                 @if(request()->routeIs('siswa.presensi'))
                     <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                 @endif
@@ -70,7 +74,7 @@
                 Presensi & Kegiatan
             </a>
 
-            <a href="{{ route('siswa.rekap') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('siswa.rekap') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+            <a href="{{ route('siswa.rekap', $__mParam) }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('siswa.rekap') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                 @if(request()->routeIs('siswa.rekap'))
                     <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                 @endif
@@ -80,7 +84,7 @@
                 Rekap Absensi
             </a>
 
-            <a href="{{ route('profile.edit') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
+            <a href="{{ route('profile.edit', array_merge($__mParam, ['from' => 'siswa'])) }}" class="relative flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
                 <span class="text-base flex items-center justify-center w-4 h-4">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                 </span>

@@ -25,18 +25,22 @@
         $__ekskulParam        = $__activeEkskulLayout ? ['ekskul' => $__activeEkskulLayout->id] : [];
     @endphp
 
+    @php
+        $__profileParam = array_merge($__ekskulParam, ['from' => 'siswa']);
+    @endphp
+
     @include('partials.pill-sidebar', [
         'psTitle' => $__sidebarTitle,
         'psLogoBrand' => 'SOUL',
         'psDashboardUrl' => route('siswa.dashboard', $__ekskulParam),
         'psNotifUrl' => route('siswa.notifikasi'),
-        'psProfileUrl' => route('profile.edit'),
+        'psProfileUrl' => route('profile.edit', $__profileParam),
         'psItems' => [
             ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('siswa.dashboard', $__ekskulParam), 'is' => 'siswa.dashboard'],
             ['icon' => 'document', 'label' => 'Katalog Ekskul', 'url' => route('siswa.katalog'), 'is' => ['siswa.katalog', 'ekskul.detail']],
             ['icon' => 'calendar', 'label' => 'Presensi & Kegiatan', 'url' => route('siswa.presensi', $__ekskulParam), 'is' => 'siswa.presensi'],
             ['icon' => 'bars', 'label' => 'Rekap Absensi', 'url' => route('siswa.rekap', $__ekskulParam), 'is' => 'siswa.rekap'],
-            ['icon' => 'user', 'label' => 'Profil Saya', 'url' => route('profile.edit'), 'is' => 'profile.edit'],
+            ['icon' => 'user', 'label' => 'Profil Saya', 'url' => route('profile.edit', $__profileParam), 'is' => 'profile.edit'],
         ],
         'psMore' => [
             ['label' => 'Daftar Ekskul', 'url' => route('siswa.daftar-ekskul'), 'is' => 'siswa.daftar-ekskul'],
@@ -84,10 +88,8 @@
                     $__hasMultiEkskul = $__activeEkskuls->count() >= 2;
 
                     if ($__hasMultiEkskul) {
-                        // Resolve currently-viewed ekskul from session (set by DashboardController)
-                        $__curId   = session('siswa_dashboard_ekskul_id');
-                        $__curId   = ($__curId && $__activeEkskuls->contains('id', $__curId)) ? $__curId : $__activeEkskuls->first()?->id;
-                        $__curEks  = $__activeEkskuls->firstWhere('id', $__curId);
+                        $__curEks  = $__activeEkskulLayout ?? $__siswaCurrent->resolveActiveEkskul();
+                        $__curId   = $__curEks?->id;
                         $__othEks  = $__activeEkskuls->firstWhere('id', '!=', $__curId);
 
                         $__isOthKetua = $__othEks && $__siswaCurrent->riwayatKetua($__othEks)->whereNull('selesai')->exists();

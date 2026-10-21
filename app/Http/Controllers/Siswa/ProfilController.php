@@ -12,15 +12,21 @@ use Illuminate\Validation\Rule;
 
 class ProfilController extends Controller
 {
-    public function edit()
+    public function edit(Request $request)
     {
         $user = auth()->user();
         $siswa = $user->siswa;
 
-        $pendaftaran = $siswa ? $siswa->activePendaftaran() : null;
+        if ($request->input('from') === 'ketua' && $siswa?->ekskulDipimpin()) {
+            $ekskul = $siswa->ekskulDipimpin();
+        } else {
+            $ekskul = $siswa ? $siswa->resolveActiveEkskul($request->filled('ekskul') ? (int) $request->input('ekskul') : null) : null;
+        }
+
+        $pendaftaran = $siswa ? $siswa->activePendaftaranUntuk($ekskul) : null;
         $pendaftaran?->load('ekskul.pembina');
-        $ekskul = $pendaftaran ? $pendaftaran->ekskul : null;
-        $pengajuan = $siswa ? $siswa->pengajuanKeluars()->latest('tanggal_pengajuan')->get() : collect();
+        $ekskul = $pendaftaran ? $pendaftaran->ekskul : $ekskul;
+        $pengajuan = $siswa ? $siswa->pengajuanKeluars()->with('ekskul')->latest('tanggal_pengajuan')->get() : collect();
 
         return view('profile.edit', compact('siswa', 'ekskul', 'pengajuan'));
     }

@@ -29,7 +29,7 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 @foreach($pendaftarans as $p)
                                     @php
-                                        $selectedEkskulId = old('ekskul_id', request('ekskul', $pendaftarans->first()->ekskul_id));
+                                        $selectedEkskulId = old('ekskul_id', request('ekskul', $ekskul?->id ?? $pendaftarans->first()->ekskul_id));
                                         $isChecked = (int)$selectedEkskulId === (int)$p->ekskul_id;
                                     @endphp
                                     <label class="relative flex items-center gap-3.5 p-4 rounded-2xl border cursor-pointer transition-all {{ $isChecked ? 'border-rose-500 bg-rose-50/50 dark:bg-rose-950/20 ring-2 ring-rose-200 dark:ring-rose-900/40' : 'border-slate-200 dark:border-neutral-700 hover:border-slate-300 dark:hover:border-neutral-600 bg-white dark:bg-neutral-800/40' }}">

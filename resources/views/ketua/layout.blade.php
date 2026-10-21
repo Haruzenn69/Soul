@@ -70,7 +70,7 @@
     'psLogoBrand' => 'SOUL',
     'psDashboardUrl' => route('ketua.dashboard'),
     'psNotifUrl' => route('ketua.notifikasi'),
-    'psProfileUrl' => route('profile.edit'),
+    'psProfileUrl' => route('profile.edit', ['from' => 'ketua']),
 'psItems' => [
         ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('ketua.dashboard'), 'is' => 'ketua.dashboard'],
         ['icon' => 'users', 'label' => 'Keanggotaan', 'children' => [
@@ -89,7 +89,7 @@
             ['icon' => 'chat', 'label' => 'Testimoni', 'url' => route('ketua.testimoni.index'), 'is' => 'ketua.testimoni.*'],
             ['icon' => 'help', 'label' => 'FAQ', 'url' => route('ketua.faq.index'), 'is' => 'ketua.faq.*'],
         ]],
-        ['icon' => 'user', 'label' => 'Profile', 'url' => route('profile.edit'), 'is' => 'profile.edit'],
+        ['icon' => 'user', 'label' => 'Profile', 'url' => route('profile.edit', ['from' => 'ketua']), 'is' => 'profile.edit'],
     ],
     'psMore' => [],
 ])
@@ -268,7 +268,7 @@
                         </a>
                     </div>
                 </details>
-                <a href="{{ route('profile.edit') }}" aria-current="{{ request()->routeIs('profile.edit') ? 'page' : 'false' }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('profile.edit') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                <a href="{{ route('profile.edit', ['from' => 'ketua']) }}" aria-current="{{ request()->routeIs('profile.edit') ? 'page' : 'false' }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ request()->routeIs('profile.edit') ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
                     @if (request()->routeIs('profile.edit'))
                         <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                     @endif
