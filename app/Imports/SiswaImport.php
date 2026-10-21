@@ -29,11 +29,11 @@ class SiswaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHeadin
         return [
             'nis' => ['required', 'string', 'digits:10', 'distinct', function (string $attribute, $value, $fail): void {
                 $nis = trim((string) $value);
-                if (Siswa::where('nis', $nis)->exists() || User::where('username', $nis)->exists()) {
+                if (Siswa::where('nis', $nis)->exists()) {
                     $fail("NIS {$nis} sudah terdaftar.");
                 }
             }],
-            'nama' => ['required', 'string', 'max:255'],
+            'nama' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s.,\'\-]+$/'],
             'email' => ['nullable', 'email', 'max:255', 'distinct', function (string $attribute, $value, $fail): void {
                 if ($value && User::where('email', trim((string) $value))->exists()) {
                     $fail('Email '.trim((string) $value).' sudah digunakan.');
@@ -42,10 +42,43 @@ class SiswaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHeadin
             'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
             'tempat_lahir' => ['required', 'string', 'max:100'],
             'tanggal_lahir' => ['required', 'date'],
-            'agama' => ['required', 'string', 'max:50'],
+            'agama' => ['required', 'string', 'max:50', 'in:Islam,Kristen,Katolik,Hindu,Buddha,Khonghucu'],
             'no_telp' => ['nullable', 'string', 'max:25'],
-            'alamat' => ['required', 'string'],
+            'alamat' => ['nullable', 'string'],
             'media_sosial' => ['nullable', 'string', 'max:255'],
+        ];
+    }
+
+    public function customValidationMessages(): array
+    {
+        return [
+            'nis.required' => 'Kolom NIS wajib diisi.',
+            'nis.string' => 'NIS harus berupa teks/angka.',
+            'nis.digits' => 'NIS harus terdiri dari tepat 10 digit angka.',
+            'nis.distinct' => 'NIS duplikat ditemukan dalam file. Setiap NIS harus unik.',
+            'nama.required' => 'Kolom Nama wajib diisi.',
+            'nama.string' => 'Nama harus berupa teks.',
+            'nama.max' => 'Nama maksimal 255 karakter.',
+            'nama.regex' => 'Nama hanya boleh mengandung huruf alfabet, spasi, titik, koma, dan strip. Tidak boleh ada angka atau simbol lainnya.',
+            'email.email' => 'Format Email tidak valid. Email harus mengandung tanda @.',
+            'email.max' => 'Email maksimal 255 karakter.',
+            'email.distinct' => 'Email duplikat ditemukan dalam file. Setiap email harus unik.',
+            'jenis_kelamin.required' => 'Kolom Jenis Kelamin wajib diisi.',
+            'jenis_kelamin.in' => 'Jenis Kelamin harus "Laki-laki" atau "Perempuan".',
+            'tempat_lahir.required' => 'Kolom Tempat Lahir wajib diisi.',
+            'tempat_lahir.string' => 'Tempat Lahir harus berupa teks.',
+            'tempat_lahir.max' => 'Tempat Lahir maksimal 100 karakter.',
+            'tanggal_lahir.required' => 'Kolom Tanggal Lahir wajib diisi.',
+            'tanggal_lahir.date' => 'Tanggal Lahir harus berupa tanggal yang valid (contoh: 26-06-2008).',
+            'agama.required' => 'Kolom Agama wajib diisi.',
+            'agama.string' => 'Agama harus berupa teks.',
+            'agama.max' => 'Agama maksimal 50 karakter.',
+            'agama.in' => 'Agama tidak valid. Pilih dari: Islam, Kristen, Katolik, Hindu, Buddha, Khonghucu.',
+            'no_telp.string' => 'No. Telp harus berupa teks.',
+            'no_telp.max' => 'No. Telp maksimal 25 karakter.',
+            'alamat.string' => 'Alamat harus berupa teks.',
+            'media_sosial.string' => 'Media Sosial harus berupa teks.',
+            'media_sosial.max' => 'Media Sosial maksimal 255 karakter.',
         ];
     }
 
@@ -56,6 +89,8 @@ class SiswaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHeadin
             $value = trim((string) ($row[$key] ?? ''));
             $clean[$key] = $value === '' ? null : $value;
         }
+        $clean['tempat_lahir'] = SpreadsheetProfileValue::placeOfBirth($clean['tempat_lahir']);
+        $clean['agama'] = SpreadsheetProfileValue::religion($clean['agama']);
         $clean['jenis_kelamin'] = SpreadsheetProfileValue::gender($clean['jenis_kelamin']);
         $clean['tanggal_lahir'] = SpreadsheetProfileValue::date($clean['tanggal_lahir']);
 
@@ -65,19 +100,28 @@ class SiswaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHeadin
     public function model(array $row): null
     {
         $user = User::create([
-            'username' => $row['nis'],
+            'username' => null,
             'email' => $row['email'],
             'password' => Hash::make('password'),
             'role' => 'siswa',
             'email_verified_at' => now(),
+            'onboarding_completed_at' => null,
         ]);
 
         $user->siswa()->create([
-            'nis' => $row['nis'], 'nama' => $row['nama'], 'kelas_id' => $this->kelasId,
-            'jenis_kelamin' => $row['jenis_kelamin'], 'tempat_lahir' => $row['tempat_lahir'] ?? null,
-            'tanggal_lahir' => $row['tanggal_lahir'], 'agama' => $row['agama'],
-            'angkatan' => null, 'email' => $row['email'] ?? null, 'no_telp' => $row['no_telp'] ?? null,
-            'alamat' => $row['alamat'] ?? null, 'medsos' => $row['media_sosial'] ?? null, 'jabatan' => 'siswa',
+            'nis' => $row['nis'],
+            'nama' => mb_strtoupper(trim((string) $row['nama'])),
+            'kelas_id' => $this->kelasId,
+            'jenis_kelamin' => $row['jenis_kelamin'],
+            'tempat_lahir' => $row['tempat_lahir'] ?? null,
+            'tanggal_lahir' => $row['tanggal_lahir'],
+            'agama' => $row['agama'],
+            'angkatan' => null,
+            'email' => $row['email'] ?? null,
+            'no_telp' => $row['no_telp'] ?? null,
+            'alamat' => $row['alamat'] ?? null,
+            'medsos' => $row['media_sosial'] ?? null,
+            'jabatan' => 'siswa',
         ]);
 
         $this->count++;
