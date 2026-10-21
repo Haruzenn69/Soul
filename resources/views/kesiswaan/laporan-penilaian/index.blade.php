@@ -59,46 +59,136 @@
                 $hasFilter = request()->filled(['q', 'status']) || request()->filled('sort');
             @endphp
 
-            {{-- SEARCH & FILTER FORM --}}
-            <form method="GET" action="{{ route('kesiswaan.laporan-penilaian.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200/70 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center">
-                @if(request('sort'))
-                    <input type="hidden" name="sort" value="{{ request('sort') }}">
-                @endif
-                @if(request('direction'))
-                    <input type="hidden" name="direction" value="{{ request('direction') }}">
-                @endif
+            {{-- SEARCH & FILTER FORM (POPOVER DESIGN) --}}
+            @php
+                $activeFilterCount = (request()->filled('status') ? 1 : 0);
+                $hasActiveFilter = request()->filled('q') || $activeFilterCount > 0;
+            @endphp
 
-                <div class="relative flex-1">
-                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </span>
-                    <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama ekskul atau pembina..."
-                           class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <select name="status" class="px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
-                        <option value="">Semua Status Kelengkapan</option>
-                        <option value="lengkap" {{ request('status') === 'lengkap' ? 'selected' : '' }}>Lengkap</option>
-                        <option value="sebagian" {{ request('status') === 'sebagian' ? 'selected' : '' }}>Sebagian</option>
-                        <option value="menunggu" {{ request('status') === 'menunggu' ? 'selected' : '' }}>Menunggu</option>
-                    </select>
-
-                    <button type="submit" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-xl shadow-sm transition">
-                        Filter
-                    </button>
-
-                    @if($hasFilter)
-                        <a href="{{ route('kesiswaan.laporan-penilaian.index') }}"
-                           class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition"
-                           title="Reset filter">
-                            Reset
-                        </a>
+            <div x-data="{ openFilter: false }" class="space-y-3">
+                <form method="GET" action="{{ route('kesiswaan.laporan-penilaian.index') }}" class="bg-white p-4 rounded-2xl border border-slate-200/70 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+                    @if(request('sort'))
+                        <input type="hidden" name="sort" value="{{ request('sort') }}">
                     @endif
-                </div>
-            </form>
+                    @if(request('direction'))
+                        <input type="hidden" name="direction" value="{{ request('direction') }}">
+                    @endif
+
+                    {{-- Input Pencarian --}}
+                    <div class="relative flex-1">
+                        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </span>
+                        <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama ekskul atau pembina..."
+                               class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                    </div>
+
+                    {{-- Tombol Filter & Popover Panel --}}
+                    <div class="relative flex items-center gap-2">
+                        <button type="button" @click="openFilter = !openFilter"
+                                class="px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 border {{ $activeFilterCount > 0 ? 'bg-sky-50 border-sky-300 text-sky-700 shadow-sm shadow-sky-100' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100' }}">
+                            <svg class="w-4 h-4 {{ $activeFilterCount > 0 ? 'text-sky-600' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                            </svg>
+                            <span>Filter Data</span>
+                            @if($activeFilterCount > 0)
+                                <span class="w-5 h-5 rounded-full bg-sky-500 text-white text-[10px] font-black flex items-center justify-center">
+                                    {{ $activeFilterCount }}
+                                </span>
+                            @endif
+                        </button>
+
+                        <button type="submit" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-xl shadow-sm transition">
+                            Cari
+                        </button>
+
+                        @if($hasActiveFilter)
+                            <a href="{{ route('kesiswaan.laporan-penilaian.index') }}"
+                               class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition"
+                               title="Reset filter">
+                                Reset
+                            </a>
+                        @endif
+
+                        {{-- DROPDOWN PANEL POPOVER --}}
+                        <div x-show="openFilter"
+                             @click.away="openFilter = false"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                             class="absolute right-0 top-full mt-2 w-80 md:w-96 bg-white rounded-2xl p-5 border border-slate-200 shadow-xl shadow-slate-900/10 z-50 space-y-4"
+                             style="display: none;">
+                            
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <span class="p-1.5 rounded-lg bg-sky-50 text-sky-600">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                                        </svg>
+                                    </span>
+                                    <h4 class="text-xs font-bold text-slate-800">Opsi Filter Laporan</h4>
+                                </div>
+                                <button type="button" @click="openFilter = false" class="text-slate-400 hover:text-slate-600 text-sm font-bold">
+                                    &times;
+                                </button>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Status Kelengkapan</label>
+                                    <select name="status" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                                        <option value="">Semua Status Kelengkapan</option>
+                                        <option value="lengkap" {{ request('status') === 'lengkap' ? 'selected' : '' }}>Lengkap</option>
+                                        <option value="sebagian" {{ request('status') === 'sebagian' ? 'selected' : '' }}>Sebagian</option>
+                                        <option value="menunggu" {{ request('status') === 'menunggu' ? 'selected' : '' }}>Menunggu</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                                <a href="{{ route('kesiswaan.laporan-penilaian.index', array_filter(['q' => request('q')])) }}"
+                                   class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition">
+                                    Reset Opsi
+                                </a>
+                                <button type="submit" @click="openFilter = false"
+                                        class="px-5 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-xl shadow-sm transition">
+                                    Terapkan Filter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                {{-- AKTIF FILTER CHIPS / TAGS --}}
+                @if($hasActiveFilter)
+                    <div class="flex flex-wrap items-center gap-2 pt-1 px-1">
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Filter Aktif:</span>
+
+                        @if(request()->filled('q'))
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 rounded-xl text-xs font-semibold">
+                                <span>Pencarian: "<strong>{{ request('q') }}</strong>"</span>
+                                <a href="{{ route('kesiswaan.laporan-penilaian.index', request()->except('q', 'page')) }}" class="hover:text-rose-500 transition">&times;</a>
+                            </span>
+                        @endif
+
+                        @if(request()->filled('status'))
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 rounded-xl text-xs font-semibold">
+                                <span>Status: <strong>{{ ucfirst(request('status')) }}</strong></span>
+                                <a href="{{ route('kesiswaan.laporan-penilaian.index', request()->except('status', 'page')) }}" class="hover:text-rose-500 transition">&times;</a>
+                            </span>
+                        @endif
+
+                        <a href="{{ route('kesiswaan.laporan-penilaian.index') }}" class="text-xs font-bold text-rose-500 hover:text-rose-600 hover:underline transition ml-1">
+                            Hapus Semua Filter
+                        </a>
+                    </div>
+                @endif
+            </div>
 
             <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm overflow-hidden">
                 <div class="p-4 md:p-5 border-b border-slate-200/70">

@@ -32,7 +32,7 @@ class PembinaController extends Controller
                 });
             })
             ->when($request->filled('jenis_kelamin'), fn ($query) => $query->where('jenis_kelamin', $request->input('jenis_kelamin')))
-            ->when(in_array($request->input('kategori'), ['Olahraga', 'Seni', 'Bahasa', 'Lainnya'], true), function ($query) use ($request) {
+            ->when(in_array($request->input('kategori'), ['Olahraga', 'Seni', 'Bahasa', 'Bela Diri', 'Lainnya'], true), function ($query) use ($request) {
                 $kat = $request->input('kategori');
                 $query->where(function ($sub) use ($kat) {
                     $sub->whereHas('ekskuls', fn ($e) => $e->where('kategori', $kat))

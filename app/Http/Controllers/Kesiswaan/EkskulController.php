@@ -22,6 +22,8 @@ class EkskulController extends Controller
             default => $sort,
         };
 
+        $kategoriList = ['Olahraga', 'Seni', 'Bahasa', 'Bela Diri', 'Lainnya'];
+
         $ekskuls = Ekskul::with(['pembina', 'pelatih'])
             ->when($request->filled('q'), function ($query) use ($request) {
                 $q = $request->input('q');
@@ -30,7 +32,7 @@ class EkskulController extends Controller
                         ->orWhereHas('pembina', fn ($p) => $p->where('nama', 'like', "%{$q}%"));
                 });
             })
-            ->when(in_array($request->input('kategori'), ['Olahraga', 'Seni', 'Bahasa', 'Lainnya'], true), fn ($q) => $q->where('kategori', $request->input('kategori')))
+            ->when(in_array($request->input('kategori'), $kategoriList, true), fn ($q) => $q->where('kategori', $request->input('kategori')))
             ->when($request->input('status') === 'aktif', fn ($q) => $q->where('status', true))
             ->when($request->input('status') === 'nonaktif', fn ($q) => $q->where('status', false))
             ->when($request->input('rekrutmen') === 'buka', fn ($q) => $q->where('is_open_recruitment', true))
@@ -42,6 +44,7 @@ class EkskulController extends Controller
         return view('kesiswaan.ekskuls.index', [
             'ekskuls' => $ekskuls,
             'pembinas' => Pembina::with(['ekskuls'])->withCount('ekskuls')->orderBy('nama')->get(),
+            'kategoriList' => $kategoriList,
             'sort' => $sort,
             'direction' => $direction,
         ]);
@@ -80,7 +83,7 @@ class EkskulController extends Controller
     {
         $data = $request->validate([
             'nama_ekskul' => ['required', 'string', 'max:255'],
-            'kategori' => ['required', 'in:Olahraga,Seni,Bahasa,Lainnya'],
+            'kategori' => ['required', 'in:Olahraga,Seni,Bahasa,Bela Diri,Lainnya'],
             'pembina_id' => ['nullable', 'exists:pembinas,id'],
             'deskripsi' => ['nullable', 'string'],
             'jadwal' => ['nullable', 'string', 'max:255'],
@@ -104,7 +107,7 @@ class EkskulController extends Controller
     {
         $data = $request->validate([
             'nama_ekskul' => ['required', 'string', 'max:255'],
-            'kategori' => ['required', 'in:Olahraga,Seni,Bahasa,Lainnya'],
+            'kategori' => ['required', 'in:Olahraga,Seni,Bahasa,Bela Diri,Lainnya'],
             'pembina_id' => ['nullable', 'exists:pembinas,id'],
             'deskripsi' => ['nullable', 'string'],
             'jadwal' => ['nullable', 'string', 'max:255'],
