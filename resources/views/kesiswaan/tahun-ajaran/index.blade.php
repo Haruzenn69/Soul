@@ -31,8 +31,8 @@
                 <p class="text-xs font-bold text-slate-400">Kelas Aktif</p>
             </div>
             <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-lg shadow-amber-100/60 text-center animate-fade-up" style="animation-delay: .2s">
-                <p class="text-xl font-extrabold {{ $pendingSiswa > 0 ? 'text-amber-600' : 'text-slate-900' }}">{{ $pendingSiswa }}</p>
-                <p class="text-xs font-bold text-slate-400">Menunggu Penempatan</p>
+                <p class="text-xl font-extrabold {{ ($siswaKelas10 ?? 0) > 0 ? 'text-amber-600' : 'text-slate-900' }}">{{ $siswaKelas10 ?? 0 }}</p>
+                <p class="text-xs font-bold text-slate-400">Siswa Kelas 10</p>
             </div>
         </div>
 

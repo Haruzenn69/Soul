@@ -176,7 +176,7 @@
     <div class="w-full flex-1 flex flex-col min-w-0 ps-page">
 
         <!-- TOP NAVBAR HEADER -->
-        <header class="px-4 md:px-8 py-4 bg-white/70 dark:bg-neutral-900/70 backdrop-blur-lg border-b border-sky-100 dark:border-neutral-800 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
+        <header class="px-4 md:px-8 py-3.5 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-b border-sky-100/80 dark:border-neutral-800 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
             <!-- KIRI: Hamburger (Mobile) + Logo + Search -->
             <div class="flex items-center gap-3 flex-1 min-w-0">
                 <!-- Tombol Hamburger (Mobile) -->
@@ -191,28 +191,44 @@
                 </div>
 
                 <!-- Search (Desktop) -->
-                <form method="GET" action="{{ route('kesiswaan.users.index') }}" class="relative w-full max-w-md hidden sm:block">
-                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center w-4 h-4 pointer-events-none opacity-60">
+                <form method="GET" action="{{ route('kesiswaan.users.index') }}" class="relative w-full max-w-sm hidden sm:block">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center w-4 h-4 pointer-events-none text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </span>
-                    <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari akun, ekskul, kelas..." class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition-all">
+                    <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari akun, ekskul, kelas..." class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-neutral-800 border border-slate-200/70 dark:border-neutral-700 rounded-full text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition-all">
                 </form>
             </div>
 
-            <!-- KANAN: Info User + Notifikasi -->
-            <div class="flex items-center gap-2 md:gap-3 shrink-0">
-                <div class="bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-900/50 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 hidden sm:block">
-                    <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Kesiswaan
-                </div>
-                <a href="{{ route('kesiswaan.notifikasi') }}" class="w-9 h-9 rounded-xl bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 flex items-center justify-center text-xs relative text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-700 hover:border-sky-200 dark:hover:border-neutral-700 transition-all shadow-sm">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- TENGAH: Date Badge (Reference UI) -->
+            <div class="hidden xl:flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-50 dark:bg-neutral-800 border border-slate-200/70 dark:border-neutral-700 text-xs font-bold text-slate-600 dark:text-slate-300 shadow-sm select-none">
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span>{{ now()->translatedFormat('j F, Y') }}</span>
+                <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+
+            <!-- KANAN: Role Badge + Notifikasi + User Profile Pill -->
+            <div class="flex items-center gap-2.5 md:gap-3 shrink-0">
+                <a href="{{ route('kesiswaan.notifikasi') }}" class="w-9 h-9 rounded-full bg-slate-50 dark:bg-neutral-800 border border-slate-200/70 dark:border-neutral-700 flex items-center justify-center text-xs relative text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-700 hover:border-sky-200 dark:hover:border-neutral-700 transition-all shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                     </svg>
                     @if(($unreadNotifCount ?? 0) > 0)
-                        <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 absolute top-1.5 right-1.5 border-2 border-white dark:border-neutral-900 shadow-sm"></span>
+                        <span class="w-2 h-2 rounded-full bg-amber-400 absolute top-1.5 right-1.5 border border-white dark:border-neutral-900 shadow-sm"></span>
                     @endif
+                </a>
+
+                <!-- User Profile Pill (Reference UI) -->
+                <a href="{{ route('kesiswaan.profile') }}" class="flex items-center gap-2.5 pl-1.5 pr-3 py-1 rounded-full bg-slate-50 dark:bg-neutral-800 border border-slate-200/70 dark:border-neutral-700 hover:border-sky-300 transition shadow-sm group">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-400 to-amber-200 text-amber-900 font-extrabold flex items-center justify-center text-xs shadow-inner">
+                        {{ strtoupper(substr(auth()->user()->username ?? 'K', 0, 1)) }}
+                    </div>
+                    <div class="text-left hidden sm:block">
+                        <p class="text-xs font-bold text-slate-800 dark:text-white leading-tight group-hover:text-blue-600 transition">{{ auth()->user()->username }}</p>
+                        <p class="text-[10px] text-slate-400 font-medium leading-none">Kesiswaan</p>
+                    </div>
+                    <svg class="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                 </a>
             </div>
         </header>

@@ -7,17 +7,27 @@
         $isSiswa = $jenis === 'siswa';
         $templateRoute = $isSiswa ? 'kesiswaan.users.template-siswa' : 'kesiswaan.users.template-pembina';
         $columns = $isSiswa ? [
-            ['NIS', 'Wajib, tepat 10 angka.'], ['Nama', 'Wajib.'], ['Email', 'Opsional; jika diisi harus berformat email dan unik.'],
-            ['Jenis Kelamin', 'Wajib: L / Laki-laki atau P / Perempuan.'], ['Tempat Lahir', 'Wajib.'],
-            ['Tanggal Lahir', 'Wajib; contoh 26-06-2008 atau 26,06,2008.'], ['Agama', 'Wajib.'],
-            ['No. Telp', 'Opsional, boleh kosong.'], ['Alamat', 'Wajib.'],
-            ['Media Sosial', 'Opsional, boleh kosong.'],
+            ['NIS', 'Wajib, tepat 10 angka.'],
+            ['Nama', 'Wajib diisi; hanya huruf alfabet, spasi, dan tanda baca nama (tidak boleh angka).'],
+            ['Email', 'Opsional; jika diisi harus berformat email dan unik.'],
+            ['Jenis Kelamin', 'Wajib: Laki-laki atau Perempuan (tersedia dropdown pilihan di file Excel).'],
+            ['Tempat Lahir', 'Wajib diisi; tulis nama Kota/Kabupaten (contoh: Kota Bandung, Kabupaten Bogor, atau Bandung). Sistem otomatis menstandarkannya sesuai wilayah resmi.'],
+            ['Tanggal Lahir', 'Wajib diisi; contoh: 26-06-2008 atau 2008-06-26.'],
+            ['Agama', 'Wajib; pilih dari dropdown template (Islam, Kristen, Katolik, Hindu, Buddha, Khonghucu).'],
+            ['No. Telp', 'Opsional, boleh dikosongkan.'],
+            ['Alamat', 'Opsional, boleh dikosongkan.'],
+            ['Media Sosial', 'Opsional, boleh dikosongkan.'],
         ] : [
-            ['NIP', 'Wajib, tepat 18 angka.'], ['Username', 'Opsional; jika diisi harus unik dan berbeda dari NIP.'],
-            ['Nama Lengkap', 'Wajib.'], ['Email', 'Opsional; jika diisi harus berformat email dan unik.'],
-            ['Jenis Kelamin', 'Wajib: L / Laki-laki atau P / Perempuan.'], ['Tempat Lahir', 'Wajib.'],
-            ['Tanggal Lahir', 'Wajib; contoh 26-06-2008 atau 26,06,2008.'], ['Agama', 'Wajib.'],
-            ['No. Telp', 'Opsional, boleh kosong.'], ['Alamat', 'Wajib.'], ['Media Sosial', 'Opsional, boleh kosong.'],
+            ['NIP', 'Wajib, tepat 18 angka.'],
+            ['Nama Lengkap', 'Wajib diisi beserta gelar; hanya huruf alfabet, spasi, dan tanda baca gelar (tidak boleh angka).'],
+            ['Email', 'Opsional; jika diisi harus berformat email dan unik.'],
+            ['Jenis Kelamin', 'Wajib: Laki-laki atau Perempuan (tersedia dropdown pilihan di file Excel).'],
+            ['Tempat Lahir', 'Wajib diisi; tulis nama Kota/Kabupaten (contoh: Kota Bandung, Kabupaten Bogor, atau Bandung). Sistem otomatis menstandarkannya sesuai wilayah resmi.'],
+            ['Tanggal Lahir', 'Wajib diisi; contoh: 26-06-2008 atau 2008-06-26.'],
+            ['Agama', 'Wajib; pilih dari dropdown template (Islam, Kristen, Katolik, Hindu, Buddha, Khonghucu).'],
+            ['No. Telp', 'Opsional, boleh dikosongkan.'],
+            ['Alamat', 'Opsional, boleh dikosongkan.'],
+            ['Media Sosial', 'Opsional, boleh dikosongkan.'],
         ];
     @endphp
 
@@ -64,7 +74,7 @@
                 </table>
             </div>
             <div class="mt-4 rounded-2xl bg-amber-50 p-4 text-xs leading-relaxed text-amber-800">
-                Email, No. Telp, dan Media Sosial boleh dikosongkan. Foto profil tidak ada di kolom Excel dan dapat ditambahkan setelah import. Jenis kelamin menerima <strong>L</strong>, <strong>Laki-laki</strong>, <strong>P</strong>, atau <strong>Perempuan</strong>; sistem menyimpannya sebagai <code>laki-laki</code> atau <code>perempuan</code>. Tanggal dapat berupa sel tanggal Excel atau teks dengan format <strong>26-06-2008</strong>, <strong>26/06/2008</strong>, <strong>26.06.2008</strong>, atau <strong>26,06,2008</strong>. Format penyimpanan menjadi <code>2008-06-26</code>.
+                <strong>Catatan Penting:</strong> Kolom <code>Username</code> tidak ada di Excel karena username dibuat mandiri oleh siswa atau pembina saat pertama kali login. Kolom <strong>Agama</strong> dan <strong>Jenis Kelamin</strong> telah dilengkapi dropdown pilihan di Excel. Email, No. Telp, dan Media Sosial boleh dikosongkan. Foto profil tidak ada di kolom Excel dan dapat ditambahkan setelah login. Tanggal dapat berupa sel tanggal Excel atau teks dengan format <strong>26-06-2008</strong> atau <strong>2008-06-26</strong>.
             </div>
         </section>
 

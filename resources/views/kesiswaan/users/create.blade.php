@@ -25,7 +25,7 @@ function userCreateForm() {
         totalSteps: 4,
         jenisKelamin: @json($currentJenisKelamin),
         nama: @json(old('nama', '')),
-        nis: @json(old('nis', '')),
+        nis: String(@json(old('nis', '')) ?? ''),
         email: @json(old('email', '')),
         noTelp: @json(old('no_telp', '')),
         tanggalLahir: @json(old('tanggal_lahir', '')),
@@ -38,7 +38,7 @@ function userCreateForm() {
         photoPreview: null,
         pembinaPhotoPreview: null,
         pembinaEmail: @json(old('email', '')),
-        pembinaNip: @json(old('nip', '')),
+        pembinaNip: String(@json(old('nip', '')) ?? ''),
         pembinaNama: @json(old('pembina_nama', '')),
         pembinaJenisKelamin: @json(old('pembina_jenis_kelamin', '')),
         pembinaAgama: @json(old('pembina_agama', '')),
@@ -48,6 +48,36 @@ function userCreateForm() {
         pembinaMedsos: @json(old('pembina_medsos', '')),
         pembinaAlamat: @json(old('pembina_alamat', '')),
         calculatedAge: '',
+        kolomKosong: [],
+        // Dropdown provinsi -> kota/kabupaten tempat lahir (laravolt/indonesia)
+        siswaProvinsi: '{{ $siswaProvinceCode ?? '' }}',
+        siswaCities: [],
+        siswaCitiesLoading: false,
+        pembinaProvinsi: '{{ $pembinaProvinceCode ?? '' }}',
+        pembinaCities: [],
+        pembinaCitiesLoading: false,
+        peringatan: {
+            isOpen: false,
+            title: 'Peringatan Validasi',
+            message: '',
+            items: [],
+            focusId: null,
+            targetStep: null,
+            actionLabel: 'Periksa Sekarang',
+        },
+        pembinaRequiredFields: [
+            { id: 'input-pembina-nama', label: 'Nama Lengkap Beserta Gelar' },
+            { id: 'input-pembina-nip', label: 'NIP (18 angka)' },
+            { id: 'input-pembina-email', label: 'Email' },
+            { id: 'input-pembina-jenis-kelamin', label: 'Jenis Kelamin' },
+            { id: 'input-pembina-provinsi', label: 'Provinsi Tempat Lahir' },
+            { id: 'input-pembina-tempat-lahir', label: 'Kota / Kabupaten Tempat Lahir' },
+
+            { id: 'input-pembina-tanggal-lahir', label: 'Tanggal Lahir' },
+            { id: 'input-pembina-agama', label: 'Agama' },
+            { id: 'input-pembina-no-telp', label: 'No. Telp / WA' },
+            { id: 'input-pembina-alamat', label: 'Alamat' },
+        ],
 
         get selectedKelasNama() {
             if (!this.kelasId) return '-';
@@ -57,6 +87,8 @@ function userCreateForm() {
 
         init() {
             this.calculateAge();
+            if (this.siswaProvinsi) this.loadCities('siswa', this.siswaProvinsi);
+            if (this.pembinaProvinsi) this.loadCities('pembina', this.pembinaProvinsi);
         },
 
         calculateAge() {
@@ -88,20 +120,139 @@ function userCreateForm() {
             return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
         },
 
+        loadCities(target, provinceCode) {
+            const isP = target === 'pembina';
+            if (isP) { this.pembinaCities = []; this.pembinaCitiesLoading = true; }
+            else { this.siswaCities = []; this.siswaCitiesLoading = true; }
+
+            fetch(`{{ route('api.cities') }}?province_code=${encodeURIComponent(provinceCode)}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (isP) { this.pembinaCities = data; this.pembinaCitiesLoading = false; }
+                    else { this.siswaCities = data; this.siswaCitiesLoading = false; }
+                    this.syncCitySelect(target);
+                })
+                .catch(() => {
+                    if (isP) this.pembinaCitiesLoading = false;
+                    else this.siswaCitiesLoading = false;
+                });
+        },
+
+        syncCitySelect(target) {
+            this.$nextTick(() => {
+                const isP = target === 'pembina';
+                const el = document.getElementById(isP ? 'input-pembina-tempat-lahir' : 'input-tempat-lahir');
+                if (el) el.value = isP ? this.pembinaTempatLahir : this.tempatLahir;
+            });
+        },
+
+        onProvinsiChange(target) {
+            const isP = target === 'pembina';
+            if (isP) {
+                this.pembinaTempatLahir = '';
+                if (this.pembinaProvinsi) this.loadCities('pembina', this.pembinaProvinsi);
+                else this.pembinaCities = [];
+            } else {
+                this.tempatLahir = '';
+                if (this.siswaProvinsi) this.loadCities('siswa', this.siswaProvinsi);
+                else this.siswaCities = [];
+            }
+        },
+
+        showWarning(options) {
+            this.peringatan = {
+                isOpen: true,
+                title: options.title || 'Peringatan Validasi',
+                message: options.message || '',
+                items: options.items || [],
+                focusId: options.focusId || null,
+                targetStep: options.targetStep || null,
+                actionLabel: options.actionLabel || 'Periksa Sekarang',
+            };
+            this.$nextTick(() => {
+                const dialog = document.getElementById('modalPeringatan');
+                if (dialog) {
+                    if (typeof dialog.showModal === 'function') {
+                        dialog.showModal();
+                    } else {
+                        dialog.setAttribute('open', '');
+                    }
+                }
+            });
+        },
+
+        closeWarning() {
+            const dialog = document.getElementById('modalPeringatan');
+            if (dialog) {
+                if (typeof dialog.close === 'function') {
+                    dialog.close();
+                } else {
+                    dialog.removeAttribute('open');
+                }
+            }
+            this.peringatan.isOpen = false;
+        },
+
+        confirmWarningAction() {
+            const targetId = this.peringatan.focusId;
+            const targetStep = this.peringatan.targetStep;
+            this.closeWarning();
+            if (targetStep && this.role === 'siswa') {
+                this.step = targetStep;
+            }
+            if (targetId) {
+                this.$nextTick(() => {
+                    const el = document.getElementById(targetId);
+                    if (el) {
+                        el.focus();
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            }
+        },
+
         validateStep(targetStep) {
             if (this.step === 1 && targetStep > 1) {
                 if (!this.email || !this.email.includes('@')) {
-                    alert('Mohon masukkan alamat Email yang valid.');
+                    if (!this.email.includes('@')) {
+                        this.showWarning({
+                            title: 'Format Email Tidak Valid',
+                            message: 'Alamat email harus menggunakan tanda @ (contoh: siswa@sekolah.sch.id atau user@gmail.com).',
+                            focusId: 'input-siswa-email',
+                            targetStep: 1,
+                            actionLabel: 'Perbaiki Email'
+                        });
+                        return false;
+                    }
+                    this.showWarning({
+                        title: 'Email Siswa Tidak Valid',
+                        message: 'Pastikan alamat email siswa terisi lengkap dan valid (contoh: siswa@sekolah.sch.id).',
+                        focusId: 'input-siswa-email',
+                        targetStep: 1,
+                        actionLabel: 'Perbaiki Email'
+                    });
                     document.getElementById('input-siswa-email')?.focus();
                     return false;
                 }
                 if (!this.nis || this.nis.length !== 10) {
-                    alert('NIS harus tepat 10 digit angka.');
+                    this.showWarning({
+                        title: 'Format NIS Tidak Sesuai',
+                        message: 'NIS harus terdiri dari tepat 10 digit angka (saat ini terisi ' + (this.nis ? this.nis.length : 0) + ' angka).',
+                        focusId: 'input-siswa-nis',
+                        targetStep: 1,
+                        actionLabel: 'Perbaiki NIS'
+                    });
                     document.getElementById('input-siswa-nis')?.focus();
                     return false;
                 }
                 if (!this.nama || this.nama.trim().length < 2) {
-                    alert('Mohon masukkan Nama Lengkap siswa.');
+                    this.showWarning({
+                        title: 'Nama Lengkap Belum Valid',
+                        message: 'Nama lengkap siswa wajib diisi minimal 2 karakter.',
+                        focusId: 'input-siswa-nama',
+                        targetStep: 1,
+                        actionLabel: 'Isi Nama'
+                    });
                     document.getElementById('input-siswa-nama')?.focus();
                     return false;
                 }
@@ -115,7 +266,53 @@ function userCreateForm() {
             }
             if (this.step === 3 && targetStep > 3) {
                 if (!this.jenisKelamin) {
-                    alert('Mohon pilih Jenis Kelamin siswa.');
+                    this.showWarning({
+                        title: 'Jenis Kelamin Belum Dipilih',
+                        message: 'Mohon pilih jenis kelamin siswa (Laki-laki atau Perempuan).',
+                        focusId: 'input-siswa-gender-l',
+                        targetStep: 3,
+                        actionLabel: 'Pilih Jenis Kelamin'
+                    });
+                    return false;
+                }
+                if (!this.siswaProvinsi) {
+                    this.showWarning({
+                        title: 'Provinsi Tempat Lahir Belum Dipilih',
+                        message: 'Mohon pilih provinsi tempat lahir siswa.',
+                        focusId: 'input-siswa-provinsi',
+                        targetStep: 3,
+                        actionLabel: 'Pilih Provinsi'
+                    });
+                    return false;
+                }
+                if (!this.tempatLahir) {
+                    this.showWarning({
+                        title: 'Kota / Kabupaten Tempat Lahir Belum Dipilih',
+                        message: 'Mohon pilih kota/kabupaten tempat lahir siswa.',
+                        focusId: 'input-tempat-lahir',
+                        targetStep: 3,
+                        actionLabel: 'Pilih Kota / Kabupaten'
+                    });
+                    return false;
+                }
+                if (!this.tanggalLahir) {
+                    this.showWarning({
+                        title: 'Tanggal Lahir Belum Diisi',
+                        message: 'Mohon isi tanggal lahir siswa.',
+                        focusId: 'input-siswa-tanggal-lahir',
+                        targetStep: 3,
+                        actionLabel: 'Isi Tanggal Lahir'
+                    });
+                    return false;
+                }
+                if (!this.agama) {
+                    this.showWarning({
+                        title: 'Agama Belum Dipilih',
+                        message: 'Mohon pilih agama siswa.',
+                        focusId: 'input-siswa-agama',
+                        targetStep: 3,
+                        actionLabel: 'Pilih Agama'
+                    });
                     return false;
                 }
             }
@@ -146,7 +343,12 @@ function userCreateForm() {
             const file = event.target.files[0];
             if (file) {
                 if (file.size > 2 * 1024 * 1024) {
-                    alert('Ukuran foto terlalu besar. Maksimal 2MB.');
+                    this.showWarning({
+                        title: 'Ukuran Foto Terlalu Besar',
+                        message: 'Ukuran file foto melebihi batas maksimal 2MB. Silakan pilih foto dengan ukuran lebih kecil.',
+                        focusId: 'input-foto-siswa',
+                        actionLabel: 'Pilih Foto Lain'
+                    });
                     event.target.value = '';
                     return;
                 }
@@ -168,7 +370,12 @@ function userCreateForm() {
             const file = event.target.files[0];
             if (file) {
                 if (file.size > 2 * 1024 * 1024) {
-                    alert('Ukuran foto terlalu besar. Maksimal 2MB.');
+                    this.showWarning({
+                        title: 'Ukuran Foto Terlalu Besar',
+                        message: 'Ukuran file foto melebihi batas maksimal 2MB. Silakan pilih foto dengan ukuran lebih kecil.',
+                        focusId: 'input-foto-pembina',
+                        actionLabel: 'Pilih Foto Lain'
+                    });
                     event.target.value = '';
                     return;
                 }
@@ -184,6 +391,35 @@ function userCreateForm() {
             this.pembinaPhotoPreview = null;
             const input = document.getElementById('input-foto-pembina');
             if (input) input.value = '';
+        },
+
+        handleSubmit(e) {
+            if (this.role === 'siswa') {
+                if (!this.nis || this.nis.length !== 10) {
+                    e.preventDefault();
+                    this.showWarning({
+                        title: 'Format NIS Tidak Sesuai',
+                        message: 'NIS harus terdiri dari tepat 10 digit angka (saat ini terisi ' + (this.nis ? this.nis.length : 0) + ' angka).',
+                        focusId: 'input-siswa-nis',
+                        targetStep: 1,
+                        actionLabel: 'Perbaiki NIS'
+                    });
+                    document.getElementById('input-siswa-nis')?.focus();
+                    return false;
+                }
+            } else if (this.role === 'pembina') {
+                if (!this.pembinaNip || this.pembinaNip.length !== 18) {
+                    e.preventDefault();
+                    this.showWarning({
+                        title: 'Format NIP Tidak Sesuai',
+                        message: 'NIP harus terdiri dari tepat 18 digit angka (saat ini terisi ' + (this.pembinaNip ? this.pembinaNip.length : 0) + ' angka).',
+                        focusId: 'input-pembina-nip',
+                        actionLabel: 'Perbaiki NIP'
+                    });
+                    document.getElementById('input-pembina-nip')?.focus();
+                    return false;
+                }
+            }
         }
     };
 }
@@ -242,7 +478,7 @@ function userCreateForm() {
 @endif
 
     {{-- FORM --}}
-    <form action="{{ route('kesiswaan.users.store') }}" method="POST" enctype="multipart/form-data" id="form-create-user">
+    <form action="{{ route('kesiswaan.users.store') }}" method="POST" enctype="multipart/form-data" id="form-create-user" novalidate x-on:submit="handleSubmit($event)">
         @csrf
 
         {{-- Hidden Jabatan Default: Siswa --}}
@@ -393,7 +629,7 @@ function userCreateForm() {
                                           :class="nis.length === 10 ? 'bg-emerald-100 text-emerald-700' : 'text-slate-400'"
                                           x-text="nis.length + '/10'"></span>
                                 </label>
-                                <input type="text" name="nis" id="input-siswa-nis" x-model="nis"
+                                <input type="text" inputmode="numeric" maxlength="10" name="nis" id="input-siswa-nis" x-model="nis"
                                        @input="nis = $event.target.value.replace(/\D/g, '').slice(0, 10)"
                                        placeholder="10 digit angka"
                                        class="w-full px-4 py-2.5 bg-slate-50 border rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:ring-2 transition"
@@ -405,6 +641,7 @@ function userCreateForm() {
                                 <input type="text" name="nama" id="input-siswa-nama" x-model="nama"
                                        placeholder="Nama lengkap sesuai rapor"
                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                                <p class="text-[10px] text-slate-400 mt-1">Hanya huruf alfabet, spasi, dan tanda baca nama (tidak boleh angka).</p>
                             </div>
                         </div>
 
@@ -464,7 +701,7 @@ function userCreateForm() {
                             <div class="grid grid-cols-2 gap-3">
                                 <label class="relative flex items-center gap-3 p-3 rounded-2xl border-2 cursor-pointer transition-all"
                                        :class="jenisKelamin === 'laki-laki' ? 'border-sky-500 bg-sky-50/60' : 'border-slate-100 hover:border-slate-200 bg-slate-50/40'">
-                                    <input type="radio" name="jenis_kelamin" value="laki-laki" x-model="jenisKelamin" class="sr-only">
+                                    <input type="radio" name="jenis_kelamin" id="input-siswa-gender-l" value="laki-laki" x-model="jenisKelamin" class="sr-only">
                                     <span class="text-xs font-bold flex-1" :class="jenisKelamin === 'laki-laki' ? 'text-sky-900' : 'text-slate-700'">Laki-laki</span>
                                     <span class="w-4 h-4 rounded-full border flex items-center justify-center"
                                           :class="jenisKelamin === 'laki-laki' ? 'border-sky-500 bg-sky-500' : 'border-slate-300'">
@@ -483,30 +720,44 @@ function userCreateForm() {
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Agama <span class="text-rose-500">*</span></label>
-                                <select name="agama" x-model="agama"
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
-                                    <option value="">Pilih Agama...</option>
-                                    @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agm)
-                                        <option value="{{ $agm }}" {{ old('agama') === $agm ? 'selected' : '' }}>{{ $agm }}</option>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Provinsi Tempat Lahir <span class="text-rose-500">*</span></label>
+                                <select name="siswa_provinsi" id="input-siswa-provinsi" x-model="siswaProvinsi" @change="onProvinsiChange('siswa')" :disabled="role !== 'siswa'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition disabled:opacity-60 disabled:cursor-not-allowed">
+                                    <option value="">Pilih provinsi...</option>
+                                    @foreach ($provinces as $province)
+                                        <option value="{{ $province->code }}" {{ ($siswaProvinceCode ?? null) === $province->code ? 'selected' : '' }}>{{ ucwords(strtolower($province->name)) }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Tempat Lahir <span class="text-rose-500">*</span></label>
-                                <input type="text" name="tempat_lahir" x-model="tempatLahir"
-                                       placeholder="Kota / Kabupaten"
-                                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Kota / Kabupaten Tempat Lahir <span class="text-rose-500">*</span></label>
+                                <select name="tempat_lahir" id="input-tempat-lahir" x-model="tempatLahir"
+                                        :disabled="role !== 'siswa' || !siswaProvinsi"
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition disabled:opacity-60 disabled:cursor-not-allowed">
+                                    <option value="" x-text="!siswaProvinsi ? 'Pilih provinsi terlebih dahulu' : (siswaCitiesLoading ? 'Memuat kota / kabupaten...' : 'Pilih kota / kabupaten')"></option>
+                                    <template x-for="city in siswaCities" :key="city.id">
+                                        <option :value="city.name" x-text="city.name" :selected="tempatLahir === city.name"></option>
+                                    </template>
+                                </select>
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
                                     Tanggal Lahir <span class="text-rose-500">*</span>
                                     <span x-show="calculatedAge" class="text-[10px] text-sky-600 font-semibold normal-case float-right" x-text="calculatedAge"></span>
                                 </label>
-                                <input type="date" name="tanggal_lahir" x-model="tanggalLahir" @change="calculateAge()"
-                                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                                <input type="date" name="tanggal_lahir" id="input-siswa-tanggal-lahir" x-model="tanggalLahir" @change="calculateAge()"
+                                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Agama <span class="text-rose-500">*</span></label>
+                                <select name="agama" id="input-siswa-agama" x-model="agama"
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                                    <option value="">Pilih Agama...</option>
+                                    @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agm)
+                                        <option value="{{ $agm }}" {{ old('agama') === $agm ? 'selected' : '' }}>{{ $agm }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
 
@@ -694,35 +945,64 @@ function userCreateForm() {
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Nama Lengkap Beserta Gelar *</label>
-                                <input required type="text" name="pembina_nama" x-model="pembinaNama" :disabled="role !== 'pembina'" placeholder="Contoh: Dra. Siti Fatimah, M.Pd" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input type="text" name="pembina_nama" id="input-pembina-nama" x-model="pembinaNama" :disabled="role !== 'pembina'" placeholder="Contoh: Dra. Siti Fatimah, M.Pd" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <p class="text-[10px] text-slate-400 mt-1">Hanya huruf alfabet, spasi, dan tanda baca gelar (tidak boleh angka).</p>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">NIP (18 angka) *</label>
-                                <input required type="text" inputmode="numeric" name="nip" :disabled="role !== 'pembina'" value="{{ old('nip') }}" minlength="18" maxlength="18" pattern="[0-9]{18}" placeholder="18 digit NIP" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
+                                    NIP <span class="text-rose-500">*</span>
+                                    <span class="text-[10px] font-bold normal-case float-right px-1.5 py-0.5 rounded-full transition-colors"
+                                          :class="pembinaNip.length === 18 ? 'bg-emerald-100 text-emerald-700' : 'text-slate-400'"
+                                          x-text="pembinaNip.length + '/18'"></span>
+                                </label>
+                                <input type="text" inputmode="numeric" maxlength="18" name="nip" id="input-pembina-nip"
+                                       x-model="pembinaNip"
+                                       :disabled="role !== 'pembina'"
+                                       @input="pembinaNip = $event.target.value.replace(/\D/g, '').slice(0, 18)"
+                                       placeholder="18 digit angka"
+                                       class="w-full px-4 py-2.5 bg-slate-50 border rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:ring-2 transition"
+                                       :class="pembinaNip.length === 18 ? 'border-emerald-300 focus:border-emerald-500 focus:ring-emerald-100' : 'border-slate-200/80 focus:border-sky-400 focus:ring-sky-100'">
+                                <p class="text-[10px] text-slate-400 mt-1">Harus tepat 18 angka.</p>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Email *</label>
-                                <input required type="email" name="email" :disabled="role !== 'pembina'" value="{{ old('email') }}" placeholder="guru@sekolah.sch.id" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input type="email" name="email" id="input-pembina-email" :disabled="role !== 'pembina'" value="{{ old('email') }}" placeholder="guru@sekolah.sch.id" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Jenis Kelamin *</label>
-                                <select required name="pembina_jenis_kelamin" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <select name="pembina_jenis_kelamin" id="input-pembina-jenis-kelamin" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                                     <option value="">Pilih jenis kelamin</option>
                                     <option value="laki-laki" {{ old('pembina_jenis_kelamin') === 'laki-laki' ? 'selected' : '' }}>Laki-laki</option>
                                     <option value="perempuan" {{ old('pembina_jenis_kelamin') === 'perempuan' ? 'selected' : '' }}>Perempuan</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tempat Lahir *</label>
-                                <input required type="text" name="pembina_tempat_lahir" :disabled="role !== 'pembina'" value="{{ old('pembina_tempat_lahir') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Provinsi Tempat Lahir *</label>
+                                <select id="input-pembina-provinsi" x-model="pembinaProvinsi" @change="onProvinsiChange('pembina')" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs disabled:opacity-60 disabled:cursor-not-allowed">
+                                    <option value="">Pilih provinsi...</option>
+                                    @foreach ($provinces as $province)
+                                        <option value="{{ $province->code }}" {{ ($pembinaProvinceCode ?? null) === $province->code ? 'selected' : '' }}>{{ ucwords(strtolower($province->name)) }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Kota / Kabupaten Tempat Lahir *</label>
+                                <select name="pembina_tempat_lahir" id="input-pembina-tempat-lahir" x-model="pembinaTempatLahir"
+                                        :disabled="role !== 'pembina' || !pembinaProvinsi"
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs disabled:opacity-60 disabled:cursor-not-allowed">
+                                    <option value="" x-text="!pembinaProvinsi ? 'Pilih provinsi terlebih dahulu' : (pembinaCitiesLoading ? 'Memuat kota / kabupaten...' : 'Pilih kota / kabupaten')"></option>
+                                    <template x-for="city in pembinaCities" :key="city.id">
+                                        <option :value="city.name" x-text="city.name"></option>
+                                    </template>
+                                </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tanggal Lahir *</label>
-                                <input required type="date" name="pembina_tanggal_lahir" :disabled="role !== 'pembina'" value="{{ old('pembina_tanggal_lahir') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input type="date" name="pembina_tanggal_lahir" id="input-pembina-tanggal-lahir" :disabled="role !== 'pembina'" value="{{ old('pembina_tanggal_lahir') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Agama *</label>
-                                <select required name="pembina_agama" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <select name="pembina_agama" id="input-pembina-agama" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                                     <option value="">Pilih agama</option>
                                     @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agama)
                                         <option value="{{ $agama }}" {{ old('pembina_agama') === $agama ? 'selected' : '' }}>{{ $agama }}</option>
@@ -731,7 +1011,7 @@ function userCreateForm() {
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">No. Telp / WA *</label>
-                                <input required type="text" name="pembina_no_telp" :disabled="role !== 'pembina'" value="{{ old('pembina_no_telp') }}" placeholder="08xxxxxxxxxx" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input type="text" name="pembina_no_telp" id="input-pembina-no-telp" :disabled="role !== 'pembina'" value="{{ old('pembina_no_telp') }}" placeholder="08xxxxxxxxxx" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Media Sosial (opsional)</label>
@@ -739,11 +1019,11 @@ function userCreateForm() {
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Alamat *</label>
-                                <textarea required name="pembina_alamat" rows="2" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">{{ old('pembina_alamat') }}</textarea>
+                                <textarea name="pembina_alamat" id="input-pembina-alamat" rows="2" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">{{ old('pembina_alamat') }}</textarea>
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Foto Profil (opsional)</label>
-                                <input type="file" name="pembina_foto" accept="image/jpeg,image/png,image/jpg,image/webp" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input type="file" name="pembina_foto" id="input-foto-pembina" @change="handlePembinaPhoto($event)" accept="image/jpeg,image/png,image/jpg,image/webp" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                                 <p class="text-[10px] text-slate-400 mt-1">Format JPG, PNG, WEBP. Maksimal 2MB.</p>
                             </div>
                         </div>
@@ -807,14 +1087,14 @@ function userCreateForm() {
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Username <span class="text-rose-500">*</span></label>
-                        <input type="text" name="username" value="{{ old('username') }}" placeholder="Username untuk login"
+                        <input type="text" name="username" id="input-staf-username" value="{{ old('username') }}" placeholder="Username untuk login"
                                :required="role === 'kesiswaan' || role === 'admin'"
                                :disabled="role !== 'kesiswaan' && role !== 'admin'"
                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                     </div>
                     <div>
                         <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Email <span class="text-rose-500">*</span></label>
-                        <input type="email" name="email" value="{{ old('email') }}" placeholder="staf@sekolah.sch.id"
+                        <input type="email" name="email" id="input-staf-email" value="{{ old('email') }}" placeholder="staf@sekolah.sch.id"
                                :disabled="role !== 'kesiswaan' && role !== 'admin'"
                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                     </div>
@@ -832,5 +1112,89 @@ function userCreateForm() {
         </div>
 
     </form>
+
+    {{-- MODAL PERINGATAN (UNIVERSAL WARNING MODAL) --}}
+    <dialog id="modalPeringatan"
+            class="rounded-3xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm p-0 w-full max-w-md shadow-2xl border border-amber-200/80 m-auto"
+            @click.self="closeWarning()">
+        <div class="bg-white rounded-3xl p-6 overflow-hidden">
+            {{-- Header --}}
+            <div class="flex items-start justify-between pb-3.5 border-b border-slate-100 gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-100/90 text-amber-600 flex items-center justify-center shrink-0 border border-amber-200/80 shadow-sm shadow-amber-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-extrabold text-slate-900 leading-snug" x-text="peringatan.title || 'Peringatan Validasi'"></h3>
+                        <p class="text-[11px] text-slate-400 font-medium">Periksa kembali data yang dimasukkan</p>
+                    </div>
+                </div>
+                <button type="button" @click="closeWarning()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition text-xs font-bold shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            {{-- Body --}}
+            <div class="mt-4 space-y-3">
+                <p class="text-xs text-slate-600 leading-relaxed font-medium" x-text="peringatan.message"></p>
+
+                {{-- List of items if multiple (e.g. empty fields or server validation errors) --}}
+                <template x-if="peringatan.items && peringatan.items.length > 0">
+                    <div class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+                        <template x-for="(item, index) in peringatan.items" :key="index">
+                            <div class="flex items-start gap-2.5 rounded-xl bg-amber-50/80 border border-amber-200/60 px-3 py-2 text-xs font-semibold text-amber-900">
+                                <span class="w-4 h-4 rounded-full bg-amber-200/80 text-amber-800 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5" x-text="index + 1"></span>
+                                <span class="flex-1 leading-snug" x-text="typeof item === 'object' ? item.label : item"></span>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+
+            {{-- Footer Buttons --}}
+            <div class="flex items-center justify-end gap-2.5 pt-4 mt-4 border-t border-slate-100">
+                <button type="button" @click="closeWarning()"
+                        class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition">
+                    Tutup
+                </button>
+                <button type="button" @click="confirmWarningAction()"
+                        class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs transition shadow-md shadow-amber-500/20 flex items-center gap-1.5">
+                    <span x-text="peringatan.actionLabel || 'Periksa Sekarang'"></span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+            </div>
+        </div>
+    </dialog>
+    <dialog id="modalKolomKosong" class="rounded-3xl backdrop:bg-slate-900/40 p-0 w-full max-w-md shadow-2xl border border-amber-100">
+        <div class="bg-white rounded-3xl border border-amber-100 p-6">
+            <div class="flex items-start justify-between pb-3 border-b border-slate-100 gap-3">
+                <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span class="hidden sm:inline">Ada Kolom Belum Terisi</span>
+                </h3>
+                <button type="button" @click="document.getElementById('modalKolomKosong')?.close()" class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 hover:text-amber-700 flex items-center justify-center transition text-xs font-bold">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="mt-4 space-y-4">
+                <p class="text-xs text-slate-600">Kolom berikut masih kosong. Lengkapi dulu sebelum menyimpan akun pembina.</p>
+                <ul class="max-h-56 overflow-y-auto space-y-1.5 pr-1">
+                    <template x-for="(kolom, index) in kolomKosong" :key="kolom.id">
+                        <li class="flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-100 px-3 py-2 text-xs font-semibold text-amber-800">
+                            <span class="w-2" x-text="index + 1"></span>
+                            <span class="flex-1" x-text="kolom.label"></span>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                <button type="button" @click="document.getElementById('modalKolomKosong')?.close()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition">Tutup</button>
+                <button type="button" @click="document.getElementById('modalKolomKosong')?.close(); fokusKolomKosong()" class="px-4 py-2 rounded-xl bg-amber-600 text-white font-bold text-xs hover:bg-amber-700 transition shadow-md shadow-amber-600/20">Isi Sekarang</button>
+            </div>
+        </div>
+    </dialog>
+
 </div>
 @endsection

@@ -21,6 +21,8 @@ class OnboardingController extends Controller
         abort_unless(in_array($user->role, ['siswa', 'pembina'], true), 403);
         abort_unless($user->needsOnboarding(), 403);
 
+        $identifierNumber = $user->role === 'siswa' ? ($user->siswa?->nis ?? '') : ($user->pembina?->nip ?? '');
+
         $validated = $request->validate([
             'username' => [
                 'required',
@@ -29,6 +31,12 @@ class OnboardingController extends Controller
                 'max:50',
                 'alpha_dash',
                 Rule::unique('users', 'username')->ignore($user->id),
+                function (string $attribute, mixed $value, $fail) use ($user, $identifierNumber): void {
+                    if ($identifierNumber !== '' && strtolower(trim((string) $value)) === strtolower(trim((string) $identifierNumber))) {
+                        $label = $user->role === 'siswa' ? 'NIS' : 'NIP';
+                        $fail("Username tidak boleh sama dengan {$label}. Buat username Anda sendiri.");
+                    }
+                },
             ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ], [

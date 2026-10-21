@@ -4,7 +4,9 @@
             $authUser = auth()->user();
             $roleLabel = $authUser->role === 'pembina' ? 'Guru / Pembina' : 'Siswa';
             $currentModel = $authUser->siswa ?? $authUser->pembina;
-            $namaLengkap = $currentModel?->nama ?? $authUser->username;
+            $namaLengkap = $currentModel?->nama ?? $authUser->username ?? 'Pengguna';
+            $identifierNumber = $authUser->role === 'pembina' ? ($authUser->pembina?->nip ?? '') : ($authUser->siswa?->nis ?? '');
+            $initialUsername = old('username', (!empty($authUser->username) && $authUser->username !== $identifierNumber ? $authUser->username : ''));
         @endphp
 
         <div class="fixed inset-0 z-[120] flex items-center justify-center p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
@@ -17,7 +19,7 @@
                         Selamat datang, {{ $namaLengkap }}!
                     </h2>
                     <p class="mt-1 text-xs leading-relaxed text-sky-100">
-                        Buat username dan password baru untuk mengamankan akun Anda.
+                        Buat username dan password baru untuk mengamankan akun Anda. Username bukan {{ $authUser->role === 'pembina' ? 'NIP' : 'NIS' }}, melainkan dibuat sendiri oleh Anda untuk login selanjutnya.
                     </p>
                 </header>
 
@@ -35,15 +37,15 @@
                     @csrf
 
                     <div>
-                        <label for="onboarding-username" class="mb-1.5 block text-xs font-bold text-slate-600">Username</label>
+                        <label for="onboarding-username" class="mb-1.5 block text-xs font-bold text-slate-600">Username Login Baru</label>
                         <input type="text" name="username" id="onboarding-username" required minlength="3" maxlength="50" pattern="[A-Za-z0-9_-]+" autofocus autocomplete="username"
-                               value="{{ old('username', $authUser->username ?? '') }}" placeholder="Masukkan username"
+                               value="{{ $initialUsername }}" placeholder="Masukkan username pilihan Anda"
                                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 focus:border-sky-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-sky-100">
                         <p id="onboarding-username-alert" class="mt-2 hidden items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700" role="alert" aria-live="polite">
                             <svg class="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm-.75-11a.75.75 0 0 1 1.5 0v3.5a.75.75 0 0 1-1.5 0V7Zm.75 7.25a.875.875 0 1 0 0-1.75.875.875 0 0 0 0 1.75Z" clip-rule="evenodd"/></svg>
-                            <span>Username kurang dari 3 karakter.</span>
+                            <span id="onboarding-username-alert-text">Username kurang dari 3 karakter.</span>
                         </p>
-                        <p class="mt-1 text-[11px] text-slate-400">Minimal 3 karakter; gunakan huruf, angka, tanda hubung, atau garis bawah.</p>
+                        <p class="mt-1 text-[11px] text-slate-400">Minimal 3 karakter; gunakan huruf, angka, tanda hubung, atau garis bawah. Tidak boleh sama dengan {{ $authUser->role === 'pembina' ? 'NIP' : 'NIS' }}.</p>
                     </div>
 
                     <div>
@@ -84,19 +86,37 @@
             (() => {
                 const usernameInput = document.getElementById('onboarding-username');
                 const usernameAlert = document.getElementById('onboarding-username-alert');
+                const usernameAlertText = document.getElementById('onboarding-username-alert-text');
                 const form = document.getElementById('onboarding-form');
                 const passwordInput = document.getElementById('onboarding-password');
                 const passwordAlert = document.getElementById('onboarding-password-alert');
                 const confirmationInput = document.getElementById('onboarding-password-confirmation');
                 const confirmationAlert = document.getElementById('onboarding-password-confirmation-alert');
+                const identifierNumber = @json($identifierNumber);
+                const roleLabel = @json($authUser->role === 'pembina' ? 'NIP' : 'NIS');
 
                 if (!usernameInput || !usernameAlert || !form || !passwordInput || !passwordAlert || !confirmationInput || !confirmationAlert) return;
 
                 const updateUsernameAlert = () => {
-                    const isTooShort = usernameInput.value.length > 0 && usernameInput.value.length < 3;
-                    usernameAlert.classList.toggle('hidden', !isTooShort);
-                    usernameAlert.classList.toggle('flex', isTooShort);
-                    usernameInput.setAttribute('aria-invalid', isTooShort ? 'true' : 'false');
+                    const val = usernameInput.value.trim();
+                    let error = null;
+
+                    if (val.length > 0 && val.length < 3) {
+                        error = 'Username minimal 3 karakter.';
+                    } else if (identifierNumber && val.toLowerCase() === identifierNumber.toLowerCase()) {
+                        error = 'Username tidak boleh sama dengan ' + roleLabel + '. Buat username Anda sendiri.';
+                    }
+
+                    if (error) {
+                        usernameAlertText.textContent = error;
+                        usernameAlert.classList.remove('hidden');
+                        usernameAlert.classList.add('flex');
+                        usernameInput.setAttribute('aria-invalid', 'true');
+                    } else {
+                        usernameAlert.classList.add('hidden');
+                        usernameAlert.classList.remove('flex');
+                        usernameInput.setAttribute('aria-invalid', 'false');
+                    }
                 };
 
                 const updatePasswordAlerts = () => {
@@ -120,6 +140,13 @@
                     if (username.length < 3) {
                         event.preventDefault();
                         window.alert('Username harus minimal 3 karakter.');
+                        usernameInput.focus();
+                        return;
+                    }
+
+                    if (identifierNumber && username.toLowerCase() === identifierNumber.toLowerCase()) {
+                        event.preventDefault();
+                        window.alert('Username tidak boleh sama dengan ' + roleLabel + '. Buat username Anda sendiri.');
                         usernameInput.focus();
                         return;
                     }
