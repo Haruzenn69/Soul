@@ -87,12 +87,12 @@ class AcademicYearRolloverService
                         $graduated++;
                     }
                 } elseif ($class->tingkat === 'x') {
-                    // 10 → 11 automatic promotion to corresponding class
-                    $target = $this->findTargetClass($class, 'xi', $newYear);
+                    // Kelas 10 lama tetap berada di kelas 10 yang bersesuaian di tahun ajaran baru (misal 10 PPLG 1 ke 10 PPLG 1 baru)
+                    // Siswa tidak hilang, tetap ada di kelas itu dan status tetap aktif
+                    $targetX = $this->findTargetClass($class, 'x', $newYear);
                     foreach ($students as $student) {
-                        $this->recordHistory($student, $currentYear->nama, $class->nama, $target->nama, 'kenaikan', $now);
-                        $student->update(['kelas_id' => $target->id, 'status' => 'aktif']);
-                        $promoted++;
+                        $student->update(['kelas_id' => $targetX->id, 'status' => 'aktif']);
+                        $pending++;
                     }
                 }
             }

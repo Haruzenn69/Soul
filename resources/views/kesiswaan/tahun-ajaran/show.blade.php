@@ -17,7 +17,7 @@
 
     $isKelas11 = $kela->tingkat === 'xi';
     $isAktif = $tahunAjaran->isAktif();
-    $hasPending = $pendingSiswaForKelas->isNotEmpty();
+    $hasPending = $availableSiswa->isNotEmpty();
     $isEmpty = $siswas->total() === 0;
 @endphp
 
@@ -75,7 +75,7 @@
                     <button type="button" onclick="document.getElementById('penempatan-section').scrollIntoView({behavior: 'smooth'})"
                        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold text-xs rounded-xl shadow-lg transition-all">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
-                        Tempatkan Siswa ({{ $pendingSiswaForKelas->count() }})
+                        Ambil Siswa Kelas 10 ({{ $availableSiswa->count() }})
                     </button>
                 @endif
                 <a href="{{ route('kesiswaan.kelas.index') }}"
@@ -102,83 +102,167 @@
                     <span class="text-xl font-black text-white mt-0.5 block">{{ $stats['perempuan'] }}</span>
                 </div>
                 <div class="bg-white/10 backdrop-blur rounded-2xl p-3 border border-white/15">
-                    <span class="text-[10px] font-bold text-white/75 uppercase tracking-wider block">Menunggu Penempatan</span>
-                    <span class="text-xl font-black {{ $hasPending ? 'text-amber-300' : 'text-white' }} mt-0.5 block">{{ $pendingSiswaForKelas->count() }}</span>
+                    @if($isKelas11)
+                        <span class="text-[10px] font-bold text-white/75 uppercase tracking-wider block">Sumber Kelas 10</span>
+                        <span class="text-sm font-extrabold text-amber-300 mt-1 block truncate">{{ $selectedSourceKelas?->nama ?? 'Tidak ada' }}</span>
+                    @else
+                        <span class="text-[10px] font-bold text-white/75 uppercase tracking-wider block">Tingkat</span>
+                        <span class="text-sm font-extrabold text-white mt-1 block">Tingkat {{ strtoupper($kela->tingkat) }}</span>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- SECTION PENEMPATAN SISWA KELAS 10 → 11 --}}
-    @if($isAktif && $isKelas11 && $hasPending)
+    {{-- SECTION UNTUK KELAS 11: AMBIL SISWA DARI KELAS 10 --}}
+    @if($isAktif && $isKelas11 && $sourceKelasOptions->isNotEmpty())
         <div id="penempatan-section" class="bg-gradient-to-br from-amber-50 to-orange-50/50 rounded-3xl border border-amber-200/80 shadow-md p-6 animate-fade-up">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-amber-200/60">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold shadow-md shadow-amber-200">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold shadow-md shadow-amber-200 shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                     </div>
                     <div>
-                        <h2 class="text-sm font-extrabold text-slate-900">Penempatan Siswa dari Kelas 10</h2>
+                        <h2 class="text-sm font-extrabold text-slate-900">Ambil Siswa dari Kelas 10</h2>
                         <p class="text-xs text-amber-800/80 mt-0.5">
-                            Pilih siswa dari kelas 10 tahun ajaran sebelumnya yang akan dinaikkan dan ditempatkan ke kelas <span class="font-bold text-amber-900">{{ $kela->nama }}</span> ini.
+                            Pilih kelas 10 asal, lalu pilih siswa yang akan dinaikkan ke kelas <span class="font-bold text-amber-900">{{ $kela->nama }}</span>.
                         </p>
                     </div>
                 </div>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-200/70 text-amber-900 border border-amber-300/50">
-                    {{ $pendingSiswaForKelas->count() }} siswa tersedia
-                </span>
+
+                {{-- Dropdown Pilih Kelas 10 Asal --}}
+                <form method="GET" action="{{ route('kesiswaan.tahun-ajaran.kelas.show', [$tahunAjaran, $kela]) }}" class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-slate-700 whitespace-nowrap">Kelas Asal:</label>
+                    <select name="source_kelas_id" onchange="this.form.submit()"
+                            class="px-3 py-2 bg-white border border-amber-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-sm">
+                        @foreach($sourceKelasOptions as $opt)
+                            <option value="{{ $opt->id }}" {{ $selectedSourceKelas?->id === $opt->id ? 'selected' : '' }}>
+                                {{ $opt->nama }} ({{ $opt->siswas_count }} siswa)
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
             </div>
 
-            <form method="POST" action="{{ route('kesiswaan.tahun-ajaran.kelas.assign', [$tahunAjaran, $kela]) }}" class="mt-4" id="form-penempatan">
+            @if($availableSiswa->isNotEmpty())
+                <form method="POST" action="{{ route('kesiswaan.tahun-ajaran.kelas.assign', [$tahunAjaran, $kela]) }}" class="mt-4" id="form-penempatan">
+                    @csrf
+
+                    <div class="flex items-center justify-between gap-3 mb-3">
+                        <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                            <input type="checkbox" id="check-all-pending" class="w-4 h-4 text-sky-600 rounded border-amber-300 focus:ring-sky-500">
+                            <span class="text-xs font-bold text-slate-700">Pilih Semua Siswa di {{ $selectedSourceKelas->nama }}</span>
+                        </label>
+                        <span id="selected-counter" class="text-xs font-semibold text-amber-800">
+                            0 siswa dipilih
+                        </span>
+                    </div>
+
+                    <div class="max-h-72 overflow-y-auto rounded-2xl border border-amber-200 bg-white divide-y divide-amber-100">
+                        @foreach($availableSiswa as $ps)
+                            <label class="flex items-center justify-between p-3.5 hover:bg-amber-50/50 cursor-pointer transition select-none">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" name="siswa_ids[]" value="{{ $ps->id }}"
+                                           class="pending-checkbox w-4 h-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500">
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-900 leading-snug">{{ $ps->nama }}</p>
+                                        <p class="text-[11px] text-slate-400 mt-0.5">
+                                            NIS: <span class="font-mono text-slate-600">{{ $ps->nis }}</span>
+                                            &bull; Kelas: <span class="font-semibold text-amber-700">{{ $selectedSourceKelas->nama }}</span>
+                                            &bull; {{ ucfirst($ps->jenis_kelamin ?? '-') }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                    Tersedia
+                                </span>
+                            </label>
+                        @endforeach
+                    </div>
+
+                    <div class="mt-4 flex justify-end">
+                        <button type="submit" id="btn-submit-assign" disabled
+                                class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold text-xs rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:from-emerald-600 hover:to-teal-700">
+                            + Naikkan Siswa Terpilih ke Kelas {{ $kela->nama }}
+                        </button>
+                    </div>
+                </form>
+            @else
+                <div class="py-6 text-center text-xs text-amber-800">
+                    Tidak ada siswa di kelas {{ $selectedSourceKelas?->nama ?? 'asal' }}.
+                </div>
+            @endif
+        </div>
+    @endif
+
+    {{-- SECTION UNTUK KELAS 10: NAIKKAN SISWA KE KELAS 11 --}}
+    @if($isAktif && $kela->tingkat === 'x' && $targetKelasOptions->isNotEmpty() && $siswas->total() > 0)
+        <div class="bg-gradient-to-br from-sky-50 to-blue-50/50 rounded-3xl border border-sky-200/80 shadow-md p-6 animate-fade-up">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-sky-200/60">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-sky-500 text-white flex items-center justify-center font-bold shadow-md shadow-sky-200 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-extrabold text-slate-900">Naikkan Siswa ke Kelas 11</h2>
+                        <p class="text-xs text-sky-800/80 mt-0.5">
+                            Pilih siswa dari kelas <span class="font-bold text-sky-900">{{ $kela->nama }}</span> ini untuk dinaikkan ke kelas tingkat 11.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ route('kesiswaan.tahun-ajaran.kelas.assign', [$tahunAjaran, $kela]) }}" class="mt-4" id="form-promosi-x">
                 @csrf
 
-                <div class="flex items-center justify-between gap-3 mb-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-bold text-slate-700 whitespace-nowrap">Pilih Kelas 11 Tujuan:</label>
+                        <select name="target_kelas_id" required
+                                class="px-3 py-2 bg-white border border-sky-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-300 shadow-sm">
+                            <option value="">-- Pilih Kelas 11 --</option>
+                            @foreach($targetKelasOptions as $opt)
+                                <option value="{{ $opt->id }}">
+                                    {{ $opt->nama }} ({{ $opt->siswas_count }} siswa saat ini)
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <label class="inline-flex items-center gap-2 cursor-pointer select-none">
-                        <input type="checkbox" id="check-all-pending" class="w-4 h-4 text-sky-600 rounded border-amber-300 focus:ring-sky-500">
+                        <input type="checkbox" id="check-all-x" class="w-4 h-4 text-sky-600 rounded border-sky-300 focus:ring-sky-500">
                         <span class="text-xs font-bold text-slate-700">Pilih Semua Siswa</span>
                     </label>
-                    <span id="selected-counter" class="text-xs font-semibold text-amber-800">
-                        0 siswa dipilih
-                    </span>
                 </div>
 
-                <div class="max-h-72 overflow-y-auto rounded-2xl border border-amber-200 bg-white divide-y divide-amber-100">
-                    @foreach($pendingSiswaForKelas as $ps)
-                        <label class="flex items-center justify-between p-3.5 hover:bg-amber-50/50 cursor-pointer transition select-none">
+                <div class="max-h-72 overflow-y-auto rounded-2xl border border-sky-200 bg-white divide-y divide-sky-100">
+                    @foreach($siswas as $s)
+                        <label class="flex items-center justify-between p-3.5 hover:bg-sky-50/50 cursor-pointer transition select-none">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" name="siswa_ids[]" value="{{ $ps->id }}"
-                                       class="pending-checkbox w-4 h-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500">
+                                <input type="checkbox" name="siswa_ids[]" value="{{ $s->id }}"
+                                       class="promosi-checkbox w-4 h-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500">
                                 <div>
-                                    <p class="text-xs font-bold text-slate-900 leading-snug">{{ $ps->nama }}</p>
+                                    <p class="text-xs font-bold text-slate-900 leading-snug">{{ $s->nama }}</p>
                                     <p class="text-[11px] text-slate-400 mt-0.5">
-                                        NIS: <span class="font-mono text-slate-600">{{ $ps->nis }}</span>
-                                        &bull; Kelas Asal: <span class="font-semibold text-amber-700">{{ $ps->kelas?->nama ?? '-' }}</span>
-                                        &bull; {{ ucfirst($ps->jenis_kelamin ?? '-') }}
+                                        NIS: <span class="font-mono text-slate-600">{{ $s->nis }}</span>
+                                        &bull; {{ ucfirst($s->jenis_kelamin ?? '-') }}
                                     </p>
                                 </div>
                             </div>
-                            <span class="text-[10px] font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-full border border-amber-200">
-                                Menunggu
+                            <span class="text-[10px] font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded-full border border-sky-200">
+                                Kelas 10
                             </span>
                         </label>
                     @endforeach
                 </div>
 
                 <div class="mt-4 flex justify-end">
-                    <button type="submit" id="btn-submit-assign" disabled
-                            class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold text-xs rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:from-emerald-600 hover:to-teal-700">
-                        + Tempatkan Siswa Terpilih ke Kelas {{ $kela->nama }}
+                    <button type="submit" id="btn-submit-promosi" disabled
+                            class="px-6 py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-extrabold text-xs rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:from-sky-600 hover:to-blue-700">
+                        + Naikkan Siswa Terpilih ke Kelas 11
                     </button>
                 </div>
             </form>
-        </div>
-    @elseif($isAktif && $isKelas11 && !$hasPending && $isEmpty)
-        <div class="bg-amber-50 rounded-2xl border border-amber-200 p-4 text-xs text-amber-800 flex items-center gap-3">
-            <svg class="w-5 h-5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <div>
-                <p class="font-bold">Kelas ini kosong dan belum ada siswa kelas 10 yang menunggu penempatan.</p>
-                <p class="text-[11px] text-amber-700 mt-0.5">Siswa baru dapat ditambahkan melalui menu Tambah Siswa di kanan atas.</p>
-            </div>
         </div>
     @endif
 
@@ -330,6 +414,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // Form 1: Ambil Siswa dari Kelas 10 ke Kelas 11
         const checkAll = document.getElementById('check-all-pending');
         const checkboxes = document.querySelectorAll('.pending-checkbox');
         const counter = document.getElementById('selected-counter');
@@ -354,6 +439,31 @@
 
         checkboxes.forEach(cb => {
             cb.addEventListener('change', updateState);
+        });
+
+        // Form 2: Naikkan Siswa dari Kelas 10 ke Kelas 11
+        const checkAllX = document.getElementById('check-all-x');
+        const checkboxesX = document.querySelectorAll('.promosi-checkbox');
+        const submitBtnX = document.getElementById('btn-submit-promosi');
+
+        function updateStateX() {
+            const checkedCountX = document.querySelectorAll('.promosi-checkbox:checked').length;
+            if (submitBtnX) submitBtnX.disabled = checkedCountX === 0;
+            if (checkAllX && checkboxesX.length > 0) {
+                checkAllX.checked = checkedCountX === checkboxesX.length;
+                checkAllX.indeterminate = checkedCountX > 0 && checkedCountX < checkboxesX.length;
+            }
+        }
+
+        if (checkAllX) {
+            checkAllX.addEventListener('change', function () {
+                checkboxesX.forEach(cb => cb.checked = checkAllX.checked);
+                updateStateX();
+            });
+        }
+
+        checkboxesX.forEach(cb => {
+            cb.addEventListener('change', updateStateX);
         });
     });
 </script>

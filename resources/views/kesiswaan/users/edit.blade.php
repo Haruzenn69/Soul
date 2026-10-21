@@ -45,7 +45,7 @@
         </div>
     @endif
 
-    <form action="{{ route('kesiswaan.users.update', $user) }}" method="POST" enctype="multipart/form-data"
+    <form action="{{ route('kesiswaan.users.update', $user) }}" method="POST" enctype="multipart/form-data" id="form-edit-user" novalidate
           class="bg-white p-6 rounded-3xl border border-sky-100 shadow-sm space-y-6">
         @csrf
         @method('PUT')
@@ -310,9 +310,101 @@
             @method('DELETE')
         </form>
     @endif
+
+    {{-- MODAL PERINGATAN (UNIVERSAL WARNING MODAL) --}}
+    <dialog id="modalPeringatan"
+            class="rounded-3xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm p-0 w-full max-w-md shadow-2xl border border-amber-200/80 m-auto"
+            onclick="if (event.target === this) closeEditWarning()">
+        <div class="bg-white rounded-3xl p-6 overflow-hidden">
+            {{-- Header --}}
+            <div class="flex items-start justify-between pb-3.5 border-b border-slate-100 gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-100/90 text-amber-600 flex items-center justify-center shrink-0 border border-amber-200/80 shadow-sm shadow-amber-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-extrabold text-slate-900 leading-snug" id="modalPeringatanTitle">Peringatan Validasi</h3>
+                        <p class="text-[11px] text-slate-400 font-medium">Periksa kembali data yang dimasukkan</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeEditWarning()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition text-xs font-bold shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            {{-- Body --}}
+            <div class="mt-4 space-y-3">
+                <p class="text-xs text-slate-600 leading-relaxed font-medium" id="modalPeringatanMessage"></p>
+                <div id="modalPeringatanList" class="space-y-1.5 max-h-56 overflow-y-auto pr-1 hidden"></div>
+            </div>
+
+            {{-- Footer Buttons --}}
+            <div class="flex items-center justify-end gap-2.5 pt-4 mt-4 border-t border-slate-100">
+                <button type="button" onclick="closeEditWarning()"
+                        class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition">
+                    Tutup
+                </button>
+                <button type="button" onclick="confirmEditWarningAction()"
+                        class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs transition shadow-md shadow-amber-500/20 flex items-center gap-1.5">
+                    <span id="modalPeringatanActionLabel">Periksa Sekarang</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+            </div>
+        </div>
+    </dialog>
 </div>
 
 <script>
+    let currentFocusTarget = null;
+    function showEditWarning(title, message, items = [], focusTarget = null, actionLabel = 'Periksa Sekarang') {
+        document.getElementById('modalPeringatanTitle').textContent = title || 'Peringatan Validasi';
+        document.getElementById('modalPeringatanMessage').textContent = message || '';
+        document.getElementById('modalPeringatanActionLabel').textContent = actionLabel;
+        currentFocusTarget = focusTarget;
+
+        const listEl = document.getElementById('modalPeringatanList');
+        if (items && items.length > 0) {
+            listEl.innerHTML = '';
+            items.forEach((item, idx) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-start gap-2.5 rounded-xl bg-amber-50/80 border border-amber-200/60 px-3 py-2 text-xs font-semibold text-amber-900';
+                row.innerHTML = `<span class="w-4 h-4 rounded-full bg-amber-200/80 text-amber-800 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">${idx + 1}</span><span class="flex-1 leading-snug">${item}</span>`;
+                listEl.appendChild(row);
+            });
+            listEl.classList.remove('hidden');
+        } else {
+            listEl.classList.add('hidden');
+        }
+
+        const dlg = document.getElementById('modalPeringatan');
+        if (dlg) {
+            if (typeof dlg.showModal === 'function') dlg.showModal();
+            else dlg.setAttribute('open', '');
+        }
+    }
+
+    function closeEditWarning() {
+        const dlg = document.getElementById('modalPeringatan');
+        if (dlg) {
+            if (typeof dlg.close === 'function') dlg.close();
+            else dlg.removeAttribute('open');
+        }
+    }
+
+    function confirmEditWarningAction() {
+        closeEditWarning();
+        if (currentFocusTarget) {
+            setTimeout(() => {
+                const el = typeof currentFocusTarget === 'string' ? document.querySelector(currentFocusTarget) : currentFocusTarget;
+                if (el) {
+                    el.focus();
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 50);
+        }
+    }
     function toggleRoleFields() {
         const role = document.getElementById('role').value;
         const siswaFields = document.getElementById('fields-siswa');
@@ -335,6 +427,79 @@
     document.addEventListener('DOMContentLoaded', () => {
         toggleRoleFields();
         document.getElementById('jabatan')?.addEventListener('change', toggleEkskulField);
+
+        document.getElementById('form-edit-user')?.addEventListener('submit', function (e) {
+            const emailEl = this.querySelector('input[name="email"]');
+            if (emailEl) {
+                const val = emailEl.value.trim();
+                if (!val) {
+                    e.preventDefault();
+                    showEditWarning('Email Wajib Diisi', 'Alamat email wajib diisi untuk login akun.', [], emailEl, 'Isi Email');
+                    return false;
+                }
+                if (!val.includes('@')) {
+                    e.preventDefault();
+                    showEditWarning('Format Email Tidak Valid', 'Alamat email harus menggunakan tanda "@" (contoh: user@sekolah.sch.id atau user@gmail.com).', [], emailEl, 'Perbaiki Email');
+                    return false;
+                }
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+                    e.preventDefault();
+                    showEditWarning('Format Email Tidak Lengkap', 'Pastikan alamat email memiliki domain yang valid (contoh: user@gmail.com).', [], emailEl, 'Perbaiki Email');
+                    return false;
+                }
+            }
+
+            const role = document.getElementById('role')?.value;
+            if (role === 'siswa') {
+                const nisEl = this.querySelector('input[name="nis"]');
+                if (nisEl) {
+                    const nisVal = nisEl.value.trim();
+                    if (!nisVal) {
+                        e.preventDefault();
+                        showEditWarning('NIS Wajib Diisi', 'NIS siswa wajib diisi tepat 10 angka.', [], nisEl, 'Isi NIS');
+                        return false;
+                    }
+                    if (nisVal.length !== 10) {
+                        e.preventDefault();
+                        showEditWarning('Format NIS Tidak Sesuai', 'NIS harus terdiri dari tepat 10 digit angka (saat ini terisi ' + nisVal.length + ' angka).', [], nisEl, 'Perbaiki NIS');
+                        return false;
+                    }
+                }
+            } else if (role === 'pembina') {
+                const nipEl = this.querySelector('input[name="nip"]');
+                if (nipEl) {
+                    const nipVal = nipEl.value.trim();
+                    if (!nipVal) {
+                        e.preventDefault();
+                        showEditWarning('NIP Wajib Diisi', 'NIP pembina wajib diisi tepat 18 angka.', [], nipEl, 'Isi NIP');
+                        return false;
+                    }
+                    if (nipVal.length !== 18 || !/^\d{18}$/.test(nipVal)) {
+                        e.preventDefault();
+                        showEditWarning('Format NIP Tidak Sesuai', 'NIP pembina harus terdiri dari tepat 18 digit angka (saat ini terisi ' + nipVal.length + ' angka).', [], nipEl, 'Perbaiki NIP');
+                        return false;
+                    }
+                }
+            }
+        });
+
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function () {
+                const file = this.files[0];
+                if (file && file.size > 2 * 1024 * 1024) {
+                    showEditWarning('Ukuran File Terlalu Besar', 'Ukuran file foto maksimal adalah 2MB. Silakan gunakan file gambar dengan ukuran lebih kecil.', [], this, 'Pilih File Lain');
+                    this.value = '';
+                }
+            });
+        });
+
+        @if ($errors->any())
+            showEditWarning('Terjadi Kesalahan Validasi', 'Terdapat data yang belum sesuai dengan ketentuan sistem:', [
+                @foreach ($errors->all() as $err)
+                    '{{ addslashes($err) }}',
+                @endforeach
+            ], null, 'Periksa Sekarang');
+        @endif
     });
 </script>
 @endsection

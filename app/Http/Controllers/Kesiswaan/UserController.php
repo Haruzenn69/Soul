@@ -20,8 +20,10 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\View\View;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
+use Laravolt\Indonesia\Models\City;
+use Laravolt\Indonesia\Models\Province;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\Failure;
 
@@ -109,8 +111,8 @@ class UserController extends Controller
         $jenis = $validated['jenis'] === 'siswa' ? 'siswa' : 'pembina';
 
         $errors = collect($import->failures())
-            ->map(function (Failure $failure) use ($jenis) {
-                $messages = collect($failure->errors())->map(function (string $error) use ($jenis) {
+            ->map(function (Failure $failure) {
+                $messages = collect($failure->errors())->map(function (string $error) {
                     if (str_contains(strtolower($error), 'the nip field is required')) {
                         return 'Kolom NIP kosong atau tidak ditemukan. Pastikan jenis akun Pembina dipilih dan gunakan template Pembina.';
                     }
@@ -189,6 +191,13 @@ class UserController extends Controller
         return view('kesiswaan.users.create', [
             'kelas' => Kelas::with('tahunAjaran')->whereHas('tahunAjaran', fn ($query) => $query->where('status', 'aktif'))->orderBy('nama')->get(),
             'ekskuls' => $this->getEskulsWithKetuaStatus(),
+            'provinces' => Province::orderBy('name')->get(['code', 'name']),
+            'siswaProvinceCode' => filled(old('tempat_lahir'))
+                ? City::where('name', old('tempat_lahir'))->value('province_code')
+                : null,
+            'pembinaProvinceCode' => filled(old('pembina_tempat_lahir'))
+                ? City::where('name', old('pembina_tempat_lahir'))->value('province_code')
+                : null,
         ]);
     }
 
@@ -200,9 +209,9 @@ class UserController extends Controller
 
         $rules = [
             'username' => [$isStaff ? 'required' : 'nullable', 'string', 'max:255', 'unique:users,username'],
-            'email'    => [$isPembina ? 'nullable' : 'required', 'nullable', 'email', 'max:255', 'unique:users,email'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             // Role admin hanya bisa dibuat oleh admin (kesiswaan tidak boleh)
-            'role'     => ['required', 'in:' . $this->allowedRoles()],
+            'role' => ['required', 'in:'.$this->allowedRoles()],
         ];
 
         if ($request->input('role') === 'siswa') {
@@ -228,21 +237,30 @@ class UserController extends Controller
             $rules += [
                 'pembina_nama' => ['required', 'string', 'max:255'],
                 'pembina_foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-                'nip'          => ['required', 'string', 'digits:18', 'unique:pembinas,nip'],
-                'pembina_tempat_lahir'    => ['nullable', 'string', 'max:100'],
-                'pembina_tanggal_lahir'   => ['nullable', 'date'],
-                'pembina_agama'           => ['nullable', 'string', 'max:50'],
-                'pembina_jenis_kelamin'   => ['nullable', 'in:laki-laki,perempuan'],
-                'pembina_no_telp'         => ['nullable', 'string', 'max:25'],
-                'pembina_alamat'          => ['nullable', 'string'],
-                'pembina_medsos'          => ['nullable', 'string', 'max:255'],
+                'nip' => ['required', 'string', 'digits:18', 'unique:pembinas,nip'],
+                'pembina_tempat_lahir' => ['required', 'string', 'max:100'],
+                'pembina_tanggal_lahir' => ['required', 'date'],
+                'pembina_agama' => ['required', 'string', 'max:50'],
+                'pembina_jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
+                'pembina_no_telp' => ['required', 'string', 'max:25'],
+                'pembina_alamat' => ['required', 'string'],
+                'pembina_medsos' => ['nullable', 'string', 'max:255'],
             ];
         }
 
         $data = $request->validate($rules, [
-            'nis.digits' => 'Periksa NIS. NIS harus terdiri dari tepat 10 angka.',
-            'nip.digits' => 'Periksa NIP. NIP harus terdiri dari tepat 18 angka.',
-            'kelas_id.required' => 'Pilih kelas siswa.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Terjadi kesalahan pada data Email. Format email harus mengandung tanda @.',
+            'email.unique' => 'Email sudah terdaftar pada sistem.',
+            'nis.required' => 'NIS wajib diisi.',
+            'nis.digits' => 'Terjadi kesalahan pada data NIS.',
+            'nis.unique' => 'NIS sudah terdaftar pada sistem.',
+            'nip.required' => 'NIP wajib diisi.',
+            'nip.digits' => 'Terjadi kesalahan pada data NIP.',
+            'nip.unique' => 'NIP sudah terdaftar pada sistem.',
+            'tempat_lahir.max' => 'Tempat lahir maksimal 100 karakter.',
+            'pembina_tempat_lahir.required' => 'Pilih provinsi lalu kota/kabupaten tempat lahir pembina.',
+            'pembina_tempat_lahir.max' => 'Tempat lahir maksimal 100 karakter.',
             'foto.image' => 'File foto siswa harus berupa gambar.',
             'foto.max' => 'Ukuran foto siswa maksimal 2MB.',
             'pembina_foto.image' => 'File foto pembina harus berupa gambar.',
@@ -255,7 +273,7 @@ class UserController extends Controller
             }
 
             $user = User::create([
-                'username' => ($isStaff && !empty($data['username'])) ? $data['username'] : null,
+                'username' => ($isStaff && ! empty($data['username'])) ? $data['username'] : null,
                 'email' => $data['email'] ?? null,
                 'password' => Hash::make('password'),
                 'role' => $data['role'],
@@ -298,17 +316,17 @@ class UserController extends Controller
                     : null;
 
                 $user->pembina()->create([
-                    'nip'           => $data['nip'] ?? null,
-                    'nama'          => $data['pembina_nama'],
-                    'foto'          => $pembinaFotoPath,
-                    'tempat_lahir'  => $data['pembina_tempat_lahir'] ?? null,
+                    'nip' => $data['nip'] ?? null,
+                    'nama' => $data['pembina_nama'],
+                    'foto' => $pembinaFotoPath,
+                    'tempat_lahir' => $data['pembina_tempat_lahir'] ?? null,
                     'tanggal_lahir' => $data['pembina_tanggal_lahir'] ?? null,
-                    'agama'         => $data['pembina_agama'] ?? null,
+                    'agama' => $data['pembina_agama'] ?? null,
                     'jenis_kelamin' => $data['pembina_jenis_kelamin'] ?? null,
-                    'email'         => $data['email'] ?? null,
-                    'no_telp'       => $data['pembina_no_telp'] ?? null,
-                    'alamat'        => $data['pembina_alamat'] ?? null,
-                    'medsos'        => $data['pembina_medsos'] ?? null,
+                    'email' => $data['email'] ?? null,
+                    'no_telp' => $data['pembina_no_telp'] ?? null,
+                    'alamat' => $data['pembina_alamat'] ?? null,
+                    'medsos' => $data['pembina_medsos'] ?? null,
                 ]);
             }
 
@@ -319,7 +337,7 @@ class UserController extends Controller
             ->route('kesiswaan.users.index')
             ->with('success', $user->username
                 ? "Akun {$user->username} berhasil dibuat dengan password default: password"
-                : "Akun berhasil dibuat. Siswa/Pembina akan mengisi username secara mandiri saat login pertama kali. Password default: password");
+                : 'Akun berhasil dibuat. Siswa/Pembina akan mengisi username secara mandiri saat login pertama kali. Password default: password');
     }
 
     public function show(User $user): View
@@ -423,8 +441,15 @@ class UserController extends Controller
         }
 
         $data = $request->validate($rules, [
-            'nis.digits' => 'Periksa NIS. NIS harus terdiri dari tepat 10 angka.',
-            'nip.digits' => 'Periksa NIP. NIP harus terdiri dari tepat 18 angka.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Terjadi kesalahan pada data Email. Format email harus mengandung tanda @.',
+            'email.unique' => 'Email sudah terdaftar pada sistem.',
+            'nis.required' => 'NIS wajib diisi.',
+            'nis.digits' => 'Terjadi kesalahan pada data NIS.',
+            'nis.unique' => 'NIS sudah terdaftar pada sistem.',
+            'nip.required' => 'NIP wajib diisi.',
+            'nip.digits' => 'Terjadi kesalahan pada data NIP.',
+            'nip.unique' => 'NIP sudah terdaftar pada sistem.',
             'foto.image' => 'File foto siswa harus berupa gambar.',
             'foto.max' => 'Ukuran foto siswa maksimal 2MB.',
             'pembina_foto.image' => 'File foto pembina harus berupa gambar.',
