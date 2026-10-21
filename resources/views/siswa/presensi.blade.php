@@ -79,6 +79,9 @@
 
     <!-- Filter & Sort Form -->
     <form method="GET" action="{{ route('siswa.presensi') }}" id="filter-presensi-form" class="bg-white p-4 rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 flex flex-wrap items-center gap-3 animate-fade-up" style="animation-delay: .3s">
+        @if($pendaftaran)
+            <input type="hidden" name="ekskul" value="{{ $pendaftaran->ekskul_id }}">
+        @endif
         <input type="hidden" name="sort" id="sort-input" value="{{ $sort ?? 'tanggal' }}">
         <input type="hidden" name="direction" id="direction-input" value="{{ $direction ?? 'desc' }}">
 
@@ -124,7 +127,7 @@
         <button type="submit" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition-all">Filter</button>
 
         @if($hasActiveFilter)
-            <a href="{{ route('siswa.presensi') }}" class="px-3 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition">Reset</a>
+            <a href="{{ route('siswa.presensi', $pendaftaran ? ['ekskul' => $pendaftaran->ekskul_id] : []) }}" class="px-3 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition">Reset</a>
         @endif
     </form>
 
@@ -211,7 +214,7 @@
                 <p class="text-[11px] text-slate-400 mt-1">Coba sesuaikan kata kunci pencarian atau filter yang dipilih</p>
                 @if($hasActiveFilter)
                     <div class="mt-4">
-                        <a href="{{ route('siswa.presensi') }}" class="px-4 py-2 bg-sky-100 hover:bg-sky-200 text-sky-700 font-bold text-xs rounded-xl transition">Reset Filter</a>
+                        <a href="{{ route('siswa.presensi', $pendaftaran ? ['ekskul' => $pendaftaran->ekskul_id] : []) }}" class="px-4 py-2 bg-sky-100 hover:bg-sky-200 text-sky-700 font-bold text-xs rounded-xl transition">Reset Filter</a>
                     </div>
                 @endif
             </div>

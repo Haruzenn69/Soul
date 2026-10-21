@@ -1,7 +1,16 @@
 <!DOCTYPE html>
 @php
     $psAuthUser = auth()->user();
-    $psIsKetua = $psAuthUser && $psAuthUser->siswa && $psAuthUser->siswa->jabatan === 'ketua';
+    $siswa = $siswa ?? $psAuthUser?->siswa;
+
+    if (request('from') === 'siswa') {
+        $psIsKetua = false;
+    } elseif (request('from') === 'ketua') {
+        $psIsKetua = $siswa ? ($ekskul && $siswa->riwayatKetua($ekskul)->whereNull('selesai')->exists() || $siswa->ekskulDipimpin() !== null) : false;
+    } else {
+        $isKetuaDiEkskul = $ekskul && $siswa && $siswa->riwayatKetua($ekskul)->whereNull('selesai')->exists();
+        $psIsKetua = $ekskul ? $isKetuaDiEkskul : ($siswa ? ($siswa->ekskulDipimpin() !== null) : false);
+    }
     $psIconSvg = [
         'dashboard' => '<path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/><path d="M14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"/><path d="M4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z"/><path d="M14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>',
         'calendar' => '<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>',
@@ -41,23 +50,23 @@
                 ['icon' => 'chat', 'label' => 'Testimoni', 'url' => route('ketua.testimoni.index'), 'is' => 'ketua.testimoni.*'],
                 ['icon' => 'help', 'label' => 'FAQ', 'url' => route('ketua.faq.index'), 'is' => 'ketua.faq.*'],
             ]],
-            ['icon' => 'user', 'label' => 'Profile', 'url' => route('profile.edit'), 'is' => 'profile.edit'],
+            ['icon' => 'user', 'label' => 'Profile', 'url' => route('profile.edit', ['from' => 'ketua']), 'is' => 'profile.edit'],
         ],
         'more' => [],
     ] : [
-        'title' => 'Menu Siswa',
-        'dash' => route('siswa.dashboard'),
+        'title' => $ekskul ? 'Menu Siswa · ' . $ekskul->nama_ekskul : 'Menu Siswa',
+        'dash' => route('siswa.dashboard', $ekskul ? ['ekskul' => $ekskul->id] : []),
         'notif' => route('siswa.notifikasi'),
         'items' => [
-            ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('siswa.dashboard'), 'is' => 'siswa.dashboard'],
+            ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('siswa.dashboard', $ekskul ? ['ekskul' => $ekskul->id] : []), 'is' => 'siswa.dashboard'],
             ['icon' => 'document', 'label' => 'Katalog Ekskul', 'url' => route('siswa.katalog'), 'is' => ['siswa.katalog', 'ekskul.detail']],
-            ['icon' => 'calendar', 'label' => 'Presensi & Kegiatan', 'url' => route('siswa.presensi'), 'is' => 'siswa.presensi'],
-            ['icon' => 'bars', 'label' => 'Rekap Absensi', 'url' => route('siswa.rekap'), 'is' => 'siswa.rekap'],
-            ['icon' => 'user', 'label' => 'Profil Saya', 'url' => route('profile.edit'), 'is' => 'profile.edit'],
+            ['icon' => 'calendar', 'label' => 'Presensi & Kegiatan', 'url' => route('siswa.presensi', $ekskul ? ['ekskul' => $ekskul->id] : []), 'is' => 'siswa.presensi'],
+            ['icon' => 'bars', 'label' => 'Rekap Absensi', 'url' => route('siswa.rekap', $ekskul ? ['ekskul' => $ekskul->id] : []), 'is' => 'siswa.rekap'],
+            ['icon' => 'user', 'label' => 'Profil Saya', 'url' => route('profile.edit', array_merge($ekskul ? ['ekskul' => $ekskul->id] : [], ['from' => 'siswa'])), 'is' => 'profile.edit'],
         ],
         'more' => [
             ['label' => 'Daftar Ekskul', 'url' => route('siswa.daftar-ekskul'), 'is' => 'siswa.daftar-ekskul'],
-            ['label' => 'Ajukan Keluar', 'url' => route('siswa.pengajuan-keluar'), 'is' => ['siswa.pengajuan-keluar', 'siswa.pengajuan-keluar.store']],
+            ['label' => 'Ajukan Keluar', 'url' => route('siswa.pengajuan-keluar', $ekskul ? ['ekskul' => $ekskul->id] : []), 'is' => ['siswa.pengajuan-keluar', 'siswa.pengajuan-keluar.store']],
         ],
     ];
 @endphp
@@ -77,7 +86,7 @@
     'psLogoBrand' => 'SOUL',
     'psDashboardUrl' => $psSidebar['dash'],
     'psNotifUrl' => $psSidebar['notif'],
-    'psProfileUrl' => route('profile.edit'),
+    'psProfileUrl' => route('profile.edit', array_merge($ekskul ? ['ekskul' => $ekskul->id] : [], ['from' => $psIsKetua ? 'ketua' : 'siswa'])),
     'psItems' => $psSidebar['items'],
     'psMore' => $psSidebar['more'],
 ])
@@ -207,6 +216,48 @@
                 <div class="bg-sky-50 text-sky-700 border border-sky-100 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 hidden sm:block">
                     <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> {{ $psIsKetua ? 'Ketua' : 'Siswa' }}
                 </div>
+
+                @php
+                    $__activeEkskulsP  = $siswa ? $siswa->activeEkskuls() : collect();
+                    $__hasMultiEkskulP = $__activeEkskulsP->count() >= 2;
+                    if ($__hasMultiEkskulP && $ekskul) {
+                        $__othEksP     = $__activeEkskulsP->firstWhere('id', '!=', $ekskul->id);
+                        $__isOthKetuaP = $__othEksP && $siswa->riwayatKetua($__othEksP)->whereNull('selesai')->exists();
+                        $__switchUrlP  = $__isOthKetuaP ? route('ketua.dashboard') : ($__othEksP ? route('siswa.dashboard', ['ekskul' => $__othEksP->id]) : '#');
+                    }
+                @endphp
+
+                @if($__hasMultiEkskulP && isset($__othEksP) && $__othEksP)
+                    <!-- Desktop: Tombol Switch Dashboard -->
+                    <a href="{{ $__switchUrlP }}"
+                       id="header-switch-dashboard-profile"
+                       title="Switch Dashboard ke {{ $__othEksP->nama_ekskul }}{{ $__isOthKetuaP ? ' (Ketua)' : '' }}"
+                       class="group relative hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 text-xs font-bold transition-all shadow-sm hover:shadow shrink-0">
+                        <svg class="w-3.5 h-3.5 transition-transform group-hover:rotate-180 duration-500 text-sky-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                        </svg>
+                        <span class="whitespace-nowrap font-bold">Switch Dashboard</span>
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-sky-200/60 text-[10px] font-semibold text-sky-800 truncate max-w-[100px]">
+                            {{ $__othEksP->nama_ekskul }}
+                            @if($__isOthKetuaP)
+                                <span class="text-[9px] text-amber-600 font-extrabold">&bull; Ketua</span>
+                            @endif
+                        </span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+                    </a>
+
+                    <!-- Mobile: Tombol Switch Dashboard ringkas -->
+                    <a href="{{ $__switchUrlP }}"
+                       id="header-switch-dashboard-profile-mobile"
+                       title="Switch Dashboard ke {{ $__othEksP->nama_ekskul }}{{ $__isOthKetuaP ? ' (Ketua)' : '' }}"
+                       class="sm:hidden relative w-9 h-9 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 flex items-center justify-center transition-all shadow-sm shrink-0">
+                        <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                        </svg>
+                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-sky-500 border-2 border-white animate-pulse"></span>
+                    </a>
+                @endif
+
                 <a href="{{ $psSidebar['notif'] }}" class="w-9 h-9 rounded-xl bg-white border border-sky-100 flex items-center justify-center text-xs relative text-slate-600 hover:bg-sky-50 hover:border-sky-200 transition-all shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -536,12 +587,28 @@
 
                 <!-- Informasi Ekskul -->
                 <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up h-full" style="animation-delay: .2s">
-                        <div class="px-6 py-5 border-b border-sky-50">
-                            <h2 class="text-sm font-extrabold text-slate-900">Informasi Ekskul</h2>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Status keanggotaan ekstrakurikulermu</p>
+                        <div class="px-6 py-5 border-b border-sky-50 flex items-center justify-between flex-wrap gap-2">
+                            <div>
+                                <h2 class="text-sm font-extrabold text-slate-900">Informasi Ekskul</h2>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Status keanggotaan ekstrakurikulermu</p>
+                            </div>
+                            @if(isset($__hasMultiEkskulP) && $__hasMultiEkskulP)
+                                <div class="flex items-center gap-1.5 bg-sky-50 border border-sky-200 p-1 rounded-xl">
+                                    <span class="text-[10px] font-bold text-sky-700 px-2">Ekskul:</span>
+                                    @foreach($__activeEkskulsP as $pEks)
+                                        <a href="{{ route('profile.edit', ['ekskul' => $pEks->id]) }}"
+                                           class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all {{ ($ekskul?->id === $pEks->id) ? 'bg-sky-500 text-white shadow-xs' : 'text-slate-600 hover:text-sky-700' }}">
+                                            {{ $pEks->nama_ekskul }}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                         <div class="p-6">
                             @if($ekskul)
+                                @php
+                                    $isKetuaDiEkskul = $ekskul && $siswa && $siswa->riwayatKetua($ekskul)->whereNull('selesai')->exists();
+                                @endphp
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100 flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center text-xs font-extrabold uppercase shadow-md shadow-sky-200 shrink-0">
@@ -555,8 +622,8 @@
                                     <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
                                         <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Jabatan</p>
                                         <p class="mt-1.5">
-                                            <span class="px-2.5 py-1 rounded-full text-xs font-bold {{ $siswa?->jabatan == 'ketua' ? 'bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 border border-amber-200' : 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 border border-sky-200' }}">
-                                                {{ ucfirst($siswa->jabatan ?? 'Anggota') }}
+                                            <span class="px-2.5 py-1 rounded-full text-xs font-bold {{ $isKetuaDiEkskul ? 'bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 border border-amber-200' : 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 border border-sky-200' }}">
+                                                {{ $isKetuaDiEkskul ? 'Ketua' : 'Anggota' }}
                                             </span>
                                         </p>
                                     </div>
@@ -592,7 +659,7 @@
                 <div class="profile-exit-card lg:col-span-3 bg-white rounded-3xl border-2 border-red-200 shadow-lg shadow-red-200/70 ring-1 ring-red-100/80 overflow-hidden animate-fade-up" style="animation-delay: .25s">
                         <div class="px-6 py-5 flex items-center justify-between border-b border-sky-50">
                             <div>
-                                <h2 class="text-sm font-extrabold text-slate-900">Pengajuan Keluar Ekskul</h2>
+                                <h2 class="text-sm font-extrabold text-slate-900">Pengajuan Keluar Ekskul {{ $ekskul ? '(' . $ekskul->nama_ekskul . ')' : '' }}</h2>
                                 <p class="text-[11px] text-slate-400 mt-0.5">Tindakan ini bersifat permanen</p>
                             </div>
                             <span class="profile-sacred-badge text-[10px] font-bold text-amber-700 bg-gradient-to-r from-amber-100 to-yellow-100 border border-amber-200 px-3 py-1.5 rounded-full">Sakral</span>
@@ -602,27 +669,28 @@
                             @if($ekskul)
                                 <div class="p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl border border-amber-200 mb-4">
                                     <p class="text-xs text-amber-700 leading-relaxed">
-                                        Pengajuan keluar dari ekskul bersifat permanen. Setelah dikeluarkan, kamu harus mendaftar ulang jika ingin bergabung kembali.
+                                        Pengajuan keluar dari ekskul <strong>{{ $ekskul->nama_ekskul }}</strong> bersifat permanen. Setelah dikeluarkan, kamu harus mendaftar ulang jika ingin bergabung kembali.
                                     </p>
                                 </div>
 
                                 @php
-                                    $hasPendingPengajuan = isset($pengajuan) && $pengajuan->where('status', 'pending')->count() > 0;
+                                    $hasPendingPengajuan = isset($pengajuan) && $pengajuan->where('status', 'pending')->where('ekskul_id', $ekskul->id)->count() > 0;
                                 @endphp
 
                                 @if($hasPendingPengajuan)
                                     <div class="p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl border border-amber-200 mb-4">
-<p class="text-xs text-amber-800 font-semibold">
-                                            &#10004;&#65039; Kamu sudah mengajukan permohonan keluar. Mohon tunggu verifikasi dan persetujuan dari ketua ekskul.
+                                        <p class="text-xs text-amber-800 font-semibold">
+                                            &#10004;&#65039; Kamu sudah mengajukan permohonan keluar untuk ekskul {{ $ekskul->nama_ekskul }}. Mohon tunggu verifikasi dan persetujuan dari ketua ekskul.
                                         </p>
                                     </div>
                                 @else
                                     <form method="POST" action="{{ route('siswa.pengajuan-keluar.store') }}">
                                         @csrf
+                                        <input type="hidden" name="ekskul_id" value="{{ $ekskul->id }}">
                                         <div class="space-y-4">
                                             <div>
                                                 <label class="text-xs font-bold text-slate-700 block mb-1.5">
-                                                    Alasan Keluar <span class="text-red-500">*</span>
+                                                    Alasan Keluar dari {{ $ekskul->nama_ekskul }} <span class="text-red-500">*</span>
                                                 </label>
                                                 <textarea name="alasan" required rows="3"
                                                     class="w-full p-3 bg-sky-50/60 border @error('alasan') border-red-300 @else border-sky-100 @enderror rounded-2xl text-xs text-slate-800 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all"
@@ -633,7 +701,7 @@
                                                 @enderror
                                             </div>
                                             <button type="submit" class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-red-200 hover:-translate-y-0.5">
-                                                Ajukan Permohonan Keluar
+                                                Ajukan Permohonan Keluar ({{ $ekskul->nama_ekskul }})
                                             </button>
                                         </div>
                                     </form>

@@ -23,7 +23,7 @@
 
         if ($siswa) {
             $pending = $siswa->pendingPendaftaran();
-            $diterima = $siswa->activePendaftaran();
+            $diterima = $pendaftaran ?? $siswa->resolveActivePendaftaran();
             $ditolak = $siswa->pendaftarans()->where('status', \App\Models\Pendaftaran::STATUS_DITOLAK)->latest('id')->first();
 
             if ($diterima) {
@@ -95,7 +95,7 @@
 
                 <div class="flex gap-3 flex-wrap mt-6">
                     @if(isset($activeEkskuls) && $activeEkskuls->isNotEmpty())
-                        <a href="{{ route('siswa.presensi') }}" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
+                        <a href="{{ route('siswa.presensi', $ekskul ? ['ekskul' => $ekskul->id] : []) }}" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
@@ -200,7 +200,7 @@
 
         <!-- Quick Actions Row -->
         <div class="relative mt-8 pt-5 border-t border-white/15 grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <a href="{{ route('siswa.presensi') }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+            <a href="{{ route('siswa.presensi', $ekskul ? ['ekskul' => $ekskul->id] : []) }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </div>
@@ -209,7 +209,7 @@
                     <p class="text-[10px] text-white/70 mt-1 leading-none truncate">Jadwal & Absen</p>
                 </div>
             </a>
-            <a href="{{ route('siswa.rekap') }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+            <a href="{{ route('siswa.rekap', $ekskul ? ['ekskul' => $ekskul->id] : []) }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14"/></svg>
                 </div>
@@ -227,7 +227,7 @@
                     <p class="text-[10px] text-white/70 mt-1 leading-none truncate">Cari Ekskul</p>
                 </div>
             </a>
-            <a href="{{ route('siswa.pengajuan-keluar') }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+            <a href="{{ route('siswa.pengajuan-keluar', $ekskul ? ['ekskul' => $ekskul->id] : []) }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-amber-300/30 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-4 h-4 text-amber-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                 </div>
@@ -459,13 +459,13 @@
                                     </div>
 
                                     <div class="relative mt-6 flex flex-col sm:flex-row gap-3">
-                                        <a href="{{ route('siswa.presensi') }}" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-sky-700 font-bold text-xs rounded-xl hover:bg-sky-50 hover:-translate-y-0.5 transition-all shadow-md">
+                                        <a href="{{ route('siswa.presensi', $ekskul ? ['ekskul' => $ekskul->id] : []) }}" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-sky-700 font-bold text-xs rounded-xl hover:bg-sky-50 hover:-translate-y-0.5 transition-all shadow-md">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                             </svg>
                                             Riwayat Presensi
                                         </a>
-                                        <a href="{{ route('siswa.pengajuan-keluar') }}" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-300/30 backdrop-blur border border-amber-200/40 text-white font-bold text-xs rounded-xl hover:bg-amber-300/50 transition-all">
+                                        <a href="{{ route('siswa.pengajuan-keluar', $ekskul ? ['ekskul' => $ekskul->id] : []) }}" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-300/30 backdrop-blur border border-amber-200/40 text-white font-bold text-xs rounded-xl hover:bg-amber-300/50 transition-all">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                                             </svg>

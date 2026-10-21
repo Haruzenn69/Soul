@@ -163,7 +163,7 @@ class Siswa extends Model
 
     public function activePendaftaran(): ?Pendaftaran
     {
-        return $this->activePendaftaranUntuk();
+        return $this->resolveActivePendaftaran();
     }
 
     public function activeEkskul(): ?Ekskul
@@ -181,6 +181,13 @@ class Siswa extends Model
         $aktif = $this->activeEkskuls();
         if ($aktif->isEmpty()) {
             return null;
+        }
+
+        if (! $requestedEkskulId && request()->filled('ekskul')) {
+            $candidate = (int) request('ekskul');
+            if ($aktif->contains('id', $candidate)) {
+                $requestedEkskulId = $candidate;
+            }
         }
 
         if ($requestedEkskulId && $aktif->contains('id', (int) $requestedEkskulId)) {
@@ -214,7 +221,7 @@ class Siswa extends Model
     {
         $ekskul = $this->resolveActiveEkskul($requestedEkskulId);
         if (! $ekskul) {
-            return $this->activePendaftaran();
+            return $this->activePendaftaranUntuk();
         }
 
         return $this->activePendaftaranUntuk($ekskul);

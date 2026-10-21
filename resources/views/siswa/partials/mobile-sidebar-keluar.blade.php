@@ -21,15 +21,19 @@
             </button>
         </div>
 
+        @php
+            $__mEkskul = $ekskul ?? (auth()->user()?->siswa ? auth()->user()->siswa->resolveActiveEkskul() : null);
+            $__mParam = $__mEkskul ? ['ekskul' => $__mEkskul->id] : [];
+        @endphp
         <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-2 px-3">Menu Utama</div>
         <nav class="space-y-1.5">
-            <a href="{{ route('siswa.dashboard') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
+            <a href="{{ route('siswa.dashboard', $__mParam) }}" class="relative flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
                 <span class="flex items-center justify-center w-4 h-4">
                     <img src="{{ asset('images/dashboard.png') }}" alt="Dashboard Icon" class="w-full h-full object-contain">
                 </span>
                 Dashboard
             </a>
-            <a href="{{ route('siswa.nilai') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
+            <a href="{{ route('siswa.nilai', $__mParam) }}" class="relative flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
                 <span class="flex items-center justify-center w-4 h-4">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5v2h6V5m-5 8l2 2 4-4"/></svg>
                 </span>
@@ -41,26 +45,26 @@
                 </span>
                 Katalog Ekskul
             </a>
-            <a href="{{ route('siswa.presensi') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
+            <a href="{{ route('siswa.presensi', $__mParam) }}" class="relative flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
                 <span class="flex items-center justify-center w-4 h-4">
                     <img src="{{ asset('images/presensi.png') }}" alt="Presensi Icon" class="w-full h-full object-contain">
                 </span>
                 Presensi & Kegiatan
             </a>
-            <a href="{{ route('siswa.rekap') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
+            <a href="{{ route('siswa.rekap', $__mParam) }}" class="relative flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
                 <span class="flex items-center justify-center w-4 h-4">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 </span>
                 Rekap Absensi
             </a>
-            <a href="{{ route('siswa.pengajuan-keluar') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold text-xs shadow-sm shadow-sky-100 transition-all">
+            <a href="{{ route('siswa.pengajuan-keluar', $__mParam) }}" class="relative flex items-center gap-3 px-3.5 py-2.5 bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold text-xs shadow-sm shadow-sky-100 transition-all">
                 <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                 <span class="flex items-center justify-center w-4 h-4">
                     <img src="{{ asset('images/pengajuan-keluar.png') }}" alt="Pengajuan Keluar Icon" class="w-full h-full object-contain">
                 </span>
                 Pengajuan Keluar
             </a>
-            <a href="{{ route('profile.edit') }}" class="relative flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
+            <a href="{{ route('profile.edit', array_merge($__mParam, ['from' => 'siswa'])) }}" class="relative flex items-center gap-3 px-3.5 py-2.5 text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium text-xs transition-all">
                 <span class="flex items-center justify-center w-4 h-4">
                     <img src="{{ asset('images/profile.png') }}" alt="Profile Icon" class="w-full h-full object-contain">
                 </span>
