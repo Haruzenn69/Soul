@@ -93,7 +93,8 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">NIS</label>
-                    <input type="text" name="nis" value="{{ old('nis', $user->siswa?->nis) }}"
+                    <input type="text" inputmode="numeric" maxlength="10" name="nis" value="{{ old('nis', $user->siswa?->nis) }}"
+                           oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)"
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
                     <p class="text-[10px] text-gray-400 mt-1">Harus tepat 10 angka.</p>
                 </div>
@@ -214,7 +215,8 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">NIP *</label>
-                    <input required type="text" name="nip" value="{{ old('nip', $user->pembina?->nip) }}"
+                    <input required type="text" inputmode="numeric" maxlength="18" name="nip" value="{{ old('nip', $user->pembina?->nip) }}"
+                           oninput="this.value = this.value.replace(/\D/g, '').slice(0, 18)"
                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-theme-blue transition">
                     <p class="text-[10px] text-gray-400 mt-1">Harus tepat 18 angka.</p>
                 </div>
