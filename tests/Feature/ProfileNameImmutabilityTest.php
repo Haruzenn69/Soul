@@ -19,6 +19,7 @@ class ProfileNameImmutabilityTest extends TestCase
         $response = $this->actingAs($user)->post(route('siswa.profile.update-data'), [
             'nama' => 'NAMA PALSU',
             'kelas_id' => $kelas->id,
+            'no_telp' => '081234567890',
             'jenis_kelamin' => 'perempuan',
             'email' => null,
         ]);
@@ -27,7 +28,8 @@ class ProfileNameImmutabilityTest extends TestCase
 
         $this->assertSame($siswa->fresh()->nama, $siswa->nama);
         $this->assertNotSame($siswa->fresh()->nama, 'NAMA PALSU');
-        $this->assertSame($siswa->fresh()->jenis_kelamin, 'perempuan');
+        $this->assertSame($siswa->fresh()->no_telp, '081234567890');
+        $this->assertSame($siswa->fresh()->jenis_kelamin, 'laki-laki');
     }
 
     public function test_pembina_tidak_bisa_mengubah_nama_via_form_profil(): void
@@ -36,6 +38,7 @@ class ProfileNameImmutabilityTest extends TestCase
 
         $response = $this->actingAs($pembina->user)->post(route('pembina.profile.update'), [
             'nama' => 'NAMA PALSU',
+            'no_telp' => '081234567890',
             'jenis_kelamin' => 'perempuan',
             'email' => null,
         ]);
@@ -44,6 +47,7 @@ class ProfileNameImmutabilityTest extends TestCase
 
         $this->assertSame($pembina->fresh()->nama, $pembina->nama);
         $this->assertNotSame($pembina->fresh()->nama, 'NAMA PALSU');
-        $this->assertSame($pembina->fresh()->jenis_kelamin, 'perempuan');
+        $this->assertSame($pembina->fresh()->no_telp, '081234567890');
+        $this->assertSame($pembina->fresh()->jenis_kelamin, 'laki-laki');
     }
 }

@@ -20,7 +20,8 @@ trait CreatesFixtures
 
     private function makeTahunAjaran(): TahunAjaran
     {
-        return TahunAjaran::create(['nama' => 'TA'.fake()->unique()->numerify('####'), 'is_active' => true]);
+        return TahunAjaran::where('status', 'aktif')->first()
+            ?? TahunAjaran::create(['nama' => 'TA'.fake()->unique()->numerify('####'), 'status' => 'aktif']);
     }
 
     private function makeKelas(string $tingkat): Kelas

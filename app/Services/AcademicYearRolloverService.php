@@ -51,6 +51,9 @@ class AcademicYearRolloverService
             foreach ($currentClasses->where('tingkat', 'x') as $class) {
                 $this->copyClass($class, 'x', $newYear);
                 $this->copyClass($class, 'xi', $newYear);
+                if ($class->jurusan === 'mp') {
+                    $this->findTargetClassByIdentity('mlog', (string) $class->rombel, 'xi', $newYear);
+                }
             }
             foreach ($currentClasses->where('tingkat', 'xi') as $class) {
                 $this->copyClass($class, 'xii', $newYear);

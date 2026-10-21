@@ -141,7 +141,7 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
     Route::get('users/template-pembina', [UserController::class, 'templatePembina'])->name('users.template-pembina');
     Route::post('users/import', [UserController::class, 'import'])->name('users.import');
 
-    Route::resource('users', UserController::class)->except(['show']);
+    Route::resource('users', UserController::class);
     Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])
         ->name('users.reset-password');
 
@@ -246,6 +246,7 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::get('/anggota', [PembinaController::class, 'anggota'])->name('anggota');
     Route::get('/anggota/ekskul/{ekskul}', [PembinaController::class, 'anggotaByEkskul'])->name('anggota.ekskul');
     Route::get('/anggota/{pendaftaran}', [PembinaController::class, 'anggotaShow'])->name('anggota.show');
+    Route::get('/ekskuls/{ekskul}/pilih-ketua', [PembinaController::class, 'pilihKetuaPage'])->name('ekskul.pilih-ketua-page');
     Route::post('/ekskuls/{ekskul}/pilih-ketua/{siswa}', [PembinaController::class, 'pilihKetua'])->name('ekskul.pilih-ketua');
     Route::post('/ekskuls/{ekskul}/copot-ketua/{siswa}', [PembinaController::class, 'copotKetua'])->name('ekskul.copot-ketua');
     Route::patch('/arsip/periode-ketua/{riwayat}', [PembinaController::class, 'updatePeriodeKetua'])->name('arsip.periode-ketua');

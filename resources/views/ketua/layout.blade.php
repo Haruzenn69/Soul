@@ -368,6 +368,49 @@
                 <div class="bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-800/50 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 hidden sm:block">
                     <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Ketua
                 </div>
+
+                @php
+                    $__siswaKetua     = auth()->user()?->siswa;
+                    $__activeEkskulsK = $__siswaKetua ? $__siswaKetua->activeEkskuls() : collect();
+                    $__hasMultiK      = $__activeEkskulsK->count() >= 2;
+                    $__ledEkskulK     = $__siswaKetua?->ekskulDipimpin();
+
+                    if ($__hasMultiK) {
+                        $__othEksK = $__ledEkskulK
+                            ? $__activeEkskulsK->firstWhere('id', '!=', $__ledEkskulK->id)
+                            : $__activeEkskulsK->skip(1)->first();
+                    }
+                @endphp
+
+                {{-- Switch Dashboard: tepat di sebelah tombol notifikasi jika ketua ikut 2 ekskul --}}
+                @if($__hasMultiK && isset($__othEksK) && $__othEksK)
+                    <!-- Desktop: Tombol Switch Dashboard (Tema Biru) -->
+                    <a href="{{ route('siswa.dashboard', ['ekskul' => $__othEksK->id]) }}"
+                       id="header-switch-dashboard-ketua"
+                       title="Switch Dashboard ke {{ $__othEksK->nama_ekskul }} (Anggota)"
+                       class="group relative hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/40 dark:hover:bg-sky-900/50 border border-sky-200 dark:border-sky-800/70 text-sky-700 dark:text-sky-300 text-xs font-bold transition-all shadow-sm hover:shadow shrink-0">
+                        <svg class="w-3.5 h-3.5 transition-transform group-hover:rotate-180 duration-500 text-sky-600 dark:text-sky-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                        </svg>
+                        <span class="whitespace-nowrap font-bold">Switch Dashboard</span>
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-sky-200/60 dark:bg-sky-900/80 text-[10px] font-semibold text-sky-800 dark:text-sky-200 truncate max-w-[100px]">
+                            {{ $__othEksK->nama_ekskul }}
+                        </span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+                    </a>
+
+                    <!-- Mobile: Tombol Switch Dashboard ringkas (Tema Biru) -->
+                    <a href="{{ route('siswa.dashboard', ['ekskul' => $__othEksK->id]) }}"
+                       id="header-switch-dashboard-ketua-mobile"
+                       title="Switch Dashboard ke {{ $__othEksK->nama_ekskul }}"
+                       class="sm:hidden relative w-9 h-9 rounded-xl bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/40 dark:hover:bg-sky-900/50 border border-sky-200 dark:border-sky-800/70 text-sky-700 dark:text-sky-300 flex items-center justify-center transition-all shadow-sm shrink-0">
+                        <svg class="w-4 h-4 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                        </svg>
+                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-sky-500 border-2 border-white dark:border-neutral-900 animate-pulse"></span>
+                    </a>
+                @endif
+
                 <a href="{{ route('ketua.notifikasi') }}" aria-label="Buka notifikasi" class="w-9 h-9 rounded-xl bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 flex items-center justify-center text-xs relative text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-700 hover:border-sky-200 dark:hover:border-neutral-700 transition-all shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>

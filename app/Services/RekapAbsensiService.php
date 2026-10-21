@@ -151,10 +151,15 @@ class RekapAbsensiService
      */
     protected function availableMonths(Ekskul $ekskul): Collection
     {
+        $driver = \Illuminate\Support\Facades\DB::connection()->getDriverName();
+        $dateExpr = $driver === 'sqlite'
+            ? "strftime('%Y-%m', kegiatans.tanggal_kegiatan)"
+            : "DATE_FORMAT(kegiatans.tanggal_kegiatan, '%Y-%m')";
+
         $bulanTersedia = Presensi::query()
             ->join('kegiatans', 'kegiatans.id', '=', 'presensis.kegiatan_id')
             ->whereHas('pendaftaran', fn ($query) => $query->where('ekskul_id', $ekskul->id))
-            ->selectRaw("DATE_FORMAT(kegiatans.tanggal_kegiatan, '%Y-%m') as bulan")
+            ->selectRaw("{$dateExpr} as bulan")
             ->distinct()
             ->orderByDesc('bulan')
             ->pluck('bulan');

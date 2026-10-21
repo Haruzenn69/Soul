@@ -37,6 +37,10 @@ return [
         ],
         'mp' => [
             'x' => 'MPLB',
+            'xi' => 'MP',
+            'xii' => 'MP',
+        ],
+        'mlog' => [
             'xi' => 'MLOG',
             'xii' => 'MLOG',
         ],

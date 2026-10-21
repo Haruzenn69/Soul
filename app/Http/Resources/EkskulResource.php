@@ -19,6 +19,7 @@ class EkskulResource extends JsonResource
         return [
             'id' => $this->id,
             'nama_ekskul' => $this->nama_ekskul,
+            'kategori' => $this->kategori,
             'tagline' => $this->tagline,
             'deskripsi' => $this->deskripsi,
             'tujuan' => $this->tujuan,

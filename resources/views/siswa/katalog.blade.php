@@ -19,12 +19,12 @@
 
 @section('content')
     @php
-        $bisaDaftar = ! $menunggu && ! $ekskulAktif;
         $filters = [
             'semua' => ['label' => 'Semua', 'count' => $jumlah['semua'] ?? 0],
             'buka'  => ['label' => 'Dibuka', 'count' => $jumlah['buka'] ?? 0],
             'tutup' => ['label' => 'Ditutup', 'count' => $jumlah['tutup'] ?? 0],
         ];
+        $ekskulAktifIds = ($ekskulAktifs ?? collect())->pluck('id')->all();
     @endphp
 
     {{-- HERO BANNER --}}
@@ -40,7 +40,7 @@
                     <span class="px-2.5 py-0.5 rounded-full bg-white/15 border border-white/20 text-[10px] font-bold tracking-widest uppercase">Ekstrakurikuler</span>
                 </div>
                 <h1 class="text-xl md:text-2xl font-extrabold tracking-tight leading-tight">Katalog Ekskul</h1>
-                <p class="text-xs text-white/75 mt-1 max-w-lg leading-relaxed">Temukan ekskul yang cocok untuk kamu. Kamu hanya bisa aktif di 1 ekskul dalam satu periode.</p>
+                <p class="text-xs text-white/75 mt-1 max-w-lg leading-relaxed">Temukan ekskul yang cocok untuk kamu. Kamu bisa aktif di maksimal {{ \App\Support\AturanEkskul::MAKS_EKSKUL }} ekskul, dan hanya satu dari kelompok {{ \App\Support\AturanEkskul::LABEL_P1I }}.</p>
             </div>
             {{-- Status Badge --}}
             @if ($menunggu)
@@ -48,12 +48,12 @@
                     <span class="w-2 h-2 rounded-full bg-amber-300 animate-pulse shrink-0"></span>
                     Menunggu verifikasi ketua
                 </div>
-            @elseif ($ekskulAktif)
-                <div class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/15 border border-white/25 text-white text-xs font-semibold shrink-0 w-fit">
+            @elseif ($ekskulAktifs->isNotEmpty())
+                <div class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/15 border border-white/25 text-white text-xs font-semibold shrink-0 w-fit max-w-[16rem]">
                     <svg class="w-4 h-4 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    Terdaftar: <strong>{{ $ekskulAktif->nama_ekskul }}</strong>
+                    <span class="truncate">Terdaftar: <strong>{{ $ekskulAktifs->pluck('nama_ekskul')->join(', ') }}</strong> ({{ $ekskulAktifs->count() }}/{{ \App\Support\AturanEkskul::MAKS_EKSKUL }})</span>
                 </div>
             @else
                 <div class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/15 border border-white/25 text-white text-xs font-semibold shrink-0 w-fit">
@@ -180,7 +180,12 @@
                             </div>
                         @endif
 
-                        @if ($buka)
+                        @if (in_array($ekskul->id, $ekskulAktifIds, true))
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold shrink-0">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                Ekskul Kamu
+                            </span>
+                        @elseif ($buka)
                             <span class="recruitment-open-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-bold shrink-0">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
                                 Buka
@@ -217,31 +222,37 @@
                     </div>
 
                     {{-- Action Buttons --}}
-                    <div class="mt-4 pt-3.5 border-t border-sky-50 flex gap-2">
-                        <a href="{{ route('ekskul.detail', $ekskul) }}"
-                           class="flex-1 py-2 px-2 bg-white hover:bg-sky-50 text-slate-600 hover:text-sky-700 text-xs font-bold rounded-xl border border-slate-200 hover:border-sky-200 transition-all text-center">
-                            Detail
-                        </a>
-                        @if ($bisaDaftar && $buka)
-                            <a href="{{ route('siswa.form-daftar', $ekskul->id) }}"
-                               class="flex-1 py-2 px-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 hover:shadow-lg hover:shadow-sky-200/70 transition-all text-center hover:-translate-y-0.5">
-                                Daftar
+                    @php $alasanEkskul = $alasanPerEkskul[$ekskul->id] ?? null; @endphp
+                    <div class="mt-4 pt-3.5 border-t border-sky-50 flex flex-col gap-2">
+                        <div class="flex gap-2">
+                            <a href="{{ route('ekskul.detail', $ekskul) }}"
+                               class="flex-1 py-2 px-2 bg-white hover:bg-sky-50 text-slate-600 hover:text-sky-700 text-xs font-bold rounded-xl border border-slate-200 hover:border-sky-200 transition-all text-center">
+                                Detail
                             </a>
-                        @elseif ($ekskulAktif && property_exists($ekskulAktif, 'id') && $ekskulAktif->id === $ekskul->id)
-                            <span class="flex-1 py-2 px-2 bg-amber-50 text-amber-700 text-xs font-bold rounded-xl border border-amber-200 text-center select-none flex items-center justify-center gap-1">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                                Ekskul Kamu
-                            </span>
-                        @elseif (!$buka)
-                            <span class="catalog-unavailable flex-1 py-2 px-2 bg-slate-50 text-slate-400 text-xs font-semibold rounded-xl border border-slate-200 cursor-not-allowed text-center select-none">
-                                Ditutup
-                            </span>
-                        @else
-                            <span class="catalog-unavailable flex-1 py-2 px-2 bg-slate-50 text-slate-400 text-xs font-semibold rounded-xl border border-slate-200 cursor-not-allowed text-center select-none" title="Kamu sudah memiliki ekskul atau pendaftaran menunggu verifikasi">
-                                Tidak Tersedia
-                            </span>
+                            @if (in_array($ekskul->id, $ekskulAktifIds, true))
+                                <span class="flex-1 py-2 px-2 bg-amber-50 text-amber-700 text-xs font-bold rounded-xl border border-amber-200 text-center select-none flex items-center justify-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Ekskul Kamu
+                                </span>
+                            @elseif (! $buka)
+                                <span class="catalog-unavailable flex-1 py-2 px-2 bg-slate-50 text-slate-400 text-xs font-semibold rounded-xl border border-slate-200 cursor-not-allowed text-center select-none">
+                                    Ditutup
+                                </span>
+                            @elseif ($alasanEkskul === null)
+                                <a href="{{ route('siswa.form-daftar', $ekskul->id) }}"
+                                   class="flex-1 py-2 px-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 hover:shadow-lg hover:shadow-sky-200/70 transition-all text-center hover:-translate-y-0.5">
+                                    Daftar
+                                </a>
+                            @else
+                                <span class="catalog-unavailable flex-1 py-2 px-2 bg-slate-50 text-slate-400 text-xs font-semibold rounded-xl border border-slate-200 cursor-not-allowed text-center select-none" title="{{ $alasanEkskul }}">
+                                    Tidak Tersedia
+                                </span>
+                            @endif
+                        </div>
+                        @if (! in_array($ekskul->id, $ekskulAktifIds, true) && $buka && $alasanEkskul !== null)
+                            <p class="text-[10px] text-center text-amber-600 leading-relaxed">{{ $alasanEkskul }}</p>
                         @endif
                     </div>
                 </div>

@@ -21,6 +21,11 @@ html.dark-mode {
 html.dark-mode body {
     background-color: #171717 !important;
     background-image: none !important;
+    /* Reset Tailwind gradient custom properties so light-mode gradient doesn't bleed through */
+    --tw-gradient-from: transparent !important;
+    --tw-gradient-via: transparent !important;
+    --tw-gradient-to: transparent !important;
+    --tw-gradient-stops: transparent !important;
     color: #e2e8f0 !important;
 }
 
@@ -215,9 +220,10 @@ html.dark-mode .ps-item.ps-active,
 html.dark-mode .ps-item[aria-current="page"],
 html.dark-mode .ps-submenu a.ps-active,
 html.dark-mode .ps-menu .ps-active {
-    background: linear-gradient(to right, #164e63, #1e3a8a);
-    color: #f0f9ff;
-    box-shadow: 0 1px 2px rgb(0 0 0 / .3);
+    background: #262626 !important;
+    border-left: 3px solid #38bdf8 !important;
+    color: #f8fafc !important;
+    box-shadow: 0 1px 2px rgb(0 0 0 / .3) !important;
 }
 
 /* Collapsed pill-sidebar flyouts are rendered outside the rail surface. */
@@ -232,9 +238,10 @@ html.dark-mode body.ps-collapsed .ps-group .ps-submenu {
 }
 
 html.dark-mode body.ps-collapsed .ps-group[open] summary {
-    background: linear-gradient(to right, #164e63, #1e3a8a);
-    color: #f0f9ff;
-    box-shadow: 0 1px 2px rgb(0 0 0 / .3);
+    background: #262626 !important;
+    border-left: 3px solid #38bdf8 !important;
+    color: #f8fafc !important;
+    box-shadow: 0 1px 2px rgb(0 0 0 / .3) !important;
 }
 
 html.dark-mode body.ps-collapsed .ps-group .ps-submenu::before {
@@ -255,7 +262,7 @@ html.dark-mode body.ps-collapsed .ps-user {
 
 html.dark-mode .ps-user-txt strong { color: #e2e8f0; }
 html.dark-mode .ps-user-txt small { color: #a8b6c9; }
-html.dark-mode .ps-user-link:hover { background: rgb(30 64 175 / .2); }
+html.dark-mode .ps-user-link:hover { background: #303030; }
 html.dark-mode .ps-dot { box-shadow: 0 0 0 2px #202020, 0 2px 6px rgb(245 158 11 / .5); }
 html.dark-mode .ps-toggle { background: #202020; border-color: #3a3a3a; color: #cbd5e1; }
 html.dark-mode .ps-menu { background: #171717; border-color: #3a3a3a; }
@@ -417,15 +424,15 @@ html.dark-mode [class~="hover:from-emerald-200"][class~="hover:to-teal-200"]:hov
 }
 
 html.dark-mode [class~="from-sky-50"][class~="to-white"] {
-    background-image: linear-gradient(to right, #172b4d, #202020) !important;
+    background-image: none !important;
     background-color: #202020 !important;
-    border-color: #334e70 !important;
+    border-color: #3a3a3a !important;
 }
 
 html.dark-mode [class~="bg-sky-50"][class~="text-sky-600"] {
-    background-color: #172b4d !important;
-    border-color: #334e70 !important;
-    color: #93c5fd !important;
+    background-color: #262626 !important;
+    border-color: #3a3a3a !important;
+    color: #38bdf8 !important;
 }
 
 html.dark-mode [class~="bg-amber-50/70"] {
@@ -460,14 +467,29 @@ html.dark-mode [class~="from-amber-100"][class~="to-yellow-50"] {
     background-color: #29251b !important;
 }
 
-html.dark-mode [class~="from-sky-400"][class~="via-blue-400"][class~="to-blue-600"] {
+/* Hero banner gradient: used across kesiswaan pages (pelatih, users, dashboard, etc.)
+   Render as pure neutral dark card in dark mode (#202020), NO blue/navy tint! */
+html.dark-mode :is(
+    [class~="from-sky-400"][class~="via-blue-400"][class~="to-blue-600"],
+    [class~="from-sky-400"][class~="via-blue-500"][class~="to-blue-600"],
+    [class~="from-sky-500"][class~="via-blue-600"][class~="to-indigo-700"]
+) {
     background-image: none !important;
-    background-color: #242424 !important;
+    background-color: #202020 !important;
+    border: 1px solid #3a3a3a !important;
+    box-shadow: 0 4px 20px rgb(0 0 0 / .4) !important;
+}
+
+html.dark-mode [class~="from-sky-400"][class~="to-blue-500"] {
+    background-image: none !important;
+    background-color: #262626 !important;
+    border-color: #3a3a3a !important;
 }
 
 html.dark-mode [class~="bg-amber-200/40"] {
     background-color: rgb(245 158 11 / .08) !important;
 }
+
 html.dark-mode :is([class~="bg-white/10"], [class~="bg-white/15"], [class~="bg-white/20"]) {
     background-color: rgb(255 255 255 / .06) !important;
 }
@@ -485,17 +507,6 @@ html.dark-mode [class~="from-rose-50"][class~="to-red-50"],
 html.dark-mode [class~="from-red-50"][class~="to-rose-50"] {
     background-image: none !important;
     background-color: #202020 !important;
-}
-
-html.dark-mode [class~="from-sky-400"][class~="via-blue-400"][class~="to-blue-600"] {
-    --tw-gradient-from: #1e40af !important;
-    --tw-gradient-via: #1d4ed8 !important;
-    --tw-gradient-to: #172554 !important;
-}
-
-html.dark-mode [class~="from-sky-400"][class~="to-blue-500"] {
-    --tw-gradient-from: #2563eb !important;
-    --tw-gradient-to: #1e40af !important;
 }
 
 html.dark-mode [class~="from-amber-300"][class~="to-yellow-400"] {
@@ -1162,9 +1173,9 @@ html.dark-mode .team-social-link {
 }
 
 html.dark-mode .team-social-link:hover {
-    color: #bfdbfe;
-    background: #1e3a8a;
-    border-color: #2563eb;
+    color: #f8fafc;
+    background: #333333;
+    border-color: #525252;
 }
 
 /* Preserve semantic accent surfaces in dark mode instead of flattening them
@@ -1175,8 +1186,8 @@ html.dark-mode :is(
     [class~="bg-indigo-50"][class*="text-indigo-"],
     [class~="bg-cyan-50"][class*="text-cyan-"]
 ) {
-    background-color: #172b4d !important;
-    border-color: #334e70 !important;
+    background-color: #262626 !important;
+    border-color: #3a3a3a !important;
 }
 
 html.dark-mode :is(
@@ -1220,8 +1231,8 @@ html.dark-mode :is(
     [class~="bg-indigo-100"][class*="text-indigo-"],
     [class~="bg-cyan-100"][class*="text-cyan-"]
 ) {
-    background-color: #1e3a5f !important;
-    border-color: #3b6090 !important;
+    background-color: #2a2a2a !important;
+    border-color: #3a3a3a !important;
 }
 
 html.dark-mode :is(
@@ -1265,8 +1276,8 @@ html.dark-mode :is(
     [class*="bg-indigo-50/"][class*="text-indigo-"],
     [class*="bg-cyan-50/"][class*="text-cyan-"]
 ) {
-    background-color: rgb(23 43 77 / .72) !important;
-    border-color: #334e70 !important;
+    background-color: #262626 !important;
+    border-color: #3a3a3a !important;
 }
 
 html.dark-mode :is(
@@ -1325,8 +1336,8 @@ html.dark-mode :is(
     [class~="from-blue-50"][class~="to-white"],
     [class~="from-sky-50"][class~="to-blue-50"]
 ) {
-    background-color: #172b4d !important;
-    border-color: #334e70 !important;
+    background-color: #202020 !important;
+    border-color: #3a3a3a !important;
 }
 
 html.dark-mode :is(
@@ -1384,8 +1395,10 @@ html.dark-mode table thead th.sticky {
 /* ==========================================================================
    Ekskul Detail Page Dark Mode
    ========================================================================== */
+/* Ekskul detail page overrides body bg — keep in sync with the main body rule above */
 html.dark-mode body {
-    background-color: #121212 !important;
+    background-color: #171717 !important;
+    background-image: none !important;
 }
 
 html.dark-mode header.sticky {
@@ -1394,15 +1407,11 @@ html.dark-mode header.sticky {
 }
 
 html.dark-mode .ekskul-gradient-mesh {
-    background-color: #0c4a6e !important;
-    background-image: 
-        radial-gradient(at 0% 0%, hsla(199, 89%, 30%, 1) 0, transparent 50%),
-        radial-gradient(at 50% 0%, hsla(217, 91%, 35%, 1) 0, transparent 50%),
-        radial-gradient(at 100% 0%, hsla(43, 96%, 35%, 0.8) 0, transparent 50%) !important;
+    background-color: #171717 !important;
+    background-image: none !important;
 }
 
-/* Detail page cards */
-html.dark-mode article,
+/* Detail page cards — scoped to ekskul detail page sections only */
 html.dark-mode section#tentang .bg-white,
 html.dark-mode section#tentang [class*="from-amber-50"],
 html.dark-mode section#prestasi article,
@@ -1416,11 +1425,11 @@ html.dark-mode div.bg-white.relative {
     color: #e2e8f0 !important;
 }
 
-/* Headings and text in detail */
-html.dark-mode h1,
-html.dark-mode h2,
-html.dark-mode h3,
-html.dark-mode h4 {
+/* Headings and text — only non-white-text headings get the dark override */
+html.dark-mode h1:not([class*="text-white"]):not([class*="text-sky-"]):not([class*="text-blue-"]):not([class*="text-amber-"]):not([class*="text-emerald-"]):not([class*="text-rose-"]),
+html.dark-mode h2:not([class*="text-white"]):not([class*="text-sky-"]):not([class*="text-blue-"]):not([class*="text-amber-"]):not([class*="text-emerald-"]):not([class*="text-rose-"]),
+html.dark-mode h3:not([class*="text-white"]):not([class*="text-sky-"]):not([class*="text-blue-"]):not([class*="text-amber-"]):not([class*="text-emerald-"]):not([class*="text-rose-"]),
+html.dark-mode h4:not([class*="text-white"]):not([class*="text-sky-"]):not([class*="text-blue-"]):not([class*="text-amber-"]):not([class*="text-emerald-"]):not([class*="text-rose-"]) {
     color: #f8fafc !important;
 }
 
@@ -1479,3 +1488,168 @@ html.dark-mode footer {
 @media print {
     #soul-theme-toggle { display: none !important; }
 }
+
+/* ==========================================================================
+   Missing border-color variants (used in stat cards, badges, pelatih page)
+   ========================================================================== */
+html.dark-mode :is(
+    [class~="border-amber-200"],
+    [class~="border-amber-300"]
+) {
+    border-color: #66501e !important;
+}
+
+html.dark-mode :is(
+    [class~="border-emerald-200"],
+    [class~="border-emerald-300"]
+) {
+    border-color: #1f5c4a !important;
+}
+
+html.dark-mode :is(
+    [class~="border-rose-200"],
+    [class~="border-rose-300"]
+) {
+    border-color: #713642 !important;
+}
+
+html.dark-mode :is(
+    [class~="border-sky-200"],
+    [class~="border-sky-300"]
+) {
+    border-color: #3a3a3a !important;
+}
+
+/* Amber ring glow (pending stat card: ring-2 ring-amber-400/50) */
+html.dark-mode [class*="ring-amber-400"] {
+    --tw-ring-color: rgb(180 120 10 / .35) !important;
+}
+
+/* ==========================================================================
+   Native <dialog> dark mode (pelatih tolak modal + any future modals)
+   ========================================================================== */
+html.dark-mode dialog {
+    background-color: #1e1e1e !important;
+    border-color: #3a3a3a !important;
+    color: #e2e8f0 !important;
+}
+
+html.dark-mode dialog::backdrop {
+    background-color: rgb(0 0 0 / .65) !important;
+}
+
+html.dark-mode dialog > div {
+    background-color: #1e1e1e !important;
+    border-color: #3a3a3a !important;
+}
+
+html.dark-mode dialog :is(.border-slate-100, .border-b, .border-t) {
+    border-color: #3a3a3a !important;
+}
+
+html.dark-mode dialog h3 {
+    color: #f1f5f9 !important;
+}
+
+html.dark-mode dialog p {
+    color: #cbd5e1 !important;
+}
+
+html.dark-mode dialog label {
+    color: #cbd5e1 !important;
+}
+
+html.dark-mode dialog textarea {
+    background-color: #262626 !important;
+    border-color: #4a4a4a !important;
+    color: #f1f5f9 !important;
+}
+
+html.dark-mode dialog textarea:focus {
+    border-color: #f43f5e !important;
+    box-shadow: 0 0 0 3px rgb(244 63 94 / .2) !important;
+}
+
+html.dark-mode dialog button[type="button"] {
+    background-color: #262626 !important;
+    border-color: #3a3a3a !important;
+    color: #cbd5e1 !important;
+}
+
+html.dark-mode dialog button[type="button"]:hover {
+    background-color: #303030 !important;
+    color: #e2e8f0 !important;
+}
+
+html.dark-mode dialog .bg-rose-100 {
+    background-color: #4a2632 !important;
+    color: #fda4af !important;
+}
+
+/* ==========================================================================
+   Pelatih page specific refinements
+   ========================================================================== */
+
+/* Pelatih list cards — pending (amber border) */
+html.dark-mode .rounded-3xl[class*="border-amber-200"] {
+    background-color: #202020 !important;
+    border-color: #66501e !important;
+    box-shadow: 0 4px 16px rgb(0 0 0 / .35) !important;
+}
+
+/* Pelatih list cards — normal (sky border) */
+html.dark-mode .rounded-3xl[class*="border-sky-100"] {
+    background-color: #202020 !important;
+    border-color: #3a3a3a !important;
+}
+
+/* Catatan penolakan box */
+html.dark-mode .rounded-xl.bg-rose-50.border-rose-100 {
+    background-color: #2b1d27 !important;
+    border-color: #713642 !important;
+}
+
+/* "Tanpa Sertifikat" neutral badge */
+html.dark-mode span.bg-slate-100.text-slate-400 {
+    background-color: #2a2a2a !important;
+    color: #64748b !important;
+}
+
+/* Mobile card action divider */
+html.dark-mode .border-t.lg\:border-t-0 {
+    border-color: #3a3a3a !important;
+}
+
+/* Neutralize colored shadows in dark mode (e.g. shadow-sky-200, shadow-blue-500) */
+html.dark-mode :is(
+    [class*="shadow-sky-"],
+    [class*="shadow-blue-"],
+    [class*="shadow-indigo-"],
+    [class*="shadow-amber-"],
+    [class*="shadow-emerald-"],
+    [class*="shadow-rose-"]
+) {
+    --tw-shadow-color: rgb(0 0 0 / .35) !important;
+}
+
+/* Filter inputs & selects on kesiswaan pages in dark mode */
+html.dark-mode :is(
+    select.bg-slate-50,
+    input[type="text"].bg-slate-50,
+    input[type="search"].bg-slate-50
+) {
+    background-color: #262626 !important;
+    border-color: #3a3a3a !important;
+    color: #f1f5f9 !important;
+}
+
+html.dark-mode :is(
+    select.bg-slate-50:focus,
+    input[type="text"].bg-slate-50:focus,
+    input[type="search"].bg-slate-50:focus
+) {
+    background-color: #2a2a2a !important;
+    border-color: #525252 !important;
+    color: #ffffff !important;
+}
+

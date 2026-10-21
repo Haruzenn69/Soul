@@ -154,8 +154,24 @@
                 <tbody class="divide-y divide-slate-100 text-xs">
                     @php
                         $kategoriTersedia = ['Olahraga', 'Seni', 'Bahasa', 'Lainnya'];
-                        $kategoriDitampilkan = request('kategori') ? [request('kategori')] : $kategoriTersedia;
-                        $ekskulPerKategori = $ekskuls->getCollection()->groupBy(fn ($item) => $item->kategori ?: 'Lainnya');
+                        $normalizeKat = function (?string $kat) use ($kategoriTersedia): string {
+                            $k = trim((string) $kat);
+                            foreach ($kategoriTersedia as $valid) {
+                                if (strcasecmp($k, $valid) === 0) return $valid;
+                            }
+                            if (in_array(strtolower($k), ['kesenian'])) return 'Seni';
+                            return !empty($k) ? ucfirst(strtolower($k)) : 'Lainnya';
+                        };
+                        $ekskulPerKategori = $ekskuls->getCollection()->groupBy(fn ($item) => $normalizeKat($item->kategori));
+                        if (request('kategori')) {
+                            $kategoriDitampilkan = [$normalizeKat(request('kategori'))];
+                        } else {
+                            $kategoriDitampilkan = collect($kategoriTersedia)
+                                ->merge($ekskulPerKategori->keys())
+                                ->unique()
+                                ->values()
+                                ->all();
+                        }
                     @endphp
                     @foreach ($kategoriDitampilkan as $kategori)
                         <tr class="bg-sky-50/70">

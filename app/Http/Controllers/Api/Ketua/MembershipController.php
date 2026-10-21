@@ -11,6 +11,7 @@ use App\Models\RiwayatJabatan;
 use App\Models\Siswa;
 use App\Services\ArsipEkskulService;
 use App\Services\NotifikasiService;
+use App\Support\MediaUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -187,18 +188,17 @@ class MembershipController extends ApiController
             abort_unless($pendaftaran->status === Pendaftaran::STATUS_PENDING, 422, 'Pendaftaran ini sudah diproses.');
 
             if ($validated['status'] === Pendaftaran::STATUS_DITERIMA) {
-                $exists = Pendaftaran::where('siswa_id', $pendaftaran->siswa_id)
-                    ->where('id', '!=', $pendaftaran->id)
-                    ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
-                    ->exists();
+                $alasan = $siswa->alasanTidakDapatMenerima($pendaftaran);
 
-                abort_if($exists, 422, 'Siswa ini sudah aktif di ekskul lain.');
+                abort_if($alasan !== null, 422, $alasan);
             }
 
             $pendaftaran->update(['status' => $validated['status']]);
 
             if ($validated['status'] === Pendaftaran::STATUS_DITERIMA) {
-                $siswa->update(['jabatan' => 'anggota']);
+                if ($siswa->jabatan !== 'ketua') {
+                    $siswa->update(['jabatan' => 'anggota']);
+                }
                 NotifikasiService::pendaftaranDiterima($pendaftaran);
             } else {
                 NotifikasiService::pendaftaranDitolak($pendaftaran);
@@ -241,6 +241,7 @@ class MembershipController extends ApiController
             'pengajuans' => $pengajuans->map(fn ($p) => [
                 'id' => $p->id,
                 'nama' => $p->siswa->nama ?? '-',
+                'foto' => MediaUrl::for($p->siswa?->foto),
                 'alasan' => $p->alasan,
                 'status' => $p->status,
                 'tanggal_pengajuan' => $p->tanggal_pengajuan?->toDateString(),

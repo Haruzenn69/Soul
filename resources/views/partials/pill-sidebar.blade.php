@@ -54,10 +54,15 @@
     $psNilaiItem = null;
     if (($psUser->role ?? null) === 'siswa') {
         $psIsKetua = str_contains(strtolower((string) $psTitle), 'ketua') || request()->routeIs('ketua.*');
+        $psActiveEkskulId = session('siswa_dashboard_ekskul_id');
+        $psNilaiUrl = $psIsKetua
+            ? route('ketua.nilai')
+            : route('siswa.nilai', $psActiveEkskulId ? ['ekskul' => $psActiveEkskulId] : []);
+
         $psNilaiItem = [
             'icon' => 'clipboard-check',
             'label' => 'Nilai',
-            'url' => $psIsKetua ? route('ketua.nilai') : route('siswa.nilai'),
+            'url' => $psNilaiUrl,
             'is' => ['siswa.nilai', 'ketua.nilai'],
         ];
         $psNilaiIndex = 0;
@@ -802,7 +807,7 @@
                     <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-500 text-xs font-extrabold text-white shadow-lg shadow-sky-300">SOUL</span>
                     <span class="min-w-0">
                         <strong class="block text-sm font-extrabold leading-none tracking-tight text-slate-900">{{ $psLogoBrand ?? 'SOUL' }}</strong>
-                        <small class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Panel Siswa</small>
+                        <small class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Panel {{ $psRole }}</small>
                     </span>
                 </a>
                 <button type="button" onclick="closeSidebar()" aria-label="Tutup menu navigasi" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100">
@@ -812,7 +817,7 @@
 
             <div class="mb-2 flex items-center justify-between px-3">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Menu Utama</span>
-                <span class="text-[9px] font-semibold text-slate-300">PANEL SISWA</span>
+                <span class="text-[9px] font-semibold text-slate-300">{{ strtoupper($psRole) }}</span>
             </div>
             <nav class="space-y-1.5" aria-label="Menu utama mobile">
                 @foreach ($psItems as $psMobileItem)

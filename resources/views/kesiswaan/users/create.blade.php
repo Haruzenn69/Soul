@@ -17,34 +17,36 @@
     $currentJenisKelamin = old('jenis_kelamin', '');
 @endphp
 
-<div class="space-y-5 animate-fade-up"
-     x-data="{
-        role: '{{ $currentRole }}',
+<script>
+function userCreateForm() {
+    return {
+        role: @json($currentRole),
         step: {{ $initialStep }},
         totalSteps: 4,
-        jenisKelamin: '{{ $currentJenisKelamin }}',
-        nama: '{{ old('nama', '') }}',
-        nis: '{{ old('nis', '') }}',
-        email: '{{ old('email', '') }}',
-        noTelp: '{{ old('no_telp', '') }}',
-        tanggalLahir: '{{ old('tanggal_lahir', '') }}',
-        tempatLahir: '{{ old('tempat_lahir', '') }}',
-        agama: '{{ old('agama', '') }}',
-        medsos: '{{ old('medsos', '') }}',
-        alamat: `{{ old('alamat', '') }}`,
-        kelasText: '',
+        jenisKelamin: @json($currentJenisKelamin),
+        nama: @json(old('nama', '')),
+        nis: @json(old('nis', '')),
+        email: @json(old('email', '')),
+        noTelp: @json(old('no_telp', '')),
+        tanggalLahir: @json(old('tanggal_lahir', '')),
+        tempatLahir: @json(old('tempat_lahir', '')),
+        agama: @json(old('agama', '')),
+        medsos: @json(old('medsos', '')),
+        alamat: @json(old('alamat', '')),
+        kelasId: @json(old('kelas_id', '')),
+        existingClasses: @json($kelas),
         photoPreview: null,
         pembinaPhotoPreview: null,
-        pembinaEmail: '{{ old('email', '') }}',
-        pembinaNip: '{{ old('nip', '') }}',
-        pembinaNama: '{{ old('pembina_nama', '') }}',
-        pembinaJenisKelamin: '{{ old('pembina_jenis_kelamin', '') }}',
-        pembinaAgama: '{{ old('pembina_agama', '') }}',
-        pembinaNoTelp: '{{ old('pembina_no_telp', '') }}',
-        pembinaTempatLahir: '{{ old('pembina_tempat_lahir', '') }}',
-        pembinaTanggalLahir: '{{ old('pembina_tanggal_lahir', '') }}',
-        pembinaMedsos: '{{ old('pembina_medsos', '') }}',
-        pembinaAlamat: `{{ old('pembina_alamat', '') }}`,
+        pembinaEmail: @json(old('email', '')),
+        pembinaNip: @json(old('nip', '')),
+        pembinaNama: @json(old('pembina_nama', '')),
+        pembinaJenisKelamin: @json(old('pembina_jenis_kelamin', '')),
+        pembinaAgama: @json(old('pembina_agama', '')),
+        pembinaNoTelp: @json(old('pembina_no_telp', '')),
+        pembinaTempatLahir: @json(old('pembina_tempat_lahir', '')),
+        pembinaTanggalLahir: @json(old('pembina_tanggal_lahir', '')),
+        pembinaMedsos: @json(old('pembina_medsos', '')),
+        pembinaAlamat: @json(old('pembina_alamat', '')),
         calculatedAge: '',
         kolomKosong: [],
         // Dropdown provinsi -> kota/kabupaten tempat lahir (laravolt/indonesia)
@@ -77,49 +79,14 @@
             { id: 'input-pembina-alamat', label: 'Alamat' },
         ],
 
-        init() {
-            this.calculateAge();
-            this.updateKelasText();
-            if (this.siswaProvinsi) this.loadCities('siswa', this.siswaProvinsi);
-            if (this.pembinaProvinsi) this.loadCities('pembina', this.pembinaProvinsi);
-            @if ($errors->any())
-                this.$nextTick(() => {
-                    this.showWarning({
-                        title: 'Terjadi Kesalahan Validasi',
-                        message: 'Terdapat data yang belum sesuai dengan ketentuan sistem:',
-                        items: [
-                            @foreach ($errors->all() as $error)
-                                { label: '{{ addslashes($error) }}' },
-                            @endforeach
-                        ],
-                        actionLabel: 'Periksa Sekarang'
-                    });
-                });
-            @elseif (session('error'))
-                this.$nextTick(() => {
-                    this.showWarning({
-                        title: 'Pemberitahuan Sistem',
-                        message: '{{ addslashes(session('error')) }}',
-                        @if (session('import_errors'))
-                            items: [
-                                @foreach (session('import_errors') as $imErr)
-                                    { label: '{{ addslashes($imErr) }}' },
-                                @endforeach
-                            ],
-                        @endif
-                        actionLabel: 'Mengerti'
-                    });
-                });
-            @endif
+        get selectedKelasNama() {
+            if (!this.kelasId) return '-';
+            const k = (this.existingClasses || []).find(c => String(c.id) === String(this.kelasId));
+            return k ? k.nama : '-';
         },
 
-        updateKelasText() {
-            const sel = document.getElementById('kelas_id_select');
-            if (sel && sel.selectedIndex > 0) {
-                this.kelasText = sel.options[sel.selectedIndex].text;
-            } else {
-                this.kelasText = '';
-            }
+        init() {
+            this.calculateAge();
         },
 
         calculateAge() {
@@ -289,16 +256,9 @@
                 }
             }
             if (this.step === 2 && targetStep > 2) {
-                const selKelas = document.getElementById('kelas_id_select');
-                if (!selKelas || !selKelas.value) {
-                    this.showWarning({
-                        title: 'Kelas Belum Dipilih',
-                        message: 'Mohon pilih kelas siswa terlebih dahulu sebelum melanjutkan.',
-                        focusId: 'kelas_id_select',
-                        targetStep: 2,
-                        actionLabel: 'Pilih Kelas'
-                    });
-                    selKelas?.focus();
+                if (!this.kelasId) {
+                    alert('Mohon pilih Kelas siswa.');
+                    document.getElementById('kelas_id_select')?.focus();
                     return false;
                 }
             }
@@ -389,178 +349,12 @@
             this.pembinaPhotoPreview = null;
             const input = document.getElementById('input-foto-pembina');
             if (input) input.value = '';
-        },
+        }
+    };
+}
+</script>
 
-        validatePembina() {
-            this.kolomKosong = this.pembinaRequiredFields.filter(f => {
-                const el = document.getElementById(f.id);
-                return !el || !String(el.value ?? '').trim();
-            });
-            if (this.kolomKosong.length > 0) {
-                this.showWarning({
-                    title: 'Ada Kolom Belum Terisi',
-                    message: 'Kolom berikut masih kosong. Lengkapi terlebih dahulu sebelum menyimpan akun pembina:',
-                    items: this.kolomKosong,
-                    focusId: this.kolomKosong[0].id,
-                    actionLabel: 'Isi Sekarang'
-                });
-                return false;
-            }
-            const namaEl = document.getElementById('input-pembina-nama');
-            const namaVal = namaEl ? namaEl.value.trim() : this.pembinaNama;
-            if (!namaVal || namaVal.length < 2) {
-                this.showWarning({
-                    title: 'Nama Pembina Belum Valid',
-                    message: 'Nama lengkap pembina wajib diisi minimal 2 karakter.',
-                    focusId: 'input-pembina-nama',
-                    actionLabel: 'Perbaiki Nama'
-                });
-                return false;
-            }
-
-            const nipEl = document.getElementById('input-pembina-nip');
-            const nipVal = nipEl ? nipEl.value.trim() : this.pembinaNip;
-            if (!nipVal || nipVal.length !== 18 || !/^\d{18}$/.test(nipVal)) {
-                this.showWarning({
-                    title: 'Format NIP Tidak Sesuai',
-                    message: 'NIP pembina harus terdiri dari tepat 18 digit angka (saat ini terisi ' + (nipVal ? nipVal.length : 0) + ' angka).',
-                    focusId: 'input-pembina-nip',
-                    actionLabel: 'Perbaiki NIP'
-                });
-                return false;
-            }
-
-            const emailEl = document.getElementById('input-pembina-email');
-            const emailVal = emailEl ? emailEl.value.trim() : this.pembinaEmail;
-            if (!emailVal) {
-                this.showWarning({
-                    title: 'Email Pembina Belum Diisi',
-                    message: 'Alamat email pembina wajib diisi.',
-                    focusId: 'input-pembina-email',
-                    actionLabel: 'Isi Email'
-                });
-                return false;
-            }
-            if (!emailVal.includes('@')) {
-                this.showWarning({
-                    title: 'Format Email Tidak Valid',
-                    message: 'Alamat email pembina harus menggunakan tanda @ (contoh: guru@sekolah.sch.id atau user@gmail.com).',
-                    focusId: 'input-pembina-email',
-                    actionLabel: 'Perbaiki Email'
-                });
-                return false;
-            }
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
-                this.showWarning({
-                    title: 'Format Email Tidak Lengkap',
-                    message: 'Alamat email pembina harus memiliki domain yang valid (contoh: guru@sekolah.sch.id).',
-                    focusId: 'input-pembina-email',
-                    actionLabel: 'Perbaiki Email'
-                });
-                return false;
-            }
-
-            return true;
-        },
-
-        validateStaf() {
-            const usernameEl = document.getElementById('input-staf-username');
-            if (usernameEl && (!usernameEl.value || usernameEl.value.trim().length < 3)) {
-                this.showWarning({
-                    title: 'Username Belum Diisi',
-                    message: 'Username untuk akun staf minimal 3 karakter.',
-                    focusId: 'input-staf-username',
-                    actionLabel: 'Isi Username'
-                });
-                return false;
-            }
-
-            const emailEl = document.getElementById('input-staf-email');
-            if (emailEl) {
-                const val = emailEl.value.trim();
-                if (!val) {
-                    this.showWarning({
-                        title: 'Email Staf Belum Diisi',
-                        message: 'Alamat email staf wajib diisi untuk login.',
-                        focusId: 'input-staf-email',
-                        actionLabel: 'Isi Email'
-                    });
-                    return false;
-                }
-                if (!val.includes('@')) {
-                    this.showWarning({
-                        title: 'Format Email Tidak Valid',
-                        message: 'Alamat email staf harus menggunakan tanda @ (contoh: staf@sekolah.sch.id atau user@gmail.com).',
-                        focusId: 'input-staf-email',
-                        actionLabel: 'Perbaiki Email'
-                    });
-                    return false;
-                }
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
-                    this.showWarning({
-                        title: 'Format Email Tidak Lengkap',
-                        message: 'Alamat email staf harus memiliki domain yang valid.',
-                        focusId: 'input-staf-email',
-                        actionLabel: 'Perbaiki Email'
-                    });
-                    return false;
-                }
-            }
-            return true;
-        },
-
-        handleSubmit(event) {
-            if (this.role === 'siswa') {
-                if (!this.email || !this.email.trim() || !this.email.includes('@') || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email.trim()) ||
-                    !this.nis || this.nis.length !== 10 || !this.nama || this.nama.trim().length < 2) {
-                    this.step = 1;
-                    if (!this.validateStep(2)) {
-                        event.preventDefault();
-                        return false;
-                    }
-                }
-                const selKelas = document.getElementById('kelas_id_select');
-                if (!selKelas || !selKelas.value) {
-                    this.step = 2;
-                    if (!this.validateStep(3)) {
-                        event.preventDefault();
-                        return false;
-                    }
-                }
-                if (!this.jenisKelamin) {
-                    this.step = 3;
-                    if (!this.validateStep(4)) {
-                        event.preventDefault();
-                        return false;
-                    }
-                }
-            } else if (this.role === 'pembina') {
-                if (!this.validatePembina()) {
-                    event.preventDefault();
-                    return false;
-                }
-            } else if (this.role === 'kesiswaan' || this.role === 'admin') {
-                if (!this.validateStaf()) {
-                    event.preventDefault();
-                    return false;
-                }
-            }
-
-
-
-
-
-
-        },
-
-        fokusKolomKosong() {
-            const pertama = this.kolomKosong[0];
-            if (pertama) {
-                document.getElementById(pertama.id)?.focus();
-            }
-            this.confirmWarningAction();
-        },
-     }">
+<div class="space-y-5 animate-fade-up" x-data="userCreateForm()">
 
     {{-- HERO CARD BIRU (STYLE SAMA DENGAN INDEX AKUN PENGGUNA) --}}
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200">
@@ -792,12 +586,12 @@
                     <div x-show="step === 2" x-transition.opacity class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-5">
                         <div class="border-b border-slate-100 pb-3">
                             <h3 class="text-sm font-extrabold text-slate-900">Data Akademik</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">Pilih kelas siswa saat ini.</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Pilih kelas yang akan dimasuki siswa.</p>
                         </div>
 
                         <div>
                             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Kelas <span class="text-rose-500">*</span></label>
-                            <select name="kelas_id" id="kelas_id_select" @change="updateKelasText()"
+                            <select name="kelas_id" id="kelas_id_select" x-model="kelasId" required
                                     class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                                 <option value="">Pilih kelas...</option>
                                 @foreach ($kelas as $k)
@@ -806,6 +600,7 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <p class="text-[10px] text-slate-400 mt-1.5">Hanya menampilkan daftar kelas dari tahun ajaran yang sedang aktif.</p>
                         </div>
 
                         <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
@@ -816,7 +611,7 @@
                             </button>
                             <button type="button" @click="nextStep()"
                                     class="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
-                                Lanjut
+                                <span>Lanjut</span>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </button>
                         </div>
@@ -855,7 +650,7 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Agama</label>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Agama <span class="text-rose-500">*</span></label>
                                 <select name="agama" x-model="agama"
                                         class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                                     <option value="">Pilih Agama...</option>
@@ -865,28 +660,14 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Tempat Lahir</label>
-                                <div class="space-y-3">
-                                    <select id="select-siswa-provinsi" x-model="siswaProvinsi" @change="onProvinsiChange('siswa')" aria-label="Provinsi"
-                                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
-                                        <option value="">Pilih provinsi...</option>
-                                        @foreach ($provinces as $province)
-                                            <option value="{{ $province->code }}" {{ ($siswaProvinceCode ?? null) === $province->code ? 'selected' : '' }}>{{ ucwords(strtolower($province->name)) }}</option>
-                                        @endforeach
-                                    </select>
-                                    <select name="tempat_lahir" id="input-tempat-lahir" x-model="tempatLahir" aria-label="Kota / Kabupaten"
-                                            :disabled="!siswaProvinsi"
-                                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition disabled:opacity-60 disabled:cursor-not-allowed">
-                                        <option value="" x-text="!siswaProvinsi ? 'Pilih provinsi terlebih dahulu' : (siswaCitiesLoading ? 'Memuat kota / kabupaten...' : 'Pilih kota / kabupaten')"></option>
-                                        <template x-for="city in siswaCities" :key="city.id">
-                                            <option :value="city.name" x-text="city.name"></option>
-                                        </template>
-                                    </select>
-                                </div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Tempat Lahir <span class="text-rose-500">*</span></label>
+                                <input type="text" name="tempat_lahir" x-model="tempatLahir"
+                                       placeholder="Kota / Kabupaten"
+                                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
-                                    Tanggal Lahir
+                                    Tanggal Lahir <span class="text-rose-500">*</span>
                                     <span x-show="calculatedAge" class="text-[10px] text-sky-600 font-semibold normal-case float-right" x-text="calculatedAge"></span>
                                 </label>
                                 <input type="date" name="tanggal_lahir" x-model="tanggalLahir" @change="calculateAge()"
@@ -992,7 +773,7 @@
                                 {{-- Kelas --}}
                                 <div class="flex items-center justify-between py-2.5">
                                     <span class="text-slate-400 font-semibold">Kelas</span>
-                                    <span class="font-bold text-slate-700 text-right truncate ml-3 max-w-[60%]" x-text="kelasText || '-'"></span>
+                                    <span class="font-bold text-slate-700 text-right truncate ml-3 max-w-[60%]" x-text="selectedKelasNama"></span>
                                 </div>
 
                                 {{-- Jenis Kelamin --}}

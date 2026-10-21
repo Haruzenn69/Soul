@@ -68,19 +68,17 @@ class PendaftaranController extends Controller
             abort_unless($pendaftaran->status === Pendaftaran::STATUS_PENDING, 422, 'Pendaftaran ini sudah diproses.');
 
             if ($validated['status'] === Pendaftaran::STATUS_DITERIMA) {
-                $hasActiveEkskul = Pendaftaran::query()
-                    ->where('siswa_id', $pendaftaran->siswa_id)
-                    ->where('id', '!=', $pendaftaran->id)
-                    ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
-                    ->exists();
+                $alasan = $pendaftaran->siswa->alasanTidakDapatMenerima($pendaftaran);
 
-                abort_if($hasActiveEkskul, 422, 'Siswa ini sudah aktif di ekskul lain.');
+                abort_if($alasan !== null, 422, $alasan);
             }
 
             $pendaftaran->update($validated);
 
             if ($validated['status'] === Pendaftaran::STATUS_DITERIMA) {
-                $pendaftaran->siswa->update(['jabatan' => 'anggota']);
+                if ($pendaftaran->siswa->jabatan !== 'ketua') {
+                    $pendaftaran->siswa->update(['jabatan' => 'anggota']);
+                }
                 NotifikasiService::pendaftaranDiterima($pendaftaran);
             } else {
                 NotifikasiService::pendaftaranDitolak($pendaftaran);

@@ -268,19 +268,19 @@
                         <!-- Foto Profile -->
                         <div class="relative inline-block">
                             <div class="w-28 h-28 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-sky-100 to-blue-100 border-4 border-sky-300 flex items-center justify-center mx-auto overflow-hidden shadow-lg shadow-sky-200">
-                                @if($siswa->foto)
+                                @if($siswa?->foto)
                                     <img src="{{ $siswa->foto_url }}" alt="Foto Profile" class="w-full h-full object-cover">
                                 @else
                                     <span class="text-3xl md:text-4xl font-extrabold text-sky-600">
-                                        {{ strtoupper(substr($siswa->nama ?? auth()->user()->username ?? 'S', 0, 1)) }}
+                                        {{ strtoupper(substr($siswa?->nama ?? auth()->user()->username ?? 'S', 0, 1)) }}
                                     </span>
                                 @endif
                             </div>
                         </div>
 
-                        <h3 class="text-sm font-extrabold text-slate-900 mt-4">{{ $siswa->nama ?? auth()->user()->username }}</h3>
+                        <h3 class="text-sm font-extrabold text-slate-900 mt-4">{{ $siswa?->nama ?? auth()->user()->username }}</h3>
                         <p class="text-xs text-sky-600 font-bold">@ {{ auth()->user()->username }}</p>
-                        <p class="text-xs text-slate-400 mt-0.5">{{ $siswa->kelas->nama ?? 'Siswa' }} • Angkatan {{ $siswa->angkatan ?? '-' }}</p>
+                        <p class="text-xs text-slate-400 mt-0.5">{{ $siswa?->kelas?->nama ?? 'Siswa' }} • Angkatan {{ $siswa?->angkatan ?? '-' }}</p>
 
                         <div class="mt-4 pt-4 border-t border-sky-50 text-left space-y-2 text-xs">
                             <div class="flex items-center justify-between text-slate-500">
@@ -356,7 +356,7 @@
 
                             <div>
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Angkatan (dikelola kesiswaan)</label>
-                                <input disabled type="text" value="{{ $siswa->angkatan }}" placeholder="Contoh: 2024 atau 2024/2025"
+                                <input disabled type="text" value="{{ $siswa?->angkatan }}" placeholder="Contoh: 2024 atau 2024/2025"
                                        class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                             </div>
 
@@ -366,26 +366,26 @@
                                         class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                                     <option value="">Pilih Agama...</option>
                                     @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agm)
-                                        <option value="{{ $agm }}" {{ old('agama', $siswa->agama) === $agm ? 'selected' : '' }}>{{ $agm }}</option>
+                                        <option value="{{ $agm }}" {{ old('agama', $siswa?->agama) === $agm ? 'selected' : '' }}>{{ $agm }}</option>
                                     @endforeach
                                 </select>
                             </div>
 
                             <div>
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tempat Lahir (dikelola kesiswaan)</label>
-                                <input disabled type="text" value="{{ $siswa->tempat_lahir }}" placeholder="Kota kelahiran"
+                                <input disabled type="text" value="{{ $siswa?->tempat_lahir }}" placeholder="Kota kelahiran"
                                        class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                             </div>
 
                             <div>
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tanggal Lahir (dikelola kesiswaan)</label>
-                                <input disabled type="date" value="{{ $siswa->tanggal_lahir?->format('Y-m-d') }}"
+                                <input disabled type="date" value="{{ $siswa?->tanggal_lahir?->format('Y-m-d') }}"
                                        class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                             </div>
 
                             <div>
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">No. Telp / WhatsApp</label>
-                                <input type="text" name="no_telp" value="{{ old('no_telp', $siswa->no_telp) }}" placeholder="08xxxxxxxxxx"
+                                <input type="text" name="no_telp" value="{{ old('no_telp', $siswa?->no_telp) }}" placeholder="08xxxxxxxxxx"
                                        class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                             </div>
 
@@ -398,7 +398,7 @@
                             {{-- MEDIA SOSIAL DENGAN SISTEM ARAHAN --}}
                             <div class="md:col-span-2">
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Media Sosial (dikelola kesiswaan)</label>
-                                <input disabled type="text" value="{{ $siswa->medsos }}" placeholder="misal: @nama_siswa (Instagram) / link profil medsos"
+                                <input disabled type="text" value="{{ $siswa?->medsos }}" placeholder="misal: @nama_siswa (Instagram) / link profil medsos"
                                        class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                                 <div class="mt-2 p-2.5 bg-sky-50 border border-sky-100 rounded-2xl text-[11px] text-sky-800 flex items-start gap-2">
                                     <span>💡</span>
@@ -409,7 +409,7 @@
                             <div class="md:col-span-2">
                                 <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Alamat Lengkap</label>
                                 <textarea disabled rows="2" placeholder="Alamat domisili lengkap"
-                                          class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('alamat', $siswa->alamat) }}</textarea>
+                                          class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('alamat', $siswa?->alamat) }}</textarea>
                             </div>
 
                             <div class="md:col-span-2 flex items-center gap-3 pt-2">
@@ -420,6 +420,70 @@
                                 @if(!$profilLengkap)
                                     <span class="text-[11px] text-slate-400">Data ini dibutuhkan untuk mendaftar ekskul.</span>
                                 @endif
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- UBAH PASSWORD -->
+                    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .14s">
+                        <div class="px-6 py-5 border-b border-sky-50 flex items-center justify-between">
+                            <div>
+                                <h2 class="text-sm font-extrabold text-slate-900">Ubah Password</h2>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Pastikan akun kamu menggunakan kata sandi yang aman dan mudah diingat</p>
+                            </div>
+                            <div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <form method="POST" action="{{ route('password.update') }}" class="p-6 space-y-4">
+                            @csrf
+                            @method('PUT')
+
+                            <div>
+                                <label for="update_password_current_password" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                                    Password Saat Ini <span class="text-rose-500">*</span>
+                                </label>
+                                <input type="password" id="update_password_current_password" name="current_password" required autocomplete="current-password" placeholder="Masukkan password saat ini"
+                                       class="w-full px-4 py-2.5 bg-sky-50/60 border {{ $errors->updatePassword->has('current_password') ? 'border-rose-300' : 'border-sky-100' }} rounded-2xl text-xs font-semibold focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                @if($errors->updatePassword->has('current_password'))
+                                    <p class="text-rose-500 text-[10px] mt-1 font-bold">{{ $errors->updatePassword->first('current_password') }}</p>
+                                @endif
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="update_password_password" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                                        Password Baru <span class="text-rose-500">*</span>
+                                    </label>
+                                    <input type="password" id="update_password_password" name="password" required autocomplete="new-password" placeholder="Minimal 8 karakter"
+                                           class="w-full px-4 py-2.5 bg-sky-50/60 border {{ $errors->updatePassword->has('password') ? 'border-rose-300' : 'border-sky-100' }} rounded-2xl text-xs font-semibold focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                    @if($errors->updatePassword->has('password'))
+                                        <p class="text-rose-500 text-[10px] mt-1 font-bold">{{ $errors->updatePassword->first('password') }}</p>
+                                    @else
+                                        <p class="text-[10px] text-slate-400 mt-1">Minimal 8 karakter.</p>
+                                    @endif
+                                </div>
+
+                                <div>
+                                    <label for="update_password_password_confirmation" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                                        Konfirmasi Password Baru <span class="text-rose-500">*</span>
+                                    </label>
+                                    <input type="password" id="update_password_password_confirmation" name="password_confirmation" required autocomplete="new-password" placeholder="Ulangi password baru"
+                                           class="w-full px-4 py-2.5 bg-sky-50/60 border {{ $errors->updatePassword->has('password_confirmation') ? 'border-rose-300' : 'border-sky-100' }} rounded-2xl text-xs font-semibold focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                    @if($errors->updatePassword->has('password_confirmation'))
+                                        <p class="text-rose-500 text-[10px] mt-1 font-bold">{{ $errors->updatePassword->first('password_confirmation') }}</p>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 pt-2">
+                                <button type="submit"
+                                        class="px-6 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition hover:-translate-y-0.5">
+                                    Perbarui Password
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -437,23 +501,23 @@
                         <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
                                 <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Nama Lengkap</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa->nama ?? '-' }}</p>
+                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa?->nama ?? '-' }}</p>
                             </div>
                             <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
                                 <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">NIS</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa->nis ?? '-' }}</p>
+                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa?->nis ?? '-' }}</p>
                             </div>
                             <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
                                 <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Kelas</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa->kelas->nama ?? '-' }}</p>
+                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa?->kelas?->nama ?? '-' }}</p>
                             </div>
                             <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
                                 <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Angkatan</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa->angkatan ?? '-' }}</p>
+                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa?->angkatan ?? '-' }}</p>
                             </div>
                             <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
                                 <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Jenis Kelamin</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ ucfirst($siswa->jenis_kelamin ?? '-') }}</p>
+                                <p class="text-sm font-bold text-slate-800 mt-1">{{ ucfirst($siswa?->jenis_kelamin ?? '-') }}</p>
                             </div>
                             <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
                                 <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Username</p>
@@ -465,7 +529,7 @@
                             </div>
                             <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
                                 <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Media Sosial</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa->medsos ?? '-' }}</p>
+                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa?->medsos ?? '-' }}</p>
                             </div>
                         </div>
                     </div>

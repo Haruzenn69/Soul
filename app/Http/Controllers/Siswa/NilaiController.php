@@ -12,7 +12,11 @@ class NilaiController extends Controller
         $siswa = auth()->user()?->siswa;
         abort_unless($siswa, 404, 'Data siswa tidak ditemukan.');
 
-        $pendaftaran = $siswa->activePendaftaran();
+        $pendaftarans = $siswa->activePendaftarans()->with('ekskul')->orderByDesc('id')->get();
+
+        $ekskulId = request()->input('ekskul');
+        $pendaftaran = $siswa->resolveActivePendaftaran($ekskulId ? (int) $ekskulId : null);
+
         $periode = Penilaian::periodeSekarang();
         $ekskul = $pendaftaran?->ekskul;
 
@@ -27,6 +31,6 @@ class NilaiController extends Controller
 
         $view = request()->routeIs('ketua.nilai') ? 'ketua.nilai' : 'siswa.nilai';
 
-        return view($view, compact('siswa', 'pendaftaran', 'ekskul', 'periode', 'penilaian'));
+        return view($view, compact('siswa', 'pendaftarans', 'pendaftaran', 'ekskul', 'periode', 'penilaian'));
     }
 }

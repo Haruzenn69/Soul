@@ -31,7 +31,17 @@ class KenaikanKelasController extends Controller
 
         $activeYear = TahunAjaran::query()->where('status', 'aktif')->first();
         $targetClasses = $activeYear && $sourceClass
-            ? Kelas::query()->where('tahun_ajaran_id', $activeYear->id)->where('tingkat', 'xi')->where('jurusan', $sourceClass->jurusan)->orderBy('rombel')->get()
+            ? Kelas::query()->where('tahun_ajaran_id', $activeYear->id)
+                ->where('tingkat', 'xi')
+                ->where(function ($query) use ($sourceClass) {
+                    $query->where('jurusan', $sourceClass->jurusan);
+                    if ($sourceClass->jurusan === 'mp') {
+                        $query->orWhere('jurusan', 'mlog');
+                    }
+                })
+                ->orderBy('jurusan')
+                ->orderBy('rombel')
+                ->get()
             : collect();
 
         return view('kesiswaan.kenaikan-kelas.index', compact('sourceClasses', 'sourceClass', 'siswas', 'activeYear', 'targetClasses'));
@@ -62,8 +72,12 @@ class KenaikanKelasController extends Controller
                 if ($siswa->status !== 'menunggu_penempatan' || $siswa->kelas?->tingkat !== 'x') {
                     throw ValidationException::withMessages(['siswa_ids' => "{$siswa->nama} tidak lagi menunggu penempatan kelas 11."]);
                 }
-                if ($siswa->kelas?->jurusan !== $target->jurusan) {
-                    throw ValidationException::withMessages(['siswa_ids' => "{$siswa->nama} hanya dapat ditempatkan pada kelas dengan jurusan yang sama."]);
+                $allowedJurusan = [$siswa->kelas?->jurusan];
+                if ($siswa->kelas?->jurusan === 'mp') {
+                    $allowedJurusan[] = 'mlog';
+                }
+                if (! in_array($target->jurusan, $allowedJurusan, true)) {
+                    throw ValidationException::withMessages(['siswa_ids' => "{$siswa->nama} hanya dapat ditempatkan pada kelas dengan jurusan yang sesuai."]);
                 }
             }
 
