@@ -44,4 +44,26 @@ class NotifikasiController extends ApiController
 
         return $this->noContent();
     }
+
+    public function destroy(Notifikasi $notifikasi): JsonResponse
+    {
+        $siswa = auth()->user()->siswa;
+
+        abort_unless($siswa && $notifikasi->siswa_id === $siswa->id, 403, 'Akses ditolak.');
+
+        $notifikasi->delete();
+
+        return $this->noContent();
+    }
+
+    public function clearAll(): JsonResponse
+    {
+        $siswa = auth()->user()->siswa;
+
+        abort_unless($siswa, 404, 'Data siswa tidak ditemukan.');
+
+        $siswa->notifikasis()->delete();
+
+        return $this->noContent();
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Kelas;
+use App\Models\Pendaftaran;
 use App\Models\Siswa;
 use App\Models\SiswaRiwayatKelas;
 use App\Models\TahunAjaran;
@@ -80,6 +81,7 @@ class AcademicYearRolloverService
                     foreach ($students as $student) {
                         $this->recordHistory($student, $currentYear->nama, $class->nama, null, 'kelulusan', $now);
                         $student->update(['status' => 'nonaktif', 'angkatan' => $currentYear->nama]);
+                        $this->tutupKeanggotaanEkskul($student);
                         if ($student->user) {
                             $student->user->forceFill(['is_active' => false, 'remember_token' => null])->save();
                             $student->user->tokens()->delete();
@@ -231,5 +233,18 @@ class AcademicYearRolloverService
             'jenis' => $type,
             'diproses_pada' => $at,
         ]);
+    }
+
+    /**
+     * Tutup keanggotaan ekskul siswa yang lulus: pendaftaran aktif
+     * (diterima / peringatan) ditandai `lulus` agar masuk arsip dan
+     * tidak muncul lagi di daftar anggota aktif. Pendaftaran nonaktif,
+     * keluar, ditolak, atau pending dibiarkan apa adanya.
+     */
+    private function tutupKeanggotaanEkskul(Siswa $student): void
+    {
+        $student->pendaftarans()
+            ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
+            ->update(['status' => Pendaftaran::STATUS_LULUS]);
     }
 }

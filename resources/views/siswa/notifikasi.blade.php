@@ -22,12 +22,21 @@
             <p class="text-xs text-slate-400 mt-0.5">Pemberitahuan status pendaftaran ekskulmu</p>
         </div>
         @if($notifikasis->isNotEmpty())
-            <form method="POST" action="{{ route('siswa.notifikasi.read-all') }}" class="w-full sm:w-auto">
-                @csrf
-                <button type="submit" class="px-3.5 py-2 bg-white hover:bg-sky-50 text-slate-600 text-xs font-semibold rounded-lg border border-sky-100 shadow-sm transition w-full sm:w-auto">
-                    Tandai Semua Dibaca
-                </button>
-            </form>
+            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <form method="POST" action="{{ route('siswa.notifikasi.read-all') }}" class="w-full sm:w-auto">
+                    @csrf
+                    <button type="submit" class="px-3.5 py-2 bg-white hover:bg-sky-50 text-slate-600 text-xs font-semibold rounded-lg border border-sky-100 shadow-sm transition w-full sm:w-auto">
+                        Tandai Semua Dibaca
+                    </button>
+                </form>
+                <form method="POST" action="{{ route('siswa.notifikasi.clear-all') }}" class="w-full sm:w-auto" onsubmit="return confirm('Hapus semua notifikasi? Tindakan ini tidak bisa dibatalkan.')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="px-3.5 py-2 bg-white hover:bg-rose-50 text-rose-600 text-xs font-semibold rounded-lg border border-rose-200 shadow-sm transition w-full sm:w-auto">
+                        Hapus Semua
+                    </button>
+                </form>
+            </div>
         @endif
     </div>
 
@@ -73,16 +82,23 @@
                             <span class="text-[10px] text-slate-400 shrink-0 whitespace-nowrap">{{ $notif->created_at->diffForHumans() }}</span>
                         </div>
                         <p class="text-[11px] md:text-xs text-slate-600 mt-2 leading-relaxed">{{ $notif->pesan }}</p>
-                        @if(!$notif->is_read)
-                            <div class="mt-2.5 flex justify-end">
+                        <div class="mt-2.5 flex justify-end gap-2">
+                            @if(!$notif->is_read)
                                 <form method="POST" action="{{ route('siswa.notifikasi.read', $notif) }}" class="w-full sm:w-auto">
                                     @csrf
                                     <button type="submit" class="text-xs font-semibold text-sky-600 hover:text-sky-700 px-3 py-1.5 bg-white border border-sky-200 rounded-lg w-full sm:w-auto text-center shadow-sm">
                                         Tandai dibaca
                                     </button>
                                 </form>
-                            </div>
-                        @endif
+                            @endif
+                            <form method="POST" action="{{ route('siswa.notifikasi.destroy', $notif) }}" class="w-full sm:w-auto" onsubmit="return confirm('Hapus notifikasi ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-xs font-semibold text-rose-600 hover:text-rose-700 px-3 py-1.5 bg-white border border-rose-200 rounded-lg w-full sm:w-auto text-center shadow-sm">
+                                    Hapus
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

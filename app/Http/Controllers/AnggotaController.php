@@ -55,7 +55,7 @@ class AnggotaController extends Controller
 
         $arsip = $tampilArsip
             ? $arsipService->arsip($ekskul)
-            : ['ketuaSelesai' => collect(), 'anggotaNonaktif' => collect(), 'total' => $arsipTotal];
+            : ['ketuaSelesai' => collect(), 'anggotaLulus' => collect(), 'total' => $arsipTotal];
 
         return view('ketua.anggota.index', compact('anggotas', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal'));
     }
@@ -118,6 +118,7 @@ class AnggotaController extends Controller
             Pendaftaran::STATUS_PERINGATAN => 'Peringatan',
             Pendaftaran::STATUS_NONAKTIF => 'Nonaktif',
             Pendaftaran::STATUS_KELUAR => 'Keluar',
+            Pendaftaran::STATUS_LULUS => 'Lulus',
             default => $status,
         };
     }

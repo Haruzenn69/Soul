@@ -40,22 +40,24 @@ class SiswaController extends ApiController
         return $siswa;
     }
 
-    public function dashboard(): JsonResponse
+    public function dashboard(Request $request): JsonResponse
     {
         $siswa = $this->siswa();
-        $pendaftaran = $siswa->pendaftarans()
-            ->whereIn('status', ['diterima', 'peringatan'])
+        $activePendaftarans = $siswa->activePendaftarans()
             ->with('ekskul.pembina')
             ->latest('id')
-            ->first();
+            ->get();
+        $requestedEkskulId = $request->integer('ekskul_id');
+        $pendaftaran = $requestedEkskulId
+            ? $activePendaftarans->firstWhere('ekskul_id', $requestedEkskulId)
+            : $activePendaftarans->first();
 
-        return $this->ok($this->dashboardPayload($siswa, $pendaftaran));
+        return $this->ok($this->dashboardPayload($siswa, $pendaftaran, $activePendaftarans));
     }
 
-    private function dashboardPayload(Siswa $siswa, $pendaftaran): array
+    private function dashboardPayload(Siswa $siswa, $pendaftaran, $activePendaftarans): array
     {
         $ekskul = $pendaftaran?->ekskul;
-        $isWarned = $pendaftaran && $pendaftaran->status === 'peringatan';
 
         $statusTerakhir = $siswa->pendaftarans()->with('ekskul')->latest('tanggal_daftar')->first();
         $nonaktifStatus = null;
@@ -66,29 +68,64 @@ class SiswaController extends ApiController
                 : null;
         }
 
-        $kegiatanMendatang = $ekskul
-            ? $ekskul->kegiatans()->whereDate('tanggal_kegiatan', '>=', today())->orderBy('tanggal_kegiatan', 'asc')->get()
-            : collect();
+        $activeSummaries = $activePendaftarans
+            ->filter(fn ($active) => $active->ekskul)
+            ->map(function ($active) {
+                $activeEkskul = $active->ekskul;
+                $totalHadir = Presensi::where('pendaftaran_id', $active->id)
+                    ->where('status', Presensi::STATUS_HADIR)
+                    ->count();
+                $upcoming = $activeEkskul->kegiatans()
+                    ->whereDate('tanggal_kegiatan', '>=', today())
+                    ->orderBy('tanggal_kegiatan')
+                    ->get();
+                $hasSubmittedTestimoni = $activeEkskul->testimoniss()
+                    ->where('user_id', auth()->id())
+                    ->whereIn('status', ['pending', 'approved'])
+                    ->exists();
 
-        $totalHadir = $pendaftaran
-            ? Presensi::where('pendaftaran_id', $pendaftaran->id)->where('status', Presensi::STATUS_HADIR)->count()
-            : 0;
+                return [
+                    'id' => $activeEkskul->id,
+                    'ekskul' => (new EkskulResource($activeEkskul))->resolve(),
+                    'pendaftaran' => (new PendaftaranResource($active))->resolve(),
+                    'status' => $active->status,
+                    'total_hadir' => $totalHadir,
+                    'kegiatan_mendatang' => $upcoming->map(fn ($kegiatan) => array_merge(
+                        (new KegiatanResource($kegiatan))->resolve(),
+                        [
+                            'ekskul_id' => $activeEkskul->id,
+                            'ekskul_nama' => $activeEkskul->nama_ekskul,
+                        ],
+                    ))->values(),
+                    'has_submitted_testimoni' => $hasSubmittedTestimoni,
+                ];
+            })->values();
+
+        $kegiatanMendatang = $activeSummaries
+            ->flatMap(fn ($summary) => $summary['kegiatan_mendatang'])
+            ->sortBy(fn ($kegiatan) => $kegiatan['tanggal_kegiatan'] ?? '')
+            ->values();
+        $totalHadir = $activeSummaries->sum('total_hadir');
+        $selectedSummary = $activeSummaries->firstWhere('id', $ekskul?->id);
+        $isWarned = ($selectedSummary['status'] ?? null) === 'peringatan';
 
         $unreadNotifCount = $siswa->notifikasis()->where('is_read', false)->count();
 
-        $hasSubmittedTestimoni = $ekskul
-            ? $ekskul->testimoniss()->where('user_id', auth()->id())->whereIn('status', ['pending', 'approved'])->exists()
-            : false;
+        $hasSubmittedTestimoni = $selectedSummary['has_submitted_testimoni'] ?? false;
 
         return [
             'siswa' => (new SiswaResource($siswa->loadMissing('kelas')))->resolve(),
             'pendaftaran' => $pendaftaran ? (new PendaftaranResource($pendaftaran))->resolve() : null,
             'is_warned' => $isWarned,
+            'warning_count' => $activeSummaries->where('status', 'peringatan')->count(),
             'status_terakhir' => $statusTerakhir ? (new PendaftaranResource($statusTerakhir))->resolve() : null,
             'nonaktif_status' => $nonaktifStatus,
             'ekskul' => $ekskul ? (new EkskulResource($ekskul))->resolve() : null,
-            'kegiatan_mendatang' => KegiatanResource::collection($kegiatanMendatang)->resolve(),
+            'active_ekskuls' => EkskulResource::collection($activePendaftarans->pluck('ekskul')->filter()->values())->resolve(),
+            'active_summaries' => $activeSummaries,
+            'kegiatan_mendatang' => $kegiatanMendatang,
             'total_hadir' => $totalHadir,
+            'total_hadir_selected' => $selectedSummary['total_hadir'] ?? 0,
             'unread_notif_count' => $unreadNotifCount,
             'has_submitted_testimoni' => $hasSubmittedTestimoni,
         ];
@@ -261,6 +298,8 @@ class SiswaController extends ApiController
         $siswa = auth()->user()->siswa;
         $pendaftaran = $siswa?->activePendaftaran();
         $pending = $siswa?->pendingPendaftaran();
+        $activePendaftarans = $siswa?->activePendaftarans()->with('ekskul')->get() ?? collect();
+        $pendingPendaftarans = $siswa?->pendingPendaftarans()->with('ekskul')->get() ?? collect();
 
         $joinable = Ekskul::with('pembina')
             ->where('status', true)
@@ -275,8 +314,15 @@ class SiswaController extends ApiController
             'profile_complete' => $siswa ? $siswa->isProfileComplete() : false,
             'pendaftaran' => $pendaftaran ? (new PendaftaranResource($pendaftaran->loadMissing('ekskul')))->resolve() : null,
             'pending' => $pending ? (new PendaftaranResource($pending->loadMissing('ekskul')))->resolve() : null,
+            'active_pendaftarans' => PendaftaranResource::collection($activePendaftarans)->resolve(),
+            'pending_pendaftarans' => PendaftaranResource::collection($pendingPendaftarans)->resolve(),
             'active_ekskuls' => $siswa ? EkskulResource::collection($siswa->activeEkskuls())->resolve() : [],
             'bisa_daftar' => $siswa ? $siswa->alasanTidakBisaDaftar() === null : false,
+            'alasan_per_ekskul' => $siswa
+                ? $joinable->mapWithKeys(fn (Ekskul $ekskul) => [
+                    $ekskul->id => $siswa->alasanTidakBisaDaftar($ekskul),
+                ])
+                : [],
             'joinable' => EkskulResource::collection($joinable)->resolve(),
         ]);
     }

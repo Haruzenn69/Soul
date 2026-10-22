@@ -77,6 +77,25 @@ class NotifikasiController extends Controller
         return redirect()->back();
     }
 
+    public function destroy(Notifikasi $notifikasi)
+    {
+        $siswa = auth()->user()->siswa;
+
+        // Notifikasi ketua selalu ditujukan ke akun siswa ketua itu sendiri.
+        abort_unless($siswa && $notifikasi->siswa_id === $siswa->id, 403);
+
+        $notifikasi->delete();
+
+        return redirect()->back()->with('success', 'Notifikasi berhasil dihapus.');
+    }
+
+    public function clearAll()
+    {
+        auth()->user()->siswa?->notifikasis()->delete();
+
+        return redirect()->back()->with('success', 'Semua notifikasi berhasil dihapus.');
+    }
+
     private function notifikasiBelongsToEkskul(Notifikasi $notifikasi, int $ekskulId): bool
     {
         return ($notifikasi->pendaftaran && $notifikasi->pendaftaran->ekskul_id === $ekskulId)
