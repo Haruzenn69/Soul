@@ -264,7 +264,17 @@ class Siswa extends Model
             return $periode->ekskul;
         }
 
-        return $this->isKetua() ? $this->activeEkskul() : null;
+        if (! $this->isKetua()) {
+            return null;
+        }
+
+        // Fallback data lama: jangan memakai activeEkskul(), karena jalur itu
+        // kembali ke resolveActiveEkskul() -> ekskulDipimpin() dan berujung
+        // rekursi tanpa henti bila belum ada riwayat periode ketua.
+        return $this->activePendaftarans()
+            ->with('ekskul')
+            ->orderByDesc('id')
+            ->first()?->ekskul;
     }
 
     /**

@@ -62,6 +62,22 @@ class SiswaMultiEkskulApiTest extends TestCase
         }
     }
 
+    public function test_login_api_tidak_menggantung_untuk_ketua_tanpa_riwayat_jabatan(): void
+    {
+        // Ketua lama bisa memiliki jabatan='ketua' tanpa baris riwayat_jabatans.
+        // Dulu jalur ini membuat resolveActiveEkskul() <-> ekskulDipimpin()
+        // berrekursi tanpa henti saat UserResource memanggil activePendaftaran().
+        $ekskul = $this->makeEkskul();
+        $user = $this->makeUser('siswa');
+        $siswa = $this->makeSiswa($user, $this->makeKelas('xii'), 'ketua');
+        $this->daftarkan($siswa, $ekskul);
+
+        $this->postJson('/api/auth/login', [
+            'identifier' => $user->email,
+            'password' => 'password',
+        ])->assertOk();
+    }
+
     public function test_leave_request_is_created_for_the_selected_membership_only(): void
     {
         $basket = $this->makeEkskul(['nama_ekskul' => 'Basket']);
