@@ -190,6 +190,8 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
     Route::post('/notifikasi/read-all', [KesiswaanNotifikasiController::class, 'readAll'])->name('notifikasi.read-all');
 
     Route::get('/laporan-penilaian', [KesiswaanLaporanPenilaianController::class, 'index'])->name('laporan-penilaian.index');
+    Route::get('/laporan-penilaian/historis-siswa', [KesiswaanLaporanPenilaianController::class, 'historisSiswa'])->name('laporan-penilaian.historis-siswa');
+    Route::get('/laporan-penilaian/siswa/{siswa}', [KesiswaanLaporanPenilaianController::class, 'detailSiswa'])->name('laporan-penilaian.detail-siswa');
     Route::get('/laporan-penilaian/{ekskul}', [KesiswaanLaporanPenilaianController::class, 'show'])->name('laporan-penilaian.show');
     Route::get('/laporan-penilaian/{ekskul}/download-pdf', [KesiswaanLaporanPenilaianController::class, 'downloadPdf'])->name('laporan-penilaian.download-pdf');
 });

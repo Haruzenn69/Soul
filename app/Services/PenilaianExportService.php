@@ -23,6 +23,7 @@ class PenilaianExportService
     public function rows(Ekskul $ekskul, ?string $status = null, ?string $periode = null): Collection
     {
         $periode = $periode ?: Penilaian::periodeSekarang()['label'];
+        $periodeInfo = Penilaian::parsePeriode($periode);
 
         $pendaftarans = $ekskul->pendaftarans()
             ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
@@ -34,13 +35,12 @@ class PenilaianExportService
         $penilaians = Penilaian::where('periode', $periode)
             ->whereIn('pendaftaran_id', $pendaftarans->modelKeys())
             ->when($status, fn ($q) => $q->where('status', $status))
+            ->with('penilai')
             ->latest('updated_at')
             ->get()
             ->keyBy('pendaftaran_id');
 
-        $periodeInfo = Penilaian::periodeSekarang();
-
-        return $pendaftarans->map(function (Pendaftaran $p) use ($penilaians, $periodeInfo) {
+        return $pendaftarans->map(function (Pendaftaran $p) use ($penilaians, $periodeInfo, $ekskul) {
             $penilaian = $penilaians->get($p->id);
 
             if ($penilaian) {
@@ -61,6 +61,7 @@ class PenilaianExportService
                 'siswa' => $p->siswa,
                 'kelas' => $p->siswa?->kelas?->nama ?? '-',
                 'penilaian' => $penilaian,
+                'pembina_penilai' => $penilaian?->penilai ?? $ekskul->pembina,
                 'total_pertemuan' => $kehadiran['total_pertemuan'],
                 'total_hadir' => $kehadiran['total_hadir'],
                 'total_izin' => $kehadiran['total_izin'],
@@ -81,9 +82,9 @@ class PenilaianExportService
     /**
      * Data ringkas untuk halaman detail (kesiswaan & siswa).
      */
-    public function summary(Ekskul $ekskul): array
+    public function summary(Ekskul $ekskul, ?string $periode = null): array
     {
-        $rows = $this->rows($ekskul, Penilaian::STATUS_TERKIRIM);
+        $rows = $this->rows($ekskul, Penilaian::STATUS_TERKIRIM, $periode);
 
         return [
             'totalAnggota' => $rows->count(),

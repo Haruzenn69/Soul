@@ -14,12 +14,7 @@
 
         <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur border border-white/20 text-[11px] font-bold uppercase tracking-wider text-white mb-2">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                    </svg>
-                    Kesiswaan &bull; Verifikasi Berkas Pelatih
-                </div>
+                
                 <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">
                     Verifikasi Pelatih Ekskul
                 </h1>
@@ -29,10 +24,7 @@
             </div>
 
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
-                <div class="px-4 py-2.5 bg-white/15 backdrop-blur border border-white/20 rounded-2xl text-center">
-                    <div class="text-lg font-black leading-none">{{ $stats['pending'] }}</div>
-                    <div class="text-[10px] font-bold text-amber-200 uppercase tracking-wider mt-0.5">Menunggu Verifikasi</div>
-                </div>
+               
             </div>
         </div>
     </div>

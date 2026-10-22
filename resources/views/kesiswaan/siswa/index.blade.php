@@ -358,6 +358,14 @@
 
                             {{-- Aksi --}}
                             <td class="py-3.5 px-5 text-right whitespace-nowrap">
+                                <a href="{{ route('kesiswaan.laporan-penilaian.detail-siswa', $s) }}"
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold rounded-xl transition text-xs mr-1"
+                                   title="Riwayat Nilai Ekskul {{ $s->nama }}">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2v2H9V5zm1 8l2 2 4-4"/>
+                                    </svg>
+                                    Nilai
+                                </a>
                                 <a href="{{ route('kesiswaan.siswa.riwayat-profil', $s) }}"
                                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold rounded-xl transition text-xs mr-1">
                                     Riwayat Profil

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Collection;
 
 class Siswa extends Model
@@ -62,6 +63,11 @@ class Siswa extends Model
     public function pendaftarans(): HasMany
     {
         return $this->hasMany(Pendaftaran::class);
+    }
+
+    public function penilaians(): HasManyThrough
+    {
+        return $this->hasManyThrough(Penilaian::class, Pendaftaran::class);
     }
 
     public function pengajuanKeluars(): HasMany

@@ -47,6 +47,11 @@ class Pendaftaran extends Model
         return $this->hasMany(Presensi::class);
     }
 
+    public function penilaians(): HasMany
+    {
+        return $this->hasMany(Penilaian::class);
+    }
+
     public function isActive(): bool
     {
         return in_array($this->status, [self::STATUS_DITERIMA, self::STATUS_PERINGATAN], true);
