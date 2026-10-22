@@ -267,7 +267,7 @@ class PembinaController extends Controller
 
         $arsip = $tampilArsip
             ? $arsipService->arsip($ekskulArsip)
-            : ['ketuaSelesai' => collect(), 'anggotaNonaktif' => collect(), 'total' => $arsipTotal];
+            : ['ketuaSelesai' => collect(), 'anggotaLulus' => collect(), 'total' => $arsipTotal];
 
         return view('pembina.anggota', compact(
             'anggota',

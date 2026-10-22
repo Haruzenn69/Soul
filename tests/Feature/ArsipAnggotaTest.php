@@ -37,7 +37,7 @@ class ArsipAnggotaTest extends TestCase
         $response->assertOk();
         $response->assertSee('Arsip Anggota &amp; Ketua Sebelumnya', false);
         $response->assertSee('Ketua Sebelumnya');
-        $response->assertSee('Anggota Nonaktif &amp; Keluar', false);
+        $response->assertSee('Anggota Lulus');
     }
 
     public function test_choosing_a_new_ketua_closes_the_previous_period(): void
@@ -149,14 +149,36 @@ class ArsipAnggotaTest extends TestCase
         // Copot + tutup periode agar ada satu periode selesai.
         app(ArsipEkskulService::class)->akhiriPeriodeKetua($ekskul, $ketua);
 
-        $nonaktif = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
-        $this->daftarkan($nonaktif, $ekskul, Pendaftaran::STATUS_NONAKTIF);
+        $lulus = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
+        $this->daftarkan($lulus, $ekskul, Pendaftaran::STATUS_LULUS);
 
         $this->actingAs($ketua->user)
             ->get(route('ketua.anggota.index', ['arsip' => 1]))
             ->assertOk()
             ->assertSee('Arsip Anggota &amp; Ketua Sebelumnya', false)
-            ->assertSee('Anggota Nonaktif &amp; Keluar', false);
+            ->assertSee('Anggota Lulus');
+    }
+
+    public function test_arsip_hanya_menampilkan_lulus_bukan_nonaktif_atau_keluar(): void
+    {
+        [, $ekskul] = $this->setupEkskulDenganKetua();
+
+        $lulus = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
+        $this->daftarkan($lulus, $ekskul, Pendaftaran::STATUS_LULUS);
+
+        $nonaktif = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
+        $this->daftarkan($nonaktif, $ekskul, Pendaftaran::STATUS_NONAKTIF);
+
+        $keluar = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
+        $this->daftarkan($keluar, $ekskul, Pendaftaran::STATUS_KELUAR);
+
+        $response = $this->actingAs($ekskul->ketua()->user)
+            ->get(route('ketua.anggota.index', ['arsip' => 1, 'arsip_tab' => 'anggota']));
+
+        $response->assertOk();
+        $response->assertSee($lulus->nis);
+        $response->assertDontSee($nonaktif->nis);
+        $response->assertDontSee($keluar->nis);
     }
 
     public function test_anggota_nonaktif_tidak_ditampilkan_tanpa_filter(): void

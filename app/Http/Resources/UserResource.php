@@ -30,6 +30,9 @@ class UserResource extends JsonResource
                 'jenis_kelamin' => $pembina->jenis_kelamin,
             ] : null,
             'aktiv_ekskul' => $aktiv?->ekskul ? (new EkskulResource($aktiv->ekskul))->resolve() : null,
+            'active_ekskuls' => $siswa
+                ? EkskulResource::collection($siswa->activeEkskuls())->resolve()
+                : [],
             'jabatan' => $siswa?->jabatan,
         ];
     }

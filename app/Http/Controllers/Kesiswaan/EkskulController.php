@@ -77,7 +77,7 @@ class EkskulController extends Controller
                 $query->whereHas('siswa', fn ($s) => $s->where('nama', 'like', $q)->orWhere('nis', 'like', $q));
             })
             ->when($request->filled('status_anggota'), fn ($query) => $query->where('status', $request->input('status_anggota')))
-            ->whereNotIn('status', [Pendaftaran::STATUS_KELUAR]);
+            ->whereNotIn('status', [Pendaftaran::STATUS_KELUAR, Pendaftaran::STATUS_LULUS]);
 
         if (in_array($sort, ['nama', 'nis'], true)) {
             $anggotaQuery->join('siswas', 'siswas.id', '=', 'pendaftarans.siswa_id')

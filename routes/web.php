@@ -186,6 +186,8 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
     })->name('profile');
 
     Route::get('/notifikasi', [KesiswaanNotifikasiController::class, 'index'])->name('notifikasi');
+    Route::delete('/notifikasi/clear-all', [KesiswaanNotifikasiController::class, 'clearAll'])->name('notifikasi.clear-all');
+    Route::delete('/notifikasi/{notifikasi}', [KesiswaanNotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
     Route::post('/notifikasi/{notifikasi}/read', [KesiswaanNotifikasiController::class, 'read'])->name('notifikasi.read');
     Route::post('/notifikasi/read-all', [KesiswaanNotifikasiController::class, 'readAll'])->name('notifikasi.read-all');
 
@@ -228,6 +230,8 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 
     // 7b. NOTIFIKASI
     Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi');
+    Route::delete('/notifikasi/clear-all', [NotifikasiController::class, 'clearAll'])->name('notifikasi.clear-all');
+    Route::delete('/notifikasi/{notifikasi}', [NotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
     Route::post('/notifikasi/{notifikasi}/read', [NotifikasiController::class, 'read'])->name('notifikasi.read');
     Route::post('/notifikasi/read-all', [NotifikasiController::class, 'readAll'])->name('notifikasi.read-all');
 
@@ -283,6 +287,8 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::get('/penilaian/download-pdf', [PembinaPenilaianController::class, 'downloadPdf'])->name('penilaian.download-pdf');
 
     Route::get('/notifikasi', [PembinaNotifikasiController::class, 'index'])->name('notifikasi');
+    Route::delete('/notifikasi/clear-all', [PembinaNotifikasiController::class, 'clearAll'])->name('notifikasi.clear-all');
+    Route::delete('/notifikasi/{notifikasi}', [PembinaNotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
     Route::post('/notifikasi/{notifikasi}/read', [PembinaNotifikasiController::class, 'read'])->name('notifikasi.read');
     Route::post('/notifikasi/read-all', [PembinaNotifikasiController::class, 'readAll'])->name('notifikasi.read-all');
 });
@@ -327,6 +333,8 @@ Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name
 
     // Notifikasi Ketua
     Route::get('/notifikasi', [KetuaNotifikasiController::class, 'index'])->name('notifikasi');
+    Route::delete('/notifikasi/clear-all', [KetuaNotifikasiController::class, 'clearAll'])->name('notifikasi.clear-all');
+    Route::delete('/notifikasi/{notifikasi}', [KetuaNotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
     Route::post('/notifikasi/{notifikasi}/read', [KetuaNotifikasiController::class, 'read'])->name('notifikasi.read');
     Route::post('/notifikasi/read-all', [KetuaNotifikasiController::class, 'readAll'])->name('notifikasi.read-all');
 });

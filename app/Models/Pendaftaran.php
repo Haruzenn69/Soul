@@ -20,6 +20,8 @@ class Pendaftaran extends Model
 
     public const STATUS_PERINGATAN = 'peringatan';
 
+    public const STATUS_LULUS = 'lulus';
+
     protected $fillable = [
         'siswa_id',
         'ekskul_id',
