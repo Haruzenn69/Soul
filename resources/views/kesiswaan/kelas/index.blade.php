@@ -283,21 +283,12 @@
                     <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-bold text-slate-400 tracking-wider uppercase">
                         <th class="py-3.5 px-5">
                             <a href="{{ $sortLink('nama') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
-                                Nama Kelas
+                                Kelas
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('nama') }}"/>
                                 </svg>
                             </a>
                         </th>
-                        <th class="py-3.5 px-5">
-                            <a href="{{ $sortLink('tingkat') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
-                                Tingkat
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('tingkat') }}"/>
-                                </svg>
-                            </a>
-                        </th>
-                        <th class="py-3.5 px-5">Jurusan / Rombel</th>
                         <th class="py-3.5 px-5">Tahun Ajaran</th>
                         <th class="py-3.5 px-5">
                             <a href="{{ $sortLink('siswas_count') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
@@ -322,20 +313,13 @@
                                         <a href="{{ route('kesiswaan.kelas.show', $k) }}" class="font-extrabold text-slate-900 hover:text-sky-600 transition block text-sm">
                                             {{ $k->nama }}
                                         </a>
-                                        <div class="text-[11px] text-slate-400">Rombel ke-{{ $k->rombel }}</div>
+                                        <div class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1.5">
+                                            <span>{{ $k->jurusan_label ?? strtoupper($k->jurusan) }}</span>
+                                            <span>&bull;</span>
+                                            <span>Rombel {{ $k->rombel }}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </td>
-
-                            <td class="py-3.5 px-5 whitespace-nowrap">
-                                <span class="px-3 py-1 rounded-full font-bold text-xs bg-sky-50 text-sky-700 border border-sky-100 uppercase">
-                                    Tingkat {{ config("kelas.tingkat.{$k->tingkat}", $k->tingkat) }}
-                                </span>
-                            </td>
-
-                            <td class="py-3.5 px-5 whitespace-nowrap">
-                                <div class="font-semibold text-slate-700">{{ $k->jurusan_label ?? strtoupper($k->jurusan) }}</div>
-                                <div class="text-[11px] text-slate-400">Rombel {{ $k->rombel }}</div>
                             </td>
 
                             <td class="py-3.5 px-5 whitespace-nowrap">
@@ -396,7 +380,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-12 text-center">
+                            <td colspan="4" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-slate-400">
                                     <svg class="w-10 h-10 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>

@@ -285,6 +285,20 @@ class Siswa extends Model
             return 'Kamu sudah terdaftar di '.$terpakai.' ekskul. Maksimal '.AturanEkskul::MAKS_EKSKUL.' ekskul per siswa.';
         }
 
+        if ($target && $target->isWajib()) {
+            $wajibAktif = $aktif->first(fn (Ekskul $e) => $e->isWajib());
+
+            if ($wajibAktif) {
+                return 'Kamu sudah terdaftar di ekskul wajib ('.$wajibAktif->nama_ekskul.'). Siswa hanya dapat memilih 1 ekskul wajib.';
+            }
+
+            $wajibPending = $pending->first(fn (Pendaftaran $p) => $p->ekskul && $p->ekskul->isWajib());
+
+            if ($wajibPending) {
+                return 'Kamu sedang mengajukan pendaftaran di ekskul wajib ('.$wajibPending->ekskul->nama_ekskul.'). Siswa hanya dapat memilih 1 ekskul wajib.';
+            }
+        }
+
         if ($target && AturanEkskul::isP1i($target->nama_ekskul)) {
             $bentrokAktif = $aktif->first(fn (Ekskul $e) => AturanEkskul::isP1i($e->nama_ekskul));
 
@@ -304,7 +318,7 @@ class Siswa extends Model
 
     /**
      * Kenapa ketua tidak boleh menerima pendaftaran ini (maksimal ekskul atau
-     * bentrok sesama 4P1I). Mengembalikan null kalau aman diterima.
+     * bentrok sesama 4P1I atau ekskul wajib). Mengembalikan null kalau aman diterima.
      */
     public function alasanTidakDapatMenerima(Pendaftaran $target): ?string
     {
@@ -315,6 +329,14 @@ class Siswa extends Model
 
         if ($lain->count() >= AturanEkskul::MAKS_EKSKUL) {
             return 'Siswa ini sudah aktif di '.AturanEkskul::MAKS_EKSKUL.' ekskul.';
+        }
+
+        if ($target->ekskul && $target->ekskul->isWajib()) {
+            $bentrokWajib = $lain->first(fn (Pendaftaran $p) => $p->ekskul && $p->ekskul->isWajib());
+
+            if ($bentrokWajib) {
+                return 'Siswa ini sudah aktif di ekskul wajib ('.$bentrokWajib->ekskul->nama_ekskul.'). Siswa hanya boleh mengikuti 1 ekskul wajib.';
+            }
         }
 
         if ($target->ekskul && AturanEkskul::isP1i($target->ekskul->nama_ekskul)) {

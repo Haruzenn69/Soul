@@ -35,12 +35,13 @@
         $cover = \App\Support\EkskulInfo::cover($ekskul->cover);
         $logo = \App\Support\EkskulInfo::logo($ekskul->logo);
         $monogram = \Illuminate\Support\Str::of($ekskul->nama_ekskul)->upper()->substr(0, 2)->value();
-        $bisaGabung = $ekskul->is_open_recruitment;
         $kontributor = auth()->check() && auth()->user()->role !== 'kesiswaan';
         $userSiswa = auth()->check() && auth()->user()->role === 'siswa' ? auth()->user()->siswa : null;
         $pendaftaranUser = $userSiswa ? $userSiswa->pendaftarans()->where('ekskul_id', $ekskul->id)->latest()->first() : null;
         $sudahTerdaftar = $pendaftaranUser && in_array($pendaftaranUser->status, ['diterima', 'peringatan']);
         $sedangMenunggu = $pendaftaranUser && $pendaftaranUser->status === 'menunggu';
+        $alasanTidakBisa = ($userSiswa && ! $sudahTerdaftar && ! $sedangMenunggu) ? $userSiswa->alasanTidakBisaDaftar($ekskul) : null;
+        $bisaGabung = $ekskul->is_open_recruitment && $alasanTidakBisa === null;
     @endphp
 
     {{-- TOP NAVBAR --}}
@@ -152,6 +153,15 @@
                                         <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                                             {{ $ekskul->nama_ekskul }}
                                         </h1>
+                                        @if ($ekskul->isWajib())
+                                            <span class="px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 text-xs font-bold">
+                                                Ekskul Wajib
+                                            </span>
+                                        @elseif ($ekskul->kategori)
+                                            <span class="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 text-slate-700 dark:text-neutral-300 text-xs font-semibold">
+                                                {{ $ekskul->kategori }}
+                                            </span>
+                                        @endif
                                         <span class="px-2.5 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/60 border border-sky-100 dark:border-sky-800 text-sky-700 dark:text-sky-300 text-xs font-bold">
                                             Resmi
                                         </span>
@@ -192,12 +202,12 @@
                                         Daftar Sekarang
                                     </a>
                                 @else
-                                    <button disabled
+                                    <button disabled title="{{ $alasanTidakBisa ?? 'Pendaftaran Ditutup' }}"
                                             class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-neutral-800 text-slate-400 dark:text-neutral-500 border border-slate-200 dark:border-neutral-700 text-xs font-bold cursor-not-allowed select-none">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                         </svg>
-                                        Pendaftaran Ditutup
+                                        {{ $alasanTidakBisa ? 'Tidak Dapat Mendaftar' : 'Pendaftaran Ditutup' }}
                                     </button>
                                 @endif
 
@@ -800,8 +810,8 @@
                                     Daftar Sekarang
                                 </a>
                             @else
-                                <span class="px-5 py-3 rounded-xl bg-white/20 backdrop-blur-md text-white/80 text-xs font-bold select-none cursor-not-allowed">
-                                    Pendaftaran Ditutup
+                                <span class="px-5 py-3 rounded-xl bg-white/20 backdrop-blur-md text-white/80 text-xs font-bold select-none cursor-not-allowed" title="{{ $alasanTidakBisa ?? 'Pendaftaran Ditutup' }}">
+                                    {{ $alasanTidakBisa ? 'Tidak Dapat Mendaftar' : 'Pendaftaran Ditutup' }}
                                 </span>
                             @endif
                         </div>

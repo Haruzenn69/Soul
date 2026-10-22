@@ -36,7 +36,7 @@
             </svg>
         </div>
         <div class="pt-1">
-            <p class="text-xs text-sky-800">Kamu bisa mengikuti maksimal <span class="font-semibold">{{ \App\Support\AturanEkskul::MAKS_EKSKUL }} ekskul</span>, dan hanya <span class="font-semibold">satu</span> dari kelompok {{ \App\Support\AturanEkskul::LABEL_P1I }} (Paskibra, Polsis, Pramuka, PMR, IRMA). Pilih dengan baik sesuai minat dan bakatmu.</p>
+            <p class="text-xs text-sky-800">Kamu bisa mengikuti maksimal <span class="font-semibold">{{ \App\Support\AturanEkskul::MAKS_EKSKUL }} ekskul</span> pilihanmu (tidak harus mengambil ekskul kategori wajib, bebas memilih ekskul pilihan seperti Silat, Basket, dll). Namun jika memilih ekskul kategori wajib, kamu hanya boleh memilih <span class="font-semibold">maksimal satu</span> ekskul wajib.</p>
         </div>
     </div>
 
@@ -51,7 +51,18 @@
                     {{ substr($ekskul->nama_ekskul, 0, 2) }}
                 </div>
                 <div class="min-w-0">
-                    <h3 class="text-sm font-bold text-slate-900 truncate">{{ $ekskul->nama_ekskul }}</h3>
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <h3 class="text-sm font-bold text-slate-900 truncate">{{ $ekskul->nama_ekskul }}</h3>
+                        @if ($ekskul->isWajib())
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                Wajib
+                            </span>
+                        @elseif ($ekskul->kategori)
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-semibold bg-slate-100 text-slate-600">
+                                {{ $ekskul->kategori }}
+                            </span>
+                        @endif
+                    </div>
                     <p class="text-[10px] text-slate-400 truncate">Pembina: {{ $ekskul->pembina->nama ?? '-' }}</p>
                 </div>
             </div>

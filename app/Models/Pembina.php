@@ -38,11 +38,18 @@ class Pembina extends Model
     }
 
     /**
-     * Kategori ekskul yang saat ini aktif dibina (jika membina ekskul).
+     * Semua kategori unik dari ekskul yang saat ini aktif dibina.
+     * Mendukung pembinaan lintas kategori (misal: "Olahraga, Seni").
      */
     public function getKategoriAktifAttribute(): ?string
     {
-        return $this->ekskuls->first()?->kategori;
+        $kategoriList = $this->ekskuls
+            ->pluck('kategori')
+            ->filter()
+            ->unique()
+            ->values();
+
+        return $kategoriList->isNotEmpty() ? $kategoriList->join(', ') : null;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\AturanEkskul;
 use App\Support\EkskulInfo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,6 +28,10 @@ class Ekskul extends Model
     protected $casts = [
         'is_open_recruitment' => 'boolean',
         'status' => 'boolean',
+    ];
+
+    protected $attributes = [
+        'is_open_recruitment' => true,
     ];
 
     public function pembina(): BelongsTo
@@ -135,5 +140,10 @@ class Ekskul extends Model
     public function getBidangAttribute(): string
     {
         return EkskulInfo::bidang($this->nama_ekskul);
+    }
+
+    public function isWajib(): bool
+    {
+        return AturanEkskul::isWajib($this->kategori);
     }
 }

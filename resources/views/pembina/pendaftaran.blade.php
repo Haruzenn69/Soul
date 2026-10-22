@@ -119,7 +119,7 @@
                                     </svg>
                                 </a>
                             </th>
-                            <th class="text-left p-3 font-semibold text-slate-500 rounded-r-xl">
+                            <th class="text-left p-3 font-semibold text-slate-500">
                                 <a href="{{ $sortLink('status') }}" class="inline-flex items-center gap-1 hover:text-sky-600 transition">
                                     Status
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -127,6 +127,7 @@
                                     </svg>
                                 </a>
                             </th>
+                            <th class="text-left p-3 font-semibold text-slate-500 rounded-r-xl">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -148,6 +149,36 @@
                                     @else bg-slate-100 text-slate-600 border-slate-200 @endif">
                                     {{ ucfirst($item->status) }}
                                 </span>
+                            </td>
+                            <td class="p-3">
+                                @if($item->status === 'pending' && $ekskulTanpaKetua->contains($item->ekskul_id))
+                                    <div class="flex items-center gap-1.5">
+                                        <form action="{{ route('pembina.pendaftaran.update', $item) }}" method="POST"
+                                              onsubmit="return confirm('Terima pendaftaran {{ $item->siswa->nama }}?')">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="status" value="diterima">
+                                            <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[10px] rounded-lg border border-emerald-200 transition" title="Terima">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                                ACC
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('pembina.pendaftaran.update', $item) }}" method="POST"
+                                              onsubmit="return confirm('Tolak pendaftaran {{ $item->siswa->nama }}?')">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="status" value="ditolak">
+                                            <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[10px] rounded-lg border border-red-200 transition" title="Tolak">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                Tolak
+                                            </button>
+                                        </form>
+                                    </div>
+                                @elseif($item->status === 'pending')
+                                    <span class="text-[10px] text-slate-400 italic">Diproses oleh Ketua</span>
+                                @else
+                                    <span class="text-slate-300 text-[10px]">—</span>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
