@@ -472,13 +472,65 @@ class PembinaController extends Controller
 
         $pendaftarans = $query->paginate(15)->withQueryString();
 
+        // Ekskul yang belum punya ketua — pembina boleh ACC/tolak
+        $ekskulTanpaKetua = $ekskuls->filter(fn ($e) => $e->ketua() === null)->pluck('id');
+
         return view('pembina.pendaftaran', [
             'pendaftarans' => $pendaftarans,
             'ekskuls' => $ekskuls,
             'grouped' => $baseCounts,
             'sort' => $sort,
             'direction' => $direction,
+            'ekskulTanpaKetua' => $ekskulTanpaKetua,
         ]);
+    }
+
+    public function updatePendaftaran(Request $request, Pendaftaran $pendaftaran)
+    {
+        $ekskuls = $this->getEkskuls();
+        $ekskulIds = $ekskuls->pluck('id');
+        abort_unless($ekskulIds->contains($pendaftaran->ekskul_id), 403);
+
+        // Pembina hanya boleh ACC/tolak jika ekskul belum punya ketua
+        $ekskul = $ekskuls->firstWhere('id', $pendaftaran->ekskul_id);
+        if ($ekskul && $ekskul->ketua() !== null) {
+            return back()->with('error', 'Ekskul ini sudah memiliki ketua. Pendaftaran hanya bisa diproses oleh ketua ekskul.');
+        }
+
+        if ($pendaftaran->status !== Pendaftaran::STATUS_PENDING) {
+            return back()->with('error', 'Hanya pendaftaran berstatus pending yang dapat diproses.');
+        }
+
+        $validated = $request->validate([
+            'status' => ['required', 'in:diterima,ditolak'],
+        ]);
+
+        DB::transaction(function () use ($pendaftaran, $validated) {
+            $pendaftaran = Pendaftaran::query()->lockForUpdate()->findOrFail($pendaftaran->id);
+            Siswa::query()->lockForUpdate()->findOrFail($pendaftaran->siswa_id);
+
+            abort_unless($pendaftaran->status === Pendaftaran::STATUS_PENDING, 422, 'Pendaftaran ini sudah diproses.');
+
+            if ($validated['status'] === Pendaftaran::STATUS_DITERIMA) {
+                $alasan = $pendaftaran->siswa->alasanTidakDapatMenerima($pendaftaran);
+                abort_if($alasan !== null, 422, $alasan);
+            }
+
+            $pendaftaran->update($validated);
+
+            if ($validated['status'] === Pendaftaran::STATUS_DITERIMA) {
+                if ($pendaftaran->siswa->jabatan !== 'ketua') {
+                    $pendaftaran->siswa->update(['jabatan' => 'anggota']);
+                }
+                NotifikasiService::pendaftaranDiterima($pendaftaran);
+            } else {
+                NotifikasiService::pendaftaranDitolak($pendaftaran);
+            }
+        });
+
+        $statusLabel = $validated['status'] === 'diterima' ? 'diterima' : 'ditolak';
+
+        return back()->with('success', "Pendaftaran {$pendaftaran->siswa->nama} berhasil {$statusLabel}.");
     }
 
     public function laporan(Request $request)

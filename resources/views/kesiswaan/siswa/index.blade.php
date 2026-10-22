@@ -284,30 +284,13 @@
                             </a>
                         </th>
                         <th class="py-3.5 px-5">
-                            <a href="{{ $sortLink('nis') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
-                                NIS
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('nis') }}"/>
-                                </svg>
-                            </a>
-                        </th>
-                        <th class="py-3.5 px-5">
                             <a href="{{ $sortLink('kelas') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
-                                Kelas
+                                Kelas & Angkatan
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('kelas') }}"/>
                                 </svg>
                             </a>
                         </th>
-                        <th class="py-3.5 px-5">
-                            <a href="{{ $sortLink('angkatan') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
-                                Angkatan
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('angkatan') }}"/>
-                                </svg>
-                            </a>
-                        </th>
-                        <th class="py-3.5 px-5">Jenis Kelamin</th>
                         <th class="py-3.5 px-5">Jabatan</th>
                         <th class="py-3.5 px-5">Status</th>
                         <th class="py-3.5 px-5 text-right">Aksi</th>
@@ -316,6 +299,7 @@
                 <tbody class="divide-y divide-slate-100 text-xs">
                     @forelse ($siswas as $s)
                         <tr class="hover:bg-sky-50/30 transition">
+                            {{-- Siswa / Avatar & Info --}}
                             <td class="py-3.5 px-5">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 font-extrabold flex items-center justify-center text-xs uppercase shrink-0 overflow-hidden">
@@ -327,28 +311,34 @@
                                     </div>
                                     <div class="min-w-0">
                                         <div class="font-bold text-slate-900 leading-snug truncate">{{ $s->nama }}</div>
-                                        <div class="text-[11px] text-slate-400 truncate">{{ $s->email ?? '-' }}</div>
+                                        <div class="text-[11px] text-slate-400 truncate flex items-center gap-1.5 mt-0.5">
+                                            <span class="font-medium text-slate-600">NIS. {{ $s->nis }}</span>
+                                            @if ($s->jenis_kelamin)
+                                                <span>&bull;</span>
+                                                <span class="{{ $s->jenis_kelamin === 'perempuan' ? 'text-rose-500' : 'text-sky-600' }} font-medium">
+                                                    {{ $s->jenis_kelamin === 'perempuan' ? '♀ P' : '♂ L' }}
+                                                </span>
+                                            @endif
+                                            @if ($s->email)
+                                                <span>&bull;</span>
+                                                <span class="truncate">{{ $s->email }}</span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </td>
 
-                            <td class="py-3.5 px-5 whitespace-nowrap font-semibold text-slate-700">{{ $s->nis }}</td>
-
+                            {{-- Kelas & Angkatan --}}
                             <td class="py-3.5 px-5 whitespace-nowrap">
                                 <span class="px-2.5 py-1 rounded-full font-bold text-[11px] bg-sky-50 text-sky-700 border border-sky-100">
                                     {{ $s->kelas?->nama ?? '-' }}
                                 </span>
+                                @if ($s->angkatan)
+                                    <span class="block text-[10px] text-slate-400 mt-1 font-medium">Angkatan {{ $s->angkatan }}</span>
+                                @endif
                             </td>
 
-                            <td class="py-3.5 px-5 whitespace-nowrap text-slate-600">{{ $s->angkatan ?: '-' }}</td>
-
-                            <td class="py-3.5 px-5 whitespace-nowrap">
-                                <span class="inline-flex items-center gap-1.5 font-semibold {{ $s->jenis_kelamin === 'perempuan' ? 'text-rose-600' : 'text-sky-700' }}">
-                                    <span class="text-sm leading-none">{{ $s->jenis_kelamin === 'perempuan' ? '♀' : '♂' }}</span>
-                                    {{ ucfirst($s->jenis_kelamin ?? '-') }}
-                                </span>
-                            </td>
-
+                            {{-- Jabatan --}}
                             <td class="py-3.5 px-5 whitespace-nowrap">
                                 @if ($s->jabatan === 'ketua')
                                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-bold text-[11px] bg-amber-50 text-amber-700 border border-amber-100">
@@ -359,12 +349,14 @@
                                 @endif
                             </td>
 
+                            {{-- Status --}}
                             <td class="py-3.5 px-5 whitespace-nowrap">
                                 <span class="rounded-full px-2.5 py-1 text-[11px] font-bold {{ $s->status === 'nonaktif' ? 'bg-slate-100 text-slate-600' : ($s->status === 'menunggu_penempatan' ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700') }}">
                                     {{ $s->status === 'nonaktif' ? 'Alumni / Nonaktif' : ($s->status === 'menunggu_penempatan' ? 'Menunggu Penempatan' : 'Aktif') }}
                                 </span>
                             </td>
 
+                            {{-- Aksi --}}
                             <td class="py-3.5 px-5 text-right whitespace-nowrap">
                                 <a href="{{ route('kesiswaan.siswa.riwayat-profil', $s) }}"
                                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold rounded-xl transition text-xs mr-1">
@@ -387,7 +379,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="py-12 text-center">
+                            <td colspan="5" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-slate-400">
                                     <svg class="w-10 h-10 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('logo')->nullable();
             $table->string('cover')->nullable();
             $table->text('jadwal')->nullable();
-            $table->boolean('is_open_recruitment')->default(false);
+            $table->boolean('is_open_recruitment')->default(true);
             $table->timestamps();
         });
     }

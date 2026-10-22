@@ -258,4 +258,135 @@ class MultiEkskulTest extends TestCase
             ->assertRedirect()
             ->assertSessionHas('error');
     }
+
+    public function test_siswa_bisa_mendaftar_satu_ekskul_wajib(): void
+    {
+        $wajib = $this->makeEkskul(['nama_ekskul' => 'Pramuka Inti', 'kategori' => 'Wajib']);
+        $siswaUser = $this->makeUser('siswa');
+        $siswa = $this->makeSiswa($siswaUser, $this->makeKelas('x'));
+
+        $this->daftarStore($siswaUser, $wajib->id)
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('pendaftarans', [
+            'siswa_id' => $siswa->id,
+            'ekskul_id' => $wajib->id,
+            'status' => Pendaftaran::STATUS_PENDING,
+        ]);
+    }
+
+    public function test_siswa_tidak_bisa_mendaftar_dua_ekskul_kategori_wajib(): void
+    {
+        $wajibA = $this->makeEkskul(['nama_ekskul' => 'Pramuka Inti', 'kategori' => 'Wajib']);
+        $wajibB = $this->makeEkskul(['nama_ekskul' => 'PMR Utama', 'kategori' => 'Wajib']);
+        $siswaUser = $this->makeUser('siswa');
+        $siswa = $this->makeSiswa($siswaUser, $this->makeKelas('x'));
+        $this->daftarkan($siswa, $wajibA);
+
+        $this->daftarStore($siswaUser, $wajibB->id)
+            ->assertRedirect()
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseMissing('pendaftarans', [
+            'siswa_id' => $siswa->id,
+            'ekskul_id' => $wajibB->id,
+        ]);
+    }
+
+    public function test_siswa_yang_sudah_ikut_ekskul_wajib_masih_bisa_mendaftar_ekskul_kategori_lain(): void
+    {
+        $wajib = $this->makeEkskul(['nama_ekskul' => 'Pramuka Inti', 'kategori' => 'Wajib']);
+        $futsal = $this->makeEkskul(['nama_ekskul' => 'Futsal', 'kategori' => 'Olahraga']);
+        $siswaUser = $this->makeUser('siswa');
+        $siswa = $this->makeSiswa($siswaUser, $this->makeKelas('x'));
+        $this->daftarkan($siswa, $wajib);
+
+        $this->daftarStore($siswaUser, $futsal->id)
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('pendaftarans', [
+            'siswa_id' => $siswa->id,
+            'ekskul_id' => $futsal->id,
+            'status' => Pendaftaran::STATUS_PENDING,
+        ]);
+    }
+
+    public function test_siswa_yang_sudah_ikut_ekskul_kategori_lain_masih_bisa_mendaftar_ekskul_wajib(): void
+    {
+        $futsal = $this->makeEkskul(['nama_ekskul' => 'Futsal', 'kategori' => 'Olahraga']);
+        $wajib = $this->makeEkskul(['nama_ekskul' => 'Pramuka Inti', 'kategori' => 'Wajib']);
+        $siswaUser = $this->makeUser('siswa');
+        $siswa = $this->makeSiswa($siswaUser, $this->makeKelas('x'));
+        $this->daftarkan($siswa, $futsal);
+
+        $this->daftarStore($siswaUser, $wajib->id)
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('pendaftarans', [
+            'siswa_id' => $siswa->id,
+            'ekskul_id' => $wajib->id,
+            'status' => Pendaftaran::STATUS_PENDING,
+        ]);
+    }
+
+    public function test_ketua_tidak_bisa_menerima_siswa_yang_sudah_aktif_di_ekskul_wajib_lain(): void
+    {
+        $wajibA = $this->makeEkskul(['nama_ekskul' => 'Pramuka Inti', 'kategori' => 'Wajib']);
+        $wajibB = $this->makeEkskul(['nama_ekskul' => 'PMR Utama', 'kategori' => 'Wajib']);
+
+        $ketuaFixture = $this->makeKetua($wajibB);
+        $ketuaUser = $ketuaFixture['user'];
+
+        $siswaUser = $this->makeUser('siswa');
+        $siswa = $this->makeSiswa($siswaUser, $this->makeKelas('x'));
+        $this->daftarkan($siswa, $wajibA, Pendaftaran::STATUS_DITERIMA);
+
+        $pendaftaranB = Pendaftaran::create([
+            'siswa_id' => $siswa->id,
+            'ekskul_id' => $wajibB->id,
+            'tanggal_daftar' => now()->toDateString(),
+            'status' => Pendaftaran::STATUS_PENDING,
+            'alasan' => 'Daftar PMR',
+        ]);
+
+        $this->actingAs($ketuaUser)
+            ->patch(route('ketua.pendaftaran.update', $pendaftaranB), [
+                'status' => Pendaftaran::STATUS_DITERIMA,
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('error');
+
+        $this->assertSame(Pendaftaran::STATUS_PENDING, $pendaftaranB->fresh()->status);
+    }
+
+    public function test_siswa_bisa_mendaftar_dua_ekskul_non_wajib_tanpa_ekskul_wajib(): void
+    {
+        $silat = $this->makeEkskul(['nama_ekskul' => 'Silat Perisai Diri', 'kategori' => 'Bela Diri']);
+        $basket = $this->makeEkskul(['nama_ekskul' => 'Bola Basket', 'kategori' => 'Olahraga']);
+
+        $siswaUser = $this->makeUser('siswa');
+        $siswa = $this->makeSiswa($siswaUser, $this->makeKelas('x'));
+
+        // Siswa daftar Silat
+        $this->daftarStore($siswaUser, $silat->id)
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        // Terima Silat
+        Pendaftaran::where('siswa_id', $siswa->id)->where('ekskul_id', $silat->id)->update(['status' => Pendaftaran::STATUS_DITERIMA]);
+
+        // Siswa daftar Basket (keduanya non-wajib, tanpa ekskul wajib sama sekali)
+        $this->daftarStore($siswaUser, $basket->id)
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('pendaftarans', [
+            'siswa_id' => $siswa->id,
+            'ekskul_id' => $basket->id,
+            'status' => Pendaftaran::STATUS_PENDING,
+        ]);
+    }
 }

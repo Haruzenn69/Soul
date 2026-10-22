@@ -42,6 +42,13 @@
             </div>
 
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
+                <button onclick="document.getElementById('modal-kategori').showModal()"
+                        class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/15 hover:bg-white/25 text-white font-bold text-xs rounded-2xl border border-white/25 shadow-sm backdrop-blur-sm hover:-translate-y-0.5 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                    </svg>
+                    Kelola Kategori
+                </button>
                 <button onclick="document.getElementById('modal-create').showModal()"
                         class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,7 +168,7 @@
                             <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Kategori Ekskul</label>
                             <select name="kategori" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                                 <option value="">Semua Kategori</option>
-                                @foreach ($kategoriList ?? ['Olahraga', 'Seni', 'Bahasa', 'Bela Diri', 'Lainnya'] as $kategori)
+                                @foreach ($kategoriList ?? \App\Support\AturanEkskul::KATEGORI_LIST as $kategori)
                                     <option value="{{ $kategori }}" {{ request('kategori') === $kategori ? 'selected' : '' }}>{{ $kategori }}</option>
                                 @endforeach
                             </select>
@@ -255,7 +262,6 @@
                         </th>
                         <th class="py-3.5 px-5">Pembina</th>
                         <th class="py-3.5 px-5">Pelatih</th>
-                        <th class="py-3.5 px-5">Jadwal</th>
                         <th class="py-3.5 px-5">
                             <a href="{{ $sortLink('rekrutmen') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
                                 Rekrutmen
@@ -264,26 +270,19 @@
                                 </svg>
                             </a>
                         </th>
-                        <th class="py-3.5 px-5">
-                            <a href="{{ $sortLink('status') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
-                                Status
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('status') }}"/>
-                                </svg>
-                            </a>
-                        </th>
                         <th class="py-3.5 px-5 text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-xs">
                     @php
-                        $kategoriTersedia = $kategoriList ?? ['Olahraga', 'Seni', 'Bahasa', 'Bela Diri', 'Lainnya'];
+                        $kategoriTersedia = $kategoriList ?? \App\Support\AturanEkskul::KATEGORI_LIST;
                         $normalizeKat = function (?string $kat) use ($kategoriTersedia): string {
                             $k = trim((string) $kat);
                             foreach ($kategoriTersedia as $valid) {
                                 if (strcasecmp($k, $valid) === 0) return $valid;
                             }
                             if (in_array(strtolower($k), ['kesenian'])) return 'Seni';
+                            if (in_array(strtolower($k), ['wajib', 'ekskul wajib'])) return 'Wajib';
                             return !empty($k) ? ucwords(strtolower($k)) : 'Lainnya';
                         };
                         $ekskulPerKategori = $ekskuls->getCollection()->groupBy(fn ($item) => $normalizeKat($item->kategori));
@@ -299,25 +298,34 @@
                     @endphp
                     @foreach ($kategoriDitampilkan as $kategori)
                         <tr class="bg-sky-50/70">
-                            <td colspan="7" class="px-5 py-3 text-xs font-extrabold uppercase tracking-wide text-sky-800">{{ $kategori }}</td>
+                            <td colspan="5" class="px-5 py-3 text-xs font-extrabold uppercase tracking-wide text-sky-800">{{ $kategori }}</td>
                         </tr>
-                        @forelse ($ekskulPerKategori->get($kategori, collect()) as $ekskul)
-                        <tr class="hover:bg-sky-50/30 transition">
+                        @php
+                            // Ekskul aktif (status = 1) tampil di atas, ekskul nonaktif (status = 0) pindah ke paling bawah di kategorinya
+                            $ekskulList = $ekskulPerKategori->get($kategori, collect())
+                                ->sortBy(fn ($item) => (int) !$item->status)
+                                ->values();
+                        @endphp
+                        @forelse ($ekskulList as $ekskul)
+                        <tr class="{{ $ekskul->status ? 'hover:bg-sky-50/30' : 'bg-slate-100/70 text-slate-400 hover:bg-slate-200/50' }} transition">
                             {{-- Ekskul --}}
                             <td class="py-3.5 px-5">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-xl overflow-hidden shrink-0">
+                                    <div class="w-9 h-9 rounded-xl overflow-hidden shrink-0 {{ !$ekskul->status ? 'grayscale opacity-60' : '' }}">
                                         @if ($ekskul->logo)
                                             <img src="{{ asset('storage/' . $ekskul->logo) }}" alt="{{ $ekskul->nama_ekskul }}" class="w-full h-full object-cover">
                                         @else
-                                            <div class="w-full h-full bg-sky-100 text-sky-700 font-extrabold flex items-center justify-center text-xs uppercase">
+                                            <div class="w-full h-full {{ $ekskul->status ? 'bg-sky-100 text-sky-700' : 'bg-slate-200 text-slate-500' }} font-extrabold flex items-center justify-center text-xs uppercase">
                                                 {{ strtoupper(substr($ekskul->nama_ekskul, 0, 2)) }}
                                             </div>
                                         @endif
                                     </div>
                                     <div class="min-w-0">
                                         <div class="flex items-center gap-2 min-w-0">
-                                            <div class="font-bold text-slate-900 leading-snug truncate">{{ $ekskul->nama_ekskul }}</div>
+                                            <div class="font-bold {{ $ekskul->status ? 'text-slate-900' : 'text-slate-500' }} leading-snug truncate">{{ $ekskul->nama_ekskul }}</div>
+                                            @if (!$ekskul->status)
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-500 shrink-0">Nonaktif</span>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -327,10 +335,10 @@
                             <td class="py-3.5 px-5 whitespace-nowrap">
                                 @if ($ekskul->pembina)
                                     <div class="flex items-center gap-2">
-                                        <div class="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-[10px] shrink-0 uppercase">
+                                        <div class="w-6 h-6 rounded-lg {{ $ekskul->status ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-500' }} font-bold flex items-center justify-center text-[10px] shrink-0 uppercase">
                                             {{ strtoupper(substr($ekskul->pembina->nama, 0, 1)) }}
                                         </div>
-                                        <span class="font-semibold text-slate-700">{{ $ekskul->pembina->nama }}</span>
+                                        <span class="font-semibold {{ $ekskul->status ? 'text-slate-700' : 'text-slate-400' }}">{{ $ekskul->pembina->nama }}</span>
                                     </div>
                                 @else
                                     <span class="text-slate-400 italic">-</span>
@@ -341,33 +349,27 @@
                             <td class="py-3.5 px-5 whitespace-nowrap">
                                 @if ($ekskul->pelatih)
                                     <div class="flex items-center gap-2">
-                                        <div class="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 font-bold flex items-center justify-center text-[10px] shrink-0 uppercase">
+                                        <div class="w-6 h-6 rounded-lg {{ $ekskul->status ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-500' }} font-bold flex items-center justify-center text-[10px] shrink-0 uppercase">
                                             {{ strtoupper(substr($ekskul->pelatih->nama, 0, 1)) }}
                                         </div>
-                                        <span class="font-semibold text-slate-700">{{ $ekskul->pelatih->nama }}</span>
+                                        <span class="font-semibold {{ $ekskul->status ? 'text-slate-700' : 'text-slate-400' }}">{{ $ekskul->pelatih->nama }}</span>
                                     </div>
                                 @else
                                     <span class="text-slate-400 italic">-</span>
                                 @endif
                             </td>
 
-                            {{-- Jadwal --}}
-                            <td class="py-3.5 px-5 whitespace-nowrap text-slate-600">
-                                {{ $ekskul->jadwal ?? '-' }}
-                            </td>
-
                             {{-- Rekrutmen --}}
                             <td class="py-3.5 px-5 whitespace-nowrap">
-                                <span class="px-2.5 py-1 rounded-full font-bold text-[11px] {{ $ekskul->is_open_recruitment ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-100 text-slate-400' }}">
-                                    {{ $ekskul->is_open_recruitment ? '● Buka' : '○ Tutup' }}
-                                </span>
-                            </td>
-
-                            {{-- Status --}}
-                            <td class="py-3.5 px-5 whitespace-nowrap">
-                                <span class="px-2.5 py-1 rounded-full font-bold text-[11px] {{ $ekskul->status ? 'bg-sky-50 text-sky-700 border border-sky-100' : 'bg-rose-50 text-rose-500 border border-rose-100' }}">
-                                    {{ $ekskul->status ? 'Aktif' : 'Nonaktif' }}
-                                </span>
+                                @if ($ekskul->status)
+                                    <span class="px-2.5 py-1 rounded-full font-bold text-[11px] {{ $ekskul->is_open_recruitment ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-100 text-slate-400' }}">
+                                        {{ $ekskul->is_open_recruitment ? '● Buka' : '○ Tutup' }}
+                                    </span>
+                                @else
+                                    <span class="px-2.5 py-1 rounded-full font-semibold text-[11px] bg-slate-200/70 text-slate-400">
+                                        -
+                                    </span>
+                                @endif
                             </td>
 
                             {{-- Aksi --}}
@@ -375,7 +377,7 @@
                                 <div class="flex gap-2 justify-end items-center">
                                     {{-- Lihat Detail --}}
                                     <a href="{{ route('kesiswaan.ekskuls.show', $ekskul) }}"
-                                       class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-xl shadow-sm shadow-sky-200 transition"
+                                       class="inline-flex items-center gap-1.5 px-3.5 py-1.5 {{ $ekskul->status ? 'bg-sky-500 hover:bg-sky-600 text-white shadow-sky-200' : 'bg-slate-200 hover:bg-slate-300 text-slate-700' }} font-bold text-xs rounded-xl shadow-sm transition"
                                        title="Lihat Detail Ekskul">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         Detail
@@ -383,28 +385,17 @@
 
                                     {{-- Edit --}}
                                     <button type="button"
-                                            onclick='openEdit({{ json_encode(["id" => $ekskul->id, "nama_ekskul" => $ekskul->nama_ekskul, "kategori" => $ekskul->kategori, "pembina_id" => $ekskul->pembina_id, "deskripsi" => $ekskul->deskripsi, "jadwal" => $ekskul->jadwal]) }})'
+                                            onclick='openEdit({{ json_encode(["id" => $ekskul->id, "nama_ekskul" => $ekskul->nama_ekskul, "kategori" => $ekskul->kategori, "pembina_id" => $ekskul->pembina_id, "deskripsi" => $ekskul->deskripsi, "jadwal" => $ekskul->jadwal, "status" => $ekskul->status ? 1 : 0]) }})'
                                             class="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition">
                                         <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                         Edit
                                     </button>
-
-                                    {{-- Toggle Status --}}
-                                    <form action="{{ route('kesiswaan.ekskuls.destroy', $ekskul) }}" method="POST"
-                                          onsubmit="return confirm('{{ $ekskul->status ? 'Nonaktifkan ekskul ' . $ekskul->nama_ekskul . '?' : 'Aktifkan ekskul ' . $ekskul->nama_ekskul . '?' }}')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="inline-flex items-center gap-1 px-3 py-1.5 {{ $ekskul->status ? 'bg-rose-50 hover:bg-rose-100 text-rose-600' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600' }} font-semibold rounded-xl text-xs transition">
-                                            {{ $ekskul->status ? 'Nonaktifkan' : 'Aktifkan' }}
-                                        </button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-5 py-4 text-center text-xs text-slate-400">Belum ada ekskul pada kategori {{ $kategori }}.</td>
+                                <td colspan="5" class="px-5 py-4 text-center text-xs text-slate-400">Belum ada ekskul pada kategori {{ $kategori }}.</td>
                             </tr>
                         @endforelse
                     @endforeach
@@ -445,7 +436,7 @@
                 <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Kategori <span class="text-rose-500">*</span></label>
                 <select name="kategori" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                     <option value="" disabled {{ old('kategori') ? '' : 'selected' }}>Pilih kategori...</option>
-                    @foreach ($kategoriList ?? ['Olahraga', 'Seni', 'Bahasa', 'Bela Diri', 'Lainnya'] as $kategori)
+                    @foreach ($kategoriList ?? \App\Support\AturanEkskul::KATEGORI_LIST as $kategori)
                         <option value="{{ $kategori }}" @selected(old('kategori') === $kategori)>{{ $kategori }}</option>
                     @endforeach
                 </select>
@@ -486,11 +477,31 @@
             </div>
 
             <div>
+                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Status Ekskul <span class="text-rose-500">*</span></label>
+                <select name="status" id="edit_status" required
+                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                    <option value="1">Aktif</option>
+                    <option value="0">Nonaktif</option>
+                </select>
+                <p class="text-[10px] text-slate-400 mt-1">Ekskul nonaktif akan dipindah ke paling bawah di kategorinya dan berwarna abu-abu.</p>
+            </div>
+
+            <div>
                 <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Kategori <span class="text-rose-500">*</span></label>
+                {{-- Jika ekskul Wajib: tampilkan info locked (diisi via JS) --}}
+                <div id="edit_kategori_locked" class="hidden w-full px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-800 font-bold flex items-center gap-2">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <span id="edit_kategori_locked_text">Wajib</span>
+                    <span class="font-normal text-amber-600 ml-1">&mdash; Kategori ekskul wajib tidak dapat diubah</span>
+                    <input type="hidden" name="kategori" id="edit_kategori_hidden" value="Wajib">
+                </div>
+                {{-- Untuk ekskul non-Wajib: dropdown biasa, tanpa opsi Wajib --}}
                 <select name="kategori" id="edit_kategori" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                     <option value="" disabled>Pilih kategori...</option>
-                    @foreach ($kategoriList ?? ['Olahraga', 'Seni', 'Bahasa', 'Bela Diri', 'Lainnya'] as $kategori)
-                        <option value="{{ $kategori }}">{{ $kategori }}</option>
+                    @foreach ($kategoriList ?? \App\Support\AturanEkskul::KATEGORI_LIST as $kategori)
+                        @if (!\App\Support\AturanEkskul::isWajib($kategori))
+                            <option value="{{ $kategori }}">{{ $kategori }}</option>
+                        @endif
                     @endforeach
                 </select>
             </div>
@@ -533,6 +544,81 @@
         </form>
     </dialog>
 
+    {{-- MODAL KELOLA KATEGORI --}}
+    <dialog id="modal-kategori" class="rounded-3xl backdrop:bg-slate-900/40 p-0 w-full max-w-lg shadow-2xl border border-sky-100">
+        <div class="p-6 md:p-8 bg-white space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-extrabold text-slate-900">Kelola Kategori Ekskul</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Tambah dan hapus kategori ekstrakurikuler</p>
+                    </div>
+                </div>
+                <button type="button" onclick="this.closest('dialog').close()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            {{-- FORM TAMBAH KATEGORI --}}
+            <form method="POST" action="{{ route('kesiswaan.kategori.store') }}" class="p-4 bg-sky-50/70 border border-sky-100 rounded-2xl space-y-3">
+                @csrf
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-sky-900 uppercase tracking-wider">Tambah Kategori Baru</h3>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" name="nama" required placeholder="Contoh: Robotik, Keagamaan, ..."
+                           class="flex-1 px-3.5 py-2.5 bg-white border border-sky-200/80 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
+                    <button type="submit"
+                            class="px-4 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-xl shadow-sm shadow-sky-200 transition shrink-0">
+                        + Tambah
+                    </button>
+                </div>
+            </form>
+
+            {{-- DAFTAR KATEGORI SAAT INI --}}
+            <div class="space-y-2">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Daftar Kategori Saat Ini</h3>
+                <div class="max-h-64 overflow-y-auto divide-y divide-slate-100 border border-slate-100 rounded-2xl">
+                    @forelse ($kategoriModels ?? [] as $kat)
+                        <div class="p-3 flex items-center justify-between gap-3 hover:bg-slate-50 transition">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="font-bold text-xs text-slate-800 truncate">{{ $kat->nama }}</span>
+                                @if ($kat->isFallback())
+                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-200" title="Kategori fallback — ekskul yang kategorinya dihapus akan dipindah ke sini">
+                                        Sistem · Fallback
+                                    </span>
+                                @endif
+                                <span class="text-[10px] text-slate-400">
+                                    ({{ $kat->ekskuls_count }} ekskul)
+                                </span>
+                            </div>
+                            @if ($kat->isFallback())
+                                <span class="text-[10px] text-slate-400 italic font-medium px-2 py-1">Tidak bisa dihapus</span>
+                            @else
+                                <form method="POST" action="{{ route('kesiswaan.kategori.destroy', $kat) }}"
+                                      onsubmit="return confirm('Hapus kategori \'{{ $kat->nama }}\'? {{ $kat->ekskuls_count > 0 ? $kat->ekskuls_count . ' ekskul pada kategori ini akan otomatis dipindah ke kategori Lainnya.' : 'Tidak ada ekskul yang terdampak.' }}')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="px-2.5 py-1 text-[11px] font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition">
+                                        Hapus
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    @empty
+                        <div class="p-4 text-center text-xs text-slate-400">Belum ada kategori terdaftar.</div>
+                    @endforelse
+                </div>
+            </div>
+
+        </div>
+    </dialog>
+
 </div>
 
 <script>
@@ -540,7 +626,38 @@
         const form = document.getElementById('form-edit');
         form.action = '{{ url('kesiswaan/ekskuls') }}/' + data.id;
         form.querySelector('[name=nama_ekskul]').value = data.nama_ekskul || '';
-        form.querySelector('[name=kategori]').value = data.kategori || '';
+
+        // Penanganan status ekskul
+        const selStatus = document.getElementById('edit_status');
+        if (selStatus) {
+            selStatus.value = (data.status !== undefined && data.status !== null) ? String(data.status) : '1';
+        }
+
+        // Penanganan dropdown kategori
+        const selKategori   = document.getElementById('edit_kategori');
+        const lockedBox     = document.getElementById('edit_kategori_locked');
+        const lockedText    = document.getElementById('edit_kategori_locked_text');
+        const hiddenKategori= document.getElementById('edit_kategori_hidden');
+        const isWajib       = (data.kategori || '').toLowerCase() === 'wajib';
+
+        if (isWajib) {
+            // Ekskul Wajib: sembunyikan dropdown, tampilkan info locked
+            selKategori.classList.add('hidden');
+            selKategori.removeAttribute('name');      // jangan ikut submit
+            selKategori.removeAttribute('required');
+            lockedBox.classList.remove('hidden');
+            lockedText.textContent = data.kategori;
+            hiddenKategori.value = data.kategori;     // yang dikirim ke server
+        } else {
+            // Ekskul non-Wajib: tampilkan dropdown, sembunyikan locked
+            selKategori.classList.remove('hidden');
+            selKategori.setAttribute('name', 'kategori');
+            selKategori.setAttribute('required', 'required');
+            lockedBox.classList.add('hidden');
+            hiddenKategori.value = '';
+            selKategori.value = data.kategori || '';
+        }
+
         const selPembina = form.querySelector('[name=pembina_id]');
         selPembina.value = data.pembina_id || '';
         Array.from(selPembina.options).forEach(opt => {

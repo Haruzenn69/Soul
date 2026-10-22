@@ -7,6 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\Kesiswaan\DashboardController as KesiswaanDashboardController;
 use App\Http\Controllers\Kesiswaan\EkskulController;
+use App\Http\Controllers\Kesiswaan\KategoriEkskulController;
 use App\Http\Controllers\Kesiswaan\KelasController;
 use App\Http\Controllers\Kesiswaan\KenaikanKelasController;
 use App\Http\Controllers\Kesiswaan\LaporanPenilaianController as KesiswaanLaporanPenilaianController;
@@ -146,6 +147,8 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
         ->name('users.reset-password');
 
     Route::resource('ekskuls', EkskulController::class)->except([]);
+    Route::post('kategori-ekskul', [KategoriEkskulController::class, 'store'])->name('kategori.store');
+    Route::delete('kategori-ekskul/{kategoriEkskul}', [KategoriEkskulController::class, 'destroy'])->name('kategori.destroy');
     Route::post('pembina/{pembina}/assign-ekskul', [KesiswaanPembinaController::class, 'assignEkskul'])->name('pembina.assign-ekskul');
     Route::delete('pembina/{pembina}/remove-ekskul/{ekskul}', [KesiswaanPembinaController::class, 'removeEkskul'])->name('pembina.remove-ekskul');
 
@@ -251,6 +254,7 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::post('/ekskuls/{ekskul}/copot-ketua/{siswa}', [PembinaController::class, 'copotKetua'])->name('ekskul.copot-ketua');
     Route::patch('/arsip/periode-ketua/{riwayat}', [PembinaController::class, 'updatePeriodeKetua'])->name('arsip.periode-ketua');
     Route::get('/pendaftaran', [PembinaController::class, 'pendaftaran'])->name('pendaftaran');
+    Route::patch('/pendaftaran/{pendaftaran}/status', [PembinaController::class, 'updatePendaftaran'])->name('pendaftaran.update');
     Route::get('/laporan', [PembinaController::class, 'laporan'])->name('laporan.index');
     Route::get('/laporan/{laporanBulanan}/detail', [PembinaController::class, 'laporanShow'])->name('laporan.show');
     Route::get('/laporan/{laporanBulanan}/download', [PembinaController::class, 'laporanDownload'])->name('laporan.download');

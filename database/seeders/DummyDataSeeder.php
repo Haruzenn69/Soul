@@ -659,11 +659,17 @@ class DummyDataSeeder extends Seeder
             // Semua siswa memiliki 1 atau 2 ekskul
             $daftarCount = ($i % 3 === 0) ? 2 : 1;
             $sudahP1i = false;
+            $sudahWajib = false;
             $terdaftar = [];
 
             // Urutkan pilihan ekskul berdasarkan index siswa agar distribusi merata
             for ($step = 0; $step < $ekskulCount && count($terdaftar) < $daftarCount; $step++) {
                 $candidateEkskul = $ekskuls[($i + $step * 5) % $ekskulCount];
+
+                $isWajib = $candidateEkskul->isWajib();
+                if ($isWajib && $sudahWajib) {
+                    continue;
+                }
 
                 $isP1i = AturanEkskul::isP1i($candidateEkskul->nama_ekskul);
                 if ($isP1i && $sudahP1i) {
@@ -681,6 +687,9 @@ class DummyDataSeeder extends Seeder
                 ]);
 
                 $terdaftar[] = $candidateEkskul->id;
+                if ($isWajib) {
+                    $sudahWajib = true;
+                }
                 if ($isP1i) {
                     $sudahP1i = true;
                 }
