@@ -50,7 +50,39 @@ class TahunAjaranController extends Controller
 
         $pendingSiswa = Siswa::where('status', 'menunggu_penempatan')->count();
 
-        return view('kesiswaan.tahun-ajaran.index', compact('tahunAjarans', 'activeTA', 'activeKelas', 'pendingSiswa', 'siswaKelas10'));
+        $kelasByTA = [];
+        foreach ($tahunAjarans as $ta) {
+            if ($ta->status === 'aktif') {
+                $kelasByTA[$ta->id] = $activeKelas;
+            } else {
+                $kelasItems = Kelas::where('tahun_ajaran_id', $ta->id)
+                    ->orderByRaw("FIELD(tingkat, 'x', 'xi', 'xii')")
+                    ->orderBy('jurusan')
+                    ->orderBy('rombel')
+                    ->get();
+
+                if ($ta->status === 'historis') {
+                    foreach ($kelasItems as $item) {
+                        $item->siswas_count = Siswa::query()->where(function ($query) use ($item, $ta) {
+                            $query->whereHas('classHistories', fn ($history) => $history
+                                    ->where('tahun_ajaran', $ta->nama)
+                                    ->where('kelas_asal', $item->nama))
+                                ->orWhere(function ($sub) use ($item, $ta) {
+                                    $sub->where('kelas_id', $item->id)
+                                        ->whereDoesntHave('classHistories', fn ($h) => $h->where('tahun_ajaran', $ta->nama));
+                                });
+                        })->distinct()->count('siswas.id');
+                    }
+                } else {
+                    foreach ($kelasItems as $item) {
+                        $item->siswas_count = Siswa::where('kelas_id', $item->id)->count();
+                    }
+                }
+                $kelasByTA[$ta->id] = $kelasItems;
+            }
+        }
+
+        return view('kesiswaan.tahun-ajaran.index', compact('tahunAjarans', 'activeTA', 'activeKelas', 'pendingSiswa', 'siswaKelas10', 'kelasByTA'));
     }
 
     /**
@@ -129,6 +161,7 @@ class TahunAjaranController extends Controller
 
     /**
      * Deactivate an active tahun ajaran (becomes historis).
+     * Snapshots ALL students in ALL classes of this tahun ajaran.
      */
     public function deactivate(TahunAjaran $tahunAjaran): RedirectResponse
     {
@@ -136,7 +169,33 @@ class TahunAjaranController extends Controller
             return back()->with('error', 'Hanya tahun ajaran aktif yang bisa dinonaktifkan.');
         }
 
-        $tahunAjaran->update(['status' => 'historis']);
+        DB::transaction(function () use ($tahunAjaran) {
+            $now = now('Asia/Jakarta');
+            $classes = Kelas::where('tahun_ajaran_id', $tahunAjaran->id)
+                ->with(['siswas' => fn ($q) => $q->where('status', 'aktif')])
+                ->get();
+
+            foreach ($classes as $class) {
+                foreach ($class->siswas as $student) {
+                    $alreadyRecorded = SiswaRiwayatKelas::where('siswa_id', $student->id)
+                        ->where('tahun_ajaran', $tahunAjaran->nama)
+                        ->exists();
+
+                    if (! $alreadyRecorded) {
+                        SiswaRiwayatKelas::create([
+                            'siswa_id' => $student->id,
+                            'tahun_ajaran' => $tahunAjaran->nama,
+                            'kelas_asal' => $class->nama,
+                            'kelas_tujuan' => $class->nama,
+                            'jenis' => 'penempatan',
+                            'diproses_pada' => $now,
+                        ]);
+                    }
+                }
+            }
+
+            $tahunAjaran->update(['status' => 'historis']);
+        });
 
         return back()->with('success', "Tahun ajaran {$tahunAjaran->nama} berhasil dinonaktifkan dan dijadikan arsip historis.");
     }
@@ -155,21 +214,26 @@ class TahunAjaranController extends Controller
         $kelasIds = $tahunAjaran->kelas->pluck('id');
         $kelasNames = $tahunAjaran->kelas->pluck('nama');
 
-        $siswaQuery = Siswa::query()->where(function ($query) use ($kelasIds, $tahunAjaran, $kelasNames) {
-            $query->whereIn('kelas_id', $kelasIds)
-                ->orWhereHas('classHistories', fn ($h) => $h
-                    ->where('tahun_ajaran', $tahunAjaran->nama)
-                    ->whereIn('kelas_asal', $kelasNames));
-        });
+        $siswaQuery = Siswa::query()
+            ->with(['classHistories', 'kelas'])
+            ->where(function ($query) use ($kelasIds, $tahunAjaran, $kelasNames) {
+                $query->whereIn('kelas_id', $kelasIds)
+                    ->orWhereHas('classHistories', fn ($h) => $h
+                        ->where('tahun_ajaran', $tahunAjaran->nama)
+                        ->whereIn('kelas_asal', $kelasNames));
+            });
 
         if ($kelasFilter) {
             $selectedKelas = Kelas::find($kelasFilter);
             if ($selectedKelas) {
                 $siswaQuery->where(function ($q) use ($selectedKelas, $tahunAjaran) {
-                    $q->where('kelas_id', $selectedKelas->id)
-                        ->orWhereHas('classHistories', fn ($h) => $h
-                            ->where('tahun_ajaran', $tahunAjaran->nama)
-                            ->where('kelas_asal', $selectedKelas->nama));
+                    $q->whereHas('classHistories', fn ($h) => $h
+                        ->where('tahun_ajaran', $tahunAjaran->nama)
+                        ->where('kelas_asal', $selectedKelas->nama))
+                    ->orWhere(function ($sub) use ($selectedKelas, $tahunAjaran) {
+                        $sub->where('kelas_id', $selectedKelas->id)
+                            ->whereDoesntHave('classHistories', fn ($h) => $h->where('tahun_ajaran', $tahunAjaran->nama));
+                    });
                 });
             }
         }
@@ -185,7 +249,7 @@ class TahunAjaranController extends Controller
 
         $siswaIds = $siswas->pluck('id');
         $ekskulData = Pendaftaran::whereIn('siswa_id', $siswaIds)
-            ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
+            ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_LULUS])
             ->with('ekskul')
             ->get()
             ->groupBy('siswa_id');
@@ -211,12 +275,17 @@ class TahunAjaranController extends Controller
 
         if ($tahunAjaran->isHistoris()) {
             // Historical view: show students that WERE in this class
-            $siswaQuery = Siswa::query()->where(function ($query) use ($kela, $tahunAjaran) {
-                $query->where('kelas_id', $kela->id)
-                    ->orWhereHas('classHistories', fn ($h) => $h
+            $siswaQuery = Siswa::query()
+                ->with(['classHistories', 'kelas'])
+                ->where(function ($query) use ($kela, $tahunAjaran) {
+                    $query->whereHas('classHistories', fn ($h) => $h
                         ->where('tahun_ajaran', $tahunAjaran->nama)
-                        ->where('kelas_asal', $kela->nama));
-            });
+                        ->where('kelas_asal', $kela->nama))
+                    ->orWhere(function ($sub) use ($kela, $tahunAjaran) {
+                        $sub->where('kelas_id', $kela->id)
+                            ->whereDoesntHave('classHistories', fn ($h) => $h->where('tahun_ajaran', $tahunAjaran->nama));
+                    });
+                });
 
             $siswas = (clone $siswaQuery)
                 ->when($request->filled('q'), function ($query) use ($request) {
@@ -227,10 +296,10 @@ class TahunAjaranController extends Controller
                 ->paginate(20)
                 ->withQueryString();
 
-            // Load ekskul data for historical view
+            // Load ekskul data for historical view (including lulus)
             $siswaIds = $siswas->pluck('id');
             $ekskulData = Pendaftaran::whereIn('siswa_id', $siswaIds)
-                ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
+                ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_LULUS])
                 ->with('ekskul')
                 ->get()
                 ->groupBy('siswa_id');

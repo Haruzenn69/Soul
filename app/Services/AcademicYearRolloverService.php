@@ -93,8 +93,16 @@ class AcademicYearRolloverService
                     // Siswa tidak hilang, tetap ada di kelas itu dan status tetap aktif
                     $targetX = $this->findTargetClass($class, 'x', $newYear);
                     foreach ($students as $student) {
+                        $this->recordHistory($student, $currentYear->nama, $class->nama, $targetX->nama, 'penempatan', $now);
                         $student->update(['kelas_id' => $targetX->id, 'status' => 'aktif']);
                         $pending++;
+                    }
+                } else {
+                    // Kelas tingkat lainnya jika ada
+                    $targetOther = $this->findTargetClass($class, $class->tingkat, $newYear);
+                    foreach ($students as $student) {
+                        $this->recordHistory($student, $currentYear->nama, $class->nama, $targetOther->nama, 'penempatan', $now);
+                        $student->update(['kelas_id' => $targetOther->id, 'status' => 'aktif']);
                     }
                 }
             }
