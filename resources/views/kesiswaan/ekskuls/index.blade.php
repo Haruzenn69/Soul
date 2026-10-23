@@ -86,6 +86,7 @@
         @endif
         @if(request('direction'))
             <input type="hidden" name="direction" value="{{ request('direction') }}">
+        @endif
         <div class="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
             {{-- Search Bar --}}
             <div class="soul-search-wrap relative flex-1">

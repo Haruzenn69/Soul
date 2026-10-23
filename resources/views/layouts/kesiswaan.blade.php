@@ -23,7 +23,6 @@
     'psDashboardUrl' => route('kesiswaan.dashboard'),
     'psNotifUrl' => route('kesiswaan.notifikasi'),
     'psProfileUrl' => route('kesiswaan.profile'),
-    'psTheme' => 'blue',
     'psItems' => [
         ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('kesiswaan.dashboard'), 'is' => 'kesiswaan.dashboard'],
         [
