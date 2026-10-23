@@ -16,6 +16,9 @@ final class AturanEkskul
     /** Jumlah maksimal ekskul aktif per siswa. */
     public const MAKS_EKSKUL = 2;
 
+    /** Jumlah maksimal ekskul yang dapat dibina oleh seorang pembina. */
+    public const MAKS_EKSKUL_PEMBINA = 5;
+
     /** Jumlah maksimal ekskul wajib per siswa. */
     public const MAKS_EKSKUL_WAJIB = 1;
 
