@@ -142,31 +142,10 @@ class EkskulController extends Controller
         $data = $request->validate([
             'nama_ekskul' => ['required', 'string', 'max:255'],
             'kategori'    => ['required', 'string', 'max:50', \Illuminate\Validation\Rule::in(\App\Support\AturanEkskul::kategoriList())],
-            'pembina_id'  => ['nullable', 'exists:pembinas,id'],
             'deskripsi'   => ['nullable', 'string'],
             'jadwal'      => ['nullable', 'string', 'max:255'],
             'status'      => ['required', 'boolean'],
         ]);
-        if (! empty($data['pembina_id'])) {
-            $pembina = Pembina::findOrFail($data['pembina_id']);
-
-            // Skip count check if same pembina
-            if ($ekskul->pembina_id != $pembina->id) {
-                $count = Ekskul::where('pembina_id', $pembina->id)->count();
-                if ($count >= 4) {
-                    return back()->withErrors([
-                        'pembina_id' => "Pembina {$pembina->nama} sudah membina 4 ekskul (batas maksimal 4 ekskul per pembina).",
-                    ])->withInput();
-                }
-            }
-
-            $namaPembinaLower = strtolower(trim($pembina->nama ?? ''));
-            if (str_contains($namaPembinaLower, 'nurianti') || str_contains($namaPembinaLower, 'nuri anti') || str_contains($namaPembinaLower, 'bu nuri')) {
-                return back()->withErrors(['pembina_id' => 'Bu Nurianti tidak diperbolehkan membina ekskul.'])->withInput();
-            }
-
-            $pembina->update(['kategori_pernah_dibina' => $data['kategori']]);
-        }
 
         $ekskul->update($data);
 
