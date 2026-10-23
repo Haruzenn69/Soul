@@ -124,20 +124,23 @@
         </div>
     @endif
 
-    {{-- SEARCH & FILTER FORM --}}
-    <form method="GET" action="{{ route('kesiswaan.kelas.index') }}" class="bg-white p-4 rounded-3xl border border-sky-100 shadow-sm">
-        @if ($activeTingkat)
-            <input type="hidden" name="tingkat" value="{{ $activeTingkat }}">
-        @endif
-        @if(request('sort'))
-            <input type="hidden" name="sort" value="{{ request('sort') }}">
-        @endif
-        @if(request('direction'))
-            <input type="hidden" name="direction" value="{{ request('direction') }}">
-        @endif
+    {{-- SEARCH & FILTER FORM (POPOVER DESIGN) --}}
+    @php
+        $selectedTa = $tahunAjarans->firstWhere('id', request('tahun_ajaran_id'));
+        $activeFilterCount = (request()->filled('tahun_ajaran_id') ? 1 : 0) + (request()->filled('tingkat') ? 1 : 0);
+        $hasActiveFilter = request()->filled('q') || $activeFilterCount > 0;
+    @endphp
 
-        <div class="flex flex-col md:flex-row gap-3 items-stretch">
-            {{-- Search Bar --}}
+    <div x-data="{ openFilter: false }" class="space-y-3">
+        <form method="GET" action="{{ route('kesiswaan.kelas.index') }}" class="bg-white p-4 rounded-3xl border border-sky-100 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+            @if(request('sort'))
+                <input type="hidden" name="sort" value="{{ request('sort') }}">
+            @endif
+            @if(request('direction'))
+                <input type="hidden" name="direction" value="{{ request('direction') }}">
+            @endif
+
+            {{-- Input Pencarian --}}
             <div class="soul-search-wrap relative flex-1">
                 <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,33 +151,129 @@
                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
             </div>
 
-            {{-- Filter Tahun Ajaran --}}
-            <div class="w-full md:w-56">
-                <select name="tahun_ajaran_id" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
-                    <option value="">Semua Tahun Ajaran</option>
-                    @foreach ($tahunAjarans as $ta)
-                        <option value="{{ $ta->id }}" {{ request('tahun_ajaran_id') == $ta->id ? 'selected' : '' }}>
-                            {{ $ta->nama }} {{ $ta->is_active ? '(Aktif)' : '' }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            {{-- Submit & Reset --}}
-            <div class="flex items-center gap-2 shrink-0">
-                <button type="submit" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
-                    Filter
+            {{-- Tombol Filter & Popover Panel --}}
+            <div class="relative flex items-center gap-2">
+                <button type="button" @click="openFilter = !openFilter"
+                        class="px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-2 border {{ $activeFilterCount > 0 ? 'bg-sky-50 border-sky-300 text-sky-700 shadow-sm shadow-sky-100' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100' }}">
+                    <svg class="w-4 h-4 {{ $activeFilterCount > 0 ? 'text-sky-600' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                    <span>Filter Data</span>
+                    @if($activeFilterCount > 0)
+                        <span class="w-5 h-5 rounded-full bg-sky-500 text-white text-[10px] font-black flex items-center justify-center">
+                            {{ $activeFilterCount }}
+                        </span>
+                    @endif
                 </button>
-                @if ($hasFilter || $activeTingkat)
+
+                <button type="submit" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
+                    Cari
+                </button>
+
+                @if($hasActiveFilter)
                     <a href="{{ route('kesiswaan.kelas.index') }}"
                        class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-2xl transition"
                        title="Reset filter">
                         Reset
                     </a>
                 @endif
+
+                {{-- DROPDOWN PANEL POPOVER --}}
+                <div x-show="openFilter"
+                     @click.away="openFilter = false"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                     class="absolute right-0 top-full mt-2 w-80 md:w-96 bg-white rounded-3xl p-5 border border-sky-100 shadow-xl shadow-sky-900/10 z-50 space-y-4"
+                     style="display: none;">
+                    
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <span class="p-1.5 rounded-lg bg-sky-50 text-sky-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                                </svg>
+                            </span>
+                            <h4 class="text-xs font-bold text-slate-800">Opsi Filter Kelas</h4>
+                        </div>
+                        <button type="button" @click="openFilter = false" class="text-slate-400 hover:text-slate-600 text-sm font-bold">
+                            &times;
+                        </button>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tingkatan Kelas</label>
+                            <select name="tingkat" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                                <option value="">Semua Tingkat</option>
+                                <option value="x" {{ request('tingkat') === 'x' ? 'selected' : '' }}>Kelas 10 (X)</option>
+                                <option value="xi" {{ request('tingkat') === 'xi' ? 'selected' : '' }}>Kelas 11 (XI)</option>
+                                <option value="xii" {{ request('tingkat') === 'xii' ? 'selected' : '' }}>Kelas 12 (XII)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Tahun Ajaran</label>
+                            <select name="tahun_ajaran_id" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                                <option value="">Semua Tahun Ajaran</option>
+                                @foreach ($tahunAjarans as $ta)
+                                    <option value="{{ $ta->id }}" {{ request('tahun_ajaran_id') == $ta->id ? 'selected' : '' }}>
+                                        {{ $ta->nama }} {{ $ta->is_active ? '(Aktif)' : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <a href="{{ route('kesiswaan.kelas.index', array_filter(['q' => request('q')])) }}"
+                           class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition">
+                            Reset Opsi
+                        </a>
+                        <button type="submit" @click="openFilter = false"
+                                class="px-5 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
+                            Terapkan Filter
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
-    </form>
+        </form>
+
+        {{-- AKTIF FILTER CHIPS / TAGS --}}
+        @if($hasActiveFilter)
+            <div class="flex flex-wrap items-center gap-2 pt-1 px-1">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Filter Aktif:</span>
+
+                @if(request()->filled('q'))
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 rounded-xl text-xs font-semibold">
+                        <span>Pencarian: "<strong>{{ request('q') }}</strong>"</span>
+                        <a href="{{ route('kesiswaan.kelas.index', request()->except('q', 'page')) }}" class="hover:text-rose-500 transition">&times;</a>
+                    </span>
+                @endif
+
+                @if(request()->filled('tingkat'))
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 rounded-xl text-xs font-semibold">
+                        <span>Tingkat: <strong>Kelas {{ strtoupper(request('tingkat')) }}</strong></span>
+                        <a href="{{ route('kesiswaan.kelas.index', request()->except('tingkat', 'page')) }}" class="hover:text-rose-500 transition">&times;</a>
+                    </span>
+                @endif
+
+                @if(request()->filled('tahun_ajaran_id') && $selectedTa)
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 rounded-xl text-xs font-semibold">
+                        <span>Tahun Ajaran: <strong>{{ $selectedTa->nama }}</strong></span>
+                        <a href="{{ route('kesiswaan.kelas.index', request()->except('tahun_ajaran_id', 'page')) }}" class="hover:text-rose-500 transition">&times;</a>
+                    </span>
+                @endif
+
+                <a href="{{ route('kesiswaan.kelas.index') }}" class="text-xs font-bold text-rose-500 hover:text-rose-600 hover:underline transition ml-1">
+                    Hapus Semua Filter
+                </a>
+            </div>
+        @endif
+    </div>
 
     {{-- TABEL KELAS (STYLE KONSISTEN DENGAN DATA SISWA) --}}
     <div class="bg-white rounded-3xl border border-sky-100 shadow-sm overflow-hidden">
@@ -184,21 +283,12 @@
                     <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-bold text-slate-400 tracking-wider uppercase">
                         <th class="py-3.5 px-5">
                             <a href="{{ $sortLink('nama') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
-                                Nama Kelas
+                                Kelas
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('nama') }}"/>
                                 </svg>
                             </a>
                         </th>
-                        <th class="py-3.5 px-5">
-                            <a href="{{ $sortLink('tingkat') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
-                                Tingkat
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('tingkat') }}"/>
-                                </svg>
-                            </a>
-                        </th>
-                        <th class="py-3.5 px-5">Jurusan / Rombel</th>
                         <th class="py-3.5 px-5">Tahun Ajaran</th>
                         <th class="py-3.5 px-5">
                             <a href="{{ $sortLink('siswas_count') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
@@ -223,20 +313,13 @@
                                         <a href="{{ route('kesiswaan.kelas.show', $k) }}" class="font-extrabold text-slate-900 hover:text-sky-600 transition block text-sm">
                                             {{ $k->nama }}
                                         </a>
-                                        <div class="text-[11px] text-slate-400">{{ filled($k->rombel) ? 'Rombel ke-'.$k->rombel : 'Tanpa rombel' }}</div>
+                                        <div class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1.5">
+                                            <span>{{ $k->jurusan_label ?? strtoupper($k->jurusan) }}</span>
+                                            <span>&bull;</span>
+                                            <span>Rombel {{ $k->rombel }}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </td>
-
-                            <td class="py-3.5 px-5 whitespace-nowrap">
-                                <span class="px-3 py-1 rounded-full font-bold text-xs bg-sky-50 text-sky-700 border border-sky-100 uppercase">
-                                    Tingkat {{ config("kelas.tingkat.{$k->tingkat}", $k->tingkat) }}
-                                </span>
-                            </td>
-
-                            <td class="py-3.5 px-5 whitespace-nowrap">
-                                <div class="font-semibold text-slate-700">{{ $k->jurusan_label ?? strtoupper($k->jurusan) }}</div>
-                                <div class="text-[11px] text-slate-400">{{ filled($k->rombel) ? 'Rombel '.$k->rombel : 'Tanpa rombel' }}</div>
                             </td>
 
                             <td class="py-3.5 px-5 whitespace-nowrap">
@@ -297,7 +380,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-12 text-center">
+                            <td colspan="4" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-slate-400">
                                     <svg class="w-10 h-10 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>

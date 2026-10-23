@@ -16,8 +16,82 @@ final class AturanEkskul
     /** Jumlah maksimal ekskul aktif per siswa. */
     public const MAKS_EKSKUL = 2;
 
+    /** Jumlah maksimal ekskul wajib per siswa. */
+    public const MAKS_EKSKUL_WAJIB = 1;
+
+    /** Nama kategori ekskul wajib. */
+    public const KATEGORI_WAJIB = 'Wajib';
+
+    /**
+     * Kategori fallback (default) untuk ekskul yang kategorinya dihapus.
+     * Kategori ini dilindungi dan tidak bisa dihapus oleh kesiswaan.
+     */
+    public const KATEGORI_FALLBACK = 'Lainnya';
+
+    /** Default daftar seluruh kategori ekskul di sistem. */
+    public const DEFAULT_KATEGORI = [
+        'Wajib',
+        'Olahraga',
+        'Seni',
+        'Bahasa',
+        'Bela Diri',
+        'Lainnya',
+    ];
+
+    /** Fallback konstanta kategori ekskul. */
+    public const KATEGORI_LIST = self::DEFAULT_KATEGORI;
+
+    /**
+     * Dapatkan daftar kategori ekskul yang aktif di database.
+     *
+     * @return list<string>
+     */
+    public static function kategoriList(): array
+    {
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('kategori_ekskuls')) {
+                $dbKats = \App\Models\KategoriEkskul::orderBy('id')->pluck('nama')->all();
+                if (! empty($dbKats)) {
+                    return $dbKats;
+                }
+            }
+        } catch (\Throwable) {
+            // Fallback
+        }
+
+        return self::DEFAULT_KATEGORI;
+    }
+
     /** Label kelompok yang tidak boleh dirangkap. */
     public const LABEL_P1I = '4P1I (Paskibra, Polsis, Pramuka, PMR, IRMA)';
+
+    /**
+     * Cek apakah sebuah kategori termasuk kategori Wajib.
+     */
+    public static function isWajib(?string $kategori): bool
+    {
+        $kat = mb_strtolower(trim((string) $kategori));
+
+        return in_array($kat, ['wajib', 'ekskul wajib'], true);
+    }
+
+    /**
+     * Cek apakah kategori adalah kategori fallback sistem (Lainnya).
+     * Kategori ini tidak bisa dihapus karena menjadi tempat penampungan
+     * ekskul yang kategorinya dihapus.
+     */
+    public static function isFallback(?string $kategori): bool
+    {
+        return mb_strtolower(trim((string) $kategori)) === mb_strtolower(self::KATEGORI_FALLBACK);
+    }
+
+    /**
+     * Cek apakah kategori adalah kategori sistem (Wajib atau Lainnya) yang tidak bisa dihapus.
+     */
+    public static function isSistem(?string $kategori): bool
+    {
+        return self::isWajib($kategori) || self::isFallback($kategori);
+    }
 
     /**
      * Kata kunci penanda ekskul 4P1I.

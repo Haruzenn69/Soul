@@ -7,6 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\Kesiswaan\DashboardController as KesiswaanDashboardController;
 use App\Http\Controllers\Kesiswaan\EkskulController;
+use App\Http\Controllers\Kesiswaan\KategoriEkskulController;
 use App\Http\Controllers\Kesiswaan\KelasController;
 use App\Http\Controllers\Kesiswaan\KenaikanKelasController;
 use App\Http\Controllers\Kesiswaan\LaporanPenilaianController as KesiswaanLaporanPenilaianController;
@@ -149,6 +150,8 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
         ->name('users.reset-password');
 
     Route::resource('ekskuls', EkskulController::class)->except([]);
+    Route::post('kategori-ekskul', [KategoriEkskulController::class, 'store'])->name('kategori.store');
+    Route::delete('kategori-ekskul/{kategoriEkskul}', [KategoriEkskulController::class, 'destroy'])->name('kategori.destroy');
     Route::post('pembina/{pembina}/assign-ekskul', [KesiswaanPembinaController::class, 'assignEkskul'])->name('pembina.assign-ekskul');
     Route::delete('pembina/{pembina}/remove-ekskul/{ekskul}', [KesiswaanPembinaController::class, 'removeEkskul'])->name('pembina.remove-ekskul');
 
@@ -186,10 +189,14 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
     })->name('profile');
 
     Route::get('/notifikasi', [KesiswaanNotifikasiController::class, 'index'])->name('notifikasi');
+    Route::delete('/notifikasi/clear-all', [KesiswaanNotifikasiController::class, 'clearAll'])->name('notifikasi.clear-all');
+    Route::delete('/notifikasi/{notifikasi}', [KesiswaanNotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
     Route::post('/notifikasi/{notifikasi}/read', [KesiswaanNotifikasiController::class, 'read'])->name('notifikasi.read');
     Route::post('/notifikasi/read-all', [KesiswaanNotifikasiController::class, 'readAll'])->name('notifikasi.read-all');
 
     Route::get('/laporan-penilaian', [KesiswaanLaporanPenilaianController::class, 'index'])->name('laporan-penilaian.index');
+    Route::get('/laporan-penilaian/historis-siswa', [KesiswaanLaporanPenilaianController::class, 'historisSiswa'])->name('laporan-penilaian.historis-siswa');
+    Route::get('/laporan-penilaian/siswa/{siswa}', [KesiswaanLaporanPenilaianController::class, 'detailSiswa'])->name('laporan-penilaian.detail-siswa');
     Route::get('/laporan-penilaian/{ekskul}', [KesiswaanLaporanPenilaianController::class, 'show'])->name('laporan-penilaian.show');
     Route::get('/laporan-penilaian/{ekskul}/download-pdf', [KesiswaanLaporanPenilaianController::class, 'downloadPdf'])->name('laporan-penilaian.download-pdf');
 });
@@ -226,6 +233,8 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 
     // 7b. NOTIFIKASI
     Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi');
+    Route::delete('/notifikasi/clear-all', [NotifikasiController::class, 'clearAll'])->name('notifikasi.clear-all');
+    Route::delete('/notifikasi/{notifikasi}', [NotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
     Route::post('/notifikasi/{notifikasi}/read', [NotifikasiController::class, 'read'])->name('notifikasi.read');
     Route::post('/notifikasi/read-all', [NotifikasiController::class, 'readAll'])->name('notifikasi.read-all');
 
@@ -254,6 +263,7 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::post('/ekskuls/{ekskul}/copot-ketua/{siswa}', [PembinaController::class, 'copotKetua'])->name('ekskul.copot-ketua');
     Route::patch('/arsip/periode-ketua/{riwayat}', [PembinaController::class, 'updatePeriodeKetua'])->name('arsip.periode-ketua');
     Route::get('/pendaftaran', [PembinaController::class, 'pendaftaran'])->name('pendaftaran');
+    Route::patch('/pendaftaran/{pendaftaran}/status', [PembinaController::class, 'updatePendaftaran'])->name('pendaftaran.update');
     Route::get('/laporan', [PembinaController::class, 'laporan'])->name('laporan.index');
     Route::get('/laporan/{laporanBulanan}/detail', [PembinaController::class, 'laporanShow'])->name('laporan.show');
     Route::get('/laporan/{laporanBulanan}/download', [PembinaController::class, 'laporanDownload'])->name('laporan.download');
@@ -280,6 +290,8 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::get('/penilaian/download-pdf', [PembinaPenilaianController::class, 'downloadPdf'])->name('penilaian.download-pdf');
 
     Route::get('/notifikasi', [PembinaNotifikasiController::class, 'index'])->name('notifikasi');
+    Route::delete('/notifikasi/clear-all', [PembinaNotifikasiController::class, 'clearAll'])->name('notifikasi.clear-all');
+    Route::delete('/notifikasi/{notifikasi}', [PembinaNotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
     Route::post('/notifikasi/{notifikasi}/read', [PembinaNotifikasiController::class, 'read'])->name('notifikasi.read');
     Route::post('/notifikasi/read-all', [PembinaNotifikasiController::class, 'readAll'])->name('notifikasi.read-all');
 });
@@ -324,6 +336,8 @@ Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name
 
     // Notifikasi Ketua
     Route::get('/notifikasi', [KetuaNotifikasiController::class, 'index'])->name('notifikasi');
+    Route::delete('/notifikasi/clear-all', [KetuaNotifikasiController::class, 'clearAll'])->name('notifikasi.clear-all');
+    Route::delete('/notifikasi/{notifikasi}', [KetuaNotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
     Route::post('/notifikasi/{notifikasi}/read', [KetuaNotifikasiController::class, 'read'])->name('notifikasi.read');
     Route::post('/notifikasi/read-all', [KetuaNotifikasiController::class, 'readAll'])->name('notifikasi.read-all');
 });

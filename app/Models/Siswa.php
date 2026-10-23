@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Collection;
 
 class Siswa extends Model
@@ -30,9 +31,19 @@ class Siswa extends Model
         'jabatan',
     ];
 
-    public function getFotoUrlAttribute(): ?string
+    public function getFotoUrlAttribute(): string
     {
-        return $this->foto ? asset('storage/'.$this->foto) : null;
+        if ($this->foto) {
+            if (str_starts_with($this->foto, 'http://') || str_starts_with($this->foto, 'https://')) {
+                return $this->foto;
+            }
+            if (str_starts_with($this->foto, 'images/')) {
+                return asset($this->foto);
+            }
+            return asset('storage/'.$this->foto);
+        }
+
+        return asset('images/default.png');
     }
 
     protected function nama(): Attribute
@@ -62,6 +73,11 @@ class Siswa extends Model
     public function pendaftarans(): HasMany
     {
         return $this->hasMany(Pendaftaran::class);
+    }
+
+    public function penilaians(): HasManyThrough
+    {
+        return $this->hasManyThrough(Penilaian::class, Pendaftaran::class);
     }
 
     public function pengajuanKeluars(): HasMany
@@ -258,7 +274,17 @@ class Siswa extends Model
             return $periode->ekskul;
         }
 
-        return $this->isKetua() ? $this->activeEkskul() : null;
+        if (! $this->isKetua()) {
+            return null;
+        }
+
+        // Fallback data lama: jangan memakai activeEkskul(), karena jalur itu
+        // kembali ke resolveActiveEkskul() -> ekskulDipimpin() dan berujung
+        // rekursi tanpa henti bila belum ada riwayat periode ketua.
+        return $this->activePendaftarans()
+            ->with('ekskul')
+            ->orderByDesc('id')
+            ->first()?->ekskul;
     }
 
     /**
@@ -277,12 +303,38 @@ class Siswa extends Model
             if ($sudah) {
                 return 'Kamu sudah terdaftar atau mengajukan pendaftaran di ekskul ini.';
             }
+
+            $riwayat = $this->pendaftarans()->where('ekskul_id', $target->id)->first();
+
+            if ($riwayat) {
+                return match ($riwayat->status) {
+                    Pendaftaran::STATUS_NONAKTIF => 'Keanggotaanmu di ekskul ini sedang nonaktif. Hubungi ketua ekskul untuk mengaktifkan kembali.',
+                    Pendaftaran::STATUS_KELUAR => 'Kamu pernah keluar dari ekskul ini. Hubungi ketua ekskul kalau ingin bergabung kembali.',
+                    Pendaftaran::STATUS_DITOLAK => 'Pendaftaranmu di ekskul ini pernah ditolak. Hubungi ketua ekskul untuk informasi lebih lanjut.',
+                    Pendaftaran::STATUS_LULUS => 'Keanggotaanmu di ekskul ini sudah berakhir setelah kelulusan. Hubungi pembina ekskul untuk informasi lebih lanjut.',
+                    default => 'Kamu sudah terdaftar atau mengajukan pendaftaran di ekskul ini.',
+                };
+            }
         }
 
         $terpakai = $aktif->count() + $pending->count();
 
         if ($terpakai >= AturanEkskul::MAKS_EKSKUL) {
             return 'Kamu sudah terdaftar di '.$terpakai.' ekskul. Maksimal '.AturanEkskul::MAKS_EKSKUL.' ekskul per siswa.';
+        }
+
+        if ($target && $target->isWajib()) {
+            $wajibAktif = $aktif->first(fn (Ekskul $e) => $e->isWajib());
+
+            if ($wajibAktif) {
+                return 'Kamu sudah terdaftar di ekskul wajib ('.$wajibAktif->nama_ekskul.'). Siswa hanya dapat memilih 1 ekskul wajib.';
+            }
+
+            $wajibPending = $pending->first(fn (Pendaftaran $p) => $p->ekskul && $p->ekskul->isWajib());
+
+            if ($wajibPending) {
+                return 'Kamu sedang mengajukan pendaftaran di ekskul wajib ('.$wajibPending->ekskul->nama_ekskul.'). Siswa hanya dapat memilih 1 ekskul wajib.';
+            }
         }
 
         if ($target && AturanEkskul::isP1i($target->nama_ekskul)) {
@@ -304,7 +356,7 @@ class Siswa extends Model
 
     /**
      * Kenapa ketua tidak boleh menerima pendaftaran ini (maksimal ekskul atau
-     * bentrok sesama 4P1I). Mengembalikan null kalau aman diterima.
+     * bentrok sesama 4P1I atau ekskul wajib). Mengembalikan null kalau aman diterima.
      */
     public function alasanTidakDapatMenerima(Pendaftaran $target): ?string
     {
@@ -315,6 +367,14 @@ class Siswa extends Model
 
         if ($lain->count() >= AturanEkskul::MAKS_EKSKUL) {
             return 'Siswa ini sudah aktif di '.AturanEkskul::MAKS_EKSKUL.' ekskul.';
+        }
+
+        if ($target->ekskul && $target->ekskul->isWajib()) {
+            $bentrokWajib = $lain->first(fn (Pendaftaran $p) => $p->ekskul && $p->ekskul->isWajib());
+
+            if ($bentrokWajib) {
+                return 'Siswa ini sudah aktif di ekskul wajib ('.$bentrokWajib->ekskul->nama_ekskul.'). Siswa hanya boleh mengikuti 1 ekskul wajib.';
+            }
         }
 
         if ($target->ekskul && AturanEkskul::isP1i($target->ekskul->nama_ekskul)) {

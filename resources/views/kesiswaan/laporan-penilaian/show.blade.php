@@ -1,26 +1,49 @@
 @extends('layouts.kesiswaan')
-@section('title', 'Detail Laporan Penilaian')
+@section('title', 'Detail Laporan Penilaian - ' . $ekskul->nama_ekskul)
 
 @section('content')
     <div class="bg-[#F8FAFC] -mx-4 md:-mx-8 px-4 md:px-8 py-6 md:py-8 min-h-[calc(100vh-5rem)] space-y-6 animate-fade-up">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        
+        {{-- TOP BAR --}}
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div>
-                <a href="{{ route('kesiswaan.laporan-penilaian.index') }}"
+                <a href="{{ route('kesiswaan.laporan-penilaian.index', ['periode' => $periode]) }}"
                    class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-blue-600 transition mb-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
-                    Kembali ke Laporan Penilaian
+                    Kembali ke Rekap Laporan
                 </a>
-                <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">{{ $ekskul->nama_ekskul }}</h1>
-                <p class="text-xs text-slate-400 mt-0.5">
-                    Pembina {{ $ekskul->pembina?->nama ?? '-' }} &middot; Pelatih {{ $ekskul->pelatih?->nama ?? '-' }}
-                    &middot; Periode <span class="font-semibold text-blue-600">{{ $periode }}</span>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">{{ $ekskul->nama_ekskul }}</h1>
+                    @if($tahunAjaranAktif)
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            TA Aktif: {{ $tahunAjaranAktif->nama }}
+                        </span>
+                    @endif
+                </div>
+                <p class="text-xs text-slate-400 mt-1">
+                    Pembina Ekskul: <span class="font-bold text-slate-700">{{ $ekskul->pembina?->nama ?? '-' }}</span> &middot;
+                    Pembina Penilai: <span class="font-bold text-blue-600">{{ $pembinaPenilai?->nama ?? $ekskul->pembina?->nama ?? '-' }}</span> &middot;
+                    Periode: <span class="font-bold text-slate-700">{{ $periode }}</span>
                 </p>
             </div>
-            <div class="flex items-center gap-2">
-                <a href="{{ route('kesiswaan.laporan-penilaian.download-pdf', $ekskul->id) }}"
-                   class="inline-flex items-center gap-2 px-3.5 py-2.5 bg-white hover:bg-red-50 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 shadow-sm transition">
+
+            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                {{-- Pemilih Periode --}}
+                <form method="GET" action="{{ route('kesiswaan.laporan-penilaian.show', $ekskul->id) }}" class="inline-flex">
+                    <select name="periode" onchange="this.form.submit()"
+                            class="px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-400 cursor-pointer">
+                        @foreach($daftarPeriode as $itemP)
+                            <option value="{{ $itemP['label'] }}" {{ $periode === $itemP['label'] ? 'selected' : '' }}>
+                                {{ $itemP['label'] }} {{ $itemP['is_aktif'] ? '(Aktif)' : '' }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+
+                <a href="{{ route('kesiswaan.laporan-penilaian.download-pdf', ['ekskul' => $ekskul->id, 'periode' => $periode]) }}"
+                   class="inline-flex items-center gap-2 px-3.5 py-2.5 bg-white hover:bg-red-50 text-slate-700 hover:text-red-600 text-xs font-bold rounded-xl border border-slate-200 shadow-sm transition">
                     <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
@@ -29,6 +52,7 @@
             </div>
         </div>
 
+        {{-- SUMMARY STATS --}}
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-4">
                 <p class="text-xl md:text-2xl font-extrabold text-slate-900">{{ $summary['totalAnggota'] }}</p>
@@ -70,12 +94,9 @@
 
         {{-- SEARCH & FILTER FORM --}}
         <form method="GET" action="{{ route('kesiswaan.laporan-penilaian.show', $ekskul->id) }}" class="bg-white p-4 rounded-2xl border border-slate-200/70 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center">
-            @if(request('sort'))
-                <input type="hidden" name="sort" value="{{ request('sort') }}">
-            @endif
-            @if(request('direction'))
-                <input type="hidden" name="direction" value="{{ request('direction') }}">
-            @endif
+            <input type="hidden" name="periode" value="{{ $periode }}">
+            @if(request('sort')) <input type="hidden" name="sort" value="{{ request('sort') }}"> @endif
+            @if(request('direction')) <input type="hidden" name="direction" value="{{ request('direction') }}"> @endif
 
             <div class="relative flex-1">
                 <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
@@ -88,9 +109,9 @@
             </div>
 
             <div class="flex items-center gap-2">
-                <select name="predikat" class="px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                <select name="predikat" class="px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                     <option value="">Semua Predikat</option>
-                    @foreach(['A', 'B', 'C', 'D'] as $pr)
+                    @foreach(['A', 'B', 'C', 'D', 'E'] as $pr)
                         <option value="{{ $pr }}" {{ request('predikat') === $pr ? 'selected' : '' }}>Predikat {{ $pr }}</option>
                     @endforeach
                 </select>
@@ -100,7 +121,7 @@
                 </button>
 
                 @if($hasFilter)
-                    <a href="{{ route('kesiswaan.laporan-penilaian.show', $ekskul->id) }}"
+                    <a href="{{ route('kesiswaan.laporan-penilaian.show', ['ekskul' => $ekskul->id, 'periode' => $periode]) }}"
                        class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition"
                        title="Reset filter">
                         Reset
@@ -109,6 +130,7 @@
             </div>
         </form>
 
+        {{-- TABEL ANGGOTA & PENILAIAN --}}
         @if ($dinilai->isEmpty())
             <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-12 md:p-16 text-center">
                 <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-500 mb-4">
@@ -116,31 +138,31 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <h2 class="text-sm font-bold text-slate-900">Tidak Ada Data Penilaian</h2>
-                <p class="text-xs text-slate-400 mt-1">Belum ada penilaian yang sesuai dengan kriteria pencarian / filter.</p>
+                <h2 class="text-sm font-bold text-slate-900">Belum Ada Penilaian Terkirim</h2>
+                <p class="text-xs text-slate-400 mt-1">Pembina belum mengirim penilaian akhir untuk periode <strong>{{ $periode }}</strong>.</p>
             </div>
         @else
             <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm overflow-hidden">
                 <div class="p-4 md:p-5 border-b border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                         <h3 class="text-sm font-bold text-slate-900">Daftar Nilai Anggota</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Nilai sudah terkunci sejak dikirim pembina.</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Penilai: <span class="font-bold text-slate-700">{{ $pembinaPenilai?->nama ?? $ekskul->pembina?->nama ?? '-' }}</span></p>
                     </div>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        {{ $dinilai->count() }} anggota dinilai
+                        {{ $dinilai->count() }} siswa selesai dinilai
                     </span>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs min-w-[980px]">
+                    <table class="w-full text-left text-xs min-w-[960px]">
                         <thead class="bg-slate-50/80 text-xs uppercase tracking-wider text-slate-400">
                             <tr>
-                                <th class="px-4 py-3 font-bold">#</th>
+                                <th class="px-4 py-3 font-bold w-12">#</th>
                                 <th class="px-4 py-3 font-bold">
                                     <a href="{{ $sortLink('nama') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
-                                        Anggota
+                                        Siswa
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('nama') }}"/>
                                         </svg>
@@ -175,6 +197,7 @@
                                     </a>
                                 </th>
                                 <th class="px-4 py-3 font-bold">Catatan</th>
+                                <th class="px-4 py-3 font-bold text-right">Riwayat</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -183,34 +206,48 @@
                                     <td class="px-4 py-3 text-slate-400 font-semibold">{{ $loop->iteration }}</td>
                                     <td class="px-4 py-3">
                                         <div class="flex items-center gap-3 min-w-[170px]">
-                                            <div class="w-9 h-9 rounded-full bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center font-extrabold text-xs shrink-0">
+                                            <div class="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center font-extrabold text-xs shrink-0">
                                                 {{ strtoupper(mb_substr($row->siswa?->nama ?? '?', 0, 1)) }}
                                             </div>
                                             <div class="min-w-0">
                                                 <p class="font-bold text-slate-900 leading-tight truncate">{{ $row->siswa?->nama }}</p>
-                                                <p class="text-xs text-slate-400">{{ $row->siswa?->nis }} &middot; {{ $row->kelas }}</p>
+                                                <p class="text-[11px] text-slate-400">{{ $row->siswa?->nis }} &middot; {{ $row->kelas }}</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-4 py-3 text-center text-slate-700 font-semibold">
                                         {{ $row->total_pertemuan }}
-                                        <span class="block text-xs text-slate-400 font-medium">H:{{ $row->total_hadir }} I:{{ $row->total_izin }} S:{{ $row->total_sakit }} A:{{ $row->total_alpha }}</span>
+                                        <span class="block text-[10px] text-slate-400 font-medium">H:{{ $row->total_hadir }} I:{{ $row->total_izin }} S:{{ $row->total_sakit }} A:{{ $row->total_alpha }}</span>
                                     </td>
                                     <td class="px-4 py-3 text-center">
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold {{ $row->persentase_kehadiran >= 70 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200' }}">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-bold {{ $row->persentase_kehadiran >= 70 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200' }}">
                                             {{ number_format((float) $row->persentase_kehadiran, 1) }}%
                                         </span>
                                     </td>
                                     <td class="px-4 py-3 text-center font-bold text-slate-900">{{ number_format((float) $row->nilai_sikap, 1) }}</td>
                                     <td class="px-4 py-3 text-center font-bold text-slate-900">{{ number_format((float) $row->nilai_keaktifan, 1) }}</td>
                                     <td class="px-4 py-3 text-center font-bold text-slate-900">{{ number_format((float) $row->nilai_keterampilan, 1) }}</td>
-                                    <td class="px-4 py-3 text-center font-extrabold text-slate-900">{{ number_format((float) $row->nilai_akhir, 2) }}</td>
+                                    <td class="px-4 py-3 text-center font-extrabold text-slate-900 text-sm">{{ number_format((float) $row->nilai_akhir, 2) }}</td>
                                     <td class="px-4 py-3 text-center">
-                                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl border font-extrabold text-xs {{ \App\Models\Penilaian::warnaPredikat((string) $row->predikat) }}">
+                                        <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg border font-extrabold text-xs {{ \App\Models\Penilaian::warnaPredikat((string) $row->predikat) }}">
                                             {{ $row->predikat }}
                                         </span>
                                     </td>
-                                    <td class="px-4 py-3 text-xs text-slate-600 max-w-[200px]">{{ $row->catatan }}</td>
+                                    <td class="px-4 py-3 text-xs text-slate-600 max-w-[200px] truncate" title="{{ $row->catatan }}">
+                                        {{ $row->catatan ?: '-' }}
+                                    </td>
+                                    <td class="px-4 py-3 text-right">
+                                        @if($row->siswa)
+                                            <a href="{{ route('kesiswaan.laporan-penilaian.detail-siswa', $row->siswa->id) }}"
+                                               class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold text-xs border border-sky-200 transition"
+                                               title="Lihat Rekam Jejak Nilai Siswa">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                                Riwayat
+                                            </a>
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -219,7 +256,7 @@
             </div>
 
             <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-4 md:p-5">
-                <h3 class="text-xs font-bold text-slate-900 mb-3">Bobot Komponen</h3>
+                <h3 class="text-xs font-bold text-slate-900 mb-3">Bobot Penilaian Ekskul</h3>
                 <div class="flex flex-wrap gap-2 text-xs font-bold">
                     <span class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-100">Kehadiran 30%</span>
                     <span class="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 border border-amber-100">Sikap 25%</span>

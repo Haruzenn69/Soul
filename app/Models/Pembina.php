@@ -25,9 +25,19 @@ class Pembina extends Model
         'medsos',
     ];
 
-    public function getFotoUrlAttribute(): ?string
+    public function getFotoUrlAttribute(): string
     {
-        return $this->foto ? asset('storage/'.$this->foto) : null;
+        if ($this->foto) {
+            if (str_starts_with($this->foto, 'http://') || str_starts_with($this->foto, 'https://')) {
+                return $this->foto;
+            }
+            if (str_starts_with($this->foto, 'images/')) {
+                return asset($this->foto);
+            }
+            return asset('storage/'.$this->foto);
+        }
+
+        return asset('images/default.png');
     }
 
     protected function nama(): Attribute
@@ -38,11 +48,18 @@ class Pembina extends Model
     }
 
     /**
-     * Kategori ekskul yang saat ini aktif dibina (jika membina ekskul).
+     * Semua kategori unik dari ekskul yang saat ini aktif dibina.
+     * Mendukung pembinaan lintas kategori (misal: "Olahraga, Seni").
      */
     public function getKategoriAktifAttribute(): ?string
     {
-        return $this->ekskuls->first()?->kategori;
+        $kategoriList = $this->ekskuls
+            ->pluck('kategori')
+            ->filter()
+            ->unique()
+            ->values();
+
+        return $kategoriList->isNotEmpty() ? $kategoriList->join(', ') : null;
     }
 
     /**

@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 
 /**
  * Sumber bersama pencatatan periode jabatan dan penyusunan data arsip
- * ekskul (ketua sebelumnya + anggota nonaktif) untuk pembina dan ketua.
+ * ekskul (ketua sebelumnya + anggota lulus) untuk pembina dan ketua.
  *
  * `siswa.jabatan` hanya menyimpan jabatan saat ini, sehingga begitu ketua
  * digantikan atau dicopot jejaknya hilang. Tabel `riwayat_jabatans`
@@ -113,23 +113,24 @@ class ArsipEkskulService
             ->whereNotNull('selesai')
             ->count();
 
-        $anggotaNonaktif = Pendaftaran::whereIn('ekskul_id', $ekskulIds)
-            ->whereIn('status', [Pendaftaran::STATUS_NONAKTIF, Pendaftaran::STATUS_KELUAR])
+        $anggotaLulus = Pendaftaran::whereIn('ekskul_id', $ekskulIds)
+            ->where('status', Pendaftaran::STATUS_LULUS)
             ->count();
 
-        return $ketuaSelesai + $anggotaNonaktif;
+        return $ketuaSelesai + $anggotaLulus;
     }
 
     /**
      * Susun data arsip untuk satu ekskul atau sekumpulan ekskul.
      *
      * `ketuaSelesai` = periode ketua yang sudah berakhir,
-     * `anggotaNonaktif` = anggota berstatus nonaktif / keluar.
+     * `anggotaLulus` = anggota berstatus lulus (keanggotaan ditutup
+     * saat kenaikan tahun ajaran; nonaktif / keluar tidak masuk arsip).
      *
      * @param  Collection<int, Ekskul>|Ekskul  $ekskuls
      * @return array{
      *     ketuaSelesai: Collection<int, RiwayatJabatan>,
-     *     anggotaNonaktif: Collection<int, Pendaftaran>,
+     *     anggotaLulus: Collection<int, Pendaftaran>,
      *     total: int
      * }
      */
@@ -146,16 +147,16 @@ class ArsipEkskulService
             ->orderByDesc('id')
             ->get();
 
-        $anggotaNonaktif = Pendaftaran::whereIn('ekskul_id', $ekskulIds)
-            ->whereIn('status', [Pendaftaran::STATUS_NONAKTIF, Pendaftaran::STATUS_KELUAR])
+        $anggotaLulus = Pendaftaran::whereIn('ekskul_id', $ekskulIds)
+            ->where('status', Pendaftaran::STATUS_LULUS)
             ->with(['siswa.kelas', 'ekskul'])
             ->orderByDesc('tanggal_daftar')
             ->get();
 
         return [
             'ketuaSelesai' => $ketuaSelesai,
-            'anggotaNonaktif' => $anggotaNonaktif,
-            'total' => $ketuaSelesai->count() + $anggotaNonaktif->count(),
+            'anggotaLulus' => $anggotaLulus,
+            'total' => $ketuaSelesai->count() + $anggotaLulus->count(),
         ];
     }
 }

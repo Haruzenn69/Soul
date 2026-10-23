@@ -23,6 +23,7 @@
     'psDashboardUrl' => route('kesiswaan.dashboard'),
     'psNotifUrl' => route('kesiswaan.notifikasi'),
     'psProfileUrl' => route('kesiswaan.profile'),
+    'psTheme' => 'blue',
     'psItems' => [
         ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('kesiswaan.dashboard'), 'is' => 'kesiswaan.dashboard'],
         [
@@ -77,14 +78,9 @@
                 </form>
             </div>
 
-            <!-- TENGAH: Date Badge (Reference UI) -->
-            <div class="hidden xl:flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-50 dark:bg-neutral-800 border border-slate-200/70 dark:border-neutral-700 text-xs font-bold text-slate-600 dark:text-slate-300 shadow-sm select-none">
-                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                <span>{{ now()->translatedFormat('j F, Y') }}</span>
-                <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </div>
 
-            <!-- KANAN: Role Badge + Notifikasi + User Profile Pill -->
+
+            <!-- KANAN: Notifikasi -->
             <div class="flex items-center gap-2.5 md:gap-3 shrink-0">
                 <a href="{{ route('kesiswaan.notifikasi') }}" class="w-9 h-9 rounded-full bg-slate-50 dark:bg-neutral-800 border border-slate-200/70 dark:border-neutral-700 flex items-center justify-center text-xs relative text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-700 hover:border-sky-200 dark:hover:border-neutral-700 transition-all shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,18 +89,6 @@
                     @if(($unreadNotifCount ?? 0) > 0)
                         <span class="w-2 h-2 rounded-full bg-amber-400 absolute top-1.5 right-1.5 border border-white dark:border-neutral-900 shadow-sm"></span>
                     @endif
-                </a>
-
-                <!-- User Profile Pill (Reference UI) -->
-                <a href="{{ route('kesiswaan.profile') }}" class="flex items-center gap-2.5 pl-1.5 pr-3 py-1 rounded-full bg-slate-50 dark:bg-neutral-800 border border-slate-200/70 dark:border-neutral-700 hover:border-sky-300 transition shadow-sm group">
-                    <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-400 to-amber-200 text-amber-900 font-extrabold flex items-center justify-center text-xs shadow-inner">
-                        {{ strtoupper(substr(auth()->user()->username ?? 'K', 0, 1)) }}
-                    </div>
-                    <div class="text-left hidden sm:block">
-                        <p class="text-xs font-bold text-slate-800 dark:text-white leading-tight group-hover:text-blue-600 transition">{{ auth()->user()->username }}</p>
-                        <p class="text-[10px] text-slate-400 font-medium leading-none">Kesiswaan</p>
-                    </div>
-                    <svg class="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                 </a>
             </div>
         </header>

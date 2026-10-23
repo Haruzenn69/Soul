@@ -14,12 +14,7 @@
 
         <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur border border-white/20 text-[11px] font-bold uppercase tracking-wider text-white mb-2">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                    </svg>
-                    Kesiswaan &bull; Verifikasi Berkas Pelatih
-                </div>
+                
                 <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">
                     Verifikasi Pelatih Ekskul
                 </h1>
@@ -29,10 +24,7 @@
             </div>
 
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
-                <div class="px-4 py-2.5 bg-white/15 backdrop-blur border border-white/20 rounded-2xl text-center">
-                    <div class="text-lg font-black leading-none">{{ $stats['pending'] }}</div>
-                    <div class="text-[10px] font-bold text-amber-200 uppercase tracking-wider mt-0.5">Menunggu Verifikasi</div>
-                </div>
+               
             </div>
         </div>
     </div>
@@ -94,86 +86,184 @@
         </div>
     </div>
 
-    {{-- FILTER & SEARCH --}}
+    {{-- FILTER & SEARCH (POPOVER DESIGN) --}}
     @php
         $sort = $sort ?? 'created_at';
         $direction = $direction ?? 'desc';
         $currentSortCombo = $sort . '_' . $direction;
-        $hasActiveFilter = request()->anyFilled(['q', 'status']) || request()->filled('sort');
+        $isStatusFiltered = request()->filled('status') && request('status') !== 'all';
+        $isSortFiltered = $currentSortCombo !== 'created_at_desc';
+        $activeFilterCount = ($isStatusFiltered ? 1 : 0) + ($isSortFiltered ? 1 : 0);
+        $hasActiveFilter = request()->filled('q') || $activeFilterCount > 0;
     @endphp
-    <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-sm">
-        <form method="GET" action="{{ route('kesiswaan.pelatih.index') }}" id="filter-pelatih-kesiswaan-form" class="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-            <input type="hidden" name="sort" id="sort-input" value="{{ $sort }}">
-            <input type="hidden" name="direction" id="direction-input" value="{{ $direction }}">
-            @if(request('status'))
-                <input type="hidden" name="status" value="{{ request('status') }}">
-            @endif
 
-            <div class="flex flex-wrap items-center gap-2">
-                <a href="{{ route('kesiswaan.pelatih.index', array_merge(request()->except('status', 'page'), ['status' => 'all'])) }}"
-                   class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ $status === 'all' ? 'bg-sky-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
-                    Semua ({{ $stats['total'] }})
-                </a>
-                <a href="{{ route('kesiswaan.pelatih.index', array_merge(request()->except('status', 'page'), ['status' => 'pending'])) }}"
-                   class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ $status === 'pending' ? 'bg-amber-500 text-white shadow-sm' : 'bg-amber-50 text-amber-700 hover:bg-amber-100' }}">
-                    Menunggu Verifikasi ({{ $stats['pending'] }})
-                </a>
-                <a href="{{ route('kesiswaan.pelatih.index', array_merge(request()->except('status', 'page'), ['status' => 'terverifikasi'])) }}"
-                   class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ $status === 'terverifikasi' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}">
-                    Terverifikasi ({{ $stats['terverifikasi'] }})
-                </a>
-                <a href="{{ route('kesiswaan.pelatih.index', array_merge(request()->except('status', 'page'), ['status' => 'ditolak'])) }}"
-                   class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ $status === 'ditolak' ? 'bg-rose-600 text-white shadow-sm' : 'bg-rose-50 text-rose-700 hover:bg-rose-100' }}">
-                    Ditolak ({{ $stats['ditolak'] }})
-                </a>
-            </div>
+    <div x-data="{ openFilter: false, sortCombo: '{{ $currentSortCombo }}' }" class="space-y-3">
+        {{-- QUICK STATUS TABS --}}
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <a href="{{ route('kesiswaan.pelatih.index', array_merge(request()->except('status', 'page'), ['status' => 'all'])) }}"
+               class="px-3.5 py-1.5 rounded-2xl text-xs font-bold transition whitespace-nowrap {{ $status === 'all' ? 'bg-sky-500 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50' }}">
+                Semua ({{ $stats['total'] }})
+            </a>
+            <a href="{{ route('kesiswaan.pelatih.index', array_merge(request()->except('status', 'page'), ['status' => 'pending'])) }}"
+               class="px-3.5 py-1.5 rounded-2xl text-xs font-bold transition whitespace-nowrap {{ $status === 'pending' ? 'bg-amber-500 text-white shadow-sm' : 'bg-white border border-amber-200 text-amber-700 hover:bg-amber-50' }}">
+                Menunggu Verifikasi ({{ $stats['pending'] }})
+            </a>
+            <a href="{{ route('kesiswaan.pelatih.index', array_merge(request()->except('status', 'page'), ['status' => 'terverifikasi'])) }}"
+               class="px-3.5 py-1.5 rounded-2xl text-xs font-bold transition whitespace-nowrap {{ $status === 'terverifikasi' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white border border-emerald-200 text-emerald-700 hover:bg-emerald-50' }}">
+                Terverifikasi ({{ $stats['terverifikasi'] }})
+            </a>
+            <a href="{{ route('kesiswaan.pelatih.index', array_merge(request()->except('status', 'page'), ['status' => 'ditolak'])) }}"
+               class="px-3.5 py-1.5 rounded-2xl text-xs font-bold transition whitespace-nowrap {{ $status === 'ditolak' ? 'bg-rose-600 text-white shadow-sm' : 'bg-white border border-rose-200 text-rose-700 hover:bg-rose-50' }}">
+                Ditolak ({{ $stats['ditolak'] }})
+            </a>
+        </div>
 
-            <div class="flex items-center gap-2 flex-wrap">
-                {{-- Dropdown Sort --}}
-                <select id="sort-select" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400">
-                    <option value="created_at_desc" {{ $currentSortCombo === 'created_at_desc' ? 'selected' : '' }}>Terbaru</option>
-                    <option value="created_at_asc" {{ $currentSortCombo === 'created_at_asc' ? 'selected' : '' }}>Terlama</option>
-                    <option value="nama_asc" {{ $currentSortCombo === 'nama_asc' ? 'selected' : '' }}>Nama (A-Z)</option>
-                    <option value="nama_desc" {{ $currentSortCombo === 'nama_desc' ? 'selected' : '' }}>Nama (Z-A)</option>
-                    <option value="status_verifikasi_asc" {{ $currentSortCombo === 'status_verifikasi_asc' ? 'selected' : '' }}>Status Verifikasi</option>
-                </select>
+        {{-- SEARCH & POPOVER FILTER FORM --}}
+        <form method="GET" action="{{ route('kesiswaan.pelatih.index') }}" id="filter-pelatih-kesiswaan-form" class="bg-white p-4 rounded-3xl border border-sky-100 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+            <input type="hidden" name="sort" id="sort-input" :value="sortCombo.substring(0, sortCombo.lastIndexOf('_'))">
+            <input type="hidden" name="direction" id="direction-input" :value="sortCombo.substring(sortCombo.lastIndexOf('_') + 1)">
 
-                <div class="relative flex-1 md:w-56">
-                    <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari pelatih, ekskul, pembina..."
-                           class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400">
-                    <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {{-- Input Pencarian --}}
+            <div class="relative flex-1">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
-                </div>
+                </span>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari pelatih, ekskul, pembina..."
+                       class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+            </div>
+
+            {{-- Tombol Filter & Popover Panel --}}
+            <div class="relative flex items-center gap-2">
+                <button type="button" @click="openFilter = !openFilter"
+                        class="px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-2 border {{ $activeFilterCount > 0 ? 'bg-sky-50 border-sky-300 text-sky-700 shadow-sm shadow-sky-100' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100' }}">
+                    <svg class="w-4 h-4 {{ $activeFilterCount > 0 ? 'text-sky-600' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                    <span>Filter Data</span>
+                    @if($activeFilterCount > 0)
+                        <span class="w-5 h-5 rounded-full bg-sky-500 text-white text-[10px] font-black flex items-center justify-center">
+                            {{ $activeFilterCount }}
+                        </span>
+                    @endif
+                </button>
+
+                <button type="submit" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
+                    Cari
+                </button>
+
                 @if($hasActiveFilter)
-                    <a href="{{ route('kesiswaan.pelatih.index') }}" title="Reset"
-                       class="p-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100 transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <a href="{{ route('kesiswaan.pelatih.index') }}"
+                       class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-2xl transition"
+                       title="Reset filter">
+                        Reset
                     </a>
                 @endif
+
+                {{-- DROPDOWN PANEL POPOVER --}}
+                <div x-show="openFilter"
+                     @click.away="openFilter = false"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                     class="absolute right-0 top-full mt-2 w-80 md:w-96 bg-white rounded-3xl p-5 border border-sky-100 shadow-xl shadow-sky-900/10 z-50 space-y-4"
+                     style="display: none;">
+                    
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <span class="p-1.5 rounded-lg bg-sky-50 text-sky-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                                </svg>
+                            </span>
+                            <h4 class="text-xs font-bold text-slate-800">Opsi Filter Pelatih</h4>
+                        </div>
+                        <button type="button" @click="openFilter = false" class="text-slate-400 hover:text-slate-600 text-sm font-bold">
+                            &times;
+                        </button>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Status Verifikasi</label>
+                            <select name="status" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                                <option value="all" {{ $status === 'all' ? 'selected' : '' }}>Semua Status</option>
+                                <option value="pending" {{ $status === 'pending' ? 'selected' : '' }}>Menunggu Verifikasi</option>
+                                <option value="terverifikasi" {{ $status === 'terverifikasi' ? 'selected' : '' }}>Terverifikasi</option>
+                                <option value="ditolak" {{ $status === 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Urutkan Berdasarkan</label>
+                            <select x-model="sortCombo" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                                <option value="created_at_desc">Terbaru</option>
+                                <option value="created_at_asc">Terlama</option>
+                                <option value="nama_asc">Nama (A-Z)</option>
+                                <option value="nama_desc">Nama (Z-A)</option>
+                                <option value="status_verifikasi_asc">Status Verifikasi</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <a href="{{ route('kesiswaan.pelatih.index', array_filter(['q' => request('q')])) }}"
+                           class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition">
+                            Reset Opsi
+                        </a>
+                        <button type="submit" @click="openFilter = false"
+                                class="px-5 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
+                            Terapkan Filter
+                        </button>
+                    </div>
+                </div>
             </div>
         </form>
+
+        {{-- AKTIF FILTER CHIPS / TAGS --}}
+        @if($hasActiveFilter)
+            <div class="flex flex-wrap items-center gap-2 pt-1 px-1">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Filter Aktif:</span>
+
+                @if(request()->filled('q'))
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 rounded-xl text-xs font-semibold">
+                        <span>Pencarian: "<strong>{{ request('q') }}</strong>"</span>
+                        <a href="{{ route('kesiswaan.pelatih.index', request()->except('q', 'page')) }}" class="hover:text-rose-500 transition">&times;</a>
+                    </span>
+                @endif
+
+                @if($isStatusFiltered)
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 rounded-xl text-xs font-semibold">
+                        <span>Status: <strong>{{ ucfirst($status) }}</strong></span>
+                        <a href="{{ route('kesiswaan.pelatih.index', request()->except('status', 'page')) }}" class="hover:text-rose-500 transition">&times;</a>
+                    </span>
+                @endif
+
+                @if($isSortFiltered)
+                    @php
+                        $sortLabels = [
+                            'created_at_asc' => 'Terlama',
+                            'nama_asc' => 'Nama (A-Z)',
+                            'nama_desc' => 'Nama (Z-A)',
+                            'status_verifikasi_asc' => 'Status Verifikasi',
+                        ];
+                    @endphp
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 rounded-xl text-xs font-semibold">
+                        <span>Urutan: <strong>{{ $sortLabels[$currentSortCombo] ?? $currentSortCombo }}</strong></span>
+                        <a href="{{ route('kesiswaan.pelatih.index', request()->except(['sort', 'direction', 'page'])) }}" class="hover:text-rose-500 transition">&times;</a>
+                    </span>
+                @endif
+
+                <a href="{{ route('kesiswaan.pelatih.index') }}" class="text-xs font-bold text-rose-500 hover:text-rose-600 hover:underline transition ml-1">
+                    Hapus Semua Filter
+                </a>
+            </div>
+        @endif
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var sortSelect = document.getElementById('sort-select');
-            var sortInput = document.getElementById('sort-input');
-            var directionInput = document.getElementById('direction-input');
-            var form = document.getElementById('filter-pelatih-kesiswaan-form');
-
-            if (sortSelect && sortInput && directionInput && form) {
-                sortSelect.addEventListener('change', function () {
-                    var val = this.value.split('_');
-                    var dir = val.pop();
-                    var col = val.join('_');
-                    sortInput.value = col;
-                    directionInput.value = dir || 'desc';
-                    form.submit();
-                });
-            }
-        });
-    </script>
 
     {{-- LIST DATA PELATIH --}}
     <div class="space-y-4">

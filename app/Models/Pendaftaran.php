@@ -20,6 +20,8 @@ class Pendaftaran extends Model
 
     public const STATUS_PERINGATAN = 'peringatan';
 
+    public const STATUS_LULUS = 'lulus';
+
     protected $fillable = [
         'siswa_id',
         'ekskul_id',
@@ -45,6 +47,11 @@ class Pendaftaran extends Model
     public function presensis(): HasMany
     {
         return $this->hasMany(Presensi::class);
+    }
+
+    public function penilaians(): HasMany
+    {
+        return $this->hasMany(Penilaian::class);
     }
 
     public function isActive(): bool

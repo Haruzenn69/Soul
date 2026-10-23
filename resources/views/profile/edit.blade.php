@@ -321,14 +321,8 @@
                     <div class="h-full bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-lg shadow-sky-100/60 dark:shadow-none p-6 text-center animate-fade-up" style="animation-delay: .1s">
                         <!-- Foto Profile -->
                         <div class="relative inline-block">
-                            <div class="w-28 h-28 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-sky-100 to-blue-100 dark:from-sky-950 dark:to-blue-950 border-4 border-sky-300 dark:border-sky-700 flex items-center justify-center mx-auto overflow-hidden shadow-lg shadow-sky-200 dark:shadow-sky-950/50">
-                                @if($siswa?->foto)
-                                    <img src="{{ $siswa->foto_url }}" alt="Foto Profile" class="w-full h-full object-cover">
-                                @else
-                                    <span class="text-3xl md:text-4xl font-extrabold text-sky-600 dark:text-sky-400">
-                                        {{ strtoupper(substr($siswa?->nama ?? auth()->user()->username ?? 'S', 0, 1)) }}
-                                    </span>
-                                @endif
+                            <div class="w-28 h-28 md:w-32 md:h-32 rounded-full bg-slate-100 dark:bg-neutral-800 border-4 border-sky-300 dark:border-sky-700 flex items-center justify-center mx-auto overflow-hidden shadow-lg shadow-sky-200 dark:shadow-sky-950/50">
+                                <img id="siswa-avatar-preview" src="{{ $siswa?->foto_url ?? asset('images/default.png') }}" alt="Foto Profile" class="w-full h-full object-cover">
                             </div>
                         </div>
 
@@ -393,7 +387,8 @@
 
                             <div>
                                 <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Foto Profil</label>
-                                <input type="file" name="foto" accept="image/jpeg,image/png,image/jpg,image/webp"
+                                <input type="file" name="foto" id="siswa-foto-input" accept="image/jpeg,image/png,image/jpg,image/webp"
+                                       onchange="if(this.files && this.files[0]){ const r = new FileReader(); r.onload = e => { const img = document.getElementById('siswa-avatar-preview'); if(img){ img.src = e.target.result; } }; r.readAsDataURL(this.files[0]); }"
                                        class="w-full px-3 py-2 bg-sky-50/60 dark:bg-neutral-800/60 border @error('foto') border-rose-300 @else border-sky-100 dark:border-neutral-700 @enderror rounded-2xl text-xs text-slate-800 dark:text-slate-300 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition file:mr-3 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-sky-500 file:text-white hover:file:bg-sky-600">
                                 <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">Format JPG/PNG/WebP, maks 2MB.</p>
                             </div>

@@ -106,32 +106,141 @@ class Penilaian extends Model
     }
 
     /**
-     * Tentukan periode semester berjalan beserta rentang tanggalnya.
+     * Tentukan periode semester berjalan beserta rentang tanggalnya berdasarkan Tahun Ajaran aktif.
      *
-     * @return array{label: string, start: string, end: string}
+     * @return array{label: string, semester: string, tahun_ajaran: string, start: string, end: string}
      */
-    public static function periodeSekarang(): array
+    public static function periodeSekarang(?TahunAjaran $ta = null): array
     {
+        $ta = $ta ?: TahunAjaran::getActive();
         $month = now()->month;
 
-        if ($month >= 7) {
-            $tahun = now()->year;
-            $label = "Ganjil {$tahun}/".($tahun + 1);
-            $start = "{$tahun}-07-01";
-            $end = "{$tahun}-12-31";
+        if ($ta && preg_match('/^(\d{4})\s*\/\s*(\d{4})$/', trim($ta->nama), $matches)) {
+            $tahunAwal = (int) $matches[1];
+            $tahunAkhir = (int) $matches[2];
         } else {
-            $tahunAkhir = now()->year;
-            $tahunAwal = $tahunAkhir - 1;
-            $label = "Genap {$tahunAwal}/{$tahunAkhir}";
+            if ($month >= 7) {
+                $tahunAwal = now()->year;
+                $tahunAkhir = $tahunAwal + 1;
+            } else {
+                $tahunAkhir = now()->year;
+                $tahunAwal = $tahunAkhir - 1;
+            }
+        }
+
+        if ($month >= 7) {
+            $semester = 'Ganjil';
+            $start = "{$tahunAwal}-07-01";
+            $end = "{$tahunAwal}-12-31";
+        } else {
+            $semester = 'Genap';
             $start = "{$tahunAkhir}-01-01";
             $end = "{$tahunAkhir}-06-30";
         }
 
+        $taNama = "{$tahunAwal}/{$tahunAkhir}";
+        $label = "{$semester} {$taNama}";
+
         return [
             'label' => $label,
+            'semester' => $semester,
+            'tahun_ajaran' => $taNama,
             'start' => $start,
             'end' => $end,
         ];
+    }
+
+    /**
+     * Parse label periode (misal: "Ganjil 2029/2030") menjadi informasi detail dan rentang tanggal.
+     *
+     * @return array{label: string, semester: string, tahun_ajaran: string, start: string, end: string}
+     */
+    public static function parsePeriode(?string $periode): array
+    {
+        if (! $periode) {
+            return static::periodeSekarang();
+        }
+
+        if (preg_match('/^(Ganjil|Genap)\s+(\d{4})\s*\/\s*(\d{4})$/i', trim($periode), $matches)) {
+            $semester = ucfirst(strtolower($matches[1]));
+            $tahunAwal = (int) $matches[2];
+            $tahunAkhir = (int) $matches[3];
+            $taNama = "{$tahunAwal}/{$tahunAkhir}";
+
+            if ($semester === 'Ganjil') {
+                $start = "{$tahunAwal}-07-01";
+                $end = "{$tahunAwal}-12-31";
+            } else {
+                $start = "{$tahunAkhir}-01-01";
+                $end = "{$tahunAkhir}-06-30";
+            }
+
+            return [
+                'label' => "{$semester} {$taNama}",
+                'semester' => $semester,
+                'tahun_ajaran' => $taNama,
+                'start' => $start,
+                'end' => $end,
+            ];
+        }
+
+        return static::periodeSekarang();
+    }
+
+    /**
+     * Dapatkan daftar periode yang tersedia (dari TahunAjaran aktif, historis, dan record DB).
+     *
+     * @return array<int, array{label: string, semester: string, tahun_ajaran: string, is_aktif: bool, is_historis: bool}>
+     */
+    public static function daftarPeriode(): array
+    {
+        $aktifTa = TahunAjaran::getActive();
+        $periodeAktif = static::periodeSekarang($aktifTa)['label'];
+
+        $daftar = [];
+        $tahuns = TahunAjaran::orderBy('id', 'desc')->get();
+
+        foreach ($tahuns as $ta) {
+            $nama = trim($ta->nama);
+            foreach (['Genap', 'Ganjil'] as $sem) {
+                $lbl = "{$sem} {$nama}";
+                $daftar[$lbl] = [
+                    'label' => $lbl,
+                    'semester' => $sem,
+                    'tahun_ajaran' => $nama,
+                    'is_aktif' => ($lbl === $periodeAktif),
+                    'is_historis' => ($ta->status === 'historis'),
+                ];
+            }
+        }
+
+        // Tambahkan juga periode yang tercatat di tabel penilaian jika ada yang belum tercakup
+        $dbPeriodes = static::query()->distinct()->pluck('periode')->filter();
+        foreach ($dbPeriodes as $lbl) {
+            if (! isset($daftar[$lbl])) {
+                $info = static::parsePeriode($lbl);
+                $daftar[$lbl] = [
+                    'label' => $lbl,
+                    'semester' => $info['semester'],
+                    'tahun_ajaran' => $info['tahun_ajaran'],
+                    'is_aktif' => ($lbl === $periodeAktif),
+                    'is_historis' => true,
+                ];
+            }
+        }
+
+        // Urutkan dengan menaruh periode aktif di paling atas
+        uasort($daftar, function ($a, $b) use ($periodeAktif) {
+            if ($a['label'] === $periodeAktif) {
+                return -1;
+            }
+            if ($b['label'] === $periodeAktif) {
+                return 1;
+            }
+            return strcmp($b['label'], $a['label']);
+        });
+
+        return array_values($daftar);
     }
 
     /**

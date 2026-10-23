@@ -8,12 +8,21 @@
             <p class="text-xs text-slate-400 mt-0.5">Pemberitahuan terkait data kesiswaan</p>
         </div>
         @if($notifikasis->isNotEmpty())
-            <form method="POST" action="{{ route('kesiswaan.notifikasi.read-all') }}" class="w-full sm:w-auto">
-                @csrf
-                <button type="submit" class="px-3.5 py-2 bg-white hover:bg-sky-50 text-slate-600 text-xs font-semibold rounded-lg border border-sky-100 shadow-sm transition w-full sm:w-auto">
-                    Tandai Semua Dibaca
-                </button>
-            </form>
+            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <form method="POST" action="{{ route('kesiswaan.notifikasi.read-all') }}" class="w-full sm:w-auto">
+                    @csrf
+                    <button type="submit" class="px-3.5 py-2 bg-white hover:bg-sky-50 text-slate-600 text-xs font-semibold rounded-lg border border-sky-100 shadow-sm transition w-full sm:w-auto">
+                        Tandai Semua Dibaca
+                    </button>
+                </form>
+                <form method="POST" action="{{ route('kesiswaan.notifikasi.clear-all') }}" class="w-full sm:w-auto" onsubmit="return confirm('Hapus semua notifikasi? Tindakan ini tidak bisa dibatalkan.')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="px-3.5 py-2 bg-white hover:bg-rose-50 text-rose-600 text-xs font-semibold rounded-lg border border-rose-200 shadow-sm transition w-full sm:w-auto">
+                        Hapus Semua
+                    </button>
+                </form>
+            </div>
         @endif
     </div>
 
@@ -80,6 +89,14 @@
                                     </button>
                                 </form>
                             @endif
+
+                            <form method="POST" action="{{ route('kesiswaan.notifikasi.destroy', $notif) }}" class="w-full sm:w-auto" onsubmit="return confirm('Hapus notifikasi ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-xs font-semibold text-rose-600 hover:text-rose-700 px-3 py-1.5 bg-white border border-rose-200 hover:bg-rose-50 rounded-lg w-full sm:w-auto text-center shadow-sm transition">
+                                    Hapus
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

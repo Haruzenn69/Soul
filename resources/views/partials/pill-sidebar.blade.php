@@ -636,10 +636,144 @@
         .ps-rail, .ps-toggle, .ps-toggle svg, .ps-page, .ps-item, .ps-tip, .ps-menu { transition: none !important; }
         .ps-item:hover { transform: none; }
     }
+
+    /* ================= BLUE THEME VARIANT (SAMA DENGAN CARD BIRU HERO) ================= */
+    .ps-pill-blue {
+        background: linear-gradient(135deg, #38bdf8 0%, #60a5fa 45%, #2563eb 100%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow:
+            0 12px 35px -10px rgba(2, 132, 199, .5),
+            0 4px 18px -4px rgba(37, 99, 235, .35),
+            inset 0 1px 0 rgba(255, 255, 255, .4) !important;
+        color: #ffffff !important;
+    }
+    .ps-pill-blue .ps-blob-1 {
+        background: rgba(255, 255, 255, 0.16) !important;
+    }
+    .ps-pill-blue .ps-blob-2 {
+        background: rgba(255, 255, 255, 0.12) !important;
+    }
+    .ps-pill-blue .ps-toggle {
+        background: #ffffff !important;
+        border-color: rgba(255, 255, 255, 0.9) !important;
+        color: #0284c7 !important;
+        box-shadow: 0 4px 12px -2px rgba(2, 132, 199, .45) !important;
+    }
+    .ps-pill-blue .ps-toggle:hover {
+        background: #f0f9ff !important;
+        color: #0369a1 !important;
+    }
+    .ps-pill-blue .ps-logo:hover {
+        background: rgba(255, 255, 255, 0.15) !important;
+    }
+    .ps-pill-blue .ps-logo-box {
+        background: #ffffff !important;
+        color: #0284c7 !important;
+        box-shadow: 0 6px 16px -4px rgba(0, 0, 0, .2) !important;
+    }
+    .ps-pill-blue .ps-logo-txt strong {
+        color: #ffffff !important;
+    }
+    .ps-pill-blue .ps-logo-txt small {
+        color: rgba(255, 255, 255, 0.82) !important;
+    }
+    .ps-pill-blue .ps-section-lbl {
+        color: rgba(255, 255, 255, 0.75) !important;
+    }
+    .ps-pill-blue .ps-section-sub {
+        color: rgba(255, 255, 255, 0.55) !important;
+    }
+    .ps-pill-blue .ps-item {
+        color: rgba(255, 255, 255, 0.88) !important;
+    }
+    .ps-pill-blue .ps-item:hover {
+        background: rgba(255, 255, 255, 0.16) !important;
+        color: #ffffff !important;
+    }
+    .ps-pill-blue .ps-item.ps-active,
+    .ps-pill-blue .ps-item[aria-current="page"] {
+        background: #ffffff !important;
+        color: #0284c7 !important;
+        font-weight: 700 !important;
+        box-shadow: 0 4px 16px -3px rgba(0, 0, 0, .18) !important;
+    }
+    .ps-pill-blue .ps-item.ps-active svg,
+    .ps-pill-blue .ps-item[aria-current="page"] svg {
+        color: #0284c7 !important;
+    }
+    .ps-pill-blue .ps-item .ps-bar {
+        display: none !important;
+    }
+    .ps-pill-blue .ps-dot {
+        background: #fde047 !important;
+    }
+    .ps-pill-blue .ps-nav-main::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.25) !important;
+    }
+    .ps-pill-blue .ps-nav-main::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.4) !important;
+    }
+    .ps-pill-blue .ps-submenu {
+        border-left-color: rgba(255, 255, 255, 0.3) !important;
+    }
+    .ps-pill-blue .ps-submenu a {
+        color: rgba(255, 255, 255, 0.85) !important;
+    }
+    .ps-pill-blue .ps-submenu a:hover,
+    .ps-pill-blue .ps-submenu a.ps-active {
+        background: rgba(255, 255, 255, 0.2) !important;
+        color: #ffffff !important;
+    }
+    .ps-pill-blue .ps-user {
+        background: rgba(255, 255, 255, 0.14) !important;
+        border: 1px solid rgba(255, 255, 255, 0.22) !important;
+        box-shadow: 0 2px 8px -2px rgba(0, 0, 0, .15) !important;
+    }
+    .ps-pill-blue .ps-user-link:hover {
+        background: rgba(255, 255, 255, 0.16) !important;
+    }
+    .ps-pill-blue .ps-avatar {
+        background: #ffffff !important;
+        color: #0284c7 !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, .15) !important;
+    }
+    .ps-pill-blue .ps-user-txt strong {
+        color: #ffffff !important;
+    }
+    .ps-pill-blue .ps-user-txt small {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    .ps-pill-blue .ps-user-logout {
+        color: rgba(255, 255, 255, 0.85) !important;
+    }
+    .ps-pill-blue .ps-user-logout:hover {
+        color: #fee2e2 !important;
+        background: rgba(239, 68, 68, .25) !important;
+    }
+    .ps-pill-blue .ps-gear summary:hover {
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: #ffffff !important;
+    }
+    body.ps-collapsed .ps-pill-blue {
+        border-radius: 22px !important;
+    }
+    body.ps-collapsed .ps-pill-blue .ps-item.ps-active {
+        background: #ffffff !important;
+        color: #0284c7 !important;
+    }
+    body.ps-collapsed .ps-pill-blue .ps-group[open] summary {
+        background: #ffffff !important;
+        color: #0284c7 !important;
+    }
+    body.ps-collapsed .ps-pill-blue .ps-user {
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+    }
 </style>
 
-<aside class="ps-rail" id="ps-rail" aria-label="{{ $psTitle ?? 'Navigasi' }}">
-    <div class="ps-pill">
+<aside class="ps-rail {{ ($psTheme ?? '') === 'blue' ? 'ps-rail-blue' : '' }}" id="ps-rail" aria-label="{{ $psTitle ?? 'Navigasi' }}">
+    <div class="ps-pill {{ ($psTheme ?? '') === 'blue' ? 'ps-pill-blue' : '' }}">
         <div class="ps-deco" aria-hidden="true">
             <div class="ps-blob ps-blob-1"></div>
             <div class="ps-blob ps-blob-2"></div>

@@ -27,20 +27,20 @@ class SiswaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHeadin
     public function rules(): array
     {
         return [
-            'nis' => ['required', 'string', 'digits:10', 'distinct', function (string $attribute, $value, $fail): void {
+            'nis' => ['required', 'string', 'min:5', 'max:20', 'distinct', function (string $attribute, $value, $fail): void {
                 $nis = trim((string) $value);
                 if (Siswa::where('nis', $nis)->exists()) {
                     $fail("NIS {$nis} sudah terdaftar.");
                 }
             }],
             'nama' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s.,\'\-]+$/'],
-            'email' => ['nullable', 'email', 'max:255', 'distinct', function (string $attribute, $value, $fail): void {
+            'email' => ['nullable', 'email', 'max:255', function (string $attribute, $value, $fail): void {
                 if ($value && User::where('email', trim((string) $value))->exists()) {
                     $fail('Email '.trim((string) $value).' sudah digunakan.');
                 }
             }],
             'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
-            'tempat_lahir' => ['required', 'string', 'max:100'],
+            'tempat_lahir' => ['nullable', 'string', 'max:100'],
             'tanggal_lahir' => ['required', 'date'],
             'agama' => ['required', 'string', 'max:50', 'in:Islam,Kristen,Katolik,Hindu,Buddha,Khonghucu'],
             'no_telp' => ['nullable', 'string', 'max:25'],
@@ -54,7 +54,8 @@ class SiswaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHeadin
         return [
             'nis.required' => 'Kolom NIS wajib diisi.',
             'nis.string' => 'NIS harus berupa teks/angka.',
-            'nis.digits' => 'NIS harus terdiri dari tepat 10 digit angka.',
+            'nis.min' => 'NIS minimal 5 karakter.',
+            'nis.max' => 'NIS maksimal 20 karakter.',
             'nis.distinct' => 'NIS duplikat ditemukan dalam file. Setiap NIS harus unik.',
             'nama.required' => 'Kolom Nama wajib diisi.',
             'nama.string' => 'Nama harus berupa teks.',
@@ -62,10 +63,8 @@ class SiswaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHeadin
             'nama.regex' => 'Nama hanya boleh mengandung huruf alfabet, spasi, titik, koma, dan strip. Tidak boleh ada angka atau simbol lainnya.',
             'email.email' => 'Format Email tidak valid. Email harus mengandung tanda @.',
             'email.max' => 'Email maksimal 255 karakter.',
-            'email.distinct' => 'Email duplikat ditemukan dalam file. Setiap email harus unik.',
             'jenis_kelamin.required' => 'Kolom Jenis Kelamin wajib diisi.',
             'jenis_kelamin.in' => 'Jenis Kelamin harus "Laki-laki" atau "Perempuan".',
-            'tempat_lahir.required' => 'Kolom Tempat Lahir wajib diisi.',
             'tempat_lahir.string' => 'Tempat Lahir harus berupa teks.',
             'tempat_lahir.max' => 'Tempat Lahir maksimal 100 karakter.',
             'tanggal_lahir.required' => 'Kolom Tanggal Lahir wajib diisi.',
@@ -89,6 +88,32 @@ class SiswaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHeadin
             $value = trim((string) ($row[$key] ?? ''));
             $clean[$key] = $value === '' ? null : $value;
         }
+
+        // Normalize NIS: strip whitespace and handle Excel float format
+        // e.g. "2603010113.0" -> "2603010113", or "2603 010113" -> "2603010113"
+        if ($clean['nis'] !== null) {
+            $nisRaw = $clean['nis'];
+            // Remove all whitespace characters
+            $nisRaw = preg_replace('/[\s\x{00A0}]+/u', '', $nisRaw);
+            // Handle Excel float format (e.g., "2603010113.0")
+            if (is_numeric($nisRaw)) {
+                $clean['nis'] = (string) (int) (float) $nisRaw;
+            } else {
+                $clean['nis'] = preg_replace('/\.0+$/', '', $nisRaw);
+            }
+        }
+
+        // If email is the same as a previously seen email in this import batch, set to null
+        // (multiple students with identical emails - treat email as not provided)
+        if ($clean['email'] !== null) {
+            $email = strtolower(trim($clean['email']));
+            if (in_array($email, $this->seenEmails, true)) {
+                $clean['email'] = null;
+            } else {
+                $this->seenEmails[] = $email;
+            }
+        }
+
         $clean['tempat_lahir'] = SpreadsheetProfileValue::placeOfBirth($clean['tempat_lahir']);
         $clean['agama'] = SpreadsheetProfileValue::religion($clean['agama']);
         $clean['jenis_kelamin'] = SpreadsheetProfileValue::gender($clean['jenis_kelamin']);
@@ -99,9 +124,16 @@ class SiswaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHeadin
 
     public function model(array $row): null
     {
+        // If email is null (not provided or duplicate in batch), generate a placeholder
+        $email = $row['email'] ?? null;
+        if (! $email) {
+            $nis = $row['nis'];
+            $email = "siswa.{$nis}@soul.internal";
+        }
+
         $user = User::create([
             'username' => null,
-            'email' => $row['email'],
+            'email' => $email,
             'password' => Hash::make('password'),
             'role' => 'siswa',
             'email_verified_at' => now(),

@@ -10,10 +10,17 @@
             <p class="text-xs text-slate-400 mt-1">Pemberitahuan terkait ekskul yang anda pimpin</p>
         </div>
         @if($notifikasis->isNotEmpty())
-        <form method="POST" action="{{ route('ketua.notifikasi.read-all') }}">
-            @csrf
-            <button type="submit" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition w-full sm:w-auto">Tandai Semua Dibaca</button>
-        </form>
+        <div class="flex flex-col sm:flex-row gap-2">
+            <form method="POST" action="{{ route('ketua.notifikasi.read-all') }}">
+                @csrf
+                <button type="submit" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition w-full sm:w-auto">Tandai Semua Dibaca</button>
+            </form>
+            <form method="POST" action="{{ route('ketua.notifikasi.clear-all') }}" onsubmit="return confirm('Hapus semua notifikasi? Tindakan ini tidak bisa dibatalkan.')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-xl border border-rose-200 transition w-full sm:w-auto">Hapus Semua</button>
+            </form>
+        </div>
         @endif
     </div>
 
@@ -59,14 +66,19 @@
                     </div>
                 </div>
                 <p class="text-xs text-slate-600 mt-2 leading-relaxed">{{ $notif->pesan }}</p>
-                @if(!$notif->is_read)
-                <div class="mt-2.5 flex justify-end">
+                <div class="mt-2.5 flex justify-end gap-2">
+                    @if(!$notif->is_read)
                     <form method="POST" action="{{ route('ketua.notifikasi.read', $notif) }}">
                         @csrf
                         <button type="submit" class="text-xs font-semibold text-sky-600 hover:text-sky-700 px-2.5 py-1.5 bg-white border border-sky-200 rounded-lg">Tandai dibaca</button>
                     </form>
+                    @endif
+                    <form method="POST" action="{{ route('ketua.notifikasi.destroy', $notif) }}" onsubmit="return confirm('Hapus notifikasi ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-xs font-semibold text-rose-600 hover:text-rose-700 px-2.5 py-1.5 bg-white border border-rose-200 rounded-lg">Hapus</button>
+                    </form>
                 </div>
-                @endif
             </div>
         @empty
             <div class="p-10 text-center bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60">

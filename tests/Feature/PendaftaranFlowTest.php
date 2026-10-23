@@ -88,6 +88,72 @@ class PendaftaranFlowTest extends TestCase
         $this->assertSame(0, Pendaftaran::count());
     }
 
+    public function test_siswa_nonaktif_tidak_bisa_daftar_ulang(): void
+    {
+        $ekskul = $this->makeEkskul();
+        $siswa = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
+        $this->daftarkan($siswa, $ekskul, Pendaftaran::STATUS_NONAKTIF);
+
+        $this->actingAs($siswa->user)
+            ->post('/siswa/daftar-ekskul', [
+                'ekskul_id' => $ekskul->id,
+                'alasan' => 'Saya ingin mengembangkan keterampilan dan menambah pengalaman.',
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseCount('pendaftarans', 1);
+        $this->assertDatabaseHas('pendaftarans', [
+            'siswa_id' => $siswa->id,
+            'ekskul_id' => $ekskul->id,
+            'status' => Pendaftaran::STATUS_NONAKTIF,
+        ]);
+    }
+
+    public function test_siswa_keluar_tidak_bisa_daftar_ulang(): void
+    {
+        $ekskul = $this->makeEkskul();
+        $siswa = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
+        $this->daftarkan($siswa, $ekskul, Pendaftaran::STATUS_KELUAR);
+
+        $this->actingAs($siswa->user)
+            ->post('/siswa/daftar-ekskul', [
+                'ekskul_id' => $ekskul->id,
+                'alasan' => 'Saya ingin mengembangkan keterampilan dan menambah pengalaman.',
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseCount('pendaftarans', 1);
+        $this->assertDatabaseHas('pendaftarans', [
+            'siswa_id' => $siswa->id,
+            'ekskul_id' => $ekskul->id,
+            'status' => Pendaftaran::STATUS_KELUAR,
+        ]);
+    }
+
+    public function test_siswa_ditolak_tidak_bisa_daftar_ulang(): void
+    {
+        $ekskul = $this->makeEkskul();
+        $siswa = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
+        $this->daftarkan($siswa, $ekskul, Pendaftaran::STATUS_DITOLAK);
+
+        $this->actingAs($siswa->user)
+            ->post('/siswa/daftar-ekskul', [
+                'ekskul_id' => $ekskul->id,
+                'alasan' => 'Saya ingin mengembangkan keterampilan dan menambah pengalaman.',
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseCount('pendaftarans', 1);
+        $this->assertDatabaseHas('pendaftarans', [
+            'siswa_id' => $siswa->id,
+            'ekskul_id' => $ekskul->id,
+            'status' => Pendaftaran::STATUS_DITOLAK,
+        ]);
+    }
+
     public function test_ketua_menyetujui_pendaftaran_menjadikan_anggota_dan_bernotifikasi(): void
     {
         $ekskul = $this->makeEkskul();

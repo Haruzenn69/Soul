@@ -40,7 +40,7 @@
                     <span class="px-2.5 py-0.5 rounded-full bg-white/15 border border-white/20 text-[10px] font-bold tracking-widest uppercase">Ekstrakurikuler</span>
                 </div>
                 <h1 class="text-xl md:text-2xl font-extrabold tracking-tight leading-tight">Katalog Ekskul</h1>
-                <p class="text-xs text-white/75 mt-1 max-w-lg leading-relaxed">Temukan ekskul yang cocok untuk kamu. Kamu bisa aktif di maksimal {{ \App\Support\AturanEkskul::MAKS_EKSKUL }} ekskul, dan hanya satu dari kelompok {{ \App\Support\AturanEkskul::LABEL_P1I }}.</p>
+                <p class="text-xs text-white/75 mt-1 max-w-lg leading-relaxed">Temukan ekskul yang cocok untuk kamu. Kamu bebas memilih hingga maksimal {{ \App\Support\AturanEkskul::MAKS_EKSKUL }} ekskul (tidak harus ekskul wajib). Khusus ekskul kategori wajib, hanya dapat diikuti maksimal 1 ekskul.</p>
             </div>
             {{-- Status Badge --}}
             @if ($menunggu)
@@ -198,9 +198,20 @@
                     </div>
 
                     {{-- Name & Desc --}}
-                    <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-sky-600 transition-colors line-clamp-1 mb-1">
-                        {{ $ekskul->nama_ekskul }}
-                    </h3>
+                    <div class="flex items-center gap-1.5 mb-1 flex-wrap">
+                        <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-sky-600 transition-colors line-clamp-1">
+                            {{ $ekskul->nama_ekskul }}
+                        </h3>
+                        @if ($ekskul->isWajib())
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                Wajib
+                            </span>
+                        @elseif ($ekskul->kategori)
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-semibold bg-slate-100 text-slate-600">
+                                {{ $ekskul->kategori }}
+                            </span>
+                        @endif
+                    </div>
                     <p class="text-[11px] text-slate-500 leading-relaxed line-clamp-2 flex-1">
                         {{ $ekskul->tagline ?: ($ekskul->deskripsi ?: 'Deskripsi belum tersedia.') }}
                     </p>

@@ -25,12 +25,8 @@
         <!-- KOLOM KIRI: Foto & Info Singkat -->
         <div class="lg:col-span-1">
             <div class="h-full bg-white p-6 rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .1s">
-                <div class="relative w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-sky-100 to-blue-100 border-4 border-sky-300 flex items-center justify-center shadow-lg shadow-sky-200 overflow-hidden group">
-                    @if($pembina->foto)
-                        <img id="pembina-avatar-img" src="{{ $pembina->foto_url }}" alt="Foto Profile" class="w-full h-full object-cover">
-                    @else
-                        <span id="pembina-avatar-initial" class="text-3xl font-extrabold text-sky-600 uppercase">{{ strtoupper(substr($pembina->nama ?? 'P', 0, 1)) }}</span>
-                    @endif
+                <div class="relative w-28 h-28 mx-auto rounded-full bg-slate-100 border-4 border-sky-300 flex items-center justify-center shadow-lg shadow-sky-200 overflow-hidden group">
+                    <img id="pembina-avatar-img" src="{{ $pembina->foto_url }}" alt="Foto Profile" class="w-full h-full object-cover">
                 </div>
                 <h3 class="text-sm font-extrabold text-slate-900 mt-4">{{ $pembina->nama ?? '-' }}</h3>
                 <p class="text-xs text-sky-600 font-bold">@ {{ auth()->user()->username }}</p>
@@ -82,6 +78,7 @@
                     <div>
                         <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Foto Profil</label>
                         <input type="file" name="foto" accept="image/jpeg,image/png,image/jpg,image/webp"
+                               onchange="if(this.files && this.files[0]){ const r = new FileReader(); r.onload = e => { const img = document.getElementById('pembina-avatar-img'); if(img){ img.src = e.target.result; } }; r.readAsDataURL(this.files[0]); }"
                                class="w-full px-3 py-2 bg-sky-50/60 border @error('foto') border-rose-300 @else border-sky-100 @enderror rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-sky-500 file:text-white hover:file:bg-sky-600">
                         <p class="text-[10px] text-slate-400 mt-1.5">Format JPG/PNG/WebP, maksimal 2MB.</p>
                     </div>

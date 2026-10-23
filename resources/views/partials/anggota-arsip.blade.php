@@ -5,7 +5,7 @@
      * Bagian ini hanya dirender saat filter arsip aktif (`?arsip=1`), sehingga
      * data lama tidak mengganggu daftar utama.
      *
-     * @var array $arsip            ['ketuaSelesai', 'anggotaNonaktif', 'total']
+     * @var array $arsip            ['ketuaSelesai', 'anggotaLulus', 'total']
      * @var bool  $tampilArsip
      * @var string $arsipAction     URL daftar anggota (tanpa parameter arsip)
      * @var bool  $arsipShowEkskul  Tampilkan kolom ekskul (dipakai modul pembina)
@@ -19,11 +19,11 @@
     );
 
     $arsipKetua = $arsip['ketuaSelesai'] ?? collect();
-    $arsipAnggota = $arsip['anggotaNonaktif'] ?? collect();
+    $arsipAnggota = $arsip['anggotaLulus'] ?? collect();
 
     $arsipTabs = [
         'ketua' => ['label' => 'Ketua Sebelumnya', 'icon' => 'star', 'count' => $arsipKetua->count()],
-        'anggota' => ['label' => 'Anggota Nonaktif & Keluar', 'icon' => 'user-off', 'count' => $arsipAnggota->count()],
+        'anggota' => ['label' => 'Anggota Lulus', 'icon' => 'user-off', 'count' => $arsipAnggota->count()],
     ];
 @endphp
 
@@ -164,11 +164,11 @@
                 </div>
             @endif
         @else
-            {{-- ARSIP: ANGGOTA YANG SUDAH NONAKTIF / KELUAR --}}
+            {{-- ARSIP: ANGGOTA YANG SUDAH LULUS --}}
             @if ($arsipAnggota->isEmpty())
                 <div class="text-center py-10 text-slate-400">
-                    <p class="text-xs font-semibold">Belum ada anggota nonaktif atau keluar.</p>
-                    <p class="text-[11px] mt-1">Anggota yang dinonaktifkan atau mengajukan keluar akan muncul di sini.</p>
+                    <p class="text-xs font-semibold">Belum ada anggota lulus.</p>
+                    <p class="text-[11px] mt-1">Anggota akan muncul di sini setelah keanggotaannya ditutup saat kenaikan tahun ajaran.</p>
                 </div>
             @else
                 <div class="overflow-x-auto">
@@ -221,11 +221,7 @@
                                     @endif
                                     <td class="p-3.5 text-slate-400 font-medium whitespace-nowrap">{{ \Carbon\Carbon::parse($item->tanggal_daftar)->isoFormat('DD MMM Y') }}</td>
                                     <td class="p-3.5">
-                                        @if ($item->status === \App\Models\Pendaftaran::STATUS_NONAKTIF)
-                                            <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">Nonaktif</span>
-                                        @else
-                                            <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-200">Keluar</span>
-                                        @endif
+                                        <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Lulus</span>
                                     </td>
                                     <td class="p-3.5 text-slate-500 text-[11px]">
                                         {{ $item->alasan ?: '—' }}
