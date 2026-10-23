@@ -15,8 +15,9 @@
         {{-- Header dengan tombol X — beri z-20 supaya paling atas --}}
         <div class="relative z-20 flex items-center justify-between mb-8 px-2 mt-1 shrink-0">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-extrabold text-lg shadow-lg shadow-sky-300">
-                    SOUL
+                <div class="w-10 h-10 rounded-2xl overflow-hidden flex items-center justify-center shadow-lg shadow-sky-200">
+                    <img src="{{ asset('images/logo-light-nobg.png') }}" alt="SOUL" class="w-full h-full object-contain ps-logo-img-light">
+                    <img src="{{ asset('images/logo-dark-nobg.png') }}" alt="SOUL" class="w-full h-full object-contain ps-logo-img-dark">
                 </div>
                 <div>
                     <h1 class="font-extrabold text-sm tracking-tight text-slate-900 leading-none">SOUL</h1>

@@ -173,20 +173,30 @@
         height: 42px;
         flex-shrink: 0;
         border-radius: 16px;
-        background: #3b82f6;
-        color: #fff;
-        font-weight: 800;
-        font-size: 13px;
-        letter-spacing: .02em;
+        overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 6px 16px -5px rgba(56, 189, 248, .65);
+        box-shadow: 0 6px 16px -5px rgba(56, 189, 248, .45);
+        background: transparent;
     }
+    .ps-logo-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        /* JANGAN taruh display:block di sini — akan override rule show/hide di bawah */
+    }
+    /* Light mode: tampilkan logo light, sembunyikan logo dark */
+    .ps-logo-box .ps-logo-img-light { display: block; }
+    .ps-logo-box .ps-logo-img-dark  { display: none;  }
+    /* Dark mode: balik keduanya */
+    html.dark .ps-logo-box .ps-logo-img-light { display: none;  }
+    html.dark .ps-logo-box .ps-logo-img-dark  { display: block; }
     .ps-logo-txt { text-align: left; min-width: 0; }
     .ps-logo-txt strong { font-size: 13px; font-weight: 800; color: #0f172a; display: block; line-height: 1.2; letter-spacing: .01em; }
     .ps-logo-txt small { font-size: 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
     body.ps-collapsed .ps-logo-txt { display: none; }
+    html.dark .ps-logo-txt strong { color: #f1f5f9; }
 
     .ps-section {
         display: flex;
@@ -205,12 +215,15 @@
         gap: 6px;
         min-width: 0;
     }
-    .ps-nav-main { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 2px 0; }
+    .ps-nav-main { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 2px 0; scrollbar-gutter: stable; }
     .ps-nav-main::-webkit-scrollbar { width: 5px; }
     .ps-nav-main::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 999px; }
     .ps-nav-main::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+    /* Saat rail dilipat, daftar menu tetap harus bisa di-scroll (menu panjang tidak terpotong). */
     body.ps-collapsed .ps-nav-main {
-        overflow: visible;
+        overflow-y: auto;
+        overflow-x: visible;
+        padding-right: 4px;
     }
 
     .ps-group { position: relative; }
@@ -314,10 +327,12 @@
         flex: 0 0 auto;
     }
     body.ps-collapsed .ps-group .ps-submenu {
-        position: absolute;
-        left: calc(100% + 16px);
-        top: 0;
+        position: fixed;
+        left: var(--ps-flyout-left, 120px);
+        top: var(--ps-flyout-top, 0px);
         min-width: 190px;
+        max-height: min(70vh, 520px);
+        overflow-y: auto;
         margin: 0;
         padding: 10px;
         border: 1px solid #e0f2fe;
@@ -439,6 +454,11 @@
         box-shadow:
             0 18px 40px -12px rgba(2, 132, 199, .28),
             0 2px 14px -6px rgba(245, 158, 11, .22);
+    }
+    body.ps-collapsed .ps-tip {
+        position: fixed;
+        left: var(--ps-tip-left, 120px);
+        top: var(--ps-tip-top, 0px);
     }
     body.ps-collapsed .ps-item:hover .ps-tip,
     body.ps-collapsed .ps-logo:hover .ps-tip,
@@ -632,7 +652,10 @@
         </button>
 
         <a class="ps-logo" href="{{ $psDashboardUrl }}" aria-label="Ke dashboard {{ $psTitle ?? '' }}">
-            <span class="ps-logo-box">SOUL</span>
+            <span class="ps-logo-box">
+                <img src="{{ asset('images/logo-light-nobg.png') }}" alt="SOUL" class="ps-logo-img-light">
+                <img src="{{ asset('images/logo-dark-nobg.png') }}" alt="SOUL" class="ps-logo-img-dark">
+            </span>
             <span class="ps-logo-txt">
                 <strong>{{ $psLogoBrand ?? 'SOUL' }}</strong>
                 <small>Panel {{ $psRole }}</small>
@@ -794,9 +817,9 @@
     </div>
 </aside>
 
-@if (($psUser->role ?? null) === 'siswa' && ! request()->routeIs('ketua.*', 'profile.edit'))
+@if (! request()->routeIs('profile.edit'))
     <div id="sidebar-overlay" class="hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-[2px] md:hidden" onclick="closeSidebar()"></div>
-    <aside id="sidebar-mobile" class="hidden fixed inset-y-0 left-0 z-50 flex w-[min(21rem,88vw)] flex-col overflow-hidden border-r border-sky-100 bg-white p-4 shadow-2xl md:hidden" aria-label="Menu navigasi Siswa">
+    <aside id="sidebar-mobile" class="hidden fixed inset-y-0 left-0 z-50 flex w-[min(21rem,88vw)] flex-col overflow-hidden border-r border-sky-100 bg-white p-4 shadow-2xl md:hidden dark:border-neutral-800 dark:bg-neutral-900" aria-label="Menu navigasi {{ $psRole }}">
         <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
             <div class="absolute -top-24 -right-16 h-64 w-64 rounded-full bg-slate-100/80 blur-3xl"></div>
             <div class="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-slate-100/80 blur-3xl"></div>
@@ -804,9 +827,12 @@
         <div class="relative flex h-full min-h-0 flex-col overflow-y-auto">
             <div class="mb-6 mt-1 flex items-center justify-between px-2">
                 <a href="{{ $psDashboardUrl }}" class="flex min-w-0 items-center gap-3">
-                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-500 text-xs font-extrabold text-white shadow-lg shadow-sky-300">SOUL</span>
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl overflow-hidden shadow-lg shadow-sky-200 dark:shadow-sky-900">
+                        <img src="{{ asset('images/logo-light-nobg.png') }}" alt="SOUL" class="w-full h-full object-contain ps-logo-img-light">
+                        <img src="{{ asset('images/logo-dark-nobg.png') }}" alt="SOUL" class="w-full h-full object-contain ps-logo-img-dark">
+                    </span>
                     <span class="min-w-0">
-                        <strong class="block text-sm font-extrabold leading-none tracking-tight text-slate-900">{{ $psLogoBrand ?? 'SOUL' }}</strong>
+                        <strong class="block text-sm font-extrabold leading-none tracking-tight text-slate-900 dark:text-white">{{ $psLogoBrand ?? 'SOUL' }}</strong>
                         <small class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Panel {{ $psRole }}</small>
                     </span>
                 </a>
@@ -823,28 +849,61 @@
                 @foreach ($psItems as $psMobileItem)
                     @php
                         $psMobileActive = isset($psMobileItem['children'])
-                            ? collect($psMobileItem['children'])->contains(fn ($child) => isset($child['is']) && request()->routeIs((array) $child['is']))
+                            ? collect($psMobileItem['children'])->contains(function ($child) {
+                                if (isset($child['is']) && request()->routeIs((array) $child['is'])) return true;
+                                if (isset($child['children'])) {
+                                    return collect($child['children'])->contains(
+                                        fn ($gc) => isset($gc['is']) && request()->routeIs((array) $gc['is'])
+                                    );
+                                }
+                                return false;
+                              })
                             : (isset($psMobileItem['is']) && request()->routeIs((array) $psMobileItem['is']));
                     @endphp
                     @if (isset($psMobileItem['children']))
                         <details class="group" {{ $psMobileActive ? 'open' : '' }}>
-                            <summary class="flex min-h-[42px] cursor-pointer list-none items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs {{ $psMobileActive ? 'bg-sky-100 font-semibold text-sky-800' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
+                            <summary class="flex min-h-[42px] cursor-pointer list-none items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs {{ $psMobileActive ? 'bg-sky-100 dark:bg-neutral-800 font-semibold text-sky-800 dark:text-slate-100' : 'font-medium text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-800 hover:text-sky-700 dark:hover:text-slate-200' }}">
                                 <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg[$psMobileItem['icon']] ?? '' !!}</svg>
                                 <span>{{ $psMobileItem['label'] }}</span>
                                 <svg class="ml-auto h-4 w-4 shrink-0 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                             </summary>
-                            <div class="ml-7 mt-1 space-y-1 border-l border-sky-100 pl-4">
+                            <div class="ml-7 mt-1 space-y-1 border-l border-sky-100 dark:border-neutral-800 pl-4">
                                 @foreach ($psMobileItem['children'] as $psMobileChild)
-                                    @php $psMobileChildActive = isset($psMobileChild['is']) && request()->routeIs((array) $psMobileChild['is']); @endphp
-                                    <a href="{{ $psMobileChild['url'] ?? '#' }}" class="flex min-h-[40px] items-center gap-2.5 rounded-lg px-3 py-2 text-xs {{ $psMobileChildActive ? 'bg-sky-50 font-semibold text-sky-700' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
-                                        <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg[$psMobileChild['icon']] ?? '' !!}</svg>
-                                        <span>{{ $psMobileChild['label'] }}</span>
-                                    </a>
+                                    @php
+                                        $psMobileChildActive = isset($psMobileChild['is']) && request()->routeIs((array) $psMobileChild['is']);
+                                        $psMobileChildHasChildren = isset($psMobileChild['children']) && count($psMobileChild['children']) > 0;
+                                        $psMobileSubActive = $psMobileChildHasChildren && collect($psMobileChild['children'])->contains(
+                                            fn ($gc) => isset($gc['is']) && request()->routeIs((array) $gc['is'])
+                                        );
+                                    @endphp
+                                    @if ($psMobileChildHasChildren)
+                                        <details class="group ps-mobile-subgroup" {{ ($psMobileChildActive || $psMobileSubActive) ? 'open' : '' }}>
+                                            <summary class="flex min-h-[40px] cursor-pointer list-none items-center gap-2.5 rounded-lg px-3 py-2 text-xs {{ ($psMobileChildActive || $psMobileSubActive) ? 'bg-sky-50 dark:bg-neutral-800 font-semibold text-sky-700 dark:text-slate-200' : 'text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-800 hover:text-sky-700 dark:hover:text-slate-200' }}">
+                                                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg[$psMobileChild['icon']] ?? '' !!}</svg>
+                                                <span>{{ $psMobileChild['label'] }}</span>
+                                                <svg class="ml-auto h-3.5 w-3.5 shrink-0 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                                            </summary>
+                                            <div class="ml-4 mt-1 space-y-1 border-l border-dashed border-sky-200 dark:border-neutral-700 pl-3">
+                                                @foreach ($psMobileChild['children'] as $psMobileGc)
+                                                    @php $psMobileGcActive = isset($psMobileGc['is']) && request()->routeIs((array) $psMobileGc['is']); @endphp
+                                                    <a href="{{ $psMobileGc['url'] ?? '#' }}" aria-current="{{ $psMobileGcActive ? 'page' : 'false' }}" class="flex min-h-[38px] items-center gap-2.5 rounded-lg px-3 py-2 text-xs {{ $psMobileGcActive ? 'bg-sky-50 dark:bg-neutral-800 font-semibold text-sky-700 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-800 hover:text-sky-700 dark:hover:text-slate-200' }}">
+                                                        <svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg[$psMobileGc['icon'] ?? 'users'] ?? '' !!}</svg>
+                                                        <span>{{ $psMobileGc['label'] }}</span>
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        </details>
+                                    @else
+                                        <a href="{{ $psMobileChild['url'] ?? '#' }}" aria-current="{{ $psMobileChildActive ? 'page' : 'false' }}" class="flex min-h-[40px] items-center gap-2.5 rounded-lg px-3 py-2 text-xs {{ $psMobileChildActive ? 'bg-sky-50 dark:bg-neutral-800 font-semibold text-sky-700 dark:text-slate-200' : 'text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-800 hover:text-sky-700 dark:hover:text-slate-200' }}">
+                                            <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg[$psMobileChild['icon']] ?? '' !!}</svg>
+                                            <span>{{ $psMobileChild['label'] }}</span>
+                                        </a>
+                                    @endif
                                 @endforeach
                             </div>
                         </details>
                     @else
-                        <a href="{{ $psMobileItem['url'] }}" @if (($psMobileItem['label'] ?? null) === 'Nilai') data-ps-nilai @endif aria-current="{{ $psMobileActive ? 'page' : 'false' }}" class="relative flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs transition-all {{ $psMobileActive ? 'bg-sky-100 font-semibold text-sky-800 shadow-sm shadow-sky-100' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
+                        <a href="{{ $psMobileItem['url'] }}" @if (($psMobileItem['label'] ?? null) === 'Nilai') data-ps-nilai @endif aria-current="{{ $psMobileActive ? 'page' : 'false' }}" class="relative flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs transition-all {{ $psMobileActive ? 'bg-sky-100 dark:bg-neutral-800 font-semibold text-sky-800 dark:text-slate-100 shadow-sm shadow-sky-100' : 'font-medium text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-800 hover:text-sky-700 dark:hover:text-slate-200' }}">
                             @if ($psMobileActive)
                                 <span class="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-blue-500" aria-hidden="true"></span>
                             @endif
@@ -855,12 +914,12 @@
                 @endforeach
                 @foreach ($psMore ?? [] as $psMobileMore)
                     @php $psMobileMoreActive = isset($psMobileMore['is']) && request()->routeIs((array) $psMobileMore['is']); @endphp
-                    <a href="{{ $psMobileMore['url'] }}" aria-current="{{ $psMobileMoreActive ? 'page' : 'false' }}" class="flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs {{ $psMobileMoreActive ? 'bg-sky-100 font-semibold text-sky-800' : 'font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
+                    <a href="{{ $psMobileMore['url'] }}" aria-current="{{ $psMobileMoreActive ? 'page' : 'false' }}" class="flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs {{ $psMobileMoreActive ? 'bg-sky-100 dark:bg-neutral-800 font-semibold text-sky-800 dark:text-slate-100' : 'font-medium text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-800 hover:text-sky-700 dark:hover:text-slate-200' }}">
                         <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg[$psMobileMore['icon'] ?? 'document'] ?? '' !!}</svg>
                         <span>{{ $psMobileMore['label'] }}</span>
                     </a>
                 @endforeach
-                <a href="{{ $psNotifUrl }}" class="flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-500 hover:bg-sky-50 hover:text-sky-700">
+                <a href="{{ $psNotifUrl }}" class="flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-800 hover:text-sky-700 dark:hover:text-slate-200">
                     <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg['bell'] !!}</svg>
                     <span>Notifikasi</span>
                 </a>
@@ -913,6 +972,73 @@
         }
 
         var groups = rail.querySelectorAll('.ps-group');
+
+        /* ---- Flyout & tooltip positioning for the collapsed rail -------------
+           The nav list must stay scrollable, so the floating panels are placed
+           with `position: fixed` and positioned from JS (viewport coordinates). */
+        function isCollapsed() {
+            return document.body.classList.contains('ps-collapsed');
+        }
+
+        function placeFlyout(group) {
+            var panel = group.querySelector(':scope > .ps-submenu');
+            var summary = group.querySelector(':scope > summary');
+            if (!panel || !summary) return;
+            var rect = summary.getBoundingClientRect();
+            var gap = 14;
+            var left = rect.right + gap;
+            var width = Math.max(panel.offsetWidth || 190, 190);
+            if (left + width > window.innerWidth - 12) {
+                left = Math.max(12, window.innerWidth - width - 12);
+            }
+            var top = rect.top;
+            var maxHeight = Math.max(160, window.innerHeight - top - 20);
+            if (panel.offsetHeight > maxHeight) {
+                top = Math.max(12, window.innerHeight - maxHeight - 12);
+            }
+            panel.style.setProperty('--ps-flyout-left', left + 'px');
+            panel.style.setProperty('--ps-flyout-top', top + 'px');
+            panel.style.maxHeight = Math.min(maxHeight, 520) + 'px';
+        }
+
+        function placeTip(host) {
+            var tip = host.querySelector(':scope > .ps-tip');
+            if (!tip) return;
+            var rect = host.getBoundingClientRect();
+            var left = rect.right + 12;
+            var width = tip.offsetWidth || 120;
+            if (left + width > window.innerWidth - 12) {
+                left = Math.max(12, window.innerWidth - width - 12);
+            }
+            tip.style.setProperty('--ps-tip-left', left + 'px');
+            tip.style.setProperty('--ps-tip-top', (rect.top + rect.height / 2) + 'px');
+        }
+
+        groups.forEach(function (group) {
+            group.addEventListener('toggle', function () {
+                if (!isCollapsed()) return;
+                if (group.open) {
+                    placeFlyout(group);
+                    requestAnimationFrame(function () { placeFlyout(group); });
+                }
+            });
+            group.addEventListener('mouseenter', function () {
+                if (isCollapsed()) placeFlyout(group);
+            });
+        });
+
+        rail.querySelectorAll('.ps-item, .ps-logo, .ps-user, .ps-gear summary').forEach(function (host) {
+            host.addEventListener('mouseenter', function () {
+                if (isCollapsed()) placeTip(host);
+            });
+        });
+
+        window.addEventListener('resize', function () {
+            if (!isCollapsed()) return;
+            groups.forEach(function (group) {
+                if (group.open) placeFlyout(group);
+            });
+        });
 
         if (gear || groups.length) {
             document.addEventListener('click', function (event) {

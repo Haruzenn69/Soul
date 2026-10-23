@@ -31,6 +31,7 @@ use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\PengajuanKeluarController;
 use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\PrestasiController;
+use App\Http\Controllers\SearchSuggestionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfilEkskulController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
@@ -96,6 +97,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Pencarian global dengan suggestion (seperti Google)
+    Route::get('/search/suggestions', [SearchSuggestionController::class, 'index'])->name('search.suggestions');
     Route::post('/onboarding/setup', [OnboardingController::class, 'setup'])->name('onboarding.setup');
     Route::post('/onboarding/login', [OnboardingController::class, 'returnToLogin'])->name('onboarding.login');
 

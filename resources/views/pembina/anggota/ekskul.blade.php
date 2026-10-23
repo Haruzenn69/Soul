@@ -1,4 +1,4 @@
-﻿@extends("pembina.layout")
+@extends("pembina.layout")
 @section("title", "Data Anggota")
 @section("content")
 <div class="space-y-6 animate-fade-up">

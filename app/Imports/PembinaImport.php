@@ -99,7 +99,7 @@ class PembinaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHead
             'password' => Hash::make('password'),
             'role' => 'pembina',
             'email_verified_at' => now(),
-            'onboarding_completed_at' => null,
+            'onboarding_completed_at' => now(),
         ]);
 
         $user->pembina()->create([

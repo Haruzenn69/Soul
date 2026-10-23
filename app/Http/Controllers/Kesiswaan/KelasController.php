@@ -192,17 +192,18 @@ class KelasController extends Controller
         return Validator::make($request->all(), [
             'tingkat' => ['required', 'in:'.implode(',', array_keys(config('kelas.tingkat')))],
             'jurusan' => ['required', Rule::in(array_keys(config('kelas.jurusan')))],
-            'rombel' => ['required', 'integer', 'min:1'],
+            // Rombel bersifat opsional - boleh dikosongkan.
+            'rombel' => ['nullable', 'integer', 'min:1'],
             'tahun_ajaran_id' => ['required', 'exists:tahun_ajarans,id'],
         ])->validate();
     }
 
-    private function buildNama(string $tingkat, string $jurusan, string $rombel): string
+    private function buildNama(string $tingkat, string $jurusan, ?string $rombel = null): string
     {
         $labelTingkat = config("kelas.tingkat.{$tingkat}", $tingkat);
         $labelJurusan = config("kelas.jurusan.{$jurusan}.{$tingkat}", $jurusan);
 
-        return trim("{$labelTingkat} {$labelJurusan} {$rombel}");
+        return trim(implode(' ', array_filter([$labelTingkat, $labelJurusan, $rombel])));
     }
 
     private function kelasExists(string $nama, int $tahunAjaranId, ?int $ignoreId = null): bool
