@@ -31,9 +31,19 @@ class Siswa extends Model
         'jabatan',
     ];
 
-    public function getFotoUrlAttribute(): ?string
+    public function getFotoUrlAttribute(): string
     {
-        return $this->foto ? asset('storage/'.$this->foto) : null;
+        if ($this->foto) {
+            if (str_starts_with($this->foto, 'http://') || str_starts_with($this->foto, 'https://')) {
+                return $this->foto;
+            }
+            if (str_starts_with($this->foto, 'images/')) {
+                return asset($this->foto);
+            }
+            return asset('storage/'.$this->foto);
+        }
+
+        return asset('images/default.png');
     }
 
     protected function nama(): Attribute

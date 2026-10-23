@@ -100,25 +100,6 @@
                 @endif
             </div>
 
-            {{-- Pembina --}}
-            <div>
-                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Pembina <span class="text-rose-500">*</span></label>
-                <select name="pembina_id" required
-                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
-                    <option value="" disabled>Pilih pembina...</option>
-                    @foreach ($pembinas as $p)
-                        @php
-                            $isCurrent = $ekskul->pembina_id == $p->id;
-                            $isFull = !$isCurrent && $p->ekskuls_count >= 4;
-                            $isNurianti = str_contains(strtolower($p->nama ?? ''), 'nurianti');
-                        @endphp
-                        <option value="{{ $p->id }}" @selected(old('pembina_id', $ekskul->pembina_id) == $p->id) @disabled($isFull || $isNurianti)>
-                            {{ $p->nama }} ({{ $p->ekskuls_count }}/4 ekskul) {{ $isFull ? '– Penuh' : '' }} {{ $isNurianti ? '– Tidak Diizinkan' : '' }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
             {{-- Deskripsi --}}
             <div>
                 <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Deskripsi</label>

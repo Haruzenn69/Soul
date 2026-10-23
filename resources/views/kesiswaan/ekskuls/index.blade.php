@@ -507,19 +507,6 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Pembina <span class="text-rose-500">*</span></label>
-                <select name="pembina_id" id="edit_pembina_id" required
-                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
-                    <option value="" disabled>Pilih pembina...</option>
-                    @foreach ($pembinas as $p)
-                        <option value="{{ $p->id }}" data-count="{{ $p->ekskuls_count }}" data-kategori="{{ $p->kategori_binaan ?? '' }}">
-                            {{ $p->nama }} ({{ $p->kategori_binaan ? $p->kategori_binaan . ' · ' : '' }}{{ $p->ekskuls_count }}/4)
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
                 <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Deskripsi</label>
                 <textarea name="deskripsi" rows="2"
                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition resize-none"></textarea>
@@ -658,18 +645,6 @@
             selKategori.value = data.kategori || '';
         }
 
-        const selPembina = form.querySelector('[name=pembina_id]');
-        selPembina.value = data.pembina_id || '';
-        Array.from(selPembina.options).forEach(opt => {
-            const count = parseInt(opt.getAttribute('data-count') || '0', 10);
-            if (opt.value != data.pembina_id && count >= 4) {
-                opt.disabled = true;
-                if (!opt.text.includes('– Penuh')) opt.text += ' – Penuh';
-            } else {
-                opt.disabled = false;
-                opt.text = opt.text.replace(' – Penuh', '');
-            }
-        });
         form.querySelector('[name=deskripsi]').value = data.deskripsi || '';
         form.querySelector('[name=jadwal]').value = data.jadwal || '';
         document.getElementById('modal-edit').showModal();
