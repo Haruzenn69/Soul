@@ -300,7 +300,7 @@
                                     </div>
                                     <button type="button" onclick="document.getElementById('modal-kelola-{{ $p->id }}').showModal()"
                                             class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-bold text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition">
-                                        Kelola Ekskul ({{ $p->ekskuls->count() }}/4)
+                                        Kelola Ekskul ({{ $p->ekskuls->count() }}/{{ \App\Support\AturanEkskul::MAKS_EKSKUL_PEMBINA }})
                                     </button>
                                 </div>
                             </td>
@@ -363,7 +363,7 @@
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div>
                     <h2 class="text-sm font-extrabold text-slate-900">Kelola Ekskul Pembina</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">{{ $p->nama }} · {{ $p->ekskuls->count() }}/4 ekskul</p>
+                    <p class="text-xs text-slate-400 mt-0.5">{{ $p->nama }} · {{ $p->ekskuls->count() }}/{{ \App\Support\AturanEkskul::MAKS_EKSKUL_PEMBINA }} ekskul</p>
                 </div>
                 <button type="button" onclick="this.closest('dialog').close()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center">×</button>
             </div>
@@ -372,7 +372,7 @@
             @if ($p->kategori_aktif)
                 <div class="p-3 bg-sky-50/80 rounded-2xl border border-sky-100 text-xs">
                     <p class="font-bold text-sky-900">Kategori Binaan: <span class="text-sky-700 font-extrabold">{{ $p->kategori_aktif }}</span></p>
-                    <p class="text-[11px] text-sky-700/80 mt-0.5">Pembina ini dapat ditugaskan pada ekskul dari kategori mana saja (lintas kategori), maksimal <strong>4 ekskul</strong>.</p>
+                    <p class="text-[11px] text-sky-700/80 mt-0.5">Pembina ini dapat ditugaskan pada ekskul dari kategori mana saja (lintas kategori), maksimal <strong>{{ \App\Support\AturanEkskul::MAKS_EKSKUL_PEMBINA }} ekskul</strong>.</p>
                 </div>
             @elseif ($p->kategori_pernah_dibina)
                 <div class="p-3 bg-amber-50/80 rounded-2xl border border-amber-100 text-xs">
@@ -382,7 +382,7 @@
             @else
                 <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 text-xs">
                     <p class="font-bold text-slate-700">Belum Ada Kategori</p>
-                    <p class="text-[11px] text-slate-500 mt-0.5">Pembina dapat ditugaskan ke ekskul dari kategori apa saja, maksimal 4 ekskul.</p>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Pembina dapat ditugaskan ke ekskul dari kategori apa saja, maksimal {{ \App\Support\AturanEkskul::MAKS_EKSKUL_PEMBINA }} ekskul.</p>
                 </div>
             @endif
 
@@ -409,7 +409,7 @@
                 @endforelse
             </div>
 
-            @if ($p->ekskuls->count() < 4)
+            @if ($p->ekskuls->count() < \App\Support\AturanEkskul::MAKS_EKSKUL_PEMBINA)
                 @php
                     $availableEkskuls = $ekskulList->whereNull('pembina_id');
                 @endphp
@@ -429,7 +429,7 @@
                     </button>
                 </form>
             @else
-                <p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded-xl p-3">Batas maksimal 4 ekskul per pembina tercapai.</p>
+                <p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded-xl p-3">Batas maksimal {{ \App\Support\AturanEkskul::MAKS_EKSKUL_PEMBINA }} ekskul per pembina tercapai.</p>
             @endif
         </div>
     </dialog>

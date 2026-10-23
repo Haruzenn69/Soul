@@ -69,9 +69,10 @@ class PembinaController extends Controller
             return back()->withErrors(['ekskul_id' => "Ekskul {$ekskul->nama_ekskul} sudah memiliki pembina."]);
         }
 
-        // Cek batas maksimal 4 ekskul per pembina
-        if ($pembina->ekskuls()->count() >= 4) {
-            return back()->withErrors(['ekskul_id' => "Pembina {$pembina->nama} sudah membina 4 ekskul (batas maksimal)."]);
+        // Cek batas maksimal ekskul per pembina
+        $maksEkskul = AturanEkskul::MAKS_EKSKUL_PEMBINA;
+        if ($pembina->ekskuls()->count() >= $maksEkskul) {
+            return back()->withErrors(['ekskul_id' => "Pembina {$pembina->nama} sudah membina {$maksEkskul} ekskul (batas maksimal)."]);
         }
 
         $namaPembinaLower = strtolower(trim($pembina->nama ?? ''));

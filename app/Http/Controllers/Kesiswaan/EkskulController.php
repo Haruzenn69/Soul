@@ -106,10 +106,11 @@ class EkskulController extends Controller
         ]);
         if (! empty($data['pembina_id'])) {
             $pembina = Pembina::findOrFail($data['pembina_id']);
+            $maksPembina = AturanEkskul::MAKS_EKSKUL_PEMBINA;
             $count = Ekskul::where('pembina_id', $pembina->id)->count();
-            if ($count >= 4) {
+            if ($count >= $maksPembina) {
                 return back()->withErrors([
-                    'pembina_id' => "Pembina {$pembina->nama} sudah membina 4 ekskul (batas maksimal 4 ekskul per pembina).",
+                    'pembina_id' => "Pembina {$pembina->nama} sudah membina {$maksPembina} ekskul (batas maksimal {$maksPembina} ekskul per pembina).",
                 ])->withInput();
             }
             $namaPembinaLower = strtolower(trim($pembina->nama ?? ''));
