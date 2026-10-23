@@ -385,3 +385,13 @@
 
 /* Alpine.js: cegah kilat elemen sebelum Alpine.start() */
 [x-cloak] { display: none !important; }
+
+/* -----------------------------------------------------------------------
+   Logo SOUL — switch dark/light mode
+   Gunakan specificity lebih tinggi agar tidak dioverride oleh Tailwind
+   preflight `img { display: block }`.
+   ----------------------------------------------------------------------- */
+img.ps-logo-img-light { display: block; }
+img.ps-logo-img-dark  { display: none;  }
+html.dark img.ps-logo-img-light { display: none;  }
+html.dark img.ps-logo-img-dark  { display: block; }

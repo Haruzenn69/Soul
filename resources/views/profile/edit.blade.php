@@ -81,7 +81,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('partials.theme-mode-head')
 </head>
-<body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 text-slate-800 font-sans antialiased min-h-screen md:flex selection:bg-sky-100 selection:text-sky-700 overflow-x-hidden">@include('partials.pill-sidebar', [
+<body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 text-slate-800 dark:text-slate-200 font-sans antialiased min-h-screen md:flex selection:bg-sky-100 dark:selection:bg-sky-900 selection:text-sky-700 dark:selection:text-sky-300 overflow-x-hidden">@include('partials.pill-sidebar', [
     'psTitle' => $psSidebar['title'],
     'psLogoBrand' => 'SOUL',
     'psDashboardUrl' => $psSidebar['dash'],
@@ -92,27 +92,30 @@
 ])
 
     <!-- MOBILE SIDEBAR OVERLAY -->
-    <div id="sidebar-overlay" class="hidden fixed inset-0 z-40 bg-black/50 md:hidden" onclick="closeSidebar()"></div>
+    <div id="sidebar-overlay" class="hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-[2px] md:hidden" onclick="closeSidebar()"></div>
 
     <!-- MOBILE SIDEBAR -->
-    <div id="sidebar-mobile" class="hidden fixed inset-y-0 left-0 z-50 w-64 h-screen bg-white border-r border-sky-100 overflow-y-auto md:hidden shadow-2xl">
+    <div id="sidebar-mobile" class="hidden fixed inset-y-0 left-0 z-50 w-64 h-screen bg-white dark:bg-neutral-900 border-r border-sky-100 dark:border-neutral-800 overflow-y-auto md:hidden shadow-2xl">
         <div class="relative h-full flex flex-col overflow-y-auto">
             <div class="flex items-center justify-between mb-8 px-2 mt-1">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-extrabold text-lg shadow-lg shadow-sky-300">SOUL</div>
+                    <div class="w-10 h-10 rounded-2xl overflow-hidden flex items-center justify-center shadow-lg shadow-sky-200 dark:shadow-sky-900">
+                        <img src="{{ asset('images/logo-light-nobg.png') }}" alt="SOUL" class="w-full h-full object-contain ps-logo-img-light">
+                        <img src="{{ asset('images/logo-dark-nobg.png') }}" alt="SOUL" class="w-full h-full object-contain ps-logo-img-dark">
+                    </div>
                     <div>
-                        <h1 class="font-extrabold text-sm tracking-tight text-slate-900 leading-none">SOUL</h1>
+                        <h1 class="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white leading-none">SOUL</h1>
                         <span class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Ekskul Manager</span>
                     </div>
                 </div>
-                <button onclick="closeSidebar()" class="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors">
+                <button onclick="closeSidebar()" class="w-8 h-8 rounded-full bg-slate-50 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-neutral-700 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
 
-<div class="flex items-center justify-between mb-2 px-3">
+            <div class="flex items-center justify-between mb-2 px-3">
                 <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Menu utama</div>
-                <span class="text-[9px] font-semibold text-slate-300">{{ $psIsKetua ? 'PANEL KETUA' : 'PANEL SISWA' }}</span>
+                <span class="text-[9px] font-semibold text-slate-400 dark:text-slate-500">{{ $psIsKetua ? 'PANEL KETUA' : 'PANEL SISWA' }}</span>
             </div>
             <nav aria-label="Menu utama mobile" class="space-y-1.5">
                 @foreach($psSidebar['items'] as $psMItem)
@@ -123,7 +126,7 @@
                     @endphp
                     @if(isset($psMItem['children']))
                         <details class="group" {{ $psMActive ? 'open' : '' }}>
-                            <summary class="relative flex items-center gap-3 px-3.5 py-2.5 {{ $psMActive ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all cursor-pointer list-none">
+                            <summary class="relative flex items-center gap-3 px-3.5 py-2.5 {{ $psMActive ? 'bg-gradient-to-r from-sky-100 to-blue-100 dark:from-sky-950/40 dark:to-blue-950/40 text-sky-800 dark:text-sky-200 rounded-xl font-semibold' : 'text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-800/60 hover:text-sky-700 dark:hover:text-sky-300 rounded-xl font-medium' }} text-xs transition-all cursor-pointer list-none">
                                 <span class="text-base flex items-center justify-center w-4 h-4">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         {!! $psIconSvg[$psMItem['icon']] ?? '' !!}
@@ -132,10 +135,10 @@
                                 {{ $psMItem['label'] }}
                                 <svg class="w-4 h-4 ml-auto transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
                             </summary>
-                            <div class="ml-7 pl-4 mt-1 space-y-1 border-l border-sky-100">
+                            <div class="ml-7 pl-4 mt-1 space-y-1 border-l border-sky-100 dark:border-neutral-800">
                                 @foreach($psMItem['children'] as $psMChild)
                                     @php $psMChildActive = request()->routeIs((array) $psMChild['is']); @endphp
-                                    <a href="{{ $psMChild['url'] }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs {{ $psMChildActive ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700' }}">
+                                    <a href="{{ $psMChild['url'] }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs {{ $psMChildActive ? 'bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 font-semibold' : 'text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-800/60 hover:text-sky-700 dark:hover:text-sky-300' }}">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             {!! $psIconSvg[$psMChild['icon']] ?? '' !!}
                                         </svg>
@@ -145,7 +148,7 @@
                             </div>
                         </details>
                     @else
-                        <a href="{{ $psMItem['url'] }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ $psMActive ? 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 rounded-xl font-semibold shadow-sm shadow-sky-100' : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 rounded-xl font-medium' }} text-xs transition-all">
+                        <a href="{{ $psMItem['url'] }}" class="relative flex items-center gap-3 px-3.5 py-2.5 {{ $psMActive ? 'bg-gradient-to-r from-sky-100 to-blue-100 dark:from-sky-950/40 dark:to-blue-950/40 text-sky-800 dark:text-sky-200 rounded-xl font-semibold shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-800/60 hover:text-sky-700 dark:hover:text-sky-300 rounded-xl font-medium' }} text-xs transition-all">
                             @if($psMActive)
                                 <span class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-gradient-to-b from-sky-400 to-blue-500"></span>
                             @endif
@@ -161,13 +164,13 @@
             </nav>
 
             <div class="mt-auto pt-6">
-                <div class="bg-gradient-to-r from-sky-50 to-amber-50 p-3 rounded-2xl flex items-center justify-between border border-sky-100 shadow-sm">
+                <div class="bg-gradient-to-r from-sky-50 to-amber-50 dark:from-neutral-800 dark:to-neutral-850 p-3 rounded-2xl flex items-center justify-between border border-sky-100 dark:border-neutral-700 shadow-sm">
                     <div class="flex items-center gap-2.5">
                         <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 font-extrabold flex items-center justify-center text-xs shadow-md shadow-amber-200">
                             {{ strtoupper(substr($siswa->nama ?? auth()->user()->username ?? 'S', 0, 1)) }}
                         </div>
                         <div class="text-left">
-                            <h4 class="text-xs font-bold text-slate-800 leading-tight">{{ $siswa->nama ?? auth()->user()->username }}</h4>
+                            <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">{{ $siswa->nama ?? auth()->user()->username }}</h4>
                             <p class="text-[10px] text-slate-400 font-medium">{{ $siswa->kelas->nama ?? 'Siswa' }}</p>
                         </div>
                     </div>
@@ -184,21 +187,24 @@
     <div class="w-full flex-1 flex flex-col min-w-0 ps-page">
 
         <!-- TOP NAVBAR HEADER -->
-        <header class="px-4 md:px-8 py-4 bg-white/70 backdrop-blur-lg border-b border-sky-100 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
+        <header class="px-4 md:px-8 py-4 bg-white/70 dark:bg-neutral-900/70 backdrop-blur-lg border-b border-sky-100 dark:border-neutral-800 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
             <!-- KIRI: Hamburger (Mobile) + Logo + Search -->
             <div class="flex items-center gap-3 flex-1 min-w-0">
                 <!-- Tombol Hamburger (Mobile) - Pindah ke Kiri -->
-                <button onclick="openSidebar()" class="w-9 h-9 rounded-full bg-white border border-sky-100 flex items-center justify-center text-slate-500 md:hidden shadow-sm shrink-0">
+                <button onclick="openSidebar()" aria-label="Buka menu navigasi" class="w-9 h-9 rounded-full bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 flex items-center justify-center text-slate-500 dark:text-slate-400 md:hidden shadow-sm shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
 
                 <!-- Logo Mobile -->
                 <div class="flex items-center gap-2 md:hidden shrink-0">
-                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-extrabold text-sm shadow-md shadow-sky-300">S</div>
-                    <span class="font-extrabold text-sm tracking-tight text-slate-900">SOUL</span>
+                    <div class="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center shadow-md shadow-sky-200 dark:shadow-sky-900">
+                        <img src="{{ asset('images/logo-light-nobg.png') }}" alt="SOUL" class="w-full h-full object-contain ps-logo-img-light">
+                        <img src="{{ asset('images/logo-dark-nobg.png') }}" alt="SOUL" class="w-full h-full object-contain ps-logo-img-dark">
+                    </div>
+                    <span class="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white">SOUL</span>
                 </div>
 
-<!-- Search (Desktop) -->
+                <!-- Search (Desktop) -->
                 @if(! $psIsKetua)
                 <form method="GET" action="{{ route('siswa.katalog') }}" class="relative w-full max-w-md hidden sm:block">
                     <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">
@@ -206,14 +212,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </span>
-                    <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari..." class="w-full pl-10 pr-4 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+                    <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari..." class="w-full pl-10 pr-4 py-2 bg-sky-50/70 dark:bg-neutral-800/80 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition-all">
                 </form>
                 @endif
             </div>
 
             <!-- KANAN: Info User + Notifikasi + Logout -->
             <div class="flex items-center gap-2 md:gap-3 shrink-0">
-                <div class="bg-sky-50 text-sky-700 border border-sky-100 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 hidden sm:block">
+                <div class="bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-800/70 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 hidden sm:block">
                     <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> {{ $psIsKetua ? 'Ketua' : 'Siswa' }}
                 </div>
 
@@ -232,15 +238,15 @@
                     <a href="{{ $__switchUrlP }}"
                        id="header-switch-dashboard-profile"
                        title="Switch Dashboard ke {{ $__othEksP->nama_ekskul }}{{ $__isOthKetuaP ? ' (Ketua)' : '' }}"
-                       class="group relative hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 text-xs font-bold transition-all shadow-sm hover:shadow shrink-0">
-                        <svg class="w-3.5 h-3.5 transition-transform group-hover:rotate-180 duration-500 text-sky-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="group relative hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/40 dark:hover:bg-sky-900/50 border border-sky-200 dark:border-sky-800/70 text-sky-700 dark:text-sky-300 text-xs font-bold transition-all shadow-sm hover:shadow shrink-0">
+                        <svg class="w-3.5 h-3.5 transition-transform group-hover:rotate-180 duration-500 text-sky-600 dark:text-sky-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                         </svg>
                         <span class="whitespace-nowrap font-bold">Switch Dashboard</span>
-                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-sky-200/60 text-[10px] font-semibold text-sky-800 truncate max-w-[100px]">
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-sky-200/60 dark:bg-sky-900/80 text-[10px] font-semibold text-sky-800 dark:text-sky-200 truncate max-w-[100px]">
                             {{ $__othEksP->nama_ekskul }}
                             @if($__isOthKetuaP)
-                                <span class="text-[9px] text-amber-600 font-extrabold">&bull; Ketua</span>
+                                <span class="text-[9px] text-amber-600 dark:text-amber-400 font-extrabold">&bull; Ketua</span>
                             @endif
                         </span>
                         <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
@@ -250,25 +256,25 @@
                     <a href="{{ $__switchUrlP }}"
                        id="header-switch-dashboard-profile-mobile"
                        title="Switch Dashboard ke {{ $__othEksP->nama_ekskul }}{{ $__isOthKetuaP ? ' (Ketua)' : '' }}"
-                       class="sm:hidden relative w-9 h-9 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 flex items-center justify-center transition-all shadow-sm shrink-0">
-                        <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="sm:hidden relative w-9 h-9 rounded-xl bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/40 dark:hover:bg-sky-900/50 border border-sky-200 dark:border-sky-800/70 text-sky-700 dark:text-sky-300 flex items-center justify-center transition-all shadow-sm shrink-0">
+                        <svg class="w-4 h-4 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                         </svg>
-                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-sky-500 border-2 border-white animate-pulse"></span>
+                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-sky-500 border-2 border-white dark:border-neutral-900 animate-pulse"></span>
                     </a>
                 @endif
 
-                <a href="{{ $psSidebar['notif'] }}" class="w-9 h-9 rounded-xl bg-white border border-sky-100 flex items-center justify-center text-xs relative text-slate-600 hover:bg-sky-50 hover:border-sky-200 transition-all shadow-sm">
+                <a href="{{ $psSidebar['notif'] }}" aria-label="Notifikasi" class="w-9 h-9 rounded-xl bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 flex items-center justify-center text-xs relative text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-700 hover:border-sky-200 dark:hover:border-neutral-700 transition-all shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                     </svg>
                     @if(($unreadNotifCount ?? 0) > 0)
-                        <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 absolute top-1.5 right-1.5 border-2 border-white shadow-sm"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 absolute top-1.5 right-1.5 border-2 border-white dark:border-neutral-900 shadow-sm"></span>
                     @endif
                 </a>
                 <form method="POST" action="{{ route('logout') }}" class="hidden sm:block">
                     @csrf
-                    <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-400 px-4 py-2 rounded-lg text-xs font-semibold border border-red-100 transition shadow-sm">
+                    <button type="submit" class="bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-950/50 text-red-500 dark:text-red-400 px-4 py-2 rounded-lg text-xs font-semibold border border-red-100 dark:border-red-900/50 transition shadow-sm">
                         Logout
                     </button>
                 </form>
@@ -277,18 +283,15 @@
 
         <!-- MAIN PAGE CONTENT -->
         <main class="p-4 md:p-8 space-y-6 overflow-y-auto">
-
             <div class="animate-fade-up">
-                <h1 class="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900">Profile Saya</h1>
-                <p class="text-xs text-slate-400 mt-1 font-medium">Kelola informasi akun dan data diri kamu</p>
+                <h1 class="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Profile Saya</h1>
+                <p class="text-xs text-slate-400 dark:text-slate-400 mt-1 font-medium">Kelola informasi akun dan data diri kamu</p>
             </div>
-
-
 
             @php $profilLengkap = $siswa && $siswa->isProfileComplete(); @endphp
 
             @if($errors->any())
-                <div class="p-4 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-2xl shadow-sm animate-fade-up">
+                <div class="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-xs font-semibold rounded-2xl shadow-sm animate-fade-up">
                     <ul class="list-disc list-inside space-y-1">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -298,15 +301,15 @@
             @endif
 
             @if(!$profilLengkap)
-                <div class="p-5 rounded-3xl border-2 border-dashed border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 shadow-sm animate-fade-up flex items-start gap-4">
-                    <div class="w-11 h-11 shrink-0 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-500 text-white flex items-center justify-center shadow-md shadow-amber-200">
+                <div class="p-5 rounded-3xl border-2 border-dashed border-amber-300 dark:border-amber-800/80 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/20 shadow-sm animate-fade-up flex items-start gap-4">
+                    <div class="w-11 h-11 shrink-0 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-500 text-white flex items-center justify-center shadow-md shadow-amber-200 dark:shadow-amber-950/50">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <h2 class="text-sm font-extrabold text-amber-900">Lengkapi Data Diri Kamu</h2>
-                        <p class="text-xs text-amber-700 mt-1 leading-relaxed">Data biodata yang belum lengkap perlu diperbarui oleh kesiswaan. Kamu tetap dapat mengubah foto profil, nomor telepon, dan email di bawah.</p>
+                        <h2 class="text-sm font-extrabold text-amber-900 dark:text-amber-200">Lengkapi Data Diri Kamu</h2>
+                        <p class="text-xs text-amber-700 dark:text-amber-300/90 mt-1 leading-relaxed">Data biodata yang belum lengkap perlu diperbarui oleh kesiswaan. Kamu tetap dapat mengubah foto profil, nomor telepon, dan email di bawah.</p>
                     </div>
                 </div>
             @endif
@@ -315,30 +318,30 @@
 
                 <!-- KOLOM KIRI: Foto Profile & Informasi Singkat -->
                 <div class="lg:col-span-1">
-                    <div class="h-full bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 p-6 text-center animate-fade-up" style="animation-delay: .1s">
+                    <div class="h-full bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-lg shadow-sky-100/60 dark:shadow-none p-6 text-center animate-fade-up" style="animation-delay: .1s">
                         <!-- Foto Profile -->
                         <div class="relative inline-block">
-                            <div class="w-28 h-28 md:w-32 md:h-32 rounded-full bg-slate-100 border-4 border-sky-300 flex items-center justify-center mx-auto overflow-hidden shadow-lg shadow-sky-200">
+                            <div class="w-28 h-28 md:w-32 md:h-32 rounded-full bg-slate-100 dark:bg-neutral-800 border-4 border-sky-300 dark:border-sky-700 flex items-center justify-center mx-auto overflow-hidden shadow-lg shadow-sky-200 dark:shadow-sky-950/50">
                                 <img id="siswa-avatar-preview" src="{{ $siswa?->foto_url ?? asset('images/default.png') }}" alt="Foto Profile" class="w-full h-full object-cover">
                             </div>
                         </div>
 
-                        <h3 class="text-sm font-extrabold text-slate-900 mt-4">{{ $siswa?->nama ?? auth()->user()->username }}</h3>
-                        <p class="text-xs text-sky-600 font-bold">@ {{ auth()->user()->username }}</p>
-                        <p class="text-xs text-slate-400 mt-0.5">{{ $siswa?->kelas?->nama ?? 'Siswa' }} • Angkatan {{ $siswa?->angkatan ?? '-' }}</p>
+                        <h3 class="text-sm font-extrabold text-slate-900 dark:text-white mt-4">{{ $siswa?->nama ?? auth()->user()->username }}</h3>
+                        <p class="text-xs text-sky-600 dark:text-sky-400 font-bold">@ {{ auth()->user()->username }}</p>
+                        <p class="text-xs text-slate-400 dark:text-slate-400 mt-0.5">{{ $siswa?->kelas?->nama ?? 'Siswa' }} • Angkatan {{ $siswa?->angkatan ?? '-' }}</p>
 
-                        <div class="mt-4 pt-4 border-t border-sky-50 text-left space-y-2 text-xs">
-                            <div class="flex items-center justify-between text-slate-500">
-                                <span class="text-[11px] text-slate-400">Media Sosial:</span>
-                                <span class="font-bold text-sky-700">{{ $siswa->medsos ?? '-' }}</span>
+                        <div class="mt-4 pt-4 border-t border-sky-50 dark:border-neutral-800 text-left space-y-2 text-xs">
+                            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                                <span class="text-[11px] text-slate-400 dark:text-slate-500">Media Sosial:</span>
+                                <span class="font-bold text-sky-700 dark:text-sky-300">{{ $siswa->medsos ?? '-' }}</span>
                             </div>
-                            <div class="flex items-center justify-between text-slate-500">
-                                <span class="text-[11px] text-slate-400">No. Telp / WA:</span>
-                                <span class="font-semibold text-slate-700">{{ $siswa->no_telp ?? '-' }}</span>
+                            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                                <span class="text-[11px] text-slate-400 dark:text-slate-500">No. Telp / WA:</span>
+                                <span class="font-semibold text-slate-700 dark:text-slate-200">{{ $siswa->no_telp ?? '-' }}</span>
                             </div>
-                            <div class="flex items-center justify-between text-slate-500">
-                                <span class="text-[11px] text-slate-400">Bergabung:</span>
-                                <span class="font-semibold text-slate-700">{{ $siswa?->created_at ? \Carbon\Carbon::parse($siswa->created_at)->isoFormat('D MMMM Y') : '-' }}</span>
+                            <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                                <span class="text-[11px] text-slate-400 dark:text-slate-500">Bergabung:</span>
+                                <span class="font-semibold text-slate-700 dark:text-slate-200">{{ $siswa?->created_at ? \Carbon\Carbon::parse($siswa->created_at)->isoFormat('D MMMM Y') : '-' }}</span>
                             </div>
                         </div>
                     </div>
@@ -348,52 +351,52 @@
                 <div class="lg:col-span-2 space-y-6">
 
                     <!-- UBAH / LENGKAPI DATA PRIBADI -->
-                    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .12s">
-                        <div class="px-6 py-5 border-b border-sky-50">
-                        <h2 class="text-sm font-extrabold text-slate-900">Data yang Dapat Diubah</h2>
-                        <p class="text-[11px] text-slate-400 mt-1">Kamu dapat mengubah foto profil, nomor telepon, dan email. Biodata lainnya dikelola kesiswaan.</p>
-                            <p class="text-[11px] text-slate-400 mt-0.5">{{ $profilLengkap ? 'Perbarui informasi identitas diri kamu' : 'Wajib diisi agar bisa mendaftar ekskul' }}</p>
+                    <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-lg shadow-sky-100/60 dark:shadow-none overflow-hidden animate-fade-up" style="animation-delay: .12s">
+                        <div class="px-6 py-5 border-b border-sky-50 dark:border-neutral-800">
+                            <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Data yang Dapat Diubah</h2>
+                            <p class="text-[11px] text-slate-400 dark:text-slate-400 mt-1">Kamu dapat mengubah foto profil, nomor telepon, dan email. Biodata lainnya dikelola kesiswaan.</p>
+                            <p class="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5">{{ $profilLengkap ? 'Perbarui informasi identitas diri kamu' : 'Wajib diisi agar bisa mendaftar ekskul' }}</p>
                         </div>
                         <form method="POST" action="{{ route('siswa.profile.update-data') }}" enctype="multipart/form-data" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                             @csrf
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>
-                                <div class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs text-slate-700 font-bold">
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Nama Lengkap</label>
+                                <div class="w-full px-4 py-2.5 bg-slate-50 dark:bg-neutral-800/80 border border-slate-100 dark:border-neutral-700 rounded-2xl text-xs text-slate-700 dark:text-slate-200 font-bold">
                                     {{ $siswa->nama ?? '-' }}
                                 </div>
-                                <p class="text-[10px] text-slate-400 mt-1.5">Ditetapkan oleh kesiswaan.</p>
+                                <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">Ditetapkan oleh kesiswaan.</p>
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Username Login <span class="text-rose-500">*</span></label>
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Username Login <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold">@</span>
                                     <input type="text" name="username" value="{{ old('username', auth()->user()->username) }}" required
-                                           class="w-full pl-8 pr-4 py-2.5 bg-sky-50/60 border @error('username') border-rose-300 @else border-sky-100 @enderror rounded-2xl text-xs font-semibold focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                           class="w-full pl-8 pr-4 py-2.5 bg-sky-50/60 dark:bg-neutral-800/60 border @error('username') border-rose-300 @else border-sky-100 dark:border-neutral-700 @enderror rounded-2xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition">
                                 </div>
-                                <p class="text-[10px] text-slate-400 mt-1.5">Gunakan username yang mudah diingat.</p>
+                                <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">Gunakan username yang mudah diingat.</p>
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Kelas</label>
-                                <div class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs text-slate-700 font-bold">
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Kelas</label>
+                                <div class="w-full px-4 py-2.5 bg-slate-50 dark:bg-neutral-800/80 border border-slate-100 dark:border-neutral-700 rounded-2xl text-xs text-slate-700 dark:text-slate-200 font-bold">
                                     {{ $siswa?->kelas?->nama ?? '-' }}
                                 </div>
-                                <p class="text-[10px] text-slate-400 mt-1.5">Ditetapkan oleh kesiswaan.</p>
+                                <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">Ditetapkan oleh kesiswaan.</p>
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Foto Profil</label>
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Foto Profil</label>
                                 <input type="file" name="foto" id="siswa-foto-input" accept="image/jpeg,image/png,image/jpg,image/webp"
                                        onchange="if(this.files && this.files[0]){ const r = new FileReader(); r.onload = e => { const img = document.getElementById('siswa-avatar-preview'); if(img){ img.src = e.target.result; } }; r.readAsDataURL(this.files[0]); }"
-                                       class="w-full px-3 py-2 bg-sky-50/60 border @error('foto') border-rose-300 @else border-sky-100 @enderror rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition file:mr-3 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-sky-500 file:text-white hover:file:bg-sky-600">
-                                <p class="text-[10px] text-slate-400 mt-1.5">Format JPG/PNG/WebP, maks 2MB.</p>
+                                       class="w-full px-3 py-2 bg-sky-50/60 dark:bg-neutral-800/60 border @error('foto') border-rose-300 @else border-sky-100 dark:border-neutral-700 @enderror rounded-2xl text-xs text-slate-800 dark:text-slate-300 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition file:mr-3 file:py-1 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-sky-500 file:text-white hover:file:bg-sky-600">
+                                <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">Format JPG/PNG/WebP, maks 2MB.</p>
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Jenis Kelamin (dikelola kesiswaan)</label>
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Jenis Kelamin (dikelola kesiswaan)</label>
                                 <select disabled
-                                        class="w-full px-4 py-2.5 bg-sky-50/60 border @error('jenis_kelamin') border-red-300 @else border-sky-100 @enderror rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                        class="w-full px-4 py-2.5 bg-sky-50/60 dark:bg-neutral-800/60 border @error('jenis_kelamin') border-red-300 @else border-sky-100 dark:border-neutral-700 @enderror rounded-2xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                                     <option value="" {{ !$siswa?->jenis_kelamin ? 'selected' : '' }} disabled>Pilih...</option>
                                     <option value="laki-laki" {{ old('jenis_kelamin', $siswa?->jenis_kelamin) === 'laki-laki' ? 'selected' : '' }}>Laki-laki</option>
                                     <option value="perempuan" {{ old('jenis_kelamin', $siswa?->jenis_kelamin) === 'perempuan' ? 'selected' : '' }}>Perempuan</option>
@@ -401,15 +404,15 @@
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Angkatan (dikelola kesiswaan)</label>
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Angkatan (dikelola kesiswaan)</label>
                                 <input disabled type="text" value="{{ $siswa?->angkatan }}" placeholder="Contoh: 2024 atau 2024/2025"
-                                       class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                       class="w-full px-4 py-2.5 bg-sky-50/60 dark:bg-neutral-800/60 border border-sky-100 dark:border-neutral-700 rounded-2xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Agama (dikelola kesiswaan)</label>
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Agama (dikelola kesiswaan)</label>
                                 <select disabled
-                                        class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                        class="w-full px-4 py-2.5 bg-sky-50/60 dark:bg-neutral-800/60 border border-sky-100 dark:border-neutral-700 rounded-2xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                                     <option value="">Pilih Agama...</option>
                                     @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agm)
                                         <option value="{{ $agm }}" {{ old('agama', $siswa?->agama) === $agm ? 'selected' : '' }}>{{ $agm }}</option>
@@ -418,66 +421,66 @@
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tempat Lahir (dikelola kesiswaan)</label>
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Tempat Lahir (dikelola kesiswaan)</label>
                                 <input disabled type="text" value="{{ $siswa?->tempat_lahir }}" placeholder="Kota kelahiran"
-                                       class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                       class="w-full px-4 py-2.5 bg-sky-50/60 dark:bg-neutral-800/60 border border-sky-100 dark:border-neutral-700 rounded-2xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tanggal Lahir (dikelola kesiswaan)</label>
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Tanggal Lahir (dikelola kesiswaan)</label>
                                 <input disabled type="date" value="{{ $siswa?->tanggal_lahir?->format('Y-m-d') }}"
-                                       class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                       class="w-full px-4 py-2.5 bg-sky-50/60 dark:bg-neutral-800/60 border border-sky-100 dark:border-neutral-700 rounded-2xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">No. Telp / WhatsApp</label>
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">No. Telp / WhatsApp</label>
                                 <input type="text" name="no_telp" value="{{ old('no_telp', $siswa?->no_telp) }}" placeholder="08xxxxxxxxxx"
-                                       class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                       class="w-full px-4 py-2.5 bg-sky-50/60 dark:bg-neutral-800/60 border border-sky-100 dark:border-neutral-700 rounded-2xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition">
                             </div>
 
                             <div>
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Email (opsional)</label>
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Email (opsional)</label>
                                 <input type="email" name="email" value="{{ old('email', auth()->user()->email ?? '') }}" placeholder="contoh@email.com"
-                                       class="w-full px-4 py-2.5 bg-sky-50/60 border @error('email') border-red-300 @else border-sky-100 @enderror rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                       class="w-full px-4 py-2.5 bg-sky-50/60 dark:bg-neutral-800/60 border @error('email') border-red-300 @else border-sky-100 dark:border-neutral-700 @enderror rounded-2xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition">
                             </div>
 
                             {{-- MEDIA SOSIAL DENGAN SISTEM ARAHAN --}}
                             <div class="md:col-span-2">
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Media Sosial (dikelola kesiswaan)</label>
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Media Sosial (dikelola kesiswaan)</label>
                                 <input disabled type="text" value="{{ $siswa?->medsos }}" placeholder="misal: @nama_siswa (Instagram) / link profil medsos"
-                                       class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
-                                <div class="mt-2 p-2.5 bg-sky-50 border border-sky-100 rounded-2xl text-[11px] text-sky-800 flex items-start gap-2">
+                                       class="w-full px-4 py-2.5 bg-sky-50/60 dark:bg-neutral-800/60 border border-sky-100 dark:border-neutral-700 rounded-2xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                <div class="mt-2 p-2.5 bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-800/70 rounded-2xl text-[11px] text-sky-800 dark:text-sky-300 flex items-start gap-2">
                                     <span>💡</span>
-                                    <span><b>Arahan Sistem:</b> Masukkan akun Instagram (contoh: <code class="bg-white/80 px-1 py-0.5 rounded text-sky-700 font-mono font-bold">@nama_kamu</code>) atau kontak medsos aktif Anda untuk mempermudah koordinasi latihan dan kegiatan ekstrakurikuler.</span>
+                                    <span><b>Arahan Sistem:</b> Masukkan akun Instagram (contoh: <code class="bg-white/80 dark:bg-neutral-900 px-1 py-0.5 rounded text-sky-700 dark:text-sky-300 font-mono font-bold border border-sky-200/50 dark:border-sky-800/50">@nama_kamu</code>) atau kontak medsos aktif Anda untuk mempermudah koordinasi latihan dan kegiatan ekstrakurikuler.</span>
                                 </div>
                             </div>
 
                             <div class="md:col-span-2">
-                                <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Alamat Lengkap</label>
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">Alamat Lengkap</label>
                                 <textarea disabled rows="2" placeholder="Alamat domisili lengkap"
-                                          class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('alamat', $siswa?->alamat) }}</textarea>
+                                          class="w-full px-4 py-2.5 bg-sky-50/60 dark:bg-neutral-800/60 border border-sky-100 dark:border-neutral-700 rounded-2xl text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">{{ old('alamat', $siswa?->alamat) }}</textarea>
                             </div>
 
                             <div class="md:col-span-2 flex items-center gap-3 pt-2">
                                 <button type="submit"
-                                        class="px-6 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition hover:-translate-y-0.5">
+                                        class="px-6 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 dark:shadow-sky-950/50 transition hover:-translate-y-0.5">
                                     Simpan Perubahan
                                 </button>
                                 @if(!$profilLengkap)
-                                    <span class="text-[11px] text-slate-400">Data ini dibutuhkan untuk mendaftar ekskul.</span>
+                                    <span class="text-[11px] text-slate-400 dark:text-slate-500">Data ini dibutuhkan untuk mendaftar ekskul.</span>
                                 @endif
                             </div>
                         </form>
                     </div>
 
                     <!-- UBAH PASSWORD -->
-                    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .14s">
-                        <div class="px-6 py-5 border-b border-sky-50 flex items-center justify-between">
+                    <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-lg shadow-sky-100/60 dark:shadow-none overflow-hidden animate-fade-up" style="animation-delay: .14s">
+                        <div class="px-6 py-5 border-b border-sky-50 dark:border-neutral-800 flex items-center justify-between">
                             <div>
-                                <h2 class="text-sm font-extrabold text-slate-900">Ubah Password</h2>
-                                <p class="text-[11px] text-slate-400 mt-0.5">Pastikan akun kamu menggunakan kata sandi yang aman dan mudah diingat</p>
+                                <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Ubah Password</h2>
+                                <p class="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5">Pastikan akun kamu menggunakan kata sandi yang aman dan mudah diingat</p>
                             </div>
-                            <div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100">
+                            <div class="w-9 h-9 rounded-xl bg-sky-50 dark:bg-neutral-800 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-100 dark:border-neutral-700">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                 </svg>
@@ -489,11 +492,11 @@
                             @method('PUT')
 
                             <div>
-                                <label for="update_password_current_password" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                                <label for="update_password_current_password" class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">
                                     Password Saat Ini <span class="text-rose-500">*</span>
                                 </label>
                                 <input type="password" id="update_password_current_password" name="current_password" required autocomplete="current-password" placeholder="Masukkan password saat ini"
-                                       class="w-full px-4 py-2.5 bg-sky-50/60 border {{ $errors->updatePassword->has('current_password') ? 'border-rose-300' : 'border-sky-100' }} rounded-2xl text-xs font-semibold focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                       class="w-full px-4 py-2.5 bg-sky-50/60 dark:bg-neutral-800/60 border {{ $errors->updatePassword->has('current_password') ? 'border-rose-300' : 'border-sky-100 dark:border-neutral-700' }} rounded-2xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition">
                                 @if($errors->updatePassword->has('current_password'))
                                     <p class="text-rose-500 text-[10px] mt-1 font-bold">{{ $errors->updatePassword->first('current_password') }}</p>
                                 @endif
@@ -501,24 +504,24 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="update_password_password" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                                    <label for="update_password_password" class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">
                                         Password Baru <span class="text-rose-500">*</span>
                                     </label>
                                     <input type="password" id="update_password_password" name="password" required autocomplete="new-password" placeholder="Minimal 8 karakter"
-                                           class="w-full px-4 py-2.5 bg-sky-50/60 border {{ $errors->updatePassword->has('password') ? 'border-rose-300' : 'border-sky-100' }} rounded-2xl text-xs font-semibold focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                           class="w-full px-4 py-2.5 bg-sky-50/60 dark:bg-neutral-800/60 border {{ $errors->updatePassword->has('password') ? 'border-rose-300' : 'border-sky-100 dark:border-neutral-700' }} rounded-2xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition">
                                     @if($errors->updatePassword->has('password'))
                                         <p class="text-rose-500 text-[10px] mt-1 font-bold">{{ $errors->updatePassword->first('password') }}</p>
                                     @else
-                                        <p class="text-[10px] text-slate-400 mt-1">Minimal 8 karakter.</p>
+                                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Minimal 8 karakter.</p>
                                     @endif
                                 </div>
 
                                 <div>
-                                    <label for="update_password_password_confirmation" class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                                    <label for="update_password_password_confirmation" class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1.5">
                                         Konfirmasi Password Baru <span class="text-rose-500">*</span>
                                     </label>
                                     <input type="password" id="update_password_password_confirmation" name="password_confirmation" required autocomplete="new-password" placeholder="Ulangi password baru"
-                                           class="w-full px-4 py-2.5 bg-sky-50/60 border {{ $errors->updatePassword->has('password_confirmation') ? 'border-rose-300' : 'border-sky-100' }} rounded-2xl text-xs font-semibold focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                                           class="w-full px-4 py-2.5 bg-sky-50/60 dark:bg-neutral-800/60 border {{ $errors->updatePassword->has('password_confirmation') ? 'border-rose-300' : 'border-sky-100 dark:border-neutral-700' }} rounded-2xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition">
                                     @if($errors->updatePassword->has('password_confirmation'))
                                         <p class="text-rose-500 text-[10px] mt-1 font-bold">{{ $errors->updatePassword->first('password_confirmation') }}</p>
                                     @endif
@@ -527,7 +530,7 @@
 
                             <div class="flex items-center gap-3 pt-2">
                                 <button type="submit"
-                                        class="px-6 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition hover:-translate-y-0.5">
+                                        class="px-6 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 dark:shadow-sky-950/50 transition hover:-translate-y-0.5">
                                     Perbarui Password
                                 </button>
                             </div>
@@ -539,60 +542,60 @@
                 <div class="lg:col-span-3 grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
 
                 <!-- Data Diri -->
-                <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up h-full" style="animation-delay: .15s">
-                        <div class="px-6 py-5 border-b border-sky-50">
-                            <h2 class="text-sm font-extrabold text-slate-900">Data Diri</h2>
-                            <p class="text-[11px] text-slate-400 mt-0.5">Informasi akun dan identitas kamu</p>
+                <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-lg shadow-sky-100/60 dark:shadow-none overflow-hidden animate-fade-up h-full" style="animation-delay: .15s">
+                        <div class="px-6 py-5 border-b border-sky-50 dark:border-neutral-800">
+                            <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Data Diri</h2>
+                            <p class="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5">Informasi akun dan identitas kamu</p>
                         </div>
                         <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Nama Lengkap</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa?->nama ?? '-' }}</p>
+                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white dark:from-neutral-800/80 dark:to-neutral-800/40 rounded-2xl border border-sky-100 dark:border-neutral-700">
+                                <p class="text-[10px] font-bold text-slate-400 dark:text-slate-400 tracking-wider uppercase">Nama Lengkap</p>
+                                <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mt-1">{{ $siswa?->nama ?? '-' }}</p>
                             </div>
-                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">NIS</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa?->nis ?? '-' }}</p>
+                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white dark:from-neutral-800/80 dark:to-neutral-800/40 rounded-2xl border border-sky-100 dark:border-neutral-700">
+                                <p class="text-[10px] font-bold text-slate-400 dark:text-slate-400 tracking-wider uppercase">NIS</p>
+                                <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mt-1">{{ $siswa?->nis ?? '-' }}</p>
                             </div>
-                            <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Kelas</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa?->kelas?->nama ?? '-' }}</p>
+                            <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white dark:from-neutral-800/80 dark:to-neutral-800/40 rounded-2xl border border-amber-100 dark:border-neutral-700">
+                                <p class="text-[10px] font-bold text-slate-400 dark:text-slate-400 tracking-wider uppercase">Kelas</p>
+                                <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mt-1">{{ $siswa?->kelas?->nama ?? '-' }}</p>
                             </div>
-                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Angkatan</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa?->angkatan ?? '-' }}</p>
+                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white dark:from-neutral-800/80 dark:to-neutral-800/40 rounded-2xl border border-sky-100 dark:border-neutral-700">
+                                <p class="text-[10px] font-bold text-slate-400 dark:text-slate-400 tracking-wider uppercase">Angkatan</p>
+                                <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mt-1">{{ $siswa?->angkatan ?? '-' }}</p>
                             </div>
-                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Jenis Kelamin</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ ucfirst($siswa?->jenis_kelamin ?? '-') }}</p>
+                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white dark:from-neutral-800/80 dark:to-neutral-800/40 rounded-2xl border border-sky-100 dark:border-neutral-700">
+                                <p class="text-[10px] font-bold text-slate-400 dark:text-slate-400 tracking-wider uppercase">Jenis Kelamin</p>
+                                <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mt-1">{{ ucfirst($siswa?->jenis_kelamin ?? '-') }}</p>
                             </div>
-                            <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Username</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ auth()->user()->username ?? '-' }}</p>
+                            <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white dark:from-neutral-800/80 dark:to-neutral-800/40 rounded-2xl border border-amber-100 dark:border-neutral-700">
+                                <p class="text-[10px] font-bold text-slate-400 dark:text-slate-400 tracking-wider uppercase">Username</p>
+                                <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mt-1">{{ auth()->user()->username ?? '-' }}</p>
                             </div>
-                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Email</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ auth()->user()->email ?? '-' }}</p>
+                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white dark:from-neutral-800/80 dark:to-neutral-800/40 rounded-2xl border border-sky-100 dark:border-neutral-700">
+                                <p class="text-[10px] font-bold text-slate-400 dark:text-slate-400 tracking-wider uppercase">Email</p>
+                                <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mt-1">{{ auth()->user()->email ?? '-' }}</p>
                             </div>
-                            <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
-                                <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Media Sosial</p>
-                                <p class="text-sm font-bold text-slate-800 mt-1">{{ $siswa?->medsos ?? '-' }}</p>
+                            <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white dark:from-neutral-800/80 dark:to-neutral-800/40 rounded-2xl border border-amber-100 dark:border-neutral-700">
+                                <p class="text-[10px] font-bold text-slate-400 dark:text-slate-400 tracking-wider uppercase">Media Sosial</p>
+                                <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mt-1">{{ $siswa?->medsos ?? '-' }}</p>
                             </div>
                         </div>
                     </div>
 
                 <!-- Informasi Ekskul -->
-                <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up h-full" style="animation-delay: .2s">
-                        <div class="px-6 py-5 border-b border-sky-50 flex items-center justify-between flex-wrap gap-2">
+                <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-lg shadow-sky-100/60 dark:shadow-none overflow-hidden animate-fade-up h-full" style="animation-delay: .2s">
+                        <div class="px-6 py-5 border-b border-sky-50 dark:border-neutral-800 flex items-center justify-between flex-wrap gap-2">
                             <div>
-                                <h2 class="text-sm font-extrabold text-slate-900">Informasi Ekskul</h2>
-                                <p class="text-[11px] text-slate-400 mt-0.5">Status keanggotaan ekstrakurikulermu</p>
+                                <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Informasi Ekskul</h2>
+                                <p class="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5">Status keanggotaan ekstrakurikulermu</p>
                             </div>
                             @if(isset($__hasMultiEkskulP) && $__hasMultiEkskulP)
-                                <div class="flex items-center gap-1.5 bg-sky-50 border border-sky-200 p-1 rounded-xl">
-                                    <span class="text-[10px] font-bold text-sky-700 px-2">Ekskul:</span>
+                                <div class="flex items-center gap-1.5 bg-sky-50 dark:bg-neutral-800 border border-sky-200 dark:border-neutral-700 p-1 rounded-xl">
+                                    <span class="text-[10px] font-bold text-sky-700 dark:text-sky-300 px-2">Ekskul:</span>
                                     @foreach($__activeEkskulsP as $pEks)
                                         <a href="{{ route('profile.edit', ['ekskul' => $pEks->id]) }}"
-                                           class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all {{ ($ekskul?->id === $pEks->id) ? 'bg-sky-500 text-white shadow-xs' : 'text-slate-600 hover:text-sky-700' }}">
+                                           class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all {{ ($ekskul?->id === $pEks->id) ? 'bg-sky-500 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300 hover:text-sky-700 dark:hover:text-sky-300' }}">
                                             {{ $pEks->nama_ekskul }}
                                         </a>
                                     @endforeach
@@ -605,44 +608,44 @@
                                     $isKetuaDiEkskul = $ekskul && $siswa && $siswa->riwayatKetua($ekskul)->whereNull('selesai')->exists();
                                 @endphp
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100 flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center text-xs font-extrabold uppercase shadow-md shadow-sky-200 shrink-0">
+                                    <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white dark:from-neutral-800/80 dark:to-neutral-800/40 rounded-2xl border border-sky-100 dark:border-neutral-700 flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center text-xs font-extrabold uppercase shadow-md shadow-sky-200 dark:shadow-sky-950/50 shrink-0">
                                             {{ substr($ekskul->nama_ekskul, 0, 2) }}
                                         </div>
                                         <div>
-                                            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Nama Ekskul</p>
-                                            <p class="text-sm font-bold text-slate-800 mt-0.5">{{ $ekskul->nama_ekskul }}</p>
+                                            <p class="text-[10px] font-bold text-slate-400 dark:text-slate-400 tracking-wider uppercase">Nama Ekskul</p>
+                                            <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mt-0.5">{{ $ekskul->nama_ekskul }}</p>
                                         </div>
                                     </div>
-                                    <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
-                                        <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Jabatan</p>
+                                    <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white dark:from-neutral-800/80 dark:to-neutral-800/40 rounded-2xl border border-amber-100 dark:border-neutral-700">
+                                        <p class="text-[10px] font-bold text-slate-400 dark:text-slate-400 tracking-wider uppercase">Jabatan</p>
                                         <p class="mt-1.5">
-                                            <span class="px-2.5 py-1 rounded-full text-xs font-bold {{ $isKetuaDiEkskul ? 'bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 border border-amber-200' : 'bg-gradient-to-r from-sky-100 to-blue-100 text-sky-700 border border-sky-200' }}">
+                                            <span class="px-2.5 py-1 rounded-full text-xs font-bold {{ $isKetuaDiEkskul ? 'bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-950/60 dark:to-yellow-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60' : 'bg-gradient-to-r from-sky-100 to-blue-100 dark:from-sky-950/60 dark:to-blue-950/40 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60' }}">
                                                 {{ $isKetuaDiEkskul ? 'Ketua' : 'Anggota' }}
                                             </span>
                                         </p>
                                     </div>
-                                    <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-2xl border border-sky-100">
-                                        <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Status</p>
-                                        <p class="text-sm font-bold text-emerald-600 mt-1 flex items-center gap-1.5">
+                                    <div class="p-3.5 bg-gradient-to-r from-sky-50 to-white dark:from-neutral-800/80 dark:to-neutral-800/40 rounded-2xl border border-sky-100 dark:border-neutral-700">
+                                        <p class="text-[10px] font-bold text-slate-400 dark:text-slate-400 tracking-wider uppercase">Status</p>
+                                        <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1.5">
                                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                             Aktif
                                         </p>
                                     </div>
-                                    <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-2xl border border-amber-100">
-                                        <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Pembina</p>
-                                        <p class="text-sm font-bold text-slate-800 mt-1">{{ $ekskul->pembina->nama ?? '-' }}</p>
+                                    <div class="p-3.5 bg-gradient-to-r from-amber-50 to-white dark:from-neutral-800/80 dark:to-neutral-800/40 rounded-2xl border border-amber-100 dark:border-neutral-700">
+                                        <p class="text-[10px] font-bold text-slate-400 dark:text-slate-400 tracking-wider uppercase">Pembina</p>
+                                        <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mt-1">{{ $ekskul->pembina->nama ?? '-' }}</p>
                                     </div>
                                 </div>
                             @else
                                 <div class="text-center py-6">
-                                    <div class="mx-auto w-14 h-14 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-300 mb-3">
+                                    <div class="mx-auto w-14 h-14 rounded-2xl bg-sky-50 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 flex items-center justify-center text-sky-300 dark:text-sky-500 mb-3">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                         </svg>
                                     </div>
-                                    <p class="text-xs font-semibold text-slate-500">Kamu belum terdaftar di ekskul manapun.</p>
-                                    <a href="{{ route('siswa.katalog') }}" class="inline-block mt-2 text-sky-600 text-xs font-bold hover:underline">Lihat Katalog Ekskul</a>
+                                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400">Kamu belum terdaftar di ekskul manapun.</p>
+                                    <a href="{{ route('siswa.katalog') }}" class="inline-block mt-2 text-sky-600 dark:text-sky-400 text-xs font-bold hover:underline">Lihat Katalog Ekskul</a>
                                 </div>
                             @endif
                         </div>
@@ -651,19 +654,19 @@
                 </div>
 
                 <!-- Pengajuan Keluar Ekskul -->
-                <div class="profile-exit-card lg:col-span-3 bg-white rounded-3xl border-2 border-red-200 shadow-lg shadow-red-200/70 ring-1 ring-red-100/80 overflow-hidden animate-fade-up" style="animation-delay: .25s">
-                        <div class="px-6 py-5 flex items-center justify-between border-b border-sky-50">
+                <div class="profile-exit-card lg:col-span-3 bg-white dark:bg-neutral-900 rounded-3xl border-2 border-red-200 dark:border-red-900/60 shadow-lg shadow-red-200/70 dark:shadow-none ring-1 ring-red-100/80 dark:ring-red-950/40 overflow-hidden animate-fade-up" style="animation-delay: .25s">
+                        <div class="px-6 py-5 flex items-center justify-between border-b border-sky-50 dark:border-neutral-800">
                             <div>
-                                <h2 class="text-sm font-extrabold text-slate-900">Pengajuan Keluar Ekskul {{ $ekskul ? '(' . $ekskul->nama_ekskul . ')' : '' }}</h2>
-                                <p class="text-[11px] text-slate-400 mt-0.5">Tindakan ini bersifat permanen</p>
+                                <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Pengajuan Keluar Ekskul {{ $ekskul ? '(' . $ekskul->nama_ekskul . ')' : '' }}</h2>
+                                <p class="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5">Tindakan ini bersifat permanen</p>
                             </div>
-                            <span class="profile-sacred-badge text-[10px] font-bold text-amber-700 bg-gradient-to-r from-amber-100 to-yellow-100 border border-amber-200 px-3 py-1.5 rounded-full">Sakral</span>
+                            <span class="profile-sacred-badge text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-950/60 dark:to-yellow-950/40 border border-amber-200 dark:border-amber-800/60 px-3 py-1.5 rounded-full">Sakral</span>
                         </div>
 
                         <div class="p-6">
                             @if($ekskul)
-                                <div class="p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl border border-amber-200 mb-4">
-                                    <p class="text-xs text-amber-700 leading-relaxed">
+                                <div class="p-4 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/40 dark:to-yellow-950/20 rounded-2xl border border-amber-200 dark:border-amber-900/60 mb-4">
+                                    <p class="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">
                                         Pengajuan keluar dari ekskul <strong>{{ $ekskul->nama_ekskul }}</strong> bersifat permanen. Setelah dikeluarkan, kamu harus mendaftar ulang jika ingin bergabung kembali.
                                     </p>
                                 </div>
@@ -673,8 +676,8 @@
                                 @endphp
 
                                 @if($hasPendingPengajuan)
-                                    <div class="p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl border border-amber-200 mb-4">
-                                        <p class="text-xs text-amber-800 font-semibold">
+                                    <div class="p-4 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/40 dark:to-yellow-950/20 rounded-2xl border border-amber-200 dark:border-amber-900/60 mb-4">
+                                        <p class="text-xs text-amber-800 dark:text-amber-300 font-semibold">
                                             &#10004;&#65039; Kamu sudah mengajukan permohonan keluar untuk ekskul {{ $ekskul->nama_ekskul }}. Mohon tunggu verifikasi dan persetujuan dari ketua ekskul.
                                         </p>
                                     </div>
@@ -684,18 +687,18 @@
                                         <input type="hidden" name="ekskul_id" value="{{ $ekskul->id }}">
                                         <div class="space-y-4">
                                             <div>
-                                                <label class="text-xs font-bold text-slate-700 block mb-1.5">
+                                                <label class="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
                                                     Alasan Keluar dari {{ $ekskul->nama_ekskul }} <span class="text-red-500">*</span>
                                                 </label>
                                                 <textarea name="alasan" required rows="3"
-                                                    class="w-full p-3 bg-sky-50/60 border @error('alasan') border-red-300 @else border-sky-100 @enderror rounded-2xl text-xs text-slate-800 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all"
+                                                    class="w-full p-3 bg-sky-50/60 dark:bg-neutral-800/60 border @error('alasan') border-red-300 @else border-sky-100 dark:border-neutral-700 @enderror rounded-2xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition-all"
                                                     placeholder="Tuliskan alasan kamu ingin keluar dari ekskul ini...">{{ old('alasan') }}</textarea>
-                                                <p class="text-[10px] text-slate-400 mt-1.5">Wajib diisi dengan alasan yang jelas dan masuk akal (minimal 10 karakter / 2 kata). Alasan kosong seperti "asd", "gatau", atau "malas" tidak diterima.</p>
+                                                <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">Wajib diisi dengan alasan yang jelas dan masuk akal (minimal 10 karakter / 2 kata). Alasan kosong seperti "asd", "gatau", atau "malas" tidak diterima.</p>
                                                 @error('alasan')
                                                     <p class="text-red-500 text-[10px] mt-1 font-bold">{{ $message }}</p>
                                                 @enderror
                                             </div>
-                                            <button type="submit" class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-red-200 hover:-translate-y-0.5">
+                                            <button type="submit" class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-red-200 dark:shadow-red-950/50 hover:-translate-y-0.5">
                                                 Ajukan Permohonan Keluar ({{ $ekskul->nama_ekskul }})
                                             </button>
                                         </div>
@@ -704,19 +707,19 @@
 
                                 <!-- Riwayat Pengajuan Keluar -->
                                 @if(isset($pengajuan) && count($pengajuan) > 0)
-                                    <div class="mt-6 pt-6 border-t border-sky-50">
-                                        <p class="text-xs font-bold text-slate-600 mb-3">Riwayat Pengajuan</p>
+                                    <div class="mt-6 pt-6 border-t border-sky-50 dark:border-neutral-800">
+                                        <p class="text-xs font-bold text-slate-600 dark:text-slate-300 mb-3">Riwayat Pengajuan</p>
                                         <div class="space-y-2">
                                             @foreach($pengajuan as $item)
-                                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-amber-50 rounded-2xl border border-sky-100 flex items-center justify-between gap-3">
+                                            <div class="p-3.5 bg-gradient-to-r from-sky-50 to-amber-50 dark:from-neutral-800/70 dark:to-neutral-800/40 rounded-2xl border border-sky-100 dark:border-neutral-700 flex items-center justify-between gap-3">
                                                 <div class="min-w-0">
-                                                    <p class="text-xs text-slate-600 truncate">{{ $item->alasan }}</p>
-                                                    <p class="text-[10px] text-slate-400 mt-0.5">{{ \Carbon\Carbon::parse($item->tanggal_pengajuan)->isoFormat('DD MMM Y') }}</p>
+                                                    <p class="text-xs text-slate-600 dark:text-slate-300 truncate">{{ $item->alasan }}</p>
+                                                    <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{{ \Carbon\Carbon::parse($item->tanggal_pengajuan)->isoFormat('DD MMM Y') }}</p>
                                                 </div>
                                                 <span class="shrink-0 px-3 py-1 rounded-full text-[10px] font-bold border
-                                                    {{ $item->status == 'pending' ? 'bg-amber-100 text-amber-700 border-amber-200' : '' }}
-                                                    {{ $item->status == 'diterima' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : '' }}
-                                                    {{ $item->status == 'ditolak' ? 'bg-red-100 text-red-700 border-red-200' : '' }}">
+                                                    {{ $item->status == 'pending' ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/60' : '' }}
+                                                    {{ $item->status == 'diterima' ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/60' : '' }}
+                                                    {{ $item->status == 'ditolak' ? 'bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800/60' : '' }}">
                                                     {{ ucfirst($item->status) }}
                                                 </span>
                                             </div>
@@ -726,14 +729,14 @@
                                 @endif
                             @else
                                 <div class="text-center py-6">
-                                    <p class="text-xs font-semibold text-slate-500">Kamu belum terdaftar di ekskul manapun.</p>
+                                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400">Kamu belum terdaftar di ekskul manapun.</p>
                                 </div>
                             @endif
                         </div>
                     </div>
 
                 </div>
-            </div>
+            </div></div>
 
         </main>
     </div>

@@ -268,7 +268,7 @@ class UserController extends Controller
                 'password' => Hash::make('password'),
                 'role' => $data['role'],
                 'email_verified_at' => now(),
-                'onboarding_completed_at' => $isStaff ? now() : null,
+                'onboarding_completed_at' => now(),
             ]);
 
             if ($data['role'] === 'siswa') {
@@ -328,7 +328,7 @@ class UserController extends Controller
             ->route('kesiswaan.users.index')
             ->with('success', $user->username
                 ? "Akun {$user->username} berhasil dibuat dengan password default: password"
-                : 'Akun berhasil dibuat. Siswa/Pembina akan mengisi username secara mandiri saat login pertama kali. Password default: password');
+                : 'Akun berhasil dibuat. Password default: password (akun dapat diubah sendiri lewat menu Profil).');
     }
 
     public function show(User $user): View

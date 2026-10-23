@@ -60,18 +60,21 @@
                 </button>
 
                 <div class="flex items-center gap-2 md:hidden shrink-0">
-                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-extrabold text-sm shadow-md shadow-sky-300">S</div>
+                    <div class="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center shadow-md shadow-sky-200 dark:shadow-sky-900">
+                        <img src="{{ asset('images/logo-light-nobg.png') }}" alt="SOUL" class="w-full h-full object-contain ps-logo-img-light">
+                        <img src="{{ asset('images/logo-dark-nobg.png') }}" alt="SOUL" class="w-full h-full object-contain ps-logo-img-dark">
+                    </div>
                     <span class="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white">SOUL</span>
                 </div>
 
                 @section('search')
-                    <form method="GET" action="{{ route('siswa.katalog') }}" class="relative w-full max-w-md hidden sm:block">
+                    <form method="GET" action="{{ route('siswa.katalog') }}" class="soul-search-wrap relative w-full max-w-md hidden sm:block">
                         <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </span>
-                        <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari ekskul..." class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition-all">
+                        <input type="search" name="cari" data-soul-search value="{{ request('cari') }}" placeholder="Cari ekskul..." class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition-all">
                     </form>
                 @show
             </div>
@@ -186,7 +189,10 @@
     </script>
 
     @include('partials.onboarding')
-    @stack('scripts')
+        {{-- Pencarian global dengan suggestion (seperti Google) --}}
+    @include('partials.search-autocomplete')
+
+@stack('scripts')
     @yield('scripts')
 </body>
 </html>

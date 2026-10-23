@@ -20,9 +20,9 @@
     <!-- ===================== HEADER ===================== -->
     <header class="site-header">
         <nav>
-            <a href="/" class="header-logo">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-                <span class="header-logo-text">SOUL</span>
+            <a href="/" class="header-logo" aria-label="SOUL">
+                <img src="{{ asset('images/logo-landing-light.png') }}" alt="SOUL" class="header-logo-img header-logo-img--light">
+                <img src="{{ asset('images/logo-landing-dark.png') }}" alt="SOUL" class="header-logo-img header-logo-img--dark">
             </a>
 
             <div class="header-actions">
@@ -403,8 +403,7 @@
                 <!-- Brand Column -->
                 <div class="footer-col footer-col--brand reveal">
                     <a href="/" class="footer-logo" aria-label="SOUL - Beranda">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-                        <span class="footer-logo-text">SOUL</span>
+                        <img src="{{ asset('images/logo-landing-dark.png') }}" alt="SOUL" class="footer-logo-img">
                     </a>
                     <p class="footer-brand-desc">
                         Platform terpadu untuk mengelola pendaftaran, presensi, dan laporan seluruh ekstrakurikuler sekolah dalam satu tempat.

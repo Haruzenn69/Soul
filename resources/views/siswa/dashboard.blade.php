@@ -241,30 +241,46 @@
 
     {{-- SWITCH DASHBOARD BANNER (multi-ekskul indicator) --}}
     @if($hasMultipleEkskul && $ekskul && $otherEkskul)
-        <div class="relative overflow-hidden rounded-2xl border border-sky-100 dark:border-sky-900/50 bg-gradient-to-r from-sky-50 to-blue-50 dark:from-sky-950/30 dark:to-blue-950/30 p-4 shadow-sm">
-            <div class="absolute top-0 right-0 w-32 h-32 rounded-full bg-sky-300/20 blur-2xl pointer-events-none -translate-y-1/2 translate-x-1/4"></div>
+        @php
+            $__isOthKetuaPill = $siswa && $siswa->riwayatKetua($otherEkskul)->whereNull('selesai')->exists();
+            $__othUrlPill     = $__isOthKetuaPill ? route('ketua.dashboard') : route('siswa.dashboard', ['ekskul' => $otherEkskul->id]);
+        @endphp
+        <div class="relative overflow-hidden rounded-2xl border border-sky-200/80 dark:border-sky-800/60 bg-gradient-to-r from-sky-50/90 via-blue-50/60 to-white dark:from-sky-950/40 dark:via-blue-950/30 dark:to-neutral-900/40 p-4 shadow-sm">
+            <div class="absolute top-0 right-0 w-32 h-32 rounded-full bg-sky-300/20 dark:bg-sky-500/10 blur-2xl pointer-events-none -translate-y-1/2 translate-x-1/4"></div>
             <div class="flex items-center gap-3 flex-wrap">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center text-white shadow-md shadow-sky-300/30 shrink-0">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 dark:from-sky-500 dark:to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-300/30 dark:shadow-sky-950/50 shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-bold text-sky-900 dark:text-sky-200">Kamu terdaftar di 2 ekskul</p>
-                    <p class="text-[11px] text-sky-700/80 dark:text-sky-400/80 mt-0.5">
-                        Sedang melihat: <strong>{{ $ekskul->nama_ekskul }}</strong> · Ekskul lain: <strong>{{ $otherEkskul->nama_ekskul }}</strong>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <p class="text-xs font-bold text-sky-900 dark:text-sky-200">Kamu terdaftar di 2 ekskul</p>
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60">
+                            Multi-Ekskul Aktif
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-sky-700/90 dark:text-sky-300/80 mt-0.5">
+                        Sedang melihat: <strong class="text-sky-900 dark:text-sky-100">{{ $ekskul->nama_ekskul }}</strong> · Ekskul lain: <strong class="text-sky-900 dark:text-sky-100">{{ $otherEkskul->nama_ekskul }}</strong>
+                        @if($__isOthKetuaPill)
+                            <span class="inline-flex items-center px-1.5 py-0.2 text-[9px] font-extrabold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60 rounded ml-1">Ketua</span>
+                        @endif
                     </p>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
                     {{-- Pill switcher --}}
-                    <div class="flex items-center gap-1 bg-white dark:bg-neutral-900 border border-sky-200 dark:border-sky-800 rounded-xl p-1 shadow-sm">
+                    <div class="flex items-center gap-1 bg-white dark:bg-neutral-900 border border-sky-200 dark:border-neutral-700 rounded-xl p-1 shadow-sm">
                         <a href="{{ route('siswa.dashboard', ['ekskul' => $ekskul->id]) }}"
-                           class="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all {{ $selectedEkskulId === $ekskul->id ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-sm' : 'text-sky-700 dark:text-sky-300 hover:bg-sky-50 dark:hover:bg-sky-950/40' }}">
+                           class="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-sm">
                             {{ $ekskul->nama_ekskul }}
                         </a>
-                        <a href="{{ route('siswa.dashboard', ['ekskul' => $otherEkskul->id]) }}"
-                           class="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all {{ $selectedEkskulId === $otherEkskul->id ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-sm' : 'text-sky-700 dark:text-sky-300 hover:bg-sky-50 dark:hover:bg-sky-950/40' }}">
-                            {{ $otherEkskul->nama_ekskul }}
+                        <a href="{{ $__othUrlPill }}"
+                           title="Pindah ke {{ $otherEkskul->nama_ekskul }}{{ $__isOthKetuaPill ? ' (Dashboard Ketua)' : '' }}"
+                           class="px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-sky-50 dark:hover:bg-neutral-800 flex items-center gap-1">
+                            <span>{{ $otherEkskul->nama_ekskul }}</span>
+                            @if($__isOthKetuaPill)
+                                <span class="text-[9px] text-amber-600 dark:text-amber-400 font-extrabold">&bull; Ketua</span>
+                            @endif
                         </a>
                     </div>
                 </div>
