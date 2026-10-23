@@ -4,33 +4,33 @@
 
 @section('content')
     {{-- HERO --}}
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 lg:pb-16 text-white shadow-xl shadow-sky-200 animate-fade-up">
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-4 md:p-6 md:pb-12 lg:pb-14 text-white shadow-xl shadow-sky-200 animate-fade-up">
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
         </div>
 
-        <div class="relative grid lg:grid-cols-5 gap-8 items-center">
+        <div class="relative grid md:grid-cols-5 gap-4 lg:gap-6 items-center">
             <!-- TEXT + CTA -->
-            <div class="lg:col-span-3">
-                <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight">
+            <div class="md:col-span-3">
+                <h1 class="text-xl md:text-2xl font-extrabold tracking-tight leading-tight">
                     Selamat datang {{ auth()->user()->username }}
                 </h1>
-                <p class="text-sm text-white/85 mt-1.5 font-medium">
+                <p class="text-xs text-white/85 mt-1 font-medium">
                     {{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }}
                 </p>
-                <p class="text-xs text-white/70 mt-3 max-w-lg leading-relaxed">
+                <p class="text-xs text-white/70 mt-2 max-w-lg leading-relaxed">
                     Kelola akun pengguna, data ekstrakurikuler, dan daftar kelas sekolah melalui panel kesiswaan.
                 </p>
 
-                <div class="flex gap-3 flex-wrap mt-6">
-                    <a href="{{ route('kesiswaan.users.create') }}" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex gap-2 flex-wrap mt-4">
+                    <a href="{{ route('kesiswaan.users.create') }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white text-sky-700 font-bold text-xs rounded-xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
                         Buat Akun Baru
                     </a>
-                    <a href="{{ route('kesiswaan.users.index') }}" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/20 transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="{{ route('kesiswaan.users.index') }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-xl hover:bg-white/20 transition-all">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                         </svg>
                         Daftar Akun
@@ -38,38 +38,37 @@
                 </div>
             </div>
 
-            <!-- ILLUSTRATIVE PANEL + FLOATING STATS (desktop only) -->
-            <div class="lg:col-span-2 relative hidden lg:block">
-                <div class="relative h-52 rounded-3xl bg-white/10 backdrop-blur border border-white/20 overflow-hidden flex items-center justify-center">
-                    <div class="absolute -bottom-10 -left-6 w-32 h-32 rounded-full bg-white/20 blur-2xl"></div>
-                    <div class="relative w-24 h-24 rounded-3xl bg-white/20 backdrop-blur border border-white/30 flex items-center justify-center text-white shadow-inner animate-floaty">
-                        <svg class="w-11 h-11" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                        </svg>
+            <!-- ILLUSTRATIVE PANEL + FLOATING STATS -->
+            <div class="md:col-span-2 relative hidden md:block">
+                <div class="relative h-36 md:h-40 lg:h-44 rounded-3xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center">
+                    <div class="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+                        <div class="absolute -bottom-10 -left-6 w-32 h-32 rounded-full bg-white/20 blur-2xl"></div>
                     </div>
+                    <img src="{{ asset('images/dashboardbiru.png') }}" alt="Ilustrasi Kesiswaan"
+                         class="h-36 md:h-40 lg:h-44 w-auto max-w-[110px] md:max-w-[130px] lg:max-w-[150px] object-contain drop-shadow-xl animate-floaty select-none relative z-0 mb-1 md:mb-2 pointer-events-none">
                 </div>
 
                 <!-- floating stat card overlapping bottom edge -->
-                <div class="absolute -bottom-10 left-3 right-3 z-10 grid grid-cols-3 gap-2 bg-white rounded-2xl shadow-xl shadow-sky-900/10 p-3">
+                <div class="absolute -bottom-6 md:-bottom-7 left-2 right-2 z-10 grid grid-cols-3 gap-1 bg-white rounded-xl shadow-xl shadow-sky-900/10 p-2">
                     <div class="text-center border-r border-slate-100 pr-1">
-                        <p class="text-base font-extrabold text-sky-700 leading-none">{{ $totalUsers }}</p>
-                        <p class="text-xs text-slate-400 font-semibold mt-1">Akun</p>
+                        <p class="text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalUsers }}</p>
+                        <p class="text-[10px] md:text-xs text-slate-400 font-semibold mt-1">Akun</p>
                     </div>
                     <div class="text-center border-r border-slate-100 px-1">
-                        <p class="text-base font-extrabold text-amber-600 leading-none">{{ $totalSiswa }}</p>
-                        <p class="text-xs text-slate-400 font-semibold mt-1">Siswa</p>
+                        <p class="text-sm md:text-base font-extrabold text-amber-600 leading-none">{{ $totalSiswa }}</p>
+                        <p class="text-[10px] md:text-xs text-slate-400 font-semibold mt-1">Siswa</p>
                     </div>
                     <div class="text-center pl-1">
-                        <p class="text-base font-extrabold text-sky-700 leading-none">{{ $totalEkskul }}</p>
-                        <p class="text-xs text-slate-400 font-semibold mt-1">Ekskul</p>
+                        <p class="text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalEkskul }}</p>
+                        <p class="text-[10px] md:text-xs text-slate-400 font-semibold mt-1">Ekskul</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="relative mt-6 pt-5 lg:mt-16 border-t border-white/15 grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <a href="{{ route('kesiswaan.users.index') }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+        <div class="relative mt-4 pt-3 md:mt-11 lg:mt-12 border-t border-white/15 grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <a href="{{ route('kesiswaan.users.index') }}" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                 </div>
@@ -78,7 +77,7 @@
                     <p class="text-xs text-white/70 mt-1 leading-none">Kelola Pengguna</p>
                 </div>
             </a>
-            <a href="{{ route('kesiswaan.ekskuls.index') }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+            <a href="{{ route('kesiswaan.ekskuls.index') }}" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                 </div>
@@ -87,7 +86,7 @@
                     <p class="text-xs text-white/70 mt-1 leading-none">Data Ekskul</p>
                 </div>
             </a>
-            <a href="{{ route('kesiswaan.kelas.index') }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+            <a href="{{ route('kesiswaan.kelas.index') }}" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                     <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                 </div>
@@ -100,7 +99,7 @@
     </div>
 
     {{-- STATS CARDS - MOBILE/TABLET --}}
-    <div class="grid grid-cols-3 gap-3 lg:hidden">
+    <div class="grid grid-cols-3 gap-3 md:hidden">
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-3 md:p-5 shadow-md shadow-sky-100 animate-fade-up" style="animation-delay: .1s">
             <p class="text-xs font-bold text-slate-400 tracking-wider uppercase">Akun Pengguna</p>
             <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $totalUsers }}</h3>
@@ -173,59 +172,55 @@
         </div>
 
         <!-- EKSUL BUKA / TUTUP PENDAFTARAN -->
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-5 md:p-6 text-white shadow-xl shadow-sky-200">
-            <div class="absolute inset-0 pointer-events-none">
-                <div class="absolute -bottom-24 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
-            </div>
+        <div class="relative overflow-hidden rounded-3xl bg-white border border-sky-100 p-5 md:p-6 shadow-sm">
 
-            <div class="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3 md:mb-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3 md:mb-4">
                 <div>
-                    <h3 class="text-xs md:text-sm font-extrabold text-white">Status Pendaftaran Ekskul</h3>
-                    <p class="text-xs text-white/75 font-medium mt-0.5">Ekskul mana yang sedang membuka atau menutup pendaftaran</p>
+                    <h3 class="text-xs md:text-sm font-extrabold text-slate-900">Status Pendaftaran Ekskul</h3>
+                    <p class="text-xs text-slate-400 font-medium mt-0.5">Ekskul mana yang sedang membuka atau menutup pendaftaran</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-white/15 backdrop-blur border border-white/25 px-2.5 py-1 rounded-lg">
-                        <span class="w-1.5 h-1.5"></span> {{ $ekskulStatus->get(1, 0) }} Terbuka
+                    <span class="inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-lg">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span> {{ $ekskulStatus->get(1, 0) }} Terbuka
                     </span>
-                    <span class="inline-flex items-center gap-1.5 text-xs font-bold text-white/80 bg-white/10 backdrop-blur border border-white/20 px-2.5 py-1 rounded-lg">
-                        <span class="w-1.5 h-1.5"></span> {{ $ekskulStatus->get(0, 0) }} Tertutup
+                    <span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg">
+                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400 inline-block"></span> {{ $ekskulStatus->get(0, 0) }} Tertutup
                     </span>
                 </div>
             </div>
 
-            <div class="relative grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 @php($ekskulBukaList = $ekskulDetail->where('is_open_recruitment', true)->values())
                 @php($ekskulTutupList = $ekskulDetail->where('is_open_recruitment', false)->values())
 
-                <div class="rounded-xl bg-white/10 backdrop-blur border border-white/20 p-3.5 md:p-4">
+                <div class="rounded-xl bg-sky-50 border border-sky-100 p-3.5 md:p-4">
                     <div class="flex items-center gap-2 mb-3">
-                        <span class="text-xs font-extrabold text-white">Buka Pendaftaran</span>
+                        <span class="text-xs font-extrabold text-sky-700">Buka Pendaftaran</span>
                     </div>
                     <ul class="space-y-2">
                         @forelse($ekskulBukaList as $ekskul)
-                            <li class="flex items-center justify-between gap-2 bg-white/10 backdrop-blur rounded-lg border border-white/15 px-3 py-2">
-                                <span class="truncate text-xs font-semibold text-white">{{ $ekskul->nama_ekskul }}</span>
-                                <span class="shrink-0 text-xs font-bold text-emerald-100 bg-emerald-400/30 px-2 py-0.5 rounded-full">Terbuka</span>
+                            <li class="flex items-center justify-between gap-2 bg-white rounded-lg border border-sky-100 px-3 py-2">
+                                <span class="truncate text-xs font-semibold text-slate-700">{{ $ekskul->nama_ekskul }}</span>
+                                <span class="shrink-0 text-xs font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded-full">Terbuka</span>
                             </li>
                         @empty
-                            <li class="text-xs text-white/70 font-medium py-2">Belum ada ekskul yang membuka pendaftaran.</li>
+                            <li class="text-xs text-slate-400 font-medium py-2">Belum ada ekskul yang membuka pendaftaran.</li>
                         @endforelse
                     </ul>
                 </div>
 
-                <div class="rounded-xl bg-white/10 backdrop-blur border border-white/20 p-3.5 md:p-4">
+                <div class="rounded-xl bg-slate-50 border border-slate-100 p-3.5 md:p-4">
                     <div class="flex items-center gap-2 mb-3">
-
-                        <span class="text-xs font-extrabold text-white">Tutup Pendaftaran</span>
+                        <span class="text-xs font-extrabold text-slate-600">Tutup Pendaftaran</span>
                     </div>
                     <ul class="space-y-2">
                         @forelse($ekskulTutupList as $ekskul)
-                            <li class="flex items-center justify-between gap-2 bg-white/10 backdrop-blur rounded-lg border border-white/15 px-3 py-2">
-                                <span class="truncate text-xs font-semibold text-white/85">{{ $ekskul->nama_ekskul }}</span>
-                                <span class="shrink-0 text-xs font-bold text-white/80 bg-white/15 px-2 py-0.5 rounded-full">Tertutup</span>
+                            <li class="flex items-center justify-between gap-2 bg-white rounded-lg border border-slate-100 px-3 py-2">
+                                <span class="truncate text-xs font-semibold text-slate-600">{{ $ekskul->nama_ekskul }}</span>
+                                <span class="shrink-0 text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Tertutup</span>
                             </li>
                         @empty
-                            <li class="text-xs text-white/70 font-medium py-2">Belum ada ekskul yang menutup pendaftaran.</li>
+                            <li class="text-xs text-slate-400 font-medium py-2">Belum ada ekskul yang menutup pendaftaran.</li>
                         @endforelse
                     </ul>
                 </div>
