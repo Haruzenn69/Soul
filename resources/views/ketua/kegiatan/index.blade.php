@@ -56,7 +56,9 @@
                                     <span class="ml-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">Event</span>
                                 @endif
                             </td>
-                            <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap font-medium text-slate-800">{{ $kegiatan->materi }}</td>
+                            <td class="px-3 md:px-6 py-3 md:py-3.5 font-medium text-slate-800 max-w-xs truncate" title="{{ $kegiatan->materi }}">
+                                {{ $kegiatan->materi }}
+                            </td>
                             <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap">
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-700 border border-sky-200">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

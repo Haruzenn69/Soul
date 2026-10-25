@@ -92,10 +92,7 @@ class PendaftaranController extends Controller
         }
 
         $pendaftaran = DB::transaction(function () use ($siswa, $ekskul, $validated) {
-            // Serialize submissions for this student so concurrent requests
-            // cannot both pass the enrollment rules.
             Siswa::whereKey($siswa->id)->lockForUpdate()->firstOrFail();
-
             $ekskul = Ekskul::query()->lockForUpdate()->findOrFail($ekskul->id);
 
             if (! $ekskul->status || ! $ekskul->is_open_recruitment) {
@@ -104,6 +101,21 @@ class PendaftaranController extends Controller
 
             if ($siswa->fresh()->alasanTidakBisaDaftar($ekskul)) {
                 return false;
+            }
+
+            // Jika sebelumnya sudah ada record pendaftaran (misal ditolak), update record lama jadi pending
+            $existing = Pendaftaran::query()
+                ->where('siswa_id', $siswa->id)
+                ->where('ekskul_id', $ekskul->id)
+                ->first();
+
+            if ($existing) {
+                $existing->update([
+                    'tanggal_daftar' => now()->toDateString(),
+                    'status' => Pendaftaran::STATUS_PENDING,
+                    'alasan' => $validated['alasan'],
+                ]);
+                return $existing->fresh();
             }
 
             return Pendaftaran::create([
