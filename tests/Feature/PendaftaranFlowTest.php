@@ -132,7 +132,7 @@ class PendaftaranFlowTest extends TestCase
         ]);
     }
 
-    public function test_siswa_ditolak_tidak_bisa_daftar_ulang(): void
+    public function test_siswa_ditolak_bisa_daftar_ulang(): void
     {
         $ekskul = $this->makeEkskul();
         $siswa = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
@@ -141,16 +141,16 @@ class PendaftaranFlowTest extends TestCase
         $this->actingAs($siswa->user)
             ->post('/siswa/daftar-ekskul', [
                 'ekskul_id' => $ekskul->id,
-                'alasan' => 'Saya ingin mengembangkan keterampilan dan menambah pengalaman.',
+                'alasan' => 'Saya ingin mencoba lagi dan siap aktif.',
             ])
             ->assertRedirect()
-            ->assertSessionHas('error');
+            ->assertSessionHas('success');
 
         $this->assertDatabaseCount('pendaftarans', 1);
         $this->assertDatabaseHas('pendaftarans', [
             'siswa_id' => $siswa->id,
             'ekskul_id' => $ekskul->id,
-            'status' => Pendaftaran::STATUS_DITOLAK,
+            'status' => Pendaftaran::STATUS_PENDING,
         ]);
     }
 

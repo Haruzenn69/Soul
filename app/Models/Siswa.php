@@ -307,10 +307,13 @@ class Siswa extends Model
             $riwayat = $this->pendaftarans()->where('ekskul_id', $target->id)->first();
 
             if ($riwayat) {
+                if ($riwayat->status === Pendaftaran::STATUS_DITOLAK) {
+                    return null; // Ditolak boleh mendaftar/mengajukan ulang
+                }
+
                 return match ($riwayat->status) {
                     Pendaftaran::STATUS_NONAKTIF => 'Keanggotaanmu di ekskul ini sedang nonaktif. Hubungi ketua ekskul untuk mengaktifkan kembali.',
                     Pendaftaran::STATUS_KELUAR => 'Kamu pernah keluar dari ekskul ini. Hubungi ketua ekskul kalau ingin bergabung kembali.',
-                    Pendaftaran::STATUS_DITOLAK => 'Pendaftaranmu di ekskul ini pernah ditolak. Hubungi ketua ekskul untuk informasi lebih lanjut.',
                     Pendaftaran::STATUS_LULUS => 'Keanggotaanmu di ekskul ini sudah berakhir setelah kelulusan. Hubungi pembina ekskul untuk informasi lebih lanjut.',
                     default => 'Kamu sudah terdaftar atau mengajukan pendaftaran di ekskul ini.',
                 };
