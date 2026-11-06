@@ -101,6 +101,18 @@ class DashboardController extends Controller
 
         $hasSubmittedTestimoni = $ekskul ? in_array($ekskul->id, $testimoniTerkirim, true) : false;
 
+        $pengurusAktif = collect();
+        if ($ekskul) {
+            $pengurusAktif = $ekskul->pengurusAktif()->with('siswa.kelas')->get()->keyBy('jabatan');
+            if (! $pengurusAktif->has(\App\Models\Pengurus::JABATAN_KETUA) && $ekskul->ketua()) {
+                $pengurusAktif->put(\App\Models\Pengurus::JABATAN_KETUA, (object) [
+                    'jabatan' => \App\Models\Pengurus::JABATAN_KETUA,
+                    'siswa' => $ekskul->ketua(),
+                    'status' => 'aktif',
+                ]);
+            }
+        }
+
         return view('siswa.dashboard', compact(
             'siswa',
             'ekskul',
@@ -116,7 +128,8 @@ class DashboardController extends Controller
             'testimoniTerkirim',
             'hasMultipleEkskul',
             'selectedEkskulId',
-            'otherEkskul'
+            'otherEkskul',
+            'pengurusAktif'
         ));
     }
 }

@@ -597,7 +597,24 @@ class PembinaController extends Controller
 
         $ekskul = $laporanBulanan->ekskul;
         $kelas = $this->generateKelas($ekskul);
-        $pdf = Pdf::loadView('ketua.laporan-bulanan.pdf', ['laporan' => $laporanBulanan, 'kelas' => $kelas]);
+
+        $tahun = substr($laporanBulanan->bulan, 0, 4);
+        $bulan = substr($laporanBulanan->bulan, 5, 2);
+
+        $kegiatanQuery = Kegiatan::where('ekskul_id', $ekskul->id)
+            ->whereYear('tanggal_kegiatan', $tahun)
+            ->whereMonth('tanggal_kegiatan', $bulan)
+            ->orderBy('tanggal_kegiatan');
+
+        $rutinKegiatans = (clone $kegiatanQuery)->whereNull('jenis_kegiatan')->get();
+        $eventKegiatans = (clone $kegiatanQuery)->whereNotNull('jenis_kegiatan')->get();
+
+        $pdf = Pdf::loadView('ketua.laporan-bulanan.pdf', [
+            'laporan' => $laporanBulanan,
+            'kelas' => $kelas,
+            'rutinKegiatans' => $rutinKegiatans,
+            'eventKegiatans' => $eventKegiatans,
+        ]);
         $filename = 'laporan-'.str_replace('/', '-', $laporanBulanan->bulan).'-'.($ekskul->nama_ekskul ?? 'ekskul').'.pdf';
 
         return $pdf->download($filename);

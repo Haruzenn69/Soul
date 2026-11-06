@@ -144,7 +144,7 @@
                                         </div>
                                     </td>
                                     <td class="px-4 py-3 text-center text-slate-700 font-semibold">{{ $row->total_pertemuan }}
-                                        <span class="block text-[9px] text-slate-400 font-medium">H:{{ $row->total_hadir }} I:{{ $row->total_izin }} S:{{ $row->total_sakit }} A:{{ $row->total_alpha }}</span>
+                                        <span class="block text-[9px] text-slate-400 font-medium">H:{{ $row->total_hadir }} S:{{ $row->total_sakit }} I:{{ $row->total_izin }} A:{{ $row->total_alpha }}</span>
                                     </td>
                                     <td class="px-4 py-3 text-center">
                                         <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold {{ $row->persentase_kehadiran >= 70 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200' }}">

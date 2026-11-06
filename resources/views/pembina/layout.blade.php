@@ -41,6 +41,7 @@
         ['icon' => 'users', 'label' => 'Keanggotaan', 'children' => [
             ['icon' => 'clipboard-list', 'label' => 'Pendaftaran', 'url' => route('pembina.pendaftaran'), 'is' => 'pembina.pendaftaran'],
             $__anggotaItem,
+            ['icon' => 'user-check', 'label' => 'Kelola Pengurus', 'url' => route('pembina.pengurus.index'), 'is' => 'pembina.pengurus.*'],
             ['icon' => 'user-check', 'label' => 'Kelola Pelatih', 'url' => route('pembina.pelatih.index'), 'is' => 'pembina.pelatih.*'],
         ]],
         ['icon' => 'calendar', 'label' => 'Presensi', 'url' => route('pembina.presensi'), 'is' => 'pembina.presensi'],

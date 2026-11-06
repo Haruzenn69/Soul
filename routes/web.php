@@ -30,6 +30,7 @@ use App\Http\Controllers\Pembina\PenilaianController as PembinaPenilaianControll
 use App\Http\Controllers\Pembina\TestimoniController as PembinaTestimoniController;
 use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\PengajuanKeluarController;
+use App\Http\Controllers\PengurusController;
 use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\SearchSuggestionController;
@@ -258,6 +259,11 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::get('/anggota', [PembinaController::class, 'anggota'])->name('anggota');
     Route::get('/anggota/ekskul/{ekskul}', [PembinaController::class, 'anggotaByEkskul'])->name('anggota.ekskul');
     Route::get('/anggota/{pendaftaran}', [PembinaController::class, 'anggotaShow'])->name('anggota.show');
+    Route::get('/pengurus', [PengurusController::class, 'indexPembina'])->name('pengurus.index');
+    Route::post('/pengurus/tetapkan/{ekskul}', [PengurusController::class, 'tetapkanPembina'])->name('pengurus.tetapkan');
+    Route::post('/pengurus/{pengurus}/approve', [PengurusController::class, 'approve'])->name('pengurus.approve');
+    Route::post('/pengurus/{pengurus}/reject', [PengurusController::class, 'reject'])->name('pengurus.reject');
+    Route::post('/pengurus/{pengurus}/copot', [PengurusController::class, 'copot'])->name('pengurus.copot');
     Route::get('/ekskuls/{ekskul}/pilih-ketua', [PembinaController::class, 'pilihKetuaPage'])->name('ekskul.pilih-ketua-page');
     Route::post('/ekskuls/{ekskul}/pilih-ketua/{siswa}', [PembinaController::class, 'pilihKetua'])->name('ekskul.pilih-ketua');
     Route::post('/ekskuls/{ekskul}/copot-ketua/{siswa}', [PembinaController::class, 'copotKetua'])->name('ekskul.copot-ketua');
@@ -313,6 +319,8 @@ Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name
     Route::resource('pengajuan-keluar', PengajuanKeluarController::class)->only(['index', 'show', 'update']);
     Route::get('anggota', [AnggotaController::class, 'index'])->name('anggota.index');
     Route::patch('anggota/{pendaftaran}/status', [AnggotaController::class, 'updateStatus'])->name('anggota.update-status');
+    Route::get('pengurus', [PengurusController::class, 'indexKetua'])->name('pengurus.index');
+    Route::post('pengurus/usulkan', [PengurusController::class, 'usulkanKetua'])->name('pengurus.usulkan');
     Route::get('profil-ekskul', [ProfilEkskulController::class, 'edit'])->name('profil-ekskul.edit');
     Route::patch('profil-ekskul', [ProfilEkskulController::class, 'update'])->name('profil-ekskul.update');
     Route::patch('profil-ekskul/toggle-recruitment', [ProfilEkskulController::class, 'toggleRecruitment'])->name('profil-ekskul.toggle-recruitment');
