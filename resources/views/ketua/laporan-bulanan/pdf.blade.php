@@ -8,18 +8,18 @@
         }
         body { 
             font-family: 'Times New Roman', Times, serif; 
-            font-size: 12pt; 
+            font-size: 11pt; 
             color: #000; 
             margin: 0; 
             padding: 0; 
-            line-height: 1.4;
+            line-height: 1.35;
         }
 
         /* HEADER / KOP SURAT */
         .header-table { 
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
         .header-table td {
             vertical-align: middle;
@@ -30,86 +30,117 @@
             text-align: center;
         }
         .header-table .logo-cell img {
-            width: 110px;
+            width: 100px;
             height: auto;
         }
         .header-table .text-cell { 
             text-align: center;
         }
-        .header-table p { font-size: 10pt; margin: 0.3px 0; }
-        .header-table .school-name { font-size: 14pt; font-weight: bold; margin: 5px 0 2px; text-transform: uppercase; }
-        .header-border { border-bottom: 3px double #000; margin-top: 5px; margin-bottom: 20px; }
+        .header-table p { font-size: 9.5pt; margin: 0.3px 0; }
+        .header-table .school-name { font-size: 13pt; font-weight: bold; margin: 4px 0 2px; text-transform: uppercase; }
+        .header-border { border-bottom: 3px double #000; margin-top: 4px; margin-bottom: 12px; }
 
         /* JUDUL */
         .title { 
             text-align: center; 
             font-size: 12pt; 
-            font-weight: bold; 
-            margin: 15px 0 20px; 
+            font-weight: normal; 
+            margin: 6px 0 3px; 
             text-transform: uppercase; 
         }
+        .subtitle {
+            text-align: center;
+            font-size: 11pt;
+            font-weight: normal;
+            margin: 0 0 12px;
+            text-transform: uppercase;
+        }
 
-        /* INFO TABEL */
-        .info-table { 
-            width: 85%; 
-            margin: 0 auto 20px; 
+        /* META TABLE (Nama Ekskul, Pelatih) */
+        .meta-table {
+            width: 100%;
             border-collapse: collapse;
+            margin-bottom: 14px;
+            font-size: 11pt;
         }
-        .info-table td { 
-            padding: 2px 0; 
-            font-size: 12pt; 
-            vertical-align: top; 
+        .meta-table td {
+            padding: 2px 0;
+            vertical-align: top;
+            font-weight: normal;
         }
-        .info-table td.label { 
-            width: 180px; 
+        .meta-table td.meta-label {
+            width: 120px;
+        }
+        .meta-table td.meta-colon {
+            width: 15px;
+        }
+        .meta-table td.meta-value {
         }
 
-        /* BAGIAN / SECTION */
-        .section { 
-            margin-bottom: 15px; 
+        /* TABEL KEGIATAN PER BARIS */
+        .kegiatan-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            table-layout: fixed;
         }
-        .section-title { 
-            font-size: 12pt; 
-            font-weight: bold; 
-            margin-bottom: 5px; 
-            padding-left: 70px;
+        .kegiatan-table tr {
+            page-break-inside: avoid;
         }
-        .section p, .section ol, .section ul { 
-            font-size: 12pt; 
-            margin: 3px 0; 
+        .penjelasan-col {
+            width: 50%;
+            border: 1px solid #000;
+            padding: 10px 12px;
+            vertical-align: top;
+            font-size: 10pt;
+            line-height: 1.4;
             text-align: justify;
-            padding-left: 90px;
         }
-        .section ol, .section ul { 
-            padding-left: 107.5px; 
+        .kegiatan-nama {
+            font-size: 10pt;
+            font-weight: normal;
+            margin-bottom: 3px;
         }
-
-        /* EVALUASI ITEM */
-        .evaluasi-item { 
-            margin-bottom: 5px; 
+        .kegiatan-tgl {
+            font-size: 9.5pt;
+            font-weight: normal;
+            color: #222;
+            margin-bottom: 8px;
+        }
+        .kegiatan-desc {
+            font-size: 9.5pt;
+            font-weight: normal;
+            color: #000;
             text-align: justify;
-            padding-left: 90px;
-        }
-        .evaluasi-item .label { 
-            font-weight: bold; 
         }
 
-        /* DOKUMENTASI */
-        .dokumentasi { 
-            text-align: center; 
-            margin: 15px 0; 
+        .foto-col {
+            width: 50%;
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+            vertical-align: middle;
+            background: #fff;
+            height: 150px;
         }
-        .dokumentasi img { 
-            max-width: 45%; 
+        .foto-col img {
+            max-width: 95%;
+            max-height: 145px;
             height: auto;
-            border: 1px solid #ccc; 
-            margin: 5px 2%;
+            display: block;
+            margin: 0 auto;
+        }
+        .no-foto {
+            color: #777;
+            font-size: 9pt;
+            font-style: italic;
         }
 
-        /* TANDA TANGAN */
+        /* TANDA TANGAN (PALING BAWAH SEBELAH KANAN) */
         .ttd-container { 
             width: 100%; 
-            margin-top: 40px; 
+            margin-top: 30px; 
             page-break-inside: avoid;
         }
         .ttd { 
@@ -118,29 +149,65 @@
             text-align: left; 
         }
         .ttd p { 
-            font-size: 12pt; 
+            font-size: 11pt; 
             margin: 2px 0; 
+            font-weight: normal;
         }
         .ttd .space { 
-            height: 60px; 
+            height: 55px; 
+        }
+        .ttd .nama-pelatih {
+            font-weight: normal;
+            text-decoration: underline;
+        }
+
+        /* PAGE BREAK */
+        .page-break {
+            page-break-before: always;
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER / KOP SURAT -->
     @php
+        \Carbon\Carbon::setLocale('id');
+
         $logoPath = public_path('images/logo-kop.webp');
+        $logoSrc = '';
+        if (file_exists($logoPath)) {
+            $logoData = base64_encode(file_get_contents($logoPath));
+            $logoMime = mime_content_type($logoPath);
+            $logoSrc = 'data:' . $logoMime . ';base64,' . $logoData;
+        }
+
+        $pelatihModel = $laporan->ekskul->pelatih ?? null;
+        $namaPelatih = ($pelatihModel && filled($pelatihModel->nama)) ? $pelatihModel->nama : '-';
+
+        $tanggalSurat = $laporan->tanggal_surat 
+            ?? \Carbon\Carbon::parse($laporan->bulan)->endOfMonth()->translatedFormat('d F Y');
+
+        // Query atau siapkan kegiatan bulanan
+        $semuaKegiatans = collect($rutinKegiatans ?? [])
+            ->merge($eventKegiatans ?? []);
+
+        if ($semuaKegiatans->isEmpty()) {
+            $tahun = substr($laporan->bulan, 0, 4);
+            $bulanNum = substr($laporan->bulan, 5, 2);
+            $semuaKegiatans = \App\Models\Kegiatan::where('ekskul_id', $laporan->ekskul_id)
+                ->whereYear('tanggal_kegiatan', $tahun)
+                ->whereMonth('tanggal_kegiatan', $bulanNum)
+                ->orderBy('tanggal_kegiatan')
+                ->get();
+        } else {
+            $semuaKegiatans = $semuaKegiatans->sortBy('tanggal_kegiatan')->values();
+        }
     @endphp
+
+    <!-- HEADER / KOP SURAT -->
     <table class="header-table" cellspacing="0">
         <tr>
             <td class="logo-cell">
-                @if(file_exists($logoPath))
-                    @php
-                        $logoData = base64_encode(file_get_contents($logoPath));
-                        $logoMime = mime_content_type($logoPath);
-                        $logoSrc = 'data:' . $logoMime . ';base64,' . $logoData;
-                    @endphp
+                @if(!empty($logoSrc))
                     <img src="{{ $logoSrc }}" alt="Logo">
                 @endif
             </td>
@@ -159,119 +226,71 @@
 
     <!-- JUDUL LAPORAN -->
     <div class="title">LAPORAN KEGIATAN</div>
-    <div class="title">Bulan : {{ \Carbon\Carbon::parse($laporan->bulan)->translatedFormat('F Y') }}</div>
+    <div class="subtitle">BULAN : {{ \Carbon\Carbon::parse($laporan->bulan)->translatedFormat('F Y') }}</div>
 
-    <!-- INFORMATION TABLE -->
-    <table class="info-table">
+    <!-- META INFORMATION -->
+    <table class="meta-table">
         <tr>
-            <td class="label">Pelatih</td>
-            <td>: {{ $laporan->ekskul->pembina->nama ?? '-' }}</td>
+            <td class="meta-label">Nama Ekskul</td>
+            <td class="meta-colon">:</td>
+            <td class="meta-value">{{ $laporan->ekskul->nama_ekskul ?? '-' }}</td>
         </tr>
         <tr>
-            <td class="label">Kelas</td>
-            <td>: {{ $kelas }}</td>
-        </tr>
-        <tr>
-            <td class="label">Hari/Tanggal Kegiatan</td>
-            <td>: {{ $laporan->ekskul->jadwal ?? '-' }}</td>
-        </tr>
-        <tr>
-            <td class="label">Tempat</td>
-            <td>: {{ $laporan->tempat ?? '-' }}</td>
+            <td class="meta-label">Pelatih</td>
+            <td class="meta-colon">:</td>
+            <td class="meta-value">{{ $namaPelatih }}</td>
         </tr>
     </table>
 
-    <!-- A. TUJUAN KEGIATAN -->
-    @if($laporan->tujuan)
-    <div class="section">
-        <div class="section-title">A. Tujuan Kegiatan</div>
-        <ol>
-            @foreach(explode("\n", $laporan->tujuan) as $line)
-                @if(trim($line) !== '')
-                    <li>{{ trim($line) }}</li>
-                @endif
-            @endforeach
-        </ol>
-    </div>
-    @endif
+    <!-- TABEL KONTEN KEGIATAN (KIRI: PENJELASAN, KANAN: FOTO DOKUMENTASI) -->
+    <table class="kegiatan-table">
+        @forelse($semuaKegiatans as $kegiatan)
+            @php
+                $imgSrc = null;
+                if ($kegiatan->dokumentasi) {
+                    $p = storage_path('app/public/' . $kegiatan->dokumentasi);
+                    if (file_exists($p)) {
+                        $imgData = base64_encode(file_get_contents($p));
+                        $mime = mime_content_type($p);
+                        $imgSrc = 'data:' . $mime . ';base64,' . $imgData;
+                    }
+                }
+            @endphp
+            <tr>
+                {{-- Kolom Kiri: Penjelasan Kegiatan --}}
+                <td class="penjelasan-col">
+                    <div class="kegiatan-nama">Kegiatan: {{ $kegiatan->materi }}</div>
+                    <div class="kegiatan-tgl">{{ $kegiatan->tanggal_kegiatan ? $kegiatan->tanggal_kegiatan->translatedFormat('l, d M Y') : '-' }}</div>
+                    <div class="kegiatan-desc">
+                        {{ $kegiatan->deskripsi ?: 'Tidak ada deskripsi kegiatan.' }}
+                    </div>
+                </td>
 
-    <!-- B. KEGIATAN RUTIN -->
-    <div class="section">
-        <div class="section-title">B. Materi Kegiatan Rutin yang Dilaksanakan</div>
-        <ol>
-            @forelse ($rutinKegiatans ?? collect() as $kegiatan)
-                <li>Pada tanggal {{ $kegiatan->tanggalText() }}, kegiatan yang dilaksanakan berupa {{ $kegiatan->materi }}.@if($kegiatan->deskripsi) {{ $kegiatan->deskripsi }}@endif</li>
-            @empty
-                <li>Tidak ada kegiatan rutin pada bulan ini.</li>
-            @endforelse
-        </ol>
-    </div>
+                {{-- Kolom Kanan: Foto Dokumentasi --}}
+                <td class="foto-col">
+                    @if($imgSrc)
+                        <img src="{{ $imgSrc }}" alt="Dokumentasi">
+                    @else
+                        <div class="no-foto">(Tidak ada dokumentasi)</div>
+                    @endif
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="2" style="border: 1px dashed #999; padding: 25px; text-align: center; color: #555;">
+                    Belum ada kegiatan yang tercatat untuk bulan ini.
+                </td>
+            </tr>
+        @endforelse
+    </table>
 
-    <!-- C. KEGIATAN EVENT -->
-    <div class="section">
-        <div class="section-title">C. Kegiatan Event yang Dilaksanakan (Diklat, Lomba, dll.)</div>
-        <ol>
-            @forelse ($eventKegiatans ?? collect() as $kegiatan)
-                <li>Pada tanggal {{ $kegiatan->tanggalText() }}, kegiatan yang dilaksanakan berupa {{ $kegiatan->materi }}.@if($kegiatan->deskripsi) {{ $kegiatan->deskripsi }}@endif</li>
-            @empty
-                <li>Tidak ada kegiatan event pada bulan ini.</li>
-            @endforelse
-        </ol>
-    </div>
-
-    <!-- D. KEHADIRAN PESERTA -->
-    @if($laporan->kehadiran)
-    <div class="section">
-        <div class="section-title">D. Kehadiran Peserta</div>
-        <p>{!! nl2br(e($laporan->kehadiran)) !!}</p>
-    </div>
-    @endif
-
-    <!-- E. EVALUASI KEGIATAN -->
-    @if($laporan->evaluasi_keberhasilan || $laporan->evaluasi_kendala || $laporan->evaluasi_solusi)
-    <div class="section">
-        <div class="section-title">E. Evaluasi Kegiatan</div>
-        @if($laporan->evaluasi_keberhasilan)
-            <div class="evaluasi-item">
-                <span class="label">Keberhasilan:</span> {!! nl2br(e($laporan->evaluasi_keberhasilan)) !!}
-            </div>
-        @endif
-        @if($laporan->evaluasi_kendala)
-            <div class="evaluasi-item">
-                <span class="label">Kendala:</span> {!! nl2br(e($laporan->evaluasi_kendala)) !!}
-            </div>
-        @endif
-        @if($laporan->evaluasi_solusi)
-            <div class="evaluasi-item">
-                <span class="label">Solusi/Tindak Lanjut:</span> {!! nl2br(e($laporan->evaluasi_solusi)) !!}
-            </div>
-        @endif
-    </div>
-    @endif
-
-    <!-- F. DOKUMENTASI KEGIATAN RUTIN -->
-    @if(collect($dokumentasiRutin ?? [])->isNotEmpty())
-    <div class="section">
-        <div class="section-title">F. Dokumentasi Kegiatan Rutin</div>
-        @include('partials.pdf-dokumentasi', ['paths' => $dokumentasiRutin ?? []])
-    </div>
-    @endif
-
-    <!-- G. DOKUMENTASI KEGIATAN EVENT -->
-    @if(collect($dokumentasiEvent ?? [])->isNotEmpty())
-    <div class="section">
-        <div class="section-title">G. Dokumentasi Kegiatan Event</div>
-        @include('partials.pdf-dokumentasi', ['paths' => $dokumentasiEvent ?? []])
-    </div>
-    @endif
-
-    <!-- TANDA TANGAN -->
+    <!-- TANDA TANGAN (PALING BAWAH SEBELAH KANAN) -->
     <div class="ttd-container">
         <div class="ttd">
-            <p>Bandung, {{ $laporan->tanggal_surat ?? now()->translatedFormat('d F Y') }}</p>
-            <p>Pelatih Ekskul {{ $laporan->ekskul->nama_ekskul ?? '' }}</p>
+            <p>Bandung, {{ $tanggalSurat }}</p>
+            <p>Pelatih Ekstrakurikuler {{ $laporan->ekskul->nama_ekskul ?? '' }}</p>
             <div class="space"></div>
-            <p><strong>{{ $laporan->ekskul->pembina->nama ?? '-' }}</strong></p>
+            <p class="nama-pelatih">{{ $namaPelatih !== '-' ? $namaPelatih : '..................................................' }}</p>
         </div>
         <div style="clear: both;"></div>
     </div>

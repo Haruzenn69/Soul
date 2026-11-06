@@ -194,9 +194,9 @@
                 <th>Kelas</th>
                 <th>Pertemuan</th>
                 <th>Hadir</th>
-                <th>Izin</th>
                 <th>Sakit</th>
-                <th>Alpha</th>
+                <th>Izin</th>
+                <th>Alpa</th>
                 <th>% Hadir</th>
                 <th>Sikap</th>
                 <th>Keaktifan</th>
@@ -215,8 +215,8 @@
                     <td class="c">{{ $row->kelas }}</td>
                     <td class="c">{{ $row->total_pertemuan }}</td>
                     <td class="c">{{ $row->total_hadir }}</td>
-                    <td class="c">{{ $row->total_izin }}</td>
                     <td class="c">{{ $row->total_sakit }}</td>
+                    <td class="c">{{ $row->total_izin }}</td>
                     <td class="c">{{ $row->total_alpha }}</td>
                     <td class="c"><b>{{ number_format((float) $row->persentase_kehadiran, 1) }}%</b></td>
                     <td class="c">{{ $row->penilaian ? number_format((float) $row->nilai_sikap, 1) : '-' }}</td>

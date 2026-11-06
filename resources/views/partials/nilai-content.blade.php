@@ -60,7 +60,7 @@
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        Kehadiran: H{{ $hadir['total_hadir'] }} I{{ $hadir['total_izin'] }} S{{ $hadir['total_sakit'] }} A{{ $hadir['total_alpha'] }}
+                        Kehadiran: H{{ $hadir['total_hadir'] }} S{{ $hadir['total_sakit'] }} I{{ $hadir['total_izin'] }} A{{ $hadir['total_alpha'] }}
                     </span>
                 </div>
             </div>
@@ -127,17 +127,17 @@
                             <p class="text-sm font-extrabold text-emerald-600">{{ $penilaian->total_hadir }}</p>
                             <p class="text-[9px] font-bold text-slate-400 mt-0.5">Hadir</p>
                         </div>
-                        <div class="p-2.5 rounded-xl bg-sky-50 border border-sky-100">
-                            <p class="text-sm font-extrabold text-sky-600">{{ $penilaian->total_izin }}</p>
-                            <p class="text-[9px] font-bold text-slate-400 mt-0.5">Izin</p>
-                        </div>
                         <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-100">
                             <p class="text-sm font-extrabold text-amber-600">{{ $penilaian->total_sakit }}</p>
                             <p class="text-[9px] font-bold text-slate-400 mt-0.5">Sakit</p>
                         </div>
+                        <div class="p-2.5 rounded-xl bg-sky-50 border border-sky-100">
+                            <p class="text-sm font-extrabold text-sky-600">{{ $penilaian->total_izin }}</p>
+                            <p class="text-[9px] font-bold text-slate-400 mt-0.5">Izin</p>
+                        </div>
                         <div class="p-2.5 rounded-xl bg-red-50 border border-red-100">
                             <p class="text-sm font-extrabold text-red-600">{{ $penilaian->total_alpha }}</p>
-                            <p class="text-[9px] font-bold text-slate-400 mt-0.5">Alpha</p>
+                            <p class="text-[9px] font-bold text-slate-400 mt-0.5">Alpa</p>
                         </div>
                     </div>
                 </div>

@@ -138,6 +138,7 @@ class RekapAbsensiService
             'totalIzin' => $rows->sum('izin'),
             'totalSakit' => $rows->sum('sakit'),
             'totalAlpha' => $rows->sum('alpha'),
+            'presensis' => $presensis,
             'availableMonths' => $this->availableMonths($ekskul),
         ];
     }

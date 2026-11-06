@@ -1,10 +1,10 @@
-﻿@php
+@php
     $statusList = ['hadir', 'sakit', 'izin', 'alpha'];
     $statusBadge = [
         'hadir' => ['bg-emerald-100 text-emerald-700', 'H', 'Hadir'],
         'sakit' => ['bg-violet-100 text-violet-700', 'S', 'Sakit'],
         'izin'  => ['bg-amber-100 text-amber-700', 'I', 'Izin'],
-        'alpha' => ['bg-rose-100 text-rose-700', 'A', 'Alpha'],
+        'alpha' => ['bg-rose-100 text-rose-700', 'A', 'Alpa'],
         null    => ['bg-slate-100 text-slate-400', '&#x2013;', 'Belum diabsen'],
     ];
     $matriksTitle = $matriksTitle ?? 'Matriks Kehadiran';
@@ -66,9 +66,9 @@
                         <th class="px-3 py-2.5 font-semibold text-slate-400 dark:text-neutral-500 text-center">Belum ada kegiatan</th>
                     @endforelse
                     <th class="px-3 py-2.5 font-bold text-emerald-600 dark:text-emerald-400 text-center">Hadir</th>
-                    <th class="px-3 py-2.5 font-bold text-amber-600 dark:text-amber-400 text-center">Izin</th>
                     <th class="px-3 py-2.5 font-bold text-violet-600 dark:text-violet-400 text-center">Sakit</th>
-                    <th class="px-3 py-2.5 font-bold text-rose-600 dark:text-rose-400 text-center">Alpha</th>
+                    <th class="px-3 py-2.5 font-bold text-amber-600 dark:text-amber-400 text-center">Izin</th>
+                    <th class="px-3 py-2.5 font-bold text-rose-600 dark:text-rose-400 text-center">Alpa</th>
                     <th class="px-3 py-2.5 font-bold text-slate-600 dark:text-neutral-400 text-center">% Kehadiran</th>
                 </tr>
             </thead>
@@ -96,8 +96,8 @@
                             <td class="px-3 py-3 text-center text-slate-300 dark:text-neutral-600">&#x2013;</td>
                         @endforelse
                         <td class="px-3 py-3 text-center font-bold text-emerald-600 dark:text-emerald-400">{{ $row->hadir }}</td>
-                        <td class="px-3 py-3 text-center font-bold text-amber-600 dark:text-amber-400">{{ $row->izin }}</td>
                         <td class="px-3 py-3 text-center font-bold text-violet-600 dark:text-violet-400">{{ $row->sakit }}</td>
+                        <td class="px-3 py-3 text-center font-bold text-amber-600 dark:text-amber-400">{{ $row->izin }}</td>
                         <td class="px-3 py-3 text-center font-bold text-rose-600 dark:text-rose-400">{{ $row->alpha }}</td>
                         <td class="px-3 py-3 text-center whitespace-nowrap">
                             <span class="inline-flex items-center gap-1.5">

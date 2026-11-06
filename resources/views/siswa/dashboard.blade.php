@@ -214,7 +214,7 @@
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14"/></svg>
                 </div>
                 <div class="text-left min-w-0">
-                    <p class="text-xs font-bold leading-none text-white truncate">Rekap Nilai</p>
+                    <p class="text-xs font-bold leading-none text-white truncate">Rekap Absensi</p>
                     <p class="text-[10px] text-white/70 mt-1 leading-none truncate">Riwayat Kehadiran</p>
                 </div>
             </a>
@@ -405,6 +405,112 @@
                             <a href="{{ route('siswa.nilai', ['ekskul' => $ekskulAktif->id]) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition">
                                 Nilai
                             </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
+    {{-- CARD PENGURUS EKSKUL (HANYA CARD DI DASHBOARD SISWA) --}}
+    @if($ekskul && isset($pengurusAktif))
+        <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-sm p-5 md:p-6 animate-fade-up">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 mb-4 border-b border-sky-50 dark:border-neutral-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-black text-sm shadow-sm shadow-sky-200 dark:shadow-none shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-sm md:text-base font-extrabold text-slate-900 dark:text-white">
+                            Pengurus {{ $ekskul->nama_ekskul }}
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Struktur pengurus inti yang memimpin organisasi ekskul</p>
+                    </div>
+                </div>
+
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-900/50 self-start sm:self-auto">
+                    <span class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
+                    4 Posisi Pokok
+                </span>
+            </div>
+
+            @php
+                $jabatanLabels = [
+                    'ketua' => 'Ketua',
+                    'wakil_ketua' => 'Wakil Ketua',
+                    'sekretaris' => 'Sekretaris',
+                    'bendahara' => 'Bendahara',
+                ];
+                $jabatanStyles = [
+                    'ketua' => [
+                        'badge' => 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+                        'accent' => 'from-amber-400 to-yellow-500',
+                        'icon' => 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
+                    ],
+                    'wakil_ketua' => [
+                        'badge' => 'bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200 dark:border-sky-800',
+                        'accent' => 'from-sky-400 to-blue-500',
+                        'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
+                    ],
+                    'sekretaris' => [
+                        'badge' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+                        'accent' => 'from-emerald-400 to-teal-500',
+                        'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+                    ],
+                    'bendahara' => [
+                        'badge' => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+                        'accent' => 'from-indigo-400 to-purple-500',
+                        'icon' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+                    ],
+                ];
+            @endphp
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                @foreach($jabatanLabels as $jKey => $jTitle)
+                    @php
+                        $pItem = $pengurusAktif->get($jKey);
+                        $jStyle = $jabatanStyles[$jKey] ?? $jabatanStyles['ketua'];
+                    @endphp
+
+                    <div class="rounded-2xl border border-sky-100/80 dark:border-neutral-800 bg-sky-50/30 dark:bg-neutral-950/60 p-4 flex flex-col justify-between transition hover:border-sky-300 dark:hover:border-neutral-700">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-3">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider border {{ $jStyle['badge'] }}">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $jStyle['icon'] }}"/>
+                                    </svg>
+                                    {{ $jTitle }}
+                                </span>
+
+                                @if($pItem && $pItem->siswa)
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-xs" title="Aktif"></span>
+                                @endif
+                            </div>
+
+                            @if($pItem && $pItem->siswa)
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-xl p-0.5 bg-gradient-to-br {{ $jStyle['accent'] }} shrink-0 shadow-xs">
+                                        <div class="w-full h-full rounded-[10px] overflow-hidden bg-white dark:bg-neutral-800 flex items-center justify-center">
+                                            <img src="{{ $pItem->siswa->foto_url ?? asset('images/default.png') }}" alt="{{ $pItem->siswa->nama }}" class="w-full h-full object-cover">
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="text-xs font-extrabold text-slate-900 dark:text-white truncate" title="{{ $pItem->siswa->nama }}">
+                                            {{ $pItem->siswa->nama }}
+                                        </h4>
+                                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                                            {{ $pItem->siswa->kelas?->nama ?? 'Siswa' }} • NIS: {{ $pItem->siswa->nis }}
+                                        </p>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="py-2.5 px-3 rounded-xl border border-dashed border-sky-200/60 dark:border-neutral-800 text-center">
+                                    <p class="text-[11px] font-bold text-slate-400 dark:text-slate-500">Belum Ada Pengurus</p>
+                                    <p class="text-[10px] text-slate-400/80 dark:text-slate-600 mt-0.5">Posisi belum terisi</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 @endforeach

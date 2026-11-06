@@ -159,9 +159,9 @@
                                 <th class="text-left p-3 font-semibold text-slate-500 rounded-l-xl">Kegiatan</th>
                                 <th class="text-left p-3 font-semibold text-slate-500">Tanggal</th>
                                 <th class="text-center p-3 font-semibold text-emerald-600">Hadir</th>
-                                <th class="text-center p-3 font-semibold text-sky-600">Izin</th>
                                 <th class="text-center p-3 font-semibold text-amber-600">Sakit</th>
-                                <th class="text-center p-3 font-semibold text-red-600 rounded-r-xl">Alpha</th>
+                                <th class="text-center p-3 font-semibold text-sky-600">Izin</th>
+                                <th class="text-center p-3 font-semibold text-red-600 rounded-r-xl">Alpa</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -170,8 +170,8 @@
                                 <td class="p-3 font-medium">{{ $kegiatan->materi }}</td>
                                 <td class="p-3">{{ \Carbon\Carbon::parse($kegiatan->tanggal_kegiatan)->isoFormat('DD MMM Y') }}</td>
                                 <td class="p-3 text-center font-bold text-emerald-600">{{ $kegiatan->hadir_count }}</td>
-                                <td class="p-3 text-center font-bold text-sky-600">{{ $kegiatan->izin_count }}</td>
                                 <td class="p-3 text-center font-bold text-amber-600">{{ $kegiatan->sakit_count }}</td>
+                                <td class="p-3 text-center font-bold text-sky-600">{{ $kegiatan->izin_count }}</td>
                                 <td class="p-3 text-center font-bold text-red-600">{{ $kegiatan->alpha_count }}</td>
                             </tr>
                             @endforeach
