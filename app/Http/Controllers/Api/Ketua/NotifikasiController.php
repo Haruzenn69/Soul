@@ -56,7 +56,7 @@ class NotifikasiController extends ApiController
         return $this->noContent();
     }
 
-    public function clearAll(): JsonResponse
+    public function destroyAll(): JsonResponse
     {
         $siswa = auth()->user()->siswa;
 
