@@ -50,6 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/notifikasi', [SiswaController::class, 'notifikasiIndex'])->name('notifikasi');
         Route::post('/notifikasi/{notifikasi}/read', [SiswaController::class, 'bacaNotifikasi'])->name('notifikasi.read');
         Route::delete('/notifikasi/{notifikasi}', [SiswaController::class, 'hapusNotifikasi'])->name('notifikasi.delete');
+        Route::delete('/notifikasi', [SiswaController::class, 'hapusSemuaNotifikasi'])->name('notifikasi.clear-all');
         Route::post('/notifikasi/read-all', [SiswaController::class, 'bacaSemuaNotifikasi'])->name('notifikasi.read-all');
         Route::get('/profile', [SiswaController::class, 'profil'])->name('profile');
         Route::post('/profile', [SiswaController::class, 'updateProfil'])->name('profile.update');
@@ -104,7 +105,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/testimoni/{testimoni}', [KetuaTestimoniController::class, 'destroy'])->name('testimoni.destroy');
 
         Route::get('/notifikasi', [KetuaNotifikasiController::class, 'index'])->name('notifikasi');
-        Route::delete('/notifikasi/clear-all', [KetuaNotifikasiController::class, 'clearAll'])->name('notifikasi.clear-all');
+        Route::delete('/notifikasi', [KetuaNotifikasiController::class, 'destroyAll'])->name('notifikasi.clear-all');
         Route::delete('/notifikasi/{notifikasi}', [KetuaNotifikasiController::class, 'destroy'])->name('notifikasi.destroy');
         Route::post('/notifikasi/{notifikasi}/read', [KetuaNotifikasiController::class, 'read'])->name('notifikasi.read');
         Route::post('/notifikasi/read-all', [KetuaNotifikasiController::class, 'readAll'])->name('notifikasi.read-all');

@@ -598,6 +598,14 @@ class SiswaController extends ApiController
         return $this->noContent();
     }
 
+    public function hapusSemuaNotifikasi(): JsonResponse
+    {
+        $siswa = $this->siswa();
+        $siswa->notifikasis()->delete();
+
+        return $this->noContent();
+    }
+
     private function serializeRekap(array $data, ?object $rekapSiswa): array
     {
         $row = fn (object $r) => [
