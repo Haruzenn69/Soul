@@ -6,7 +6,7 @@
 <div class="space-y-5 animate-fade-up">
 
     {{-- HERO CARD BIRU (STYLE SAMA DENGAN HALAMAN LAIN) --}}
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200">
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white soul-timbul">
         {{-- Ambient blur circles --}}
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
@@ -26,9 +26,7 @@
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
                 <a href="{{ route('kesiswaan.users.index') }}"
                    class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/20 transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
                     Kembali ke Daftar Akun
                 </a>
             </div>
@@ -83,6 +81,15 @@
                             <option value="{{ $value }}" {{ old('role', $user->role) === $value ? 'selected' : '' }}>{{ $label }}</option>
                         @endforeach
                     </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Status Akun</label>
+                    <select name="is_active" required
+                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                        <option value="1" @selected((string) old('is_active', (int) $user->is_active) === '1')>Aktif</option>
+                        <option value="0" @selected((string) old('is_active', (int) $user->is_active) === '0')>Nonaktif</option>
+                    </select>
+                    <p class="mt-1 text-[10px] text-slate-400">Akun nonaktif tidak dapat digunakan untuk login.</p>
                 </div>
             </div>
         </div>
@@ -184,9 +191,7 @@
                         @endforeach
                     </select>
                     <p class="text-xs text-slate-400 mt-1 flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-                        </svg>
+                        
                         Ekskul yang sudah ada ketua tidak bisa dipilih.
                     </p>
                 </div>
@@ -283,61 +288,85 @@
             </div>
         </div>
 
-        {{-- ACTION BUTTONS + DELETE OPTION --}}
+        {{-- ACTION BUTTONS + DEACTIVATE OPTION --}}
         <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100 flex-wrap">
             <div class="flex items-center gap-2">
-                <button type="submit" class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm shadow-sky-200 transition">
+                <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm shadow-sky-200 transition">
+                    <i class="fa-solid fa-floppy-disk text-xs"></i>
                     Simpan Perubahan
                 </button>
                 <a href="{{ route('kesiswaan.users.index') }}"
-                   class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-2xl transition">Batal</a>
+                   class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-2xl transition">
+                    Batal
+                </a>
             </div>
 
             @if ($user->id !== auth()->id())
-                <button type="button" onclick="confirmDeleteUser()"
-                        class="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 font-bold text-xs rounded-2xl transition flex items-center gap-1.5"
-                        title="Hapus akun ini secara permanen">
-                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                    Hapus Akun
-                </button>
+                @if ($user->is_active)
+                    <button type="button" onclick="toggleAccountActive(0)"
+                            class="px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/80 font-bold text-xs rounded-2xl transition flex items-center gap-1.5 shadow-sm"
+                            title="Nonaktifkan akun ini">
+                        <i class="fa-solid fa-user-slash text-xs text-amber-600"></i>
+                        Nonaktifkan Akun Ini
+                    </button>
+                @else
+                    <button type="button" onclick="toggleAccountActive(1)"
+                            class="px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 font-bold text-xs rounded-2xl transition flex items-center gap-1.5 shadow-sm"
+                            title="Aktifkan kembali akun ini">
+                        <i class="fa-solid fa-user-check text-xs text-emerald-600"></i>
+                        Aktifkan Akun Ini
+                    </button>
+                @endif
             @endif
         </div>
     </form>
 
-    @if ($user->id !== auth()->id())
-        <form id="delete-user-form" action="{{ route('kesiswaan.users.destroy', $user) }}" method="POST" class="hidden">
-            @csrf
-            @method('DELETE')
-        </form>
-    @endif
+    {{-- MODAL KONFIRMASI NONAKTIFKAN AKUN DENGAN BINGUNG.PNG --}}
+    <dialog id="modalKonfirmasiNonaktif"
+            class="rounded-3xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm p-0 w-full max-w-sm shadow-2xl border border-sky-100 m-auto"
+            onclick="if (event.target === this) closeConfirmNonaktifModal()">
+        <div class="bg-white rounded-3xl p-6 text-center space-y-4">
+            <div class="flex justify-center">
+                <img src="{{ asset('images/bingung.png') }}" alt="Konfirmasi" class="w-24 h-24 object-contain">
+            </div>
+            <div>
+                <h3 class="text-base font-extrabold text-slate-900 leading-snug">
+                    Yakin ingin menonaktifkan akun ini?
+                </h3>
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Akun <strong>{{ $user->username ?: $user->email }}</strong> tidak akan bisa login ke dalam sistem dan akan ditampilkan dengan warna abu-abu di posisi paling bawah.
+                </p>
+            </div>
+            <div class="flex items-center justify-center gap-2.5 pt-2">
+                <button type="button" onclick="closeConfirmNonaktifModal()"
+                        class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition">
+                    Batal
+                </button>
+                <button type="button" onclick="confirmDeactivateAccount()"
+                        class="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs transition shadow-md shadow-sky-500/20 inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-slash text-xs"></i>
+                    Ya, Nonaktifkan
+                </button>
+            </div>
+        </div>
+    </dialog>
 
     {{-- MODAL PERINGATAN (UNIVERSAL WARNING MODAL) --}}
     <dialog id="modalPeringatan"
-            class="rounded-3xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm p-0 w-full max-w-md shadow-2xl border border-amber-200/80 m-auto"
+            class="rounded-3xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm p-0 w-full max-w-md shadow-2xl border border-sky-100 m-auto"
             onclick="if (event.target === this) closeEditWarning()">
         <div class="bg-white rounded-3xl p-6 overflow-hidden">
-            {{-- Header --}}
-            <div class="flex items-start justify-between pb-3.5 border-b border-slate-100 gap-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-amber-100/90 text-amber-600 flex items-center justify-center shrink-0 border border-amber-200/80 shadow-sm shadow-amber-100">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-extrabold text-slate-900 leading-snug" id="modalPeringatanTitle">Peringatan Validasi</h3>
-                        <p class="text-[11px] text-slate-400 font-medium">Periksa kembali data yang dimasukkan</p>
-                    </div>
-                </div>
-                <button type="button" onclick="closeEditWarning()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition text-xs font-bold shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
+            <div class="flex justify-center">
+                <img src="{{ asset('images/bingung.png') }}" alt="Peringatan" class="w-24 h-24 object-contain">
+            </div>
+
+            <div class="text-center mt-2">
+                <h3 class="text-sm font-extrabold text-slate-900 leading-snug" id="modalPeringatanTitle">Peringatan Validasi</h3>
+                <p class="text-[11px] text-slate-400 font-medium">Periksa kembali data yang dimasukkan</p>
             </div>
 
             {{-- Body --}}
-            <div class="mt-4 space-y-3">
+            <div class="mt-4 space-y-3 text-left">
                 <p class="text-xs text-slate-600 leading-relaxed font-medium" id="modalPeringatanMessage"></p>
                 <div id="modalPeringatanList" class="space-y-1.5 max-h-56 overflow-y-auto pr-1 hidden"></div>
             </div>
@@ -349,9 +378,9 @@
                     Tutup
                 </button>
                 <button type="button" onclick="confirmEditWarningAction()"
-                        class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs transition shadow-md shadow-amber-500/20 flex items-center gap-1.5">
+                        class="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs transition shadow-md shadow-sky-500/20 inline-flex items-center gap-1.5">
                     <span id="modalPeringatanActionLabel">Periksa Sekarang</span>
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
                 </button>
             </div>
         </div>
@@ -371,8 +400,8 @@
             listEl.innerHTML = '';
             items.forEach((item, idx) => {
                 const row = document.createElement('div');
-                row.className = 'flex items-start gap-2.5 rounded-xl bg-amber-50/80 border border-amber-200/60 px-3 py-2 text-xs font-semibold text-amber-900';
-                row.innerHTML = `<span class="w-4 h-4 rounded-full bg-amber-200/80 text-amber-800 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">${idx + 1}</span><span class="flex-1 leading-snug">${item}</span>`;
+                row.className = 'flex items-start gap-2.5 rounded-xl bg-sky-50/80 border border-sky-200/60 px-3 py-2 text-xs font-semibold text-sky-900';
+                row.innerHTML = `<span class="w-4 h-4 rounded-full bg-sky-200/80 text-sky-800 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">${idx + 1}</span><span class="flex-1 leading-snug">${item}</span>`;
                 listEl.appendChild(row);
             });
             listEl.classList.remove('hidden');
@@ -421,9 +450,41 @@
         const jabatan = document.getElementById('jabatan')?.value;
         document.getElementById('field-ekskul').classList.toggle('hidden', jabatan !== 'ketua');
     }
-    function confirmDeleteUser() {
-        if (confirm('Yakin ingin menghapus akun {{ $user->username }}? Seluruh data yang terkait akan terhapus dan tindakan ini tidak dapat dibatalkan.')) {
-            document.getElementById('delete-user-form').submit();
+    let isDeactivationConfirmed = false;
+
+    function openConfirmNonaktifModal() {
+        const dlg = document.getElementById('modalKonfirmasiNonaktif');
+        if (dlg) {
+            if (typeof dlg.showModal === 'function') dlg.showModal();
+            else dlg.setAttribute('open', '');
+        }
+    }
+
+    function closeConfirmNonaktifModal() {
+        const dlg = document.getElementById('modalKonfirmasiNonaktif');
+        if (dlg) {
+            if (typeof dlg.close === 'function') dlg.close();
+            else dlg.removeAttribute('open');
+        }
+    }
+
+    function confirmDeactivateAccount() {
+        isDeactivationConfirmed = true;
+        const select = document.querySelector('select[name="is_active"]');
+        if (select) select.value = '0';
+        closeConfirmNonaktifModal();
+        const form = document.getElementById('form-edit-user');
+        if (form) form.submit();
+    }
+
+    function toggleAccountActive(targetStatus) {
+        if (targetStatus === 0) {
+            openConfirmNonaktifModal();
+        } else {
+            const select = document.querySelector('select[name="is_active"]');
+            if (select) select.value = '1';
+            const form = document.getElementById('form-edit-user');
+            if (form) form.submit();
         }
     }
     document.addEventListener('DOMContentLoaded', () => {
@@ -431,6 +492,12 @@
         document.getElementById('jabatan')?.addEventListener('change', toggleEkskulField);
 
         document.getElementById('form-edit-user')?.addEventListener('submit', function (e) {
+            const isActiveSelect = this.querySelector('select[name="is_active"]');
+            if (isActiveSelect && isActiveSelect.value === '0' && !isDeactivationConfirmed && {{ $user->is_active ? 'true' : 'false' }}) {
+                e.preventDefault();
+                openConfirmNonaktifModal();
+                return false;
+            }
             const emailEl = this.querySelector('input[name="email"]');
             if (emailEl) {
                 const val = emailEl.value.trim();

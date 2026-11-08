@@ -52,9 +52,9 @@
                     default => 'bg-sky-50 border-sky-200',
                 };
                 $typeIcon = match($notif->tipe) {
-                    'diterima' => '<svg class="w-4 h-4 md:w-5 md:h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
-                    'ditolak' => '<svg class="w-4 h-4 md:w-5 md:h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>',
-                    default => '<svg class="w-4 h-4 md:w-5 md:h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                    'diterima' => '',
+                    'ditolak' => '',
+                    default => '',
                 };
             @endphp
             <div class="p-3.5 md:p-4 rounded-xl md:rounded-2xl border {{ $typeColor }} {{ $notif->is_read ? 'opacity-70' : '' }} bg-white/70 backdrop-blur shadow-sm animate-fade-up">
@@ -71,12 +71,12 @@
                         <div class="mt-2.5 flex items-center justify-end gap-2 flex-wrap">
                             @if($notif->siswa_id)
                                 <a href="{{ route('kesiswaan.siswa.riwayat-profil', $notif->siswa_id) }}" class="text-xs font-bold text-sky-700 hover:text-sky-800 px-3 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg shadow-sm transition inline-flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    
                                     Lihat Riwayat Profil
                                 </a>
                             @elseif($notif->pembina_id)
                                 <a href="{{ route('kesiswaan.pembina.riwayat-profil', $notif->pembina_id) }}" class="text-xs font-bold text-sky-700 hover:text-sky-800 px-3 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg shadow-sm transition inline-flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    
                                     Lihat Riwayat Profil
                                 </a>
                             @endif
@@ -104,9 +104,7 @@
         @empty
             <div class="p-8 md:p-12 text-center bg-white rounded-2xl border border-sky-100 shadow-sm animate-fade-up">
                 <div class="w-12 h-12 md:w-14 md:h-14 mx-auto bg-gradient-to-br from-sky-100 to-blue-100 border border-sky-200 rounded-2xl flex items-center justify-center text-sky-400 mb-3">
-                    <svg class="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                    </svg>
+                    
                 </div>
                 <p class="text-sm font-medium text-slate-600">Belum ada notifikasi</p>
                 <p class="text-xs text-slate-400 mt-1">Notifikasi pendaftaran, pengajuan keluar, dan aktivitas siswa akan muncul di sini.</p>

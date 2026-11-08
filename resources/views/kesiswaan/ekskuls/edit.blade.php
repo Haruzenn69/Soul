@@ -10,7 +10,7 @@
         <div class="flex items-center gap-3">
             <a href="{{ route('kesiswaan.ekskuls.index') }}"
                class="w-10 h-10 rounded-2xl bg-white border border-slate-200/80 text-slate-600 hover:text-sky-600 hover:border-sky-200 flex items-center justify-center transition shadow-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                
             </a>
             <div>
                 <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">Edit Ekskul</h1>
@@ -80,7 +80,7 @@
                 <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Kategori <span class="text-rose-500">*</span></label>
                 @if ($ekskul->isWajib())
                     <div class="w-full px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-800 font-bold flex items-center gap-2">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        
                         <span>{{ \App\Support\AturanEkskul::KATEGORI_WAJIB }}</span>
                         <span class="font-normal text-amber-600 ml-1">&mdash; Kategori ekskul wajib tidak dapat diubah</span>
                         <input type="hidden" name="kategori" value="{{ \App\Support\AturanEkskul::KATEGORI_WAJIB }}">

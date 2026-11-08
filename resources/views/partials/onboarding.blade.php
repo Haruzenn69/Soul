@@ -12,7 +12,7 @@
         <div class="fixed inset-0 z-[120] flex items-center justify-center p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
             <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md"></div>
 
-            <section class="relative z-10 my-8 w-full max-w-md overflow-hidden rounded-3xl border border-sky-100 bg-white shadow-2xl">
+            <section class="relative z-10 my-8 w-full max-w-md overflow-hidden rounded-3xl border border-sky-100 bg-white shadow-2xl animate-fade-up">
                 <header class="bg-gradient-to-br from-sky-500 via-sky-600 to-blue-600 px-6 py-5 text-white">
                     <p class="text-[11px] font-bold uppercase tracking-wide text-sky-100">Login pertama kali · {{ $roleLabel }}</p>
                     <h2 id="onboarding-title" class="mt-2 text-lg font-extrabold leading-tight">

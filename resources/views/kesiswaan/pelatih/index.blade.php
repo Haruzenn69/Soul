@@ -6,7 +6,7 @@
 <div class="space-y-6 animate-fade-up">
 
     {{-- HERO CARD --}}
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700 p-6 md:p-8 text-white shadow-xl shadow-sky-200">
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white soul-timbul">
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
             <div class="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
@@ -36,52 +36,44 @@
         {{-- Total --}}
         <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-sm flex items-center gap-3.5">
             <div class="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                </svg>
+                
             </div>
             <div>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Pelatih</p>
-                <p class="text-xl font-black text-slate-800">{{ $stats['total'] }}</p>
+                <p class="text-xl font-black text-sky-700">{{ $stats['total'] }}</p>
             </div>
         </div>
 
         {{-- Pending --}}
-        <div class="bg-white rounded-2xl p-4 border border-amber-200 shadow-sm flex items-center gap-3.5 {{ $stats['pending'] > 0 ? 'ring-2 ring-amber-400/50' : '' }}">
-            <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
+        <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-sm flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold shrink-0">
+                
             </div>
             <div>
-                <p class="text-[10px] font-bold text-amber-600 uppercase tracking-wider">Perlu Diverifikasi</p>
-                <p class="text-xl font-black text-amber-600">{{ $stats['pending'] }}</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Perlu Diverifikasi</p>
+                <p class="text-xl font-black text-sky-700">{{ $stats['pending'] }}</p>
             </div>
         </div>
 
         {{-- Terverifikasi --}}
-        <div class="bg-white rounded-2xl p-4 border border-emerald-100 shadow-sm flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
+        <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-sm flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold shrink-0">
+                
             </div>
             <div>
-                <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Terverifikasi</p>
-                <p class="text-xl font-black text-slate-800">{{ $stats['terverifikasi'] }}</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Terverifikasi</p>
+                <p class="text-xl font-black text-sky-700">{{ $stats['terverifikasi'] }}</p>
             </div>
         </div>
 
         {{-- Ditolak --}}
-        <div class="bg-white rounded-2xl p-4 border border-rose-100 shadow-sm flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
+        <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-sm flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold shrink-0">
+                
             </div>
             <div>
-                <p class="text-[10px] font-bold text-rose-500 uppercase tracking-wider">Ditolak</p>
-                <p class="text-xl font-black text-slate-800">{{ $stats['ditolak'] }}</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ditolak</p>
+                <p class="text-xl font-black text-sky-700">{{ $stats['ditolak'] }}</p>
             </div>
         </div>
     </div>
@@ -101,19 +93,19 @@
         {{-- QUICK STATUS TABS --}}
         <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
             <a href="{{ route('kesiswaan.pelatih.index', array_merge(request()->except('status', 'page'), ['status' => 'all'])) }}"
-               class="px-3.5 py-1.5 rounded-2xl text-xs font-bold transition whitespace-nowrap {{ $status === 'all' ? 'bg-sky-500 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50' }}">
+               class="px-3.5 py-1.5 rounded-2xl text-xs font-bold transition whitespace-nowrap {{ $status === 'all' ? 'bg-sky-600 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50' }}">
                 Semua ({{ $stats['total'] }})
             </a>
             <a href="{{ route('kesiswaan.pelatih.index', array_merge(request()->except('status', 'page'), ['status' => 'pending'])) }}"
-               class="px-3.5 py-1.5 rounded-2xl text-xs font-bold transition whitespace-nowrap {{ $status === 'pending' ? 'bg-amber-500 text-white shadow-sm' : 'bg-white border border-amber-200 text-amber-700 hover:bg-amber-50' }}">
+               class="px-3.5 py-1.5 rounded-2xl text-xs font-bold transition whitespace-nowrap {{ $status === 'pending' ? 'bg-sky-600 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50' }}">
                 Menunggu Verifikasi ({{ $stats['pending'] }})
             </a>
             <a href="{{ route('kesiswaan.pelatih.index', array_merge(request()->except('status', 'page'), ['status' => 'terverifikasi'])) }}"
-               class="px-3.5 py-1.5 rounded-2xl text-xs font-bold transition whitespace-nowrap {{ $status === 'terverifikasi' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white border border-emerald-200 text-emerald-700 hover:bg-emerald-50' }}">
+               class="px-3.5 py-1.5 rounded-2xl text-xs font-bold transition whitespace-nowrap {{ $status === 'terverifikasi' ? 'bg-sky-600 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50' }}">
                 Terverifikasi ({{ $stats['terverifikasi'] }})
             </a>
             <a href="{{ route('kesiswaan.pelatih.index', array_merge(request()->except('status', 'page'), ['status' => 'ditolak'])) }}"
-               class="px-3.5 py-1.5 rounded-2xl text-xs font-bold transition whitespace-nowrap {{ $status === 'ditolak' ? 'bg-rose-600 text-white shadow-sm' : 'bg-white border border-rose-200 text-rose-700 hover:bg-rose-50' }}">
+               class="px-3.5 py-1.5 rounded-2xl text-xs font-bold transition whitespace-nowrap {{ $status === 'ditolak' ? 'bg-sky-600 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50' }}">
                 Ditolak ({{ $stats['ditolak'] }})
             </a>
         </div>
@@ -126,21 +118,17 @@
             {{-- Input Pencarian --}}
             <div class="relative flex-1">
                 <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
+                    
                 </span>
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari pelatih, ekskul, pembina..."
-                       class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                       class="w-full pl-4 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
             </div>
 
             {{-- Tombol Filter & Popover Panel --}}
             <div class="relative flex items-center gap-2">
                 <button type="button" @click="openFilter = !openFilter"
                         class="px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-2 border {{ $activeFilterCount > 0 ? 'bg-sky-50 border-sky-300 text-sky-700 shadow-sm shadow-sky-100' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100' }}">
-                    <svg class="w-4 h-4 {{ $activeFilterCount > 0 ? 'text-sky-600' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                    </svg>
+                    
                     <span>Filter Data</span>
                     @if($activeFilterCount > 0)
                         <span class="w-5 h-5 rounded-full bg-sky-500 text-white text-[10px] font-black flex items-center justify-center">
@@ -176,9 +164,7 @@
                     <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                         <div class="flex items-center gap-2">
                             <span class="p-1.5 rounded-lg bg-sky-50 text-sky-600">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-                                </svg>
+                                
                             </span>
                             <h4 class="text-xs font-bold text-slate-800">Opsi Filter Pelatih</h4>
                         </div>
@@ -232,14 +218,14 @@
                 @if(request()->filled('q'))
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 rounded-xl text-xs font-semibold">
                         <span>Pencarian: "<strong>{{ request('q') }}</strong>"</span>
-                        <a href="{{ route('kesiswaan.pelatih.index', request()->except('q', 'page')) }}" class="hover:text-rose-500 transition">&times;</a>
+                        <a href="{{ route('kesiswaan.pelatih.index', request()->except('q', 'page')) }}" class="hover:text-slate-700 transition">&times;</a>
                     </span>
                 @endif
 
                 @if($isStatusFiltered)
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 rounded-xl text-xs font-semibold">
                         <span>Status: <strong>{{ ucfirst($status) }}</strong></span>
-                        <a href="{{ route('kesiswaan.pelatih.index', request()->except('status', 'page')) }}" class="hover:text-rose-500 transition">&times;</a>
+                        <a href="{{ route('kesiswaan.pelatih.index', request()->except('status', 'page')) }}" class="hover:text-slate-700 transition">&times;</a>
                     </span>
                 @endif
 
@@ -254,11 +240,11 @@
                     @endphp
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-50 border border-sky-200 text-sky-700 rounded-xl text-xs font-semibold">
                         <span>Urutan: <strong>{{ $sortLabels[$currentSortCombo] ?? $currentSortCombo }}</strong></span>
-                        <a href="{{ route('kesiswaan.pelatih.index', request()->except(['sort', 'direction', 'page'])) }}" class="hover:text-rose-500 transition">&times;</a>
+                        <a href="{{ route('kesiswaan.pelatih.index', request()->except(['sort', 'direction', 'page'])) }}" class="hover:text-slate-700 transition">&times;</a>
                     </span>
                 @endif
 
-                <a href="{{ route('kesiswaan.pelatih.index') }}" class="text-xs font-bold text-rose-500 hover:text-rose-600 hover:underline transition ml-1">
+                <a href="{{ route('kesiswaan.pelatih.index') }}" class="text-xs font-bold text-sky-700 hover:text-sky-800 hover:underline transition ml-1">
                     Hapus Semua Filter
                 </a>
             </div>
@@ -268,11 +254,11 @@
     {{-- LIST DATA PELATIH --}}
     <div class="space-y-4">
         @forelse ($pelatihs as $pelatih)
-            <div class="bg-white rounded-3xl border {{ $pelatih->isPending() ? 'border-amber-200 shadow-amber-50 shadow-md' : 'border-sky-100 shadow-sm' }} p-5 md:p-6 transition">
+            <div class="bg-white rounded-3xl border border-sky-100 shadow-sm p-5 md:p-6 transition">
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
                     {{-- Identity & Detail --}}
                     <div class="flex items-start gap-4 flex-1">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br {{ $pelatih->isPending() ? 'from-amber-400 to-amber-600' : 'from-sky-400 to-blue-600' }} text-white font-black text-base flex items-center justify-center shadow-md shrink-0">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 text-white font-black text-base flex items-center justify-center shadow-md shrink-0">
                             {{ strtoupper(substr($pelatih->nama, 0, 2)) }}
                         </div>
                         <div class="min-w-0 flex-1">
@@ -283,24 +269,18 @@
                                 </span>
 
                                 @if($pelatih->isTerverifikasi())
-                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                        <svg class="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                        </svg>
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-600 text-white border border-sky-600">
+                                        
                                         Terverifikasi
                                     </span>
                                 @elseif($pelatih->isPending())
-                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-300 animate-pulse">
-                                        <svg class="w-3 h-3 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white text-sky-700 border border-sky-300">
+                                        
                                         Menunggu Verifikasi Kesiswaan
                                     </span>
                                 @elseif($pelatih->isDitolak())
-                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
-                                        <svg class="w-3 h-3 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                                        
                                         Ditolak
                                     </span>
                                 @endif
@@ -324,18 +304,18 @@
                             {{-- Kontak --}}
                             <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500 mt-2">
                                 <span class="flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                    
                                     {{ $pelatih->no_hp }}
                                 </span>
                                 @if($pelatih->email)
                                     <span class="flex items-center gap-1">
-                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                        
                                         {{ $pelatih->email }}
                                     </span>
                                 @endif
                                 @if($pelatih->sosmed)
                                     <span class="flex items-center gap-1 text-slate-600">
-                                        <svg class="w-3.5 h-3.5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                                        
                                         {{ $pelatih->sosmed }}
                                     </span>
                                 @endif
@@ -346,7 +326,7 @@
 
                             {{-- Catatan Verifikasi Jika Ada --}}
                             @if($pelatih->isDitolak() && $pelatih->catatan_verifikasi)
-                                <div class="mt-2.5 p-3 rounded-xl bg-rose-50 border border-rose-100 text-xs text-rose-700">
+                                <div class="mt-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700">
                                     <strong class="font-bold">Alasan Penolakan:</strong> {{ $pelatih->catatan_verifikasi }}
                                 </div>
                             @endif
@@ -368,9 +348,7 @@
                             @if($pelatih->cv)
                                 <a href="{{ route('storage.public', ['path' => $pelatih->cv]) }}" target="_blank"
                                    class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-sm transition">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                                    </svg>
+                                    
                                     Buka CV (PDF)
                                 </a>
                             @endif
@@ -378,10 +356,8 @@
                             {{-- Sertifikat Wajib PDF --}}
                             @if($pelatih->sertifikat)
                                 <a href="{{ route('storage.public', ['path' => $pelatih->sertifikat]) }}" target="_blank"
-                                   class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-sm transition">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                                    </svg>
+                                   class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold text-xs transition">
+                                    
                                     Buka Sertifikat (PDF)
                                 </a>
                             @else
@@ -399,8 +375,8 @@
                                       onsubmit="return confirm('Apakah Anda yakin ingin memverifikasi dan menyetujui pelatih ini? Pelatih akan langsung aktif di katalog ekskul.')">
                                     @csrf
                                     <button type="submit"
-                                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-md shadow-sky-600/20 transition">
+                                        
                                         Setujui & Verifikasi
                                     </button>
                                 </form>
@@ -408,8 +384,8 @@
                                 {{-- Tombol Tolak (Reject) --}}
                                 <button type="button"
                                         onclick="openTolakModal('{{ $pelatih->id }}', '{{ addslashes($pelatih->nama) }}')"
-                                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs border border-rose-200 transition">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-600 font-bold text-xs border border-slate-200 transition">
+                                    
                                     Tolak
                                 </button>
                             </div>
@@ -419,7 +395,7 @@
                                   onsubmit="return confirm('Verifikasi ulang pelatih ini?')">
                                 @csrf
                                 <button type="submit"
-                                        class="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs border border-emerald-200 transition">
+                                        class="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold text-xs border border-sky-200 transition">
                                     Verifikasi Ulang
                                 </button>
                             </form>
@@ -430,9 +406,7 @@
         @empty
             <div class="text-center py-16 bg-white rounded-3xl border border-sky-100 shadow-sm">
                 <div class="mx-auto w-16 h-16 rounded-2xl bg-sky-50 text-sky-400 flex items-center justify-center mb-3">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+                    
                 </div>
                 <h3 class="text-sm font-bold text-slate-700">Tidak Ada Data Pelatih</h3>
                 <p class="text-xs text-slate-400 mt-1">
@@ -452,16 +426,16 @@
 </div>
 
 {{-- MODAL TOLAK VERIFIKASI --}}
-<dialog id="modal-tolak" class="modal rounded-3xl backdrop:bg-slate-900/40 p-0 shadow-2xl w-full max-w-md mx-auto">
-    <div class="bg-white rounded-3xl border border-rose-100 p-6">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-            <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                <span class="w-6 h-6 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-xs">✕</span>
+<dialog id="modal-tolak" class="modal rounded-3xl backdrop:bg-slate-900/40 backdrop:backdrop-blur-sm p-0 shadow-2xl w-full max-w-md mx-auto border border-sky-100">
+    <div class="bg-white rounded-3xl p-6">
+        <div class="flex justify-center">
+            <img src="{{ asset('images/bingung.png') }}" alt="Tolak pendaftaran" class="w-24 h-24 object-contain">
+        </div>
+        <div class="text-center mt-2">
+            <h3 class="text-sm font-extrabold text-slate-900">
                 Tolak Pendaftaran Pelatih
             </h3>
-            <button onclick="document.getElementById('modal-tolak').close()" class="text-slate-400 hover:text-slate-600">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
+            <p class="text-[11px] text-slate-400 font-medium">Berikan alasan agar pembina dapat merevisi berkas</p>
         </div>
 
         <form id="form-tolak" method="POST" class="mt-4 space-y-4">
@@ -475,7 +449,7 @@
                     Alasan Penolakan <span class="text-rose-500">*</span>
                 </label>
                 <textarea name="catatan" rows="3" required placeholder="Contoh: Sertifikat yang diunggah tidak terbaca / masa berlaku lisensi telah habis..."
-                          class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-rose-400 transition"></textarea>
+                          class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition"></textarea>
             </div>
 
             <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
@@ -484,7 +458,7 @@
                     Batal
                 </button>
                 <button type="submit"
-                        class="px-4 py-2 rounded-xl bg-rose-600 text-white font-bold text-xs hover:bg-rose-700 transition shadow-md shadow-rose-600/20">
+                        class="px-4 py-2 rounded-xl bg-sky-600 text-white font-bold text-xs hover:bg-sky-700 transition shadow-md shadow-sky-600/20">
                     Kirim Penolakan
                 </button>
             </div>

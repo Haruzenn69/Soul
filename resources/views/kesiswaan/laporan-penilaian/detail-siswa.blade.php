@@ -8,9 +8,7 @@
         <div>
             <a href="{{ route('kesiswaan.laporan-penilaian.historis-siswa') }}"
                class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-blue-600 transition mb-3">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                </svg>
+                
                 Kembali ke Daftar Riwayat Siswa
             </a>
 
@@ -43,9 +41,7 @@
                 <div class="flex items-center gap-2">
                     <button type="button" onclick="window.print()"
                             class="inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 shadow-sm transition">
-                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
-                        </svg>
+                        
                         Cetak Riwayat
                     </button>
                 </div>
@@ -76,9 +72,7 @@
         @if ($groupedPenilaians->isEmpty())
             <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-12 md:p-16 text-center">
                 <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-500 mb-4">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+                    
                 </div>
                 <h2 class="text-sm font-bold text-slate-900">Belum Ada Riwayat Penilaian</h2>
                 <p class="text-xs text-slate-400 mt-1">Siswa ini belum memiliki penilaian ekstrakurikuler yang telah dikirim oleh pembina di tahun ajaran manapun.</p>
@@ -96,9 +90,7 @@
                         <div class="p-4 md:p-5 bg-gradient-to-r {{ $isAktif ? 'from-sky-50/60 to-white' : 'from-slate-50 to-white' }} border-b border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl {{ $isAktif ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/20' : 'bg-slate-200 text-slate-600' }} flex items-center justify-center font-bold text-xs shrink-0">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
+                                    
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">

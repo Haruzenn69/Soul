@@ -6,6 +6,7 @@ use App\Models\Ekskul;
 use App\Models\Faq;
 use App\Models\Kegiatan;
 use App\Models\Kelas;
+use App\Models\KategoriEkskul;
 use App\Models\Pelatih;
 use App\Models\Pembina;
 use App\Models\Pendaftaran;
@@ -23,6 +24,10 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        foreach (\App\Support\AturanEkskul::DEFAULT_KATEGORI as $namaKategori) {
+            KategoriEkskul::firstOrCreate(['nama' => $namaKategori]);
+        }
+
         // Tahun Ajaran
         $tahunAjaran = TahunAjaran::create([
             'nama' => '2026/2027',
@@ -78,7 +83,7 @@ class DatabaseSeeder extends Seeder
 
         // Kesiswaan
         User::firstOrCreate(
-            ['username' => 'kesiswaan'],
+            ['username' => 'thinker'],
             [
                 'email' => 'kesiswaan@soul.test',
                 'password' => Hash::make('password'),

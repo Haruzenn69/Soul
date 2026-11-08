@@ -15,7 +15,6 @@
         return $direction === 'asc' ? 'M8 15l4 4 4-4' : 'M8 9l4-4 4 4';
     };
 
-    $isKelas11 = $kela->tingkat === 'xi';
     $isAktif = $tahunAjaran->isAktif();
     $hasPending = $availableSiswa->isNotEmpty();
     $isEmpty = $siswas->total() === 0;
@@ -24,7 +23,7 @@
 <div class="space-y-6 animate-fade-up">
 
     {{-- HERO CARD --}}
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-500 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200">
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-500 to-blue-600 p-6 md:p-8 text-white soul-timbul">
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
             <div class="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
@@ -35,7 +34,7 @@
                 <div class="flex items-center gap-2 mb-2 flex-wrap">
                     <a href="{{ route('kesiswaan.tahun-ajaran.index') }}"
                        class="inline-flex items-center gap-1.5 text-xs text-white/80 hover:text-white font-bold transition">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                        
                         Tahun Ajaran
                     </a>
                     <span class="text-white/40">/</span>
@@ -68,20 +67,20 @@
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
                 <a href="{{ route('kesiswaan.tahun-ajaran.index') }}"
                    class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-xl hover:bg-white/20 transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    
                     Daftar TA & Kelas
                 </a>
-                @if($isAktif && $isKelas11 && $hasPending)
-                    <button type="button" onclick="document.getElementById('penempatan-section').scrollIntoView({behavior: 'smooth'})"
+                @if($isAktif && $hasPending)
+                    <button type="button" onclick="document.getElementById('penempatan-section')?.scrollIntoView({behavior: 'smooth'})"
                        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold text-xs rounded-xl shadow-lg transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
-                        Ambil Siswa Kelas 10 ({{ $availableSiswa->count() }})
+                        
+                        Atur Siswa ({{ $availableSiswa->count() }})
                     </button>
                 @endif
                 <a href="{{ route('kesiswaan.kelas.index') }}"
                    class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-sky-700 font-bold text-xs rounded-xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                    Kelola di Data Kelas
+                    
+                    Data Kelas
                 </a>
             </div>
         </div>
@@ -90,181 +89,36 @@
         <div class="relative mt-6 pt-5 border-t border-white/15">
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div class="bg-white/10 backdrop-blur rounded-2xl p-3 border border-white/15">
-                    <span class="text-[10px] font-bold text-white/75 uppercase tracking-wider block">Total Siswa</span>
+                    <span class="text-[10px] font-bold text-white/75 uppercase tracking-wider block">Siswa Aktif</span>
                     <span class="text-xl font-black text-white mt-0.5 block">{{ $stats['total'] }}</span>
                 </div>
                 <div class="bg-white/10 backdrop-blur rounded-2xl p-3 border border-white/15">
-                    <span class="text-[10px] font-bold text-white/75 uppercase tracking-wider block">Laki-Laki (♂)</span>
+                    <span class="text-[10px] font-bold text-white/75 uppercase tracking-wider block">Laki-Laki (L)</span>
                     <span class="text-xl font-black text-white mt-0.5 block">{{ $stats['laki'] }}</span>
                 </div>
                 <div class="bg-white/10 backdrop-blur rounded-2xl p-3 border border-white/15">
-                    <span class="text-[10px] font-bold text-white/75 uppercase tracking-wider block">Perempuan (♀)</span>
+                    <span class="text-[10px] font-bold text-white/75 uppercase tracking-wider block">Perempuan (P)</span>
                     <span class="text-xl font-black text-white mt-0.5 block">{{ $stats['perempuan'] }}</span>
                 </div>
                 <div class="bg-white/10 backdrop-blur rounded-2xl p-3 border border-white/15">
-                    @if($isKelas11)
-                        <span class="text-[10px] font-bold text-white/75 uppercase tracking-wider block">Sumber Kelas 10</span>
-                        <span class="text-sm font-extrabold text-amber-300 mt-1 block truncate">{{ $selectedSourceKelas?->nama ?? 'Tidak ada' }}</span>
-                    @else
-                        <span class="text-[10px] font-bold text-white/75 uppercase tracking-wider block">Tingkat</span>
-                        <span class="text-sm font-extrabold text-white mt-1 block">Tingkat {{ strtoupper($kela->tingkat) }}</span>
-                    @endif
+                    <span class="text-[10px] font-bold text-white/75 uppercase tracking-wider block">
+                        @if($kela->tingkat === 'xi') Sumber Kelas 10
+                        @elseif($kela->tingkat === 'xii') Sumber Kelas 11
+                        @else Penempatan Baru
+                        @endif
+                    </span>
+                    <span class="text-sm font-extrabold text-amber-300 mt-1 block truncate">
+                        @if($kela->tingkat === 'xi') Jurusan {{ strtoupper($kela->jurusan) }}
+                        @elseif($kela->tingkat === 'xii') {{ $matchingSourceClass?->nama ?? '11 '.$kela->jurusan.' '.$kela->rombel }}
+                        @else Kelas 10 Baru
+                        @endif
+                    </span>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- SECTION UNTUK KELAS 11: AMBIL SISWA DARI KELAS 10 --}}
-    @if($isAktif && $isKelas11 && $sourceKelasOptions->isNotEmpty())
-        <div id="penempatan-section" class="bg-gradient-to-br from-amber-50 to-orange-50/50 rounded-3xl border border-amber-200/80 shadow-md p-6 animate-fade-up">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-amber-200/60">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold shadow-md shadow-amber-200 shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                    </div>
-                    <div>
-                        <h2 class="text-sm font-extrabold text-slate-900">Ambil Siswa dari Kelas 10</h2>
-                        <p class="text-xs text-amber-800/80 mt-0.5">
-                            Pilih kelas 10 asal, lalu pilih siswa yang akan dinaikkan ke kelas <span class="font-bold text-amber-900">{{ $kela->nama }}</span>.
-                        </p>
-                    </div>
-                </div>
 
-                {{-- Dropdown Pilih Kelas 10 Asal --}}
-                <form method="GET" action="{{ route('kesiswaan.tahun-ajaran.kelas.show', [$tahunAjaran, $kela]) }}" class="flex items-center gap-2">
-                    <label class="text-xs font-bold text-slate-700 whitespace-nowrap">Kelas Asal:</label>
-                    <select name="source_kelas_id" onchange="this.form.submit()"
-                            class="px-3 py-2 bg-white border border-amber-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-300 shadow-sm">
-                        @foreach($sourceKelasOptions as $opt)
-                            <option value="{{ $opt->id }}" {{ $selectedSourceKelas?->id === $opt->id ? 'selected' : '' }}>
-                                {{ $opt->nama }} ({{ $opt->siswas_count }} siswa)
-                            </option>
-                        @endforeach
-                    </select>
-                </form>
-            </div>
-
-            @if($availableSiswa->isNotEmpty())
-                <form method="POST" action="{{ route('kesiswaan.tahun-ajaran.kelas.assign', [$tahunAjaran, $kela]) }}" class="mt-4" id="form-penempatan">
-                    @csrf
-
-                    <div class="flex items-center justify-between gap-3 mb-3">
-                        <label class="inline-flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" id="check-all-pending" class="w-4 h-4 text-sky-600 rounded border-amber-300 focus:ring-sky-500">
-                            <span class="text-xs font-bold text-slate-700">Pilih Semua Siswa di {{ $selectedSourceKelas->nama }}</span>
-                        </label>
-                        <span id="selected-counter" class="text-xs font-semibold text-amber-800">
-                            0 siswa dipilih
-                        </span>
-                    </div>
-
-                    <div class="max-h-72 overflow-y-auto rounded-2xl border border-amber-200 bg-white divide-y divide-amber-100">
-                        @foreach($availableSiswa as $ps)
-                            <label class="flex items-center justify-between p-3.5 hover:bg-amber-50/50 cursor-pointer transition select-none">
-                                <div class="flex items-center gap-3">
-                                    <input type="checkbox" name="siswa_ids[]" value="{{ $ps->id }}"
-                                           class="pending-checkbox w-4 h-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500">
-                                    <div>
-                                        <p class="text-xs font-bold text-slate-900 leading-snug">{{ $ps->nama }}</p>
-                                        <p class="text-[11px] text-slate-400 mt-0.5">
-                                            NIS: <span class="font-mono text-slate-600">{{ $ps->nis }}</span>
-                                            &bull; Kelas: <span class="font-semibold text-amber-700">{{ $selectedSourceKelas->nama }}</span>
-                                            &bull; {{ ucfirst($ps->jenis_kelamin ?? '-') }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                                    Tersedia
-                                </span>
-                            </label>
-                        @endforeach
-                    </div>
-
-                    <div class="mt-4 flex justify-end">
-                        <button type="submit" id="btn-submit-assign" disabled
-                                class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-extrabold text-xs rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:from-emerald-600 hover:to-teal-700">
-                            + Naikkan Siswa Terpilih ke Kelas {{ $kela->nama }}
-                        </button>
-                    </div>
-                </form>
-            @else
-                <div class="py-6 text-center text-xs text-amber-800">
-                    Tidak ada siswa di kelas {{ $selectedSourceKelas?->nama ?? 'asal' }}.
-                </div>
-            @endif
-        </div>
-    @endif
-
-    {{-- SECTION UNTUK KELAS 10: NAIKKAN SISWA KE KELAS 11 --}}
-    @if($isAktif && $kela->tingkat === 'x' && $targetKelasOptions->isNotEmpty() && $siswas->total() > 0)
-        <div class="bg-gradient-to-br from-sky-50 to-blue-50/50 rounded-3xl border border-sky-200/80 shadow-md p-6 animate-fade-up">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-sky-200/60">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-sky-500 text-white flex items-center justify-center font-bold shadow-md shadow-sky-200 shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-                    </div>
-                    <div>
-                        <h2 class="text-sm font-extrabold text-slate-900">Naikkan Siswa ke Kelas 11</h2>
-                        <p class="text-xs text-sky-800/80 mt-0.5">
-                            Pilih siswa dari kelas <span class="font-bold text-sky-900">{{ $kela->nama }}</span> ini untuk dinaikkan ke kelas tingkat 11.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <form method="POST" action="{{ route('kesiswaan.tahun-ajaran.kelas.assign', [$tahunAjaran, $kela]) }}" class="mt-4" id="form-promosi-x">
-                @csrf
-
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-bold text-slate-700 whitespace-nowrap">Pilih Kelas 11 Tujuan:</label>
-                        <select name="target_kelas_id" required
-                                class="px-3 py-2 bg-white border border-sky-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-300 shadow-sm">
-                            <option value="">-- Pilih Kelas 11 --</option>
-                            @foreach($targetKelasOptions as $opt)
-                                <option value="{{ $opt->id }}">
-                                    {{ $opt->nama }} ({{ $opt->siswas_count }} siswa saat ini)
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
-                        <input type="checkbox" id="check-all-x" class="w-4 h-4 text-sky-600 rounded border-sky-300 focus:ring-sky-500">
-                        <span class="text-xs font-bold text-slate-700">Pilih Semua Siswa</span>
-                    </label>
-                </div>
-
-                <div class="max-h-72 overflow-y-auto rounded-2xl border border-sky-200 bg-white divide-y divide-sky-100">
-                    @foreach($siswas as $s)
-                        <label class="flex items-center justify-between p-3.5 hover:bg-sky-50/50 cursor-pointer transition select-none">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" name="siswa_ids[]" value="{{ $s->id }}"
-                                       class="promosi-checkbox w-4 h-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500">
-                                <div>
-                                    <p class="text-xs font-bold text-slate-900 leading-snug">{{ $s->nama }}</p>
-                                    <p class="text-[11px] text-slate-400 mt-0.5">
-                                        NIS: <span class="font-mono text-slate-600">{{ $s->nis }}</span>
-                                        &bull; {{ ucfirst($s->jenis_kelamin ?? '-') }}
-                                    </p>
-                                </div>
-                            </div>
-                            <span class="text-[10px] font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded-full border border-sky-200">
-                                Kelas 10
-                            </span>
-                        </label>
-                    @endforeach
-                </div>
-
-                <div class="mt-4 flex justify-end">
-                    <button type="submit" id="btn-submit-promosi" disabled
-                            class="px-6 py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-extrabold text-xs rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:from-sky-600 hover:to-blue-700">
-                        + Naikkan Siswa Terpilih ke Kelas 11
-                    </button>
-                </div>
-            </form>
-        </div>
-    @endif
 
     {{-- SEARCH & FILTER FORM --}}
     <form method="GET" action="{{ route('kesiswaan.tahun-ajaran.kelas.show', [$tahunAjaran, $kela]) }}" class="bg-white p-4 rounded-3xl border border-sky-100 shadow-sm">
@@ -274,12 +128,10 @@
         <div class="flex flex-col md:flex-row gap-3 items-stretch">
             <div class="relative flex-1">
                 <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
+                    
                 </span>
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama atau NIS siswa di kelas ini..."
-                       class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                       class="w-full pl-4 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
             </div>
 
             <div class="flex items-center gap-2 shrink-0">
@@ -305,17 +157,13 @@
                         <th class="py-3.5 px-5">
                             <a href="{{ $sortLink('nama') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
                                 Siswa
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('nama') }}"/>
-                                </svg>
+                                
                             </a>
                         </th>
                         <th class="py-3.5 px-5">
                             <a href="{{ $sortLink('nis') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
                                 NIS
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('nis') }}"/>
-                                </svg>
+                                
                             </a>
                         </th>
                         <th class="py-3.5 px-5">Jenis Kelamin</th>
@@ -326,7 +174,7 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-xs">
                     @forelse ($siswas as $s)
-                        <tr class="hover:bg-sky-50/30 transition">
+                        <tr class="transition hover:bg-sky-50/30">
                             <td class="py-3.5 px-5">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 font-extrabold flex items-center justify-center text-xs uppercase shrink-0 overflow-hidden">
@@ -347,7 +195,7 @@
 
                             <td class="py-3.5 px-5 whitespace-nowrap">
                                 <span class="inline-flex items-center gap-1.5 font-semibold {{ $s->jenis_kelamin === 'perempuan' ? 'text-rose-600' : 'text-sky-700' }}">
-                                    <span class="text-sm leading-none">{{ $s->jenis_kelamin === 'perempuan' ? '♀' : '♂' }}</span>
+                                    <span class="text-sm leading-none">{{ $s->jenis_kelamin === 'perempuan' ? 'P' : 'L' }}</span>
                                     {{ ucfirst($s->jenis_kelamin ?? '-') }}
                                 </span>
                             </td>
@@ -373,9 +221,7 @@
                                     <a href="{{ route('kesiswaan.users.edit', $s->user_id) }}"
                                        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold rounded-xl transition text-xs"
                                        title="Edit Akun {{ $s->nama }}">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
+                                        
                                         Edit Akun
                                     </a>
                                 @else
@@ -387,12 +233,10 @@
                         <tr>
                             <td colspan="6" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-slate-400">
-                                    <svg class="w-10 h-10 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                                    </svg>
-                                    <p class="text-xs font-semibold text-slate-600">Belum ada siswa di kelas {{ $kela->nama }} ini.</p>
-                                    @if($isAktif && $isKelas11 && $hasPending)
-                                        <p class="text-[11px] text-amber-600 mt-1 font-medium">Gunakan form penempatan di atas untuk menambahkan siswa dari kelas 10.</p>
+                                    
+                                    <p class="text-xs font-semibold text-slate-600">Belum ada siswa aktif di kelas {{ $kela->nama }} ini.</p>
+                                    @if($isAktif)
+                                        <p class="text-[11px] text-slate-400 mt-1">Gunakan panel penempatan siswa di bawah untuk memasukkan siswa ke kelas ini.</p>
                                     @endif
                                 </div>
                             </td>
@@ -404,35 +248,291 @@
 
         <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row gap-2 justify-between items-center">
             <p class="text-[11px] text-slate-400 font-semibold">
-                Menampilkan {{ $siswas->firstItem() ?? 0 }}-{{ $siswas->lastItem() ?? 0 }} dari {{ $siswas->total() }} siswa
+                Menampilkan {{ $siswas->firstItem() ?? 0 }}-{{ $siswas->lastItem() ?? 0 }} dari {{ $siswas->total() }} siswa aktif
             </p>
             {{ $siswas->links() }}
         </div>
     </div>
 
+    {{-- ======================================================== --}}
+    {{-- SECTION PENEMPATAN / KENAIKAN SISWA KE KELAS INI (AKTIF) --}}
+    {{-- ======================================================== --}}
+    @if($isAktif)
+        <div id="penempatan-section" class="space-y-4 animate-fade-up">
+
+            {{-- 1. KELAS 11: PENEMPATAN DARI KELAS 10 JURUSAN SAMA --}}
+            @if($kela->tingkat === 'xi')
+                <div class="bg-gradient-to-br from-sky-50 via-white to-blue-50/60 rounded-3xl border border-sky-200/80 shadow-md p-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-sky-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-2xl bg-sky-500 text-white flex items-center justify-center font-extrabold text-base shadow-md shadow-sky-200 shrink-0">
+                                11
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-extrabold text-slate-900">Penempatan Siswa ke Kelas {{ $kela->nama }}</h2>
+                                <p class="text-xs text-slate-500 mt-0.5">
+                                    Pilih siswa kelas 10 di jurusan <strong class="text-sky-700">{{ strtoupper($kela->jurusan) }}</strong> yang akan ditempatkan di kelas ini. Siswa yang tidak naik dapat ditandai tinggal kelas.
+                                </p>
+                            </div>
+                        </div>
+
+                        @if($sourceKelasOptions->isNotEmpty())
+                            <form method="GET" action="{{ route('kesiswaan.tahun-ajaran.kelas.show', [$tahunAjaran, $kela]) }}" class="flex items-center gap-2">
+                                <input type="hidden" name="sort" value="{{ $sort }}">
+                                <input type="hidden" name="direction" value="{{ $direction }}">
+                                @if(request('q')) <input type="hidden" name="q" value="{{ request('q') }}"> @endif
+                                <label class="text-[11px] font-bold text-slate-500 whitespace-nowrap">Filter Asal:</label>
+                                <select name="source_kelas_id" onchange="this.form.submit()" class="px-3 py-1.5 bg-white border border-sky-200 rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-200 shadow-sm">
+                                    <option value="">Semua Kelas 10 ({{ $sourceKelasOptions->sum('waiting_siswas_count') }} siswa)</option>
+                                    @foreach($sourceKelasOptions as $sko)
+                                        <option value="{{ $sko->id }}" {{ request('source_kelas_id') == $sko->id ? 'selected' : '' }}>
+                                            {{ $sko->nama }} ({{ $sko->waiting_siswas_count }} siswa)
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </form>
+                        @endif
+                    </div>
+
+                    @if($availableSiswa->isNotEmpty())
+                        <form method="POST" action="{{ route('kesiswaan.tahun-ajaran.kelas.assign', [$tahunAjaran, $kela]) }}" class="mt-4">
+                            @csrf
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                                <div class="flex items-center gap-3">
+                                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                                        <input type="checkbox" id="check-all-assign" class="w-4 h-4 text-sky-600 rounded border-sky-300 focus:ring-sky-500">
+                                        <span class="text-xs font-bold text-slate-700">Pilih Semua ({{ $availableSiswa->count() }} siswa)</span>
+                                    </label>
+                                    <span id="assign-counter" class="text-xs font-semibold text-sky-700 bg-sky-100/60 px-2.5 py-0.5 rounded-full">
+                                        0 siswa dipilih
+                                    </span>
+                                </div>
+                                <div class="relative w-full sm:w-64">
+                                    <input type="text" id="filter-student-search" placeholder="Cari nama siswa..." class="w-full px-3 py-1.5 bg-white border border-sky-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-200 shadow-sm">
+                                </div>
+                            </div>
+
+                            <div class="max-h-80 overflow-y-auto rounded-2xl border border-sky-200/80 bg-white divide-y divide-sky-100" id="student-list-container">
+                                @foreach($availableSiswa as $asw)
+                                    <label class="student-item flex items-center justify-between p-3.5 hover:bg-sky-50/60 cursor-pointer transition select-none" data-name="{{ strtolower($asw->nama) }}" data-nis="{{ $asw->nis }}">
+                                        <div class="flex items-center gap-3">
+                                            <input type="checkbox" name="siswa_ids[]" value="{{ $asw->id }}" class="assign-checkbox w-4 h-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500">
+                                            <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 font-extrabold flex items-center justify-center text-xs uppercase shrink-0">
+                                                {{ strtoupper(substr($asw->nama, 0, 2)) }}
+                                            </div>
+                                            <div>
+                                                <p class="text-xs font-bold text-slate-900 leading-snug">{{ $asw->nama }}</p>
+                                                <p class="text-[11px] text-slate-400 mt-0.5">
+                                                    NIS: <span class="font-mono text-slate-600">{{ $asw->nis }}</span>
+                                                    &bull; Asal: <span class="font-bold text-sky-700">{{ $asw->kelas?->nama ?? 'Kelas 10' }}</span>
+                                                    &bull; {{ ucfirst($asw->jenis_kelamin ?? '-') }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Menunggu Penempatan</span>
+                                    </label>
+                                @endforeach
+                            </div>
+
+                            <div class="mt-4 flex flex-wrap justify-end gap-2.5">
+                                <button type="submit" name="keputusan" value="tinggal" onclick="return confirm('Tetapkan siswa terpilih tinggal di kelas 10?')" class="rounded-xl border border-amber-300 bg-white px-5 py-2.5 text-xs font-extrabold text-amber-800 shadow-sm transition hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50" disabled data-assign-submit>
+                                    Tetapkan Tinggal di Kelas 10
+                                </button>
+                                <button type="submit" name="keputusan" value="naik" class="rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 px-6 py-2.5 text-xs font-extrabold text-white shadow-md shadow-sky-200 transition hover:from-sky-600 hover:to-blue-700 disabled:cursor-not-allowed disabled:opacity-50" disabled data-assign-submit>
+                                    + Tempatkan Terpilih ke {{ $kela->nama }}
+                                </button>
+                            </div>
+                        </form>
+                    @else
+                        <div class="py-8 text-center text-xs font-semibold text-slate-500">
+                            Tidak ada siswa kelas 10 jurusan {{ strtoupper($kela->jurusan) }} yang menunggu penempatan ke kelas ini.
+                        </div>
+                    @endif
+                </div>
+
+            {{-- 2. KELAS 12: KENAIKAN DARI KELAS 11 ROMBEL TETAP --}}
+            @elseif($kela->tingkat === 'xii')
+                <div class="bg-gradient-to-br from-indigo-50 via-white to-blue-50/60 rounded-3xl border border-indigo-200/80 shadow-md p-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-indigo-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-base shadow-md shadow-indigo-200 shrink-0">
+                                12
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-extrabold text-slate-900">Kenaikan Siswa dari Kelas {{ $matchingSourceClass?->nama ?? 'Kelas 11' }} ke {{ $kela->nama }}</h2>
+                                <p class="text-xs text-slate-500 mt-0.5">
+                                    Perubahan tingkat dari rombel yang sama (<strong class="text-indigo-700">{{ $matchingSourceClass?->nama ?? '11 '.$kela->jurusan.' '.$kela->rombel }}</strong> -> <strong class="text-indigo-700">{{ $kela->nama }}</strong>). Semua siswa tercentang otomatis untuk naik. Hapus centang jika ada yang tinggal kelas.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($availableSiswa->isNotEmpty())
+                        <form method="POST" action="{{ route('kesiswaan.tahun-ajaran.kelas.assign', [$tahunAjaran, $kela]) }}" class="mt-4">
+                            @csrf
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                                <div class="flex items-center gap-3">
+                                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                                        <input type="checkbox" id="check-all-assign" checked class="w-4 h-4 text-indigo-600 rounded border-indigo-300 focus:ring-indigo-500">
+                                        <span class="text-xs font-bold text-slate-700">Pilih Semua ({{ $availableSiswa->count() }} siswa)</span>
+                                    </label>
+                                    <span id="assign-counter" class="text-xs font-semibold text-indigo-700 bg-indigo-100/60 px-2.5 py-0.5 rounded-full">
+                                        {{ $availableSiswa->count() }} siswa dipilih
+                                    </span>
+                                </div>
+                                <div class="relative w-full sm:w-64">
+                                    <input type="text" id="filter-student-search" placeholder="Cari nama siswa..." class="w-full px-3 py-1.5 bg-white border border-indigo-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 shadow-sm">
+                                </div>
+                            </div>
+
+                            <div class="max-h-80 overflow-y-auto rounded-2xl border border-indigo-200/80 bg-white divide-y divide-indigo-100" id="student-list-container">
+                                @foreach($availableSiswa as $asw)
+                                    <label class="student-item flex items-center justify-between p-3.5 hover:bg-indigo-50/60 cursor-pointer transition select-none" data-name="{{ strtolower($asw->nama) }}" data-nis="{{ $asw->nis }}">
+                                        <div class="flex items-center gap-3">
+                                            <input type="checkbox" name="siswa_ids[]" value="{{ $asw->id }}" checked class="assign-checkbox w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                                            <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 font-extrabold flex items-center justify-center text-xs uppercase shrink-0">
+                                                {{ strtoupper(substr($asw->nama, 0, 2)) }}
+                                            </div>
+                                            <div>
+                                                <p class="text-xs font-bold text-slate-900 leading-snug">{{ $asw->nama }}</p>
+                                                <p class="text-[11px] text-slate-400 mt-0.5">
+                                                    NIS: <span class="font-mono text-slate-600">{{ $asw->nis }}</span>
+                                                    &bull; Asal: <span class="font-bold text-indigo-700">{{ $asw->kelas?->nama ?? 'Kelas 11' }}</span>
+                                                    &bull; {{ ucfirst($asw->jenis_kelamin ?? '-') }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <span class="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">Siap Naik ke 12</span>
+                                    </label>
+                                @endforeach
+                            </div>
+
+                            <div class="mt-4 flex flex-wrap justify-end gap-2.5">
+                                <button type="submit" name="keputusan" value="tinggal" onclick="return confirm('Tetapkan siswa terpilih tinggal di kelas 11?')" class="rounded-xl border border-amber-300 bg-white px-5 py-2.5 text-xs font-extrabold text-amber-800 shadow-sm transition hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50" data-assign-submit>
+                                    Tetapkan Tinggal di Kelas 11
+                                </button>
+                                <button type="submit" name="keputusan" value="naik" class="rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-6 py-2.5 text-xs font-extrabold text-white shadow-md shadow-indigo-200 transition hover:from-indigo-700 hover:to-blue-700 disabled:cursor-not-allowed disabled:opacity-50" data-assign-submit>
+                                    + Naikkan Terpilih ke {{ $kela->nama }}
+                                </button>
+                            </div>
+                        </form>
+                    @else
+                        <div class="py-8 text-center text-xs font-semibold text-slate-500">
+                            Semua siswa dari kelas {{ $matchingSourceClass?->nama ?? '11 '.$kela->jurusan.' '.$kela->rombel }} sudah dinaikkan atau tidak ada siswa yang menunggu.
+                        </div>
+                    @endif
+                </div>
+
+            {{-- 3. KELAS 10: PENEMPATAN SISWA BARU / PPDB --}}
+            @elseif($kela->tingkat === 'x')
+                <div class="bg-gradient-to-br from-emerald-50 via-white to-teal-50/60 rounded-3xl border border-emerald-200/80 shadow-md p-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-emerald-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-extrabold text-base shadow-md shadow-emerald-200 shrink-0">
+                                10
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-extrabold text-slate-900">Penempatan Siswa Baru ke Kelas {{ $kela->nama }}</h2>
+                                <p class="text-xs text-slate-500 mt-0.5">
+                                    Centang siswa baru (atau siswa yang tinggal di kelas 10) untuk ditempatkan pada rombel ini.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($availableSiswa->isNotEmpty())
+                        <form method="POST" action="{{ route('kesiswaan.tahun-ajaran.kelas.assign', [$tahunAjaran, $kela]) }}" class="mt-4">
+                            @csrf
+                            <input type="hidden" name="keputusan" value="naik">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                                <div class="flex items-center gap-3">
+                                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                                        <input type="checkbox" id="check-all-assign" class="w-4 h-4 text-emerald-600 rounded border-emerald-300 focus:ring-emerald-500">
+                                        <span class="text-xs font-bold text-slate-700">Pilih Semua ({{ $availableSiswa->count() }} siswa)</span>
+                                    </label>
+                                    <span id="assign-counter" class="text-xs font-semibold text-emerald-700 bg-emerald-100/60 px-2.5 py-0.5 rounded-full">
+                                        0 siswa dipilih
+                                    </span>
+                                </div>
+                                <div class="relative w-full sm:w-64">
+                                    <input type="text" id="filter-student-search" placeholder="Cari nama siswa..." class="w-full px-3 py-1.5 bg-white border border-emerald-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-200 shadow-sm">
+                                </div>
+                            </div>
+
+                            <div class="max-h-80 overflow-y-auto rounded-2xl border border-emerald-200/80 bg-white divide-y divide-emerald-100" id="student-list-container">
+                                @foreach($availableSiswa as $asw)
+                                    <label class="student-item flex items-center justify-between p-3.5 hover:bg-emerald-50/60 cursor-pointer transition select-none" data-name="{{ strtolower($asw->nama) }}" data-nis="{{ $asw->nis }}">
+                                        <div class="flex items-center gap-3">
+                                            <input type="checkbox" name="siswa_ids[]" value="{{ $asw->id }}" class="assign-checkbox w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+                                            <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 font-extrabold flex items-center justify-center text-xs uppercase shrink-0">
+                                                {{ strtoupper(substr($asw->nama, 0, 2)) }}
+                                            </div>
+                                            <div>
+                                                <p class="text-xs font-bold text-slate-900 leading-snug">{{ $asw->nama }}</p>
+                                                <p class="text-[11px] text-slate-400 mt-0.5">
+                                                    NIS: <span class="font-mono text-slate-600">{{ $asw->nis }}</span>
+                                                    &bull; Status: <span class="font-bold text-emerald-700">Siswa Baru / Menunggu</span>
+                                                    &bull; {{ ucfirst($asw->jenis_kelamin ?? '-') }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Belum Ada Kelas</span>
+                                    </label>
+                                @endforeach
+                            </div>
+
+                            <div class="mt-4 flex justify-end">
+                                <button type="submit" class="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-2.5 text-xs font-extrabold text-white shadow-md shadow-emerald-200 transition hover:from-emerald-700 hover:to-teal-700 disabled:cursor-not-allowed disabled:opacity-50" disabled data-assign-submit>
+                                    + Tempatkan Terpilih ke {{ $kela->nama }}
+                                </button>
+                            </div>
+                        </form>
+                    @else
+                        <div class="py-8 text-center">
+                            <div class="w-12 h-12 mx-auto rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
+                                
+                            </div>
+                            <p class="text-xs font-bold text-slate-700">Belum ada siswa baru yang menunggu penempatan</p>
+                            <p class="text-[11px] text-slate-400 mt-1 max-w-sm mx-auto">Tambahkan siswa baru melalui menu Data Siswa (input manual atau import excel PPDB).</p>
+                            <a href="{{ route('kesiswaan.siswa.index') }}" class="inline-flex items-center gap-1.5 mt-3 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-200 transition">
+                                + Buka Data Siswa
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            @endif
+
+        </div>
+    @endif
+
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Form 1: Ambil Siswa dari Kelas 10 ke Kelas 11
-        const checkAll = document.getElementById('check-all-pending');
-        const checkboxes = document.querySelectorAll('.pending-checkbox');
-        const counter = document.getElementById('selected-counter');
-        const submitBtn = document.getElementById('btn-submit-assign');
+        const checkAll = document.getElementById('check-all-assign');
+        const checkboxes = document.querySelectorAll('.assign-checkbox');
+        const counter = document.getElementById('assign-counter');
+        const submitBtns = document.querySelectorAll('[data-assign-submit]');
+        const searchInput = document.getElementById('filter-student-search');
+        const studentItems = document.querySelectorAll('.student-item');
 
         function updateState() {
-            const checkedCount = document.querySelectorAll('.pending-checkbox:checked').length;
+            const visibleCheckboxes = Array.from(checkboxes).filter(cb => cb.closest('.student-item').style.display !== 'none');
+            const checkedCount = visibleCheckboxes.filter(cb => cb.checked).length;
+
             if (counter) counter.textContent = `${checkedCount} siswa dipilih`;
-            if (submitBtn) submitBtn.disabled = checkedCount === 0;
-            if (checkAll && checkboxes.length > 0) {
-                checkAll.checked = checkedCount === checkboxes.length;
-                checkAll.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+            submitBtns.forEach(btn => btn.disabled = checkedCount === 0);
+
+            if (checkAll && visibleCheckboxes.length > 0) {
+                checkAll.checked = checkedCount === visibleCheckboxes.length;
+                checkAll.indeterminate = checkedCount > 0 && checkedCount < visibleCheckboxes.length;
             }
         }
 
         if (checkAll) {
             checkAll.addEventListener('change', function () {
-                checkboxes.forEach(cb => cb.checked = checkAll.checked);
+                const visibleCheckboxes = Array.from(checkboxes).filter(cb => cb.closest('.student-item').style.display !== 'none');
+                visibleCheckboxes.forEach(cb => cb.checked = checkAll.checked);
                 updateState();
             });
         }
@@ -441,30 +541,20 @@
             cb.addEventListener('change', updateState);
         });
 
-        // Form 2: Naikkan Siswa dari Kelas 10 ke Kelas 11
-        const checkAllX = document.getElementById('check-all-x');
-        const checkboxesX = document.querySelectorAll('.promosi-checkbox');
-        const submitBtnX = document.getElementById('btn-submit-promosi');
-
-        function updateStateX() {
-            const checkedCountX = document.querySelectorAll('.promosi-checkbox:checked').length;
-            if (submitBtnX) submitBtnX.disabled = checkedCountX === 0;
-            if (checkAllX && checkboxesX.length > 0) {
-                checkAllX.checked = checkedCountX === checkboxesX.length;
-                checkAllX.indeterminate = checkedCountX > 0 && checkedCountX < checkboxesX.length;
-            }
-        }
-
-        if (checkAllX) {
-            checkAllX.addEventListener('change', function () {
-                checkboxesX.forEach(cb => cb.checked = checkAllX.checked);
-                updateStateX();
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const term = this.value.trim().toLowerCase();
+                studentItems.forEach(item => {
+                    const name = item.dataset.name || '';
+                    const nis = item.dataset.nis || '';
+                    const matches = name.includes(term) || nis.includes(term);
+                    item.style.display = matches ? '' : 'none';
+                });
+                updateState();
             });
         }
 
-        checkboxesX.forEach(cb => {
-            cb.addEventListener('change', updateStateX);
-        });
+        updateState();
     });
 </script>
 @endsection

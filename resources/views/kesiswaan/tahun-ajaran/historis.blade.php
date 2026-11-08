@@ -16,7 +16,7 @@
                 <div class="flex items-center gap-2 mb-2 flex-wrap">
                     <a href="{{ route('kesiswaan.tahun-ajaran.index') }}"
                        class="inline-flex items-center gap-1.5 text-xs text-slate-300 hover:text-white font-bold transition">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                        <i class="fa-solid fa-arrow-left text-xs"></i>
                         Tahun Ajaran
                     </a>
                     <span class="text-slate-500">/</span>
@@ -40,24 +40,79 @@
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
                 <a href="{{ route('kesiswaan.tahun-ajaran.index') }}"
                    class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-xl hover:bg-white/20 transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
                     Kembali ke Daftar TA
                 </a>
             </div>
         </div>
     </div>
 
+    {{-- DAFTAR KELAS ARSIP PADA TAHUN AJARAN HISTORIS --}}
+    @if($kelasList->isNotEmpty())
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-5 animate-fade-up">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs shadow-sm shrink-0">
+                        <i class="fa-solid fa-box-archive text-sm"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm md:text-base font-extrabold text-slate-900">
+                            Daftar Kelas Arsip ({{ $kelasList->count() }} Kelas)
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Pilih salah satu kartu kelas di bawah untuk melihat daftar siswa di kelas tersebut pada Tahun Ajaran {{ $tahunAjaran->nama }}
+                        </p>
+                    </div>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 self-start sm:self-auto shrink-0">
+                    Total {{ $kelasList->sum('siswas_count') }} Siswa
+                </span>
+            </div>
+
+            {{-- Group by tingkat --}}
+            @foreach(['x' => 'Kelas 10', 'xi' => 'Kelas 11', 'xii' => 'Kelas 12'] as $tingkat => $tingkatLabel)
+                @php $kelasGroup = $kelasList->where('tingkat', $tingkat); @endphp
+                @if($kelasGroup->isNotEmpty())
+                    <div class="space-y-2.5">
+                        <h3 class="text-[11px] font-extrabold text-slate-400 tracking-wider uppercase">
+                            {{ $tingkatLabel }}
+                        </h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                            @foreach($kelasGroup as $kls)
+                                <a href="{{ route('kesiswaan.tahun-ajaran.kelas.show', [$tahunAjaran, $kls]) }}"
+                                   class="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-sky-300 hover:shadow-md transition-all group flex flex-col justify-between">
+                                    <div>
+                                        <p class="text-xs font-extrabold text-slate-800 group-hover:text-sky-700 transition-colors">
+                                            {{ $kls->nama }}
+                                        </p>
+                                        <p class="text-[10px] text-slate-400 font-medium mt-0.5">
+                                            Jurusan {{ strtoupper($kls->jurusan) }} &bull; Rombel {{ $kls->rombel }}
+                                        </p>
+                                    </div>
+
+                                    <div class="mt-3.5 flex items-center justify-between">
+                                        <span class="inline-flex items-center gap-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 px-2.5 py-1 text-[10px] font-bold group-hover:bg-sky-50 group-hover:border-sky-200 group-hover:text-sky-800 transition">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 group-hover:bg-sky-500"></span>
+                                            {{ $kls->siswas_count ?? 0 }} Siswa
+                                        </span>
+                                        <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-sky-600 transition"></i>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            @endforeach
+        </div>
+    @endif
+
     {{-- PENCARIAN & FILTER KELAS --}}
     <form method="GET" action="{{ route('kesiswaan.tahun-ajaran.historis', $tahunAjaran) }}" class="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm">
         <div class="flex flex-col sm:flex-row gap-3">
             <div class="relative flex-1">
-                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                </span>
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama siswa..."
-                       class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-slate-400 transition">
+                       class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-slate-400 transition">
             </div>
 
             <div class="w-full sm:w-56">
@@ -72,12 +127,14 @@
             </div>
 
             <div class="flex items-center gap-2 shrink-0">
-                <button type="submit" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-2xl shadow-sm transition">
+                <button type="submit" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-2xl shadow-sm transition">
+                    <i class="fa-solid fa-filter text-xs"></i>
                     Filter
                 </button>
                 @if (request()->filled('q') || request()->filled('kelas_id'))
                     <a href="{{ route('kesiswaan.tahun-ajaran.historis', $tahunAjaran) }}"
-                       class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-2xl transition">
+                       class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-2xl transition">
+                        <i class="fa-solid fa-rotate-left text-xs"></i>
                         Reset
                     </a>
                 @endif
@@ -123,8 +180,9 @@
                             <td class="py-3.5 px-5 text-center font-bold text-slate-400">
                                 {{ $siswas->firstItem() + $index }}
                             </td>
-                            <td class="py-3.5 px-5 font-bold text-slate-900">
-                                {{ $s->nama }}
+                            <td class="py-3.5 px-5">
+                                <span class="font-bold text-slate-900 block">{{ $s->nama }}</span>
+                                <span class="font-mono text-[11px] text-slate-400">NIS: {{ $s->nis }}</span>
                             </td>
                             <td class="py-3.5 px-5 font-semibold text-slate-700">
                                 {{ $kelasNama }}
@@ -150,11 +208,9 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-12 text-center">
+                            <td colspan="6" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-slate-400">
-                                    <svg class="w-10 h-10 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                                    </svg>
+                                    <i class="fa-solid fa-box-archive text-3xl mb-2 text-slate-300"></i>
                                     <p class="text-xs font-semibold text-slate-600">Tidak ada data historis siswa pada tahun ajaran ini.</p>
                                 </div>
                             </td>

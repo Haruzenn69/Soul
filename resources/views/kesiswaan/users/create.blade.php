@@ -75,8 +75,6 @@ function userCreateForm() {
 
             { id: 'input-pembina-tanggal-lahir', label: 'Tanggal Lahir' },
             { id: 'input-pembina-agama', label: 'Agama' },
-            { id: 'input-pembina-no-telp', label: 'No. Telp / WA' },
-            { id: 'input-pembina-alamat', label: 'Alamat' },
         ],
 
         get selectedKelasNama() {
@@ -89,6 +87,15 @@ function userCreateForm() {
             this.calculateAge();
             if (this.siswaProvinsi) this.loadCities('siswa', this.siswaProvinsi);
             if (this.pembinaProvinsi) this.loadCities('pembina', this.pembinaProvinsi);
+            this.$nextTick(() => this.checkSiswaClassAvailability());
+        },
+
+        checkSiswaClassAvailability() {
+            this.$nextTick(() => {
+                if (this.role !== 'siswa' || (this.existingClasses || []).length > 0) return;
+                const dialog = document.getElementById('modalTidakAdaKelas');
+                if (dialog && !dialog.open) dialog.showModal();
+            });
         },
 
         calculateAge() {
@@ -328,6 +335,10 @@ function userCreateForm() {
         },
 
         nextStep() {
+            if (this.role === 'siswa' && (this.existingClasses || []).length === 0) {
+                this.checkSiswaClassAvailability();
+                return;
+            }
             if (this.step < this.totalSteps) {
                 this.goToStep(this.step + 1);
             }
@@ -394,6 +405,11 @@ function userCreateForm() {
         },
 
         handleSubmit(e) {
+            if (this.role === 'siswa' && (this.existingClasses || []).length === 0) {
+                e.preventDefault();
+                this.checkSiswaClassAvailability();
+                return;
+            }
             if (this.role === 'siswa') {
                 if (!this.nis || this.nis.length !== 10) {
                     e.preventDefault();
@@ -425,7 +441,7 @@ function userCreateForm() {
 }
 </script>
 
-<div class="space-y-5 animate-fade-up" x-data="userCreateForm()">
+<div class="-mt-6 md:-mt-8 lg:-mt-10 space-y-5 animate-fade-up" x-data="userCreateForm()">
 
     {{-- HERO CARD BIRU (STYLE SAMA DENGAN INDEX AKUN PENGGUNA) --}}
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200">
@@ -448,9 +464,7 @@ function userCreateForm() {
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
                 <a href="{{ route('kesiswaan.users.index') }}"
                    class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/20 transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
                     Kembali ke Daftar Akun
                 </a>
             </div>
@@ -506,7 +520,7 @@ function userCreateForm() {
                 @foreach ($roles as $rVal => $rData)
                     <label class="relative flex flex-col p-3 rounded-2xl border-2 cursor-pointer transition-all"
                            :class="role === '{{ $rVal }}' ? 'border-sky-500 bg-sky-50/60' : 'border-slate-100 hover:border-slate-200 bg-slate-50/40'">
-                        <input type="radio" name="role" value="{{ $rVal }}" x-model="role" class="sr-only">
+                        <input type="radio" name="role" value="{{ $rVal }}" x-model="role" @change="checkSiswaClassAvailability()" class="sr-only">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold" :class="role === '{{ $rVal }}' ? 'text-sky-900' : 'text-slate-800'">
                                 {{ $rData['label'] }}
@@ -532,7 +546,7 @@ function userCreateForm() {
                 <div class="flex-1 min-w-0 space-y-5">
 
                     <a href="{{ route('kesiswaan.users.import-form', 'siswa') }}" class="inline-flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-xs font-bold text-emerald-800 hover:bg-emerald-100">
-                        Import Akun Siswa dengan Excel
+                        <i class="fa-solid fa-file-excel text-sm text-emerald-600"></i> Import Akun Siswa dengan Excel
                     </a>
 
                     {{-- STEPPER NAV --}}
@@ -564,7 +578,7 @@ function userCreateForm() {
                                     <div class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 text-[10px] font-bold"
                                          :class="step === {{ $sNum }} ? 'bg-sky-500 text-white' : (step > {{ $sNum }} ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600')">
                                         <template x-if="step > {{ $sNum }}">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                            
                                         </template>
                                         <template x-if="step <= {{ $sNum }}">
                                             <span>{{ $sNum }}</span>
@@ -596,9 +610,7 @@ function userCreateForm() {
                                 </div>
                                 <template x-if="photoPreview">
                                     <button type="button" @click="removePhoto()" title="Hapus Foto"
-                                            class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center shadow hover:bg-rose-600 transition">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                    </button>
+                                            class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center shadow hover:bg-rose-600 transition">Hapus Foto</button>
                                 </template>
                             </div>
                             <div class="flex-1">
@@ -649,7 +661,7 @@ function userCreateForm() {
                             <button type="button" @click="nextStep()"
                                     class="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
                                 <span>Lanjut</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                
                             </button>
                         </div>
                     </div>
@@ -678,13 +690,13 @@ function userCreateForm() {
                         <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
                             <button type="button" @click="prevStep()"
                                     class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-2xl transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                                
                                 Kembali
                             </button>
                             <button type="button" @click="nextStep()"
                                     class="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
                                 <span>Lanjut</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                
                             </button>
                         </div>
                     </div>
@@ -764,13 +776,13 @@ function userCreateForm() {
                         <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
                             <button type="button" @click="prevStep()"
                                     class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-2xl transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                                
                                 Kembali
                             </button>
                             <button type="button" @click="nextStep()"
                                     class="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
                                 Lanjut
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                
                             </button>
                         </div>
                     </div>
@@ -807,7 +819,7 @@ function userCreateForm() {
                         <div class="flex items-center justify-between">
                             <button type="button" @click="prevStep()"
                                     class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-2xl transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                                
                                 Kembali
                             </button>
                             <div class="flex items-center gap-2">
@@ -934,7 +946,7 @@ function userCreateForm() {
                 {{-- LEFT: FORM --}}
                 <div class="flex-1 min-w-0">
                     <a href="{{ route('kesiswaan.users.import-form', 'pembina') }}" class="mb-5 inline-flex items-center gap-2 rounded-2xl border border-blue-200 bg-blue-50 px-5 py-3 text-xs font-bold text-blue-800 hover:bg-blue-100">
-                        Import Akun Guru dengan Excel
+                        <i class="fa-solid fa-file-excel text-sm text-blue-600"></i> Import Akun Guru dengan Excel
                     </a>
                     <div class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-5">
                         <div class="border-b border-slate-100 pb-3">
@@ -1010,7 +1022,7 @@ function userCreateForm() {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">No. Telp / WA *</label>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">No. Telp / WA <span class="font-normal text-slate-400 normal-case">(Opsional)</span></label>
                                 <input type="text" name="pembina_no_telp" id="input-pembina-no-telp" :disabled="role !== 'pembina'" value="{{ old('pembina_no_telp') }}" placeholder="08xxxxxxxxxx" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div>
@@ -1018,7 +1030,7 @@ function userCreateForm() {
                                 <input type="text" name="pembina_medsos" :disabled="role !== 'pembina'" value="{{ old('pembina_medsos') }}" placeholder="@username / tautan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Alamat *</label>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Alamat <span class="font-normal text-slate-400 normal-case">(Opsional)</span></label>
                                 <textarea name="pembina_alamat" id="input-pembina-alamat" rows="2" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">{{ old('pembina_alamat') }}</textarea>
                             </div>
                             <div class="md:col-span-2">
@@ -1115,37 +1127,28 @@ function userCreateForm() {
 
     {{-- MODAL PERINGATAN (UNIVERSAL WARNING MODAL) --}}
     <dialog id="modalPeringatan"
-            class="rounded-3xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm p-0 w-full max-w-md shadow-2xl border border-amber-200/80 m-auto"
+            class="rounded-3xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm p-0 w-full max-w-md shadow-2xl border border-sky-100 m-auto"
             @click.self="closeWarning()">
         <div class="bg-white rounded-3xl p-6 overflow-hidden">
-            {{-- Header --}}
-            <div class="flex items-start justify-between pb-3.5 border-b border-slate-100 gap-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-amber-100/90 text-amber-600 flex items-center justify-center shrink-0 border border-amber-200/80 shadow-sm shadow-amber-100">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-extrabold text-slate-900 leading-snug" x-text="peringatan.title || 'Peringatan Validasi'"></h3>
-                        <p class="text-[11px] text-slate-400 font-medium">Periksa kembali data yang dimasukkan</p>
-                    </div>
-                </div>
-                <button type="button" @click="closeWarning()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition text-xs font-bold shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
+            <div class="flex justify-center">
+                <img src="{{ asset('images/bingung.png') }}" alt="Peringatan" class="w-24 h-24 object-contain">
+            </div>
+
+            <div class="text-center mt-2">
+                <h3 class="text-sm font-extrabold text-slate-900 leading-snug" x-text="peringatan.title || 'Peringatan Validasi'"></h3>
+                <p class="text-[11px] text-slate-400 font-medium">Periksa kembali data yang dimasukkan</p>
             </div>
 
             {{-- Body --}}
-            <div class="mt-4 space-y-3">
+            <div class="mt-4 space-y-3 text-left">
                 <p class="text-xs text-slate-600 leading-relaxed font-medium" x-text="peringatan.message"></p>
 
                 {{-- List of items if multiple (e.g. empty fields or server validation errors) --}}
                 <template x-if="peringatan.items && peringatan.items.length > 0">
                     <div class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
                         <template x-for="(item, index) in peringatan.items" :key="index">
-                            <div class="flex items-start gap-2.5 rounded-xl bg-amber-50/80 border border-amber-200/60 px-3 py-2 text-xs font-semibold text-amber-900">
-                                <span class="w-4 h-4 rounded-full bg-amber-200/80 text-amber-800 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5" x-text="index + 1"></span>
+                            <div class="flex items-start gap-2.5 rounded-xl bg-sky-50/80 border border-sky-200/60 px-3 py-2 text-xs font-semibold text-sky-900">
+                                <span class="w-4 h-4 rounded-full bg-sky-200/80 text-sky-800 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5" x-text="index + 1"></span>
                                 <span class="flex-1 leading-snug" x-text="typeof item === 'object' ? item.label : item"></span>
                             </div>
                         </template>
@@ -1160,38 +1163,52 @@ function userCreateForm() {
                     Tutup
                 </button>
                 <button type="button" @click="confirmWarningAction()"
-                        class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs transition shadow-md shadow-amber-500/20 flex items-center gap-1.5">
+                        class="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs transition shadow-md shadow-sky-500/20">
                     <span x-text="peringatan.actionLabel || 'Periksa Sekarang'"></span>
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                 </button>
             </div>
         </div>
     </dialog>
-    <dialog id="modalKolomKosong" class="rounded-3xl backdrop:bg-slate-900/40 p-0 w-full max-w-md shadow-2xl border border-amber-100">
-        <div class="bg-white rounded-3xl border border-amber-100 p-6">
-            <div class="flex items-start justify-between pb-3 border-b border-slate-100 gap-3">
-                <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    <span class="hidden sm:inline">Ada Kolom Belum Terisi</span>
-                </h3>
-                <button type="button" @click="document.getElementById('modalKolomKosong')?.close()" class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 hover:text-amber-700 flex items-center justify-center transition text-xs font-bold">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
+
+    <dialog id="modalKolomKosong" class="rounded-3xl backdrop:bg-slate-900/40 backdrop:backdrop-blur-sm p-0 w-full max-w-md shadow-2xl border border-sky-100 m-auto">
+        <div class="bg-white rounded-3xl p-6">
+            <div class="flex justify-center">
+                <img src="{{ asset('images/bingung.png') }}" alt="Kolom belum terisi" class="w-24 h-24 object-contain">
             </div>
-            <div class="mt-4 space-y-4">
+            <div class="text-center mt-2">
+                <h3 class="text-sm font-extrabold text-slate-900">Ada Kolom Belum Terisi</h3>
+                <p class="text-[11px] text-slate-400 font-medium">Lengkapi data sebelum menyimpan</p>
+            </div>
+            <div class="mt-4 space-y-4 text-left">
                 <p class="text-xs text-slate-600">Kolom berikut masih kosong. Lengkapi dulu sebelum menyimpan akun pembina.</p>
                 <ul class="max-h-56 overflow-y-auto space-y-1.5 pr-1">
                     <template x-for="(kolom, index) in kolomKosong" :key="kolom.id">
-                        <li class="flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-100 px-3 py-2 text-xs font-semibold text-amber-800">
+                        <li class="flex items-start gap-2 rounded-xl bg-sky-50 border border-sky-100 px-3 py-2 text-xs font-semibold text-sky-800">
                             <span class="w-2" x-text="index + 1"></span>
                             <span class="flex-1" x-text="kolom.label"></span>
                         </li>
                     </template>
                 </ul>
             </div>
-            <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+            <div class="flex items-center justify-end gap-2 pt-3 mt-4 border-t border-slate-100">
                 <button type="button" @click="document.getElementById('modalKolomKosong')?.close()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition">Tutup</button>
-                <button type="button" @click="document.getElementById('modalKolomKosong')?.close(); fokusKolomKosong()" class="px-4 py-2 rounded-xl bg-amber-600 text-white font-bold text-xs hover:bg-amber-700 transition shadow-md shadow-amber-600/20">Isi Sekarang</button>
+                <button type="button" @click="document.getElementById('modalKolomKosong')?.close(); fokusKolomKosong()" class="px-4 py-2 rounded-xl bg-sky-600 text-white font-bold text-xs hover:bg-sky-700 transition shadow-md shadow-sky-600/20">Isi Sekarang</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="modalTidakAdaKelas" class="rounded-3xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm p-0 w-full max-w-md shadow-2xl border border-sky-100 m-auto">
+        <div class="overflow-hidden rounded-3xl bg-white">
+            <div class="flex justify-center bg-gradient-to-br from-sky-50 to-blue-50 px-6 pt-6">
+                <img src="{{ asset('images/bingung.png') }}" alt="Ilustrasi belum ada kelas" class="h-36 w-36 object-contain">
+            </div>
+            <div class="space-y-2 px-6 pb-6 pt-4 text-center">
+                <h2 class="text-lg font-extrabold text-slate-900">Kelas belum tersedia</h2>
+                <p class="text-sm leading-relaxed text-slate-600">Tambahkan kelas pada tahun ajaran aktif terlebih dahulu sebelum membuat akun siswa.</p>
+                <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-center">
+                    <button type="button" onclick="document.getElementById('modalTidakAdaKelas').close()" class="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-50">Tutup</button>
+                    <a href="{{ route('kesiswaan.kelas.index') }}" class="rounded-xl bg-sky-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-sky-700">Tambah Kelas</a>
+                </div>
             </div>
         </div>
     </dialog>

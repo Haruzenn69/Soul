@@ -44,10 +44,8 @@ class User extends Authenticatable
 
     public function needsOnboarding(): bool
     {
-        // Akun yang dibuat kesiswaan (siswa/pembina) TIDAK lagi dipaksa
-        // membuat username & password baru saat login pertama kali.
-        // Onboarding hanya muncul bila akun benar-benar belum pernah
-        // menyelesaikan setup (mis. dibuat lewat API/import lama).
+        // Siswa dan pembina baru harus mengatur username serta password
+        // mereka sebelum menggunakan akun.
         return in_array($this->role, ['siswa', 'pembina'], true)
             && is_null($this->onboarding_completed_at);
     }

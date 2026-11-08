@@ -17,34 +17,34 @@ class KenaikanKelasController extends Controller
 {
     public function index(Request $request): View
     {
-        $sourceClasses = Kelas::query()
-            ->where('tingkat', 'x')
-            ->whereHas('siswas', fn ($query) => $query->where('status', 'menunggu_penempatan'))
-            ->with('tahunAjaran')
-            ->withCount(['siswas as pending_siswas_count' => fn ($query) => $query->where('status', 'menunggu_penempatan')])
-            ->orderByDesc('tahun_ajaran_id')->orderBy('nama')->get();
-
-        $sourceClass = $sourceClasses->firstWhere('id', (int) $request->input('kelas_asal_id'));
-        $siswas = $sourceClass
-            ? Siswa::query()->with('kelas')->where('kelas_id', $sourceClass->id)->where('status', 'menunggu_penempatan')->orderBy('nama')->get()
-            : collect();
-
         $activeYear = TahunAjaran::query()->where('status', 'aktif')->first();
-        $targetClasses = $activeYear && $sourceClass
-            ? Kelas::query()->where('tahun_ajaran_id', $activeYear->id)
-                ->where('tingkat', 'xi')
-                ->where(function ($query) use ($sourceClass) {
-                    $query->where('jurusan', $sourceClass->jurusan);
-                    if ($sourceClass->jurusan === 'mp') {
-                        $query->orWhere('jurusan', 'mlog');
-                    }
-                })
-                ->orderBy('jurusan')
-                ->orderBy('rombel')
-                ->get()
+        $sourceYear = TahunAjaran::query()->where('status', 'historis')->orderByDesc('id')->first();
+        $classes = $activeYear && $sourceYear
+            ? Kelas::query()->where('tahun_ajaran_id', $sourceYear->id)
+                ->with(['siswas' => fn ($query) => $query->where('status', 'aktif')->orderBy('nama')])
+                ->orderByRaw("FIELD(tingkat, 'x', 'xi', 'xii')")->orderBy('nama')->get()
+            : collect();
+        $targetClasses = $activeYear
+            ? Kelas::query()->where('tahun_ajaran_id', $activeYear->id)->orderBy('jurusan')->orderBy('rombel')->get()->groupBy('tingkat')
             : collect();
 
-        return view('kesiswaan.kenaikan-kelas.index', compact('sourceClasses', 'sourceClass', 'siswas', 'activeYear', 'targetClasses'));
+        return view('kesiswaan.kenaikan-kelas.index', compact('activeYear', 'sourceYear', 'classes', 'targetClasses'));
+
+    }
+
+    public function processRollover(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'naik_xi' => ['sometimes', 'array'], 'naik_xi.*' => ['integer', 'distinct', 'exists:siswas,id'],
+            'naik_xii' => ['sometimes', 'array'], 'naik_xii.*' => ['integer', 'distinct', 'exists:siswas,id'],
+            'lulus' => ['sometimes', 'array'], 'lulus.*' => ['integer', 'distinct', 'exists:siswas,id'],
+            'kelas_tujuan' => ['sometimes', 'array'], 'kelas_tujuan.*' => ['integer', 'exists:kelas,id'],
+        ]);
+        $activeYear = TahunAjaran::query()->where('status', 'aktif')->firstOrFail();
+        $sourceYear = TahunAjaran::query()->where('status', 'historis')->orderByDesc('id')->firstOrFail();
+        $result = app(\App\Services\AcademicYearRolloverService::class)->processPromotionChoices($sourceYear, $activeYear, $data);
+
+        return back()->with('success', "Pilihan tersimpan: {$result['promoted']} siswa naik tingkat, {$result['graduated']} siswa lulus, dan {$result['repeated']} siswa tinggal kelas.");
     }
 
     public function assign(Request $request): RedirectResponse

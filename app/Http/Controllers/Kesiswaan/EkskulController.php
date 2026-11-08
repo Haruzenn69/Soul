@@ -16,18 +16,27 @@ class EkskulController extends Controller
 {
     public function index(Request $request): View
     {
-        $sort = in_array($request->input('sort'), ['nama_ekskul', 'status', 'rekrutmen', 'created_at'], true) ? $request->input('sort') : 'nama_ekskul';
-        $direction = $request->input('direction') === 'desc' ? 'desc' : 'asc';
-
-        $sortColumn = match ($sort) {
-            'rekrutmen' => 'is_open_recruitment',
-            default => $sort,
-        };
-
-        $kategoriList = AturanEkskul::kategoriList();
+        $kategoriList = $this->kategoriList();
         $kategoriModels = KategoriEkskul::withCount('ekskuls')->orderBy('id')->get();
 
+        return view('kesiswaan.ekskuls.index', [
+            'kategoriList' => $kategoriList,
+            'kategoriModels' => $kategoriModels,
+            'pembinas' => Pembina::with(['ekskuls'])->withCount('ekskuls')->orderBy('nama')->get(),
+        ]);
+    }
+
+    public function byKategori(Request $request, string $kategori): View
+    {
+        $kategoriList = $this->kategoriList();
+        abort_unless(in_array($kategori, $kategoriList, true), 404);
+
+        $sort = in_array($request->input('sort'), ['nama_ekskul', 'status', 'rekrutmen', 'created_at'], true) ? $request->input('sort') : 'nama_ekskul';
+        $direction = $request->input('direction') === 'desc' ? 'desc' : 'asc';
+        $sortColumn = $sort === 'rekrutmen' ? 'is_open_recruitment' : $sort;
+
         $ekskuls = Ekskul::with(['pembina', 'pelatih'])
+            ->where('kategori', $kategori)
             ->when($request->filled('q'), function ($query) use ($request) {
                 $q = $request->input('q');
                 $query->where(function ($search) use ($q) {
@@ -35,7 +44,6 @@ class EkskulController extends Controller
                         ->orWhereHas('pembina', fn ($p) => $p->where('nama', 'like', "%{$q}%"));
                 });
             })
-            ->when(in_array($request->input('kategori'), $kategoriList, true), fn ($q) => $q->where('kategori', $request->input('kategori')))
             ->when($request->input('status') === 'aktif', fn ($q) => $q->where('status', true))
             ->when($request->input('status') === 'nonaktif', fn ($q) => $q->where('status', false))
             ->when($request->input('rekrutmen') === 'buka', fn ($q) => $q->where('is_open_recruitment', true))
@@ -45,11 +53,11 @@ class EkskulController extends Controller
             ->paginate(50)
             ->withQueryString();
 
-        return view('kesiswaan.ekskuls.index', [
+        return view('kesiswaan.ekskuls.by-kategori', [
             'ekskuls' => $ekskuls,
             'pembinas' => Pembina::with(['ekskuls'])->withCount('ekskuls')->orderBy('nama')->get(),
+            'kategori' => $kategori,
             'kategoriList' => $kategoriList,
-            'kategoriModels' => $kategoriModels,
             'sort' => $sort,
             'direction' => $direction,
         ]);
@@ -57,7 +65,7 @@ class EkskulController extends Controller
 
     public function edit(Ekskul $ekskul): View
     {
-        $kategoriList = AturanEkskul::kategoriList();
+        $kategoriList = $this->kategoriList();
         $pembinas = Pembina::with(['ekskuls'])->withCount('ekskuls')->orderBy('nama')->get();
 
         return view('kesiswaan.ekskuls.edit', compact('ekskul', 'kategoriList', 'pembinas'));
@@ -94,12 +102,13 @@ class EkskulController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $kategoriList = $this->kategoriList();
         if (AturanEkskul::isWajib($request->input('kategori'))) {
             $request->merge(['kategori' => AturanEkskul::KATEGORI_WAJIB]);
         }
         $data = $request->validate([
             'nama_ekskul' => ['required', 'string', 'max:255'],
-            'kategori'    => ['required', 'string', 'max:50', \Illuminate\Validation\Rule::in(\App\Support\AturanEkskul::kategoriList())],
+            'kategori'    => ['required', 'string', 'max:50', \Illuminate\Validation\Rule::in($kategoriList)],
             'pembina_id' => ['nullable', 'exists:pembinas,id'],
             'deskripsi' => ['nullable', 'string'],
             'jadwal' => ['nullable', 'string', 'max:255'],
@@ -129,6 +138,7 @@ class EkskulController extends Controller
 
     public function update(Request $request, Ekskul $ekskul): RedirectResponse
     {
+        $kategoriList = $this->kategoriList();
         // Proteksi kategori Wajib dari perubahan
         if ($ekskul->isWajib()) {
             // Ekskul Wajib: paksa kategori tetap Wajib, tidak bisa diubah
@@ -142,7 +152,7 @@ class EkskulController extends Controller
 
         $data = $request->validate([
             'nama_ekskul' => ['required', 'string', 'max:255'],
-            'kategori'    => ['required', 'string', 'max:50', \Illuminate\Validation\Rule::in(\App\Support\AturanEkskul::kategoriList())],
+            'kategori'    => ['required', 'string', 'max:50', \Illuminate\Validation\Rule::in($kategoriList)],
             'deskripsi'   => ['nullable', 'string'],
             'jadwal'      => ['nullable', 'string', 'max:255'],
             'status'      => ['required', 'boolean'],
@@ -161,5 +171,17 @@ class EkskulController extends Controller
         $state = $ekskul->status ? 'diaktifkan' : 'dinonaktifkan';
 
         return back()->with('success', "Ekskul {$nama} berhasil {$state}.");
+    }
+
+    /** @return list<string> */
+    private function kategoriList(): array
+    {
+        if (! KategoriEkskul::query()->exists()) {
+            foreach (AturanEkskul::DEFAULT_KATEGORI as $nama) {
+                KategoriEkskul::firstOrCreate(['nama' => $nama]);
+            }
+        }
+
+        return KategoriEkskul::query()->orderBy('id')->pluck('nama')->all();
     }
 }
