@@ -88,7 +88,7 @@ class KelasController extends Controller
         $direction = $request->input('direction') === 'desc' ? 'desc' : 'asc';
 
         $historicalYear = $kela->tahunAjaran?->status !== 'aktif' && $kela->tahunAjaran;
-        $siswaQuery = Siswa::query()->where(function ($query) use ($kela, $historicalYear) {
+        $siswaQuery = Siswa::with('user')->where(function ($query) use ($kela, $historicalYear) {
             if ($historicalYear) {
                 $query->whereHas('classHistories', fn ($history) => $history
                     ->where('tahun_ajaran', $kela->tahunAjaran->nama)
@@ -113,6 +113,7 @@ class KelasController extends Controller
             })
             ->when($request->filled('jenis_kelamin'), fn ($query) => $query->where('jenis_kelamin', $request->input('jenis_kelamin')))
             ->when($request->filled('jabatan'), fn ($query) => $query->where('jabatan', $request->input('jabatan')))
+            ->orderByRaw("CASE WHEN siswas.status = 'nonaktif' OR EXISTS (SELECT 1 FROM users WHERE users.id = siswas.user_id AND users.is_active = 0) THEN 1 ELSE 0 END ASC")
             ->orderBy($sort, $direction)
             ->paginate(15)
             ->withQueryString();

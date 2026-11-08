@@ -9,9 +9,7 @@
             <div>
                 <a href="{{ route('kesiswaan.laporan-penilaian.index', ['periode' => $periode]) }}"
                    class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-blue-600 transition mb-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
+                    
                     Kembali ke Rekap Laporan
                 </a>
                 <div class="flex items-center gap-3">
@@ -44,9 +42,7 @@
 
                 <a href="{{ route('kesiswaan.laporan-penilaian.download-pdf', ['ekskul' => $ekskul->id, 'periode' => $periode]) }}"
                    class="inline-flex items-center gap-2 px-3.5 py-2.5 bg-white hover:bg-red-50 text-slate-700 hover:text-red-600 text-xs font-bold rounded-xl border border-slate-200 shadow-sm transition">
-                    <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
+                    
                     Download PDF
                 </a>
             </div>
@@ -100,12 +96,10 @@
 
             <div class="relative flex-1">
                 <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
+                    
                 </span>
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama atau NIS siswa..."
-                       class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                       class="w-full pl-4 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
             </div>
 
             <div class="flex items-center gap-2">
@@ -134,9 +128,7 @@
         @if ($dinilai->isEmpty())
             <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-12 md:p-16 text-center">
                 <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-500 mb-4">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+                    
                 </div>
                 <h2 class="text-sm font-bold text-slate-900">Belum Ada Penilaian Terkirim</h2>
                 <p class="text-xs text-slate-400 mt-1">Pembina belum mengirim penilaian akhir untuk periode <strong>{{ $periode }}</strong>.</p>
@@ -149,9 +141,7 @@
                         <p class="text-xs text-slate-400 mt-0.5">Penilai: <span class="font-bold text-slate-700">{{ $pembinaPenilai?->nama ?? $ekskul->pembina?->nama ?? '-' }}</span></p>
                     </div>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                        
                         {{ $dinilai->count() }} siswa selesai dinilai
                     </span>
                 </div>
@@ -163,18 +153,14 @@
                                 <th class="px-4 py-3 font-bold">
                                     <a href="{{ $sortLink('nama') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
                                         Siswa
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('nama') }}"/>
-                                        </svg>
+                                        
                                     </a>
                                 </th>
                                 <th class="px-4 py-3 font-bold text-center">Pertemuan</th>
                                 <th class="px-4 py-3 font-bold text-center">
                                     <a href="{{ $sortLink('kehadiran') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
                                         % Hadir
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('kehadiran') }}"/>
-                                        </svg>
+                                        
                                     </a>
                                 </th>
                                 <th class="px-4 py-3 font-bold text-center">Sikap</th>
@@ -183,17 +169,13 @@
                                 <th class="px-4 py-3 font-bold text-center">
                                     <a href="{{ $sortLink('nilai_akhir') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
                                         Nilai Akhir
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('nilai_akhir') }}"/>
-                                        </svg>
+                                        
                                     </a>
                                 </th>
                                 <th class="px-4 py-3 font-bold text-center">
                                     <a href="{{ $sortLink('predikat') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
                                         Predikat
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('predikat') }}"/>
-                                        </svg>
+                                        
                                     </a>
                                 </th>
                                 <th class="px-4 py-3 font-bold">Catatan</th>
@@ -241,9 +223,7 @@
                                             <a href="{{ route('kesiswaan.laporan-penilaian.detail-siswa', $row->siswa->id) }}"
                                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold text-xs border border-sky-200 transition"
                                                title="Lihat Rekam Jejak Nilai Siswa">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
+                                                
                                                 Riwayat
                                             </a>
                                         @endif

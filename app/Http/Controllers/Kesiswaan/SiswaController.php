@@ -22,7 +22,7 @@ class SiswaController extends Controller
             ? $request->input('status')
             : 'aktif';
 
-        $siswas = Siswa::with('kelas')
+        $siswas = Siswa::with(['kelas', 'user'])
             ->where('status', $selectedStatus)
             ->when($request->filled('q'), function ($query) use ($request) {
                 $q = '%'.$request->input('q').'%';
@@ -36,6 +36,7 @@ class SiswaController extends Controller
             ->when($request->filled('angkatan'), fn ($query) => $query->where('angkatan', $request->input('angkatan')))
             ->when($request->filled('jenis_kelamin'), fn ($query) => $query->where('jenis_kelamin', $request->input('jenis_kelamin')))
             ->when($request->filled('jabatan'), fn ($query) => $query->where('jabatan', $request->input('jabatan')))
+            ->orderByRaw("CASE WHEN siswas.status = 'nonaktif' OR EXISTS (SELECT 1 FROM users WHERE users.id = siswas.user_id AND users.is_active = 0) THEN 1 ELSE 0 END ASC")
             ->when($sort === 'kelas', fn ($query) => $query->leftJoin('kelas', 'kelas.id', '=', 'siswas.kelas_id')->select('siswas.*')->orderBy('kelas.nama', $direction)->orderBy('siswas.nama'))
             ->when($sort !== 'kelas', fn ($query) => $query->orderBy($sort, $direction))
             ->paginate(15)

@@ -9,7 +9,6 @@ use App\Http\Controllers\Kesiswaan\DashboardController as KesiswaanDashboardCont
 use App\Http\Controllers\Kesiswaan\EkskulController;
 use App\Http\Controllers\Kesiswaan\KategoriEkskulController;
 use App\Http\Controllers\Kesiswaan\KelasController;
-use App\Http\Controllers\Kesiswaan\KenaikanKelasController;
 use App\Http\Controllers\Kesiswaan\LaporanPenilaianController as KesiswaanLaporanPenilaianController;
 use App\Http\Controllers\Kesiswaan\NotifikasiController as KesiswaanNotifikasiController;
 use App\Http\Controllers\Kesiswaan\PelatihController as KesiswaanPelatihController;
@@ -149,6 +148,7 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
     Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])
         ->name('users.reset-password');
 
+    Route::get('ekskuls/kategori/{kategori}', [EkskulController::class, 'byKategori'])->name('ekskuls.by-kategori');
     Route::resource('ekskuls', EkskulController::class)->except([]);
     Route::post('kategori-ekskul', [KategoriEkskulController::class, 'store'])->name('kategori.store');
     Route::delete('kategori-ekskul/{kategoriEkskul}', [KategoriEkskulController::class, 'destroy'])->name('kategori.destroy');
@@ -168,9 +168,8 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
     Route::get('tahun-ajaran/{tahunAjaran}/historis', [TahunAjaranController::class, 'historis'])->name('tahun-ajaran.historis');
     Route::get('tahun-ajaran/{tahunAjaran}/kelas/{kela}', [TahunAjaranController::class, 'showKelas'])->name('tahun-ajaran.kelas.show');
     Route::post('tahun-ajaran/{tahunAjaran}/kelas/{kela}/assign', [TahunAjaranController::class, 'assignSiswa'])->name('tahun-ajaran.kelas.assign');
-
-    Route::get('kenaikan-kelas', [KenaikanKelasController::class, 'index'])->name('kenaikan-kelas.index');
-    Route::post('kenaikan-kelas', [KenaikanKelasController::class, 'assign'])->name('kenaikan-kelas.assign');
+    Route::post('tahun-ajaran/{tahunAjaran}/kelas/{kela}/siswa/{siswa}/resolve', [TahunAjaranController::class, 'resolvePendingSiswa'])->name('tahun-ajaran.kelas.resolve');
+    Route::post('tahun-ajaran/{tahunAjaran}/kelulusan', [TahunAjaranController::class, 'kelulusanKelas12'])->name('tahun-ajaran.kelulusan');
 
     Route::get('siswa', [SiswaController::class, 'index'])->name('siswa.index');
     Route::get('siswa/riwayat-profil', [SiswaController::class, 'riwayatProfilAll'])->name('siswa.riwayat-profil-all');
@@ -199,6 +198,10 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
     Route::get('/laporan-penilaian/siswa/{siswa}', [KesiswaanLaporanPenilaianController::class, 'detailSiswa'])->name('laporan-penilaian.detail-siswa');
     Route::get('/laporan-penilaian/{ekskul}', [KesiswaanLaporanPenilaianController::class, 'show'])->name('laporan-penilaian.show');
     Route::get('/laporan-penilaian/{ekskul}/download-pdf', [KesiswaanLaporanPenilaianController::class, 'downloadPdf'])->name('laporan-penilaian.download-pdf');
+
+    Route::get('/bantuan', function () {
+        return view('kesiswaan.bantuan');
+    })->name('bantuan');
 });
 
 // ============================================================

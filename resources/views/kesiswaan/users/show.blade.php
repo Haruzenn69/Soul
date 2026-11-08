@@ -1,5 +1,5 @@
 @extends('layouts.kesiswaan')
-@section('title', 'Detail Akun – ' . ($user->siswa?->nama ?? $user->pembina?->nama ?? $user->username ?? $user->email))
+@section('title', 'Info Akun – ' . ($user->siswa?->nama ?? $user->pembina?->nama ?? $user->username ?? $user->email))
 
 @section('content')
 @php
@@ -27,124 +27,153 @@
     {{-- BACK BUTTON --}}
     <a href="{{ $backUrl }}"
        class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-2xl transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        <i class="fa-solid fa-arrow-left text-xs"></i>
         Kembali
     </a>
 
-    {{-- PROFILE CARD --}}
-    <div class="bg-white p-6 rounded-3xl border border-sky-100 shadow-sm">
-        <div class="flex flex-col md:flex-row items-start md:items-center gap-5">
-            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 border-2 border-sky-200">
-                @if($user->siswa?->foto_url)
-                    <img src="{{ $user->siswa->foto_url }}" alt="{{ $user->siswa->nama }}" class="w-full h-full object-cover">
-                @elseif($user->pembina?->foto_url)
-                    <img src="{{ $user->pembina->foto_url }}" alt="{{ $user->pembina->nama }}" class="w-full h-full object-cover">
-                @else
-                    <span class="text-2xl font-black text-sky-600">
-                        {{ strtoupper(substr($user->siswa?->nama ?? $user->pembina?->nama ?? $user->username ?? $user->email ?? 'U', 0, 2)) }}
-                    </span>
-                @endif
-            </div>
+    {{-- PROFILE CARD BIRU --}}
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200">
+        {{-- Ambient blur circles --}}
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
+            <div class="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
+        </div>
 
-            <div class="flex-1 min-w-0">
-                <div class="flex flex-wrap items-center gap-2 mb-2">
-                    <h2 class="text-xl font-extrabold text-slate-900 truncate">
-                        {{ $user->siswa?->nama ?? $user->pembina?->nama ?? $user->username ?? $user->email }}
-                    </h2>
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-bold
-                        @if($user->role === 'siswa') bg-sky-100 text-sky-700 border border-sky-200
-                        @elseif($user->role === 'pembina') bg-emerald-100 text-emerald-700 border border-emerald-200
-                        @elseif($user->role === 'kesiswaan') bg-indigo-100 text-indigo-700 border border-indigo-200
-                        @else bg-amber-100 text-amber-700 border border-amber-200 @endif">
-                        {{ ucfirst($user->role) }}
-                    </span>
-                    @if($user->siswa?->jabatan === 'ketua')
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">
-                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M2 19l2-9 5 5 3-8 3 8 5-5 2 9H2z"/></svg> Ketua
-                        </span>
-                    @endif
-                    @if($user->siswa?->status)
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-xl text-[10px] font-bold whitespace-nowrap
-                            @if($user->siswa->status === 'aktif') bg-emerald-100 text-emerald-700 border border-emerald-200
-                            @elseif($user->siswa->status === 'menunggu_penempatan') bg-amber-100 text-amber-700 border border-amber-200
-                            @else bg-slate-100 text-slate-500 border border-slate-200 @endif">
-                            {{ ['aktif' => 'Aktif', 'menunggu_penempatan' => 'Menunggu Penempatan', 'nonaktif' => 'Alumni / Nonaktif'][$user->siswa->status] ?? ucfirst($user->siswa->status) }}
-                        </span>
-                    @endif
-                </div>
-
-                <dl class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-                    <div>
-                        <dt class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Username</dt>
-                        <dd class="text-slate-900 font-medium mt-0.5 break-all">{{ filled($user->username) ? $user->username : '—' }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email</dt>
-                        <dd class="text-slate-900 font-medium mt-0.5 break-all">{{ filled($user->email) ? $user->email : '—' }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Role</dt>
-                        <dd class="text-slate-900 font-medium mt-0.5 capitalize">{{ $user->role }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status Akun</dt>
-                        <dd class="text-slate-900 font-medium mt-0.5">
-                            <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold
-                                @if($user->is_active) bg-emerald-50 text-emerald-700 border border-emerald-200
-                                @else bg-rose-50 text-rose-600 border border-rose-200 @endif">
-                                {{ $user->is_active ? 'Aktif' : 'Nonaktif' }}
+        <div class="relative space-y-6">
+            {{-- BARIS ATAS: AVATAR, IDENTITAS UTAMA, DAN TOMBOL AKSI --}}
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
+                <div class="flex items-center gap-4 sm:gap-5 min-w-0">
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center overflow-hidden shrink-0 border-2 border-white/30 shadow-md">
+                        @if($user->siswa?->foto_url)
+                            <img src="{{ $user->siswa->foto_url }}" alt="{{ $user->siswa->nama }}" class="w-full h-full object-cover">
+                        @elseif($user->pembina?->foto_url)
+                            <img src="{{ $user->pembina->foto_url }}" alt="{{ $user->pembina->nama }}" class="w-full h-full object-cover">
+                        @else
+                            <span class="text-2xl font-black text-white">
+                                {{ strtoupper(substr($user->siswa?->nama ?? $user->pembina?->nama ?? $user->username ?? $user->email ?? 'U', 0, 2)) }}
                             </span>
-                        </dd>
-                    </div>
-                </dl>
-
-                {{-- QUICK STATS --}}
-                <div class="flex flex-wrap gap-2 mt-4">
-                    @if($user->role === 'siswa')
-                        <div class="px-3 py-2 rounded-2xl bg-sky-50 border border-sky-100">
-                            <div class="text-[10px] font-bold text-sky-500 uppercase tracking-wider">Ekskul Aktif</div>
-                            <div class="text-sm font-extrabold text-slate-900">{{ $pendaftaranAktif }}</div>
-                        </div>
-                        <div class="px-3 py-2 rounded-2xl bg-slate-50 border border-slate-100">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Kelas</div>
-                            <div class="text-sm font-extrabold text-slate-900">{{ $user->siswa?->kelas?->nama ?? '—' }}</div>
-                        </div>
-                        @if($persenHadir !== null)
-                            <div class="px-3 py-2 rounded-2xl bg-emerald-50 border border-emerald-100">
-                                <div class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Kehadiran</div>
-                                <div class="text-sm font-extrabold text-slate-900">{{ $persenHadir }}% <span class="text-[10px] font-semibold text-slate-400">({{ $hadirPresensi }}/{{ $totalPresensi }})</span></div>
-                            </div>
                         @endif
-                    @elseif($user->role === 'pembina')
-                        <div class="px-3 py-2 rounded-2xl bg-emerald-50 border border-emerald-100">
-                            <div class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Ekskul Dibina</div>
-                            <div class="text-sm font-extrabold text-slate-900">{{ $pendaftaranAktif }}</div>
+                    </div>
+
+                    <div class="min-w-0">
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-white truncate leading-tight">
+                            {{ $user->siswa?->nama ?? $user->pembina?->nama ?? $user->username ?? $user->email }}
+                        </h2>
+
+                        {{-- Identitas Ringkas Tanpa Pil --}}
+                        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-white/85 mt-1.5 font-medium">
+                            <span class="capitalize">{{ $user->role === 'siswa' ? 'Siswa' : ($user->role === 'pembina' ? 'Guru Pembina' : ucfirst($user->role)) }}</span>
+                            @if($user->role === 'siswa' && $user->siswa?->kelas)
+                                <span>•</span>
+                                <span>{{ $user->siswa->kelas->nama }}</span>
+                            @endif
+                            @if($user->siswa?->jabatan === 'ketua')
+                                <span>•</span>
+                                <span class="text-amber-200 font-bold flex items-center gap-1">
+                                    <i class="fa-solid fa-crown text-[10px]"></i>
+                                    Ketua Ekskul
+                                </span>
+                            @endif
+                            @if($user->siswa?->status === 'nonaktif')
+                                <span>•</span>
+                                <span class="text-white/70 italic">Alumni / Nonaktif</span>
+                            @endif
+                            <span>•</span>
+                            <span class="inline-flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full {{ $user->is_active ? 'bg-emerald-300' : 'bg-white/40' }}"></span>
+                                <span>{{ $user->is_active ? 'Akun Aktif' : 'Nonaktif' }}</span>
+                            </span>
                         </div>
+                    </div>
+                </div>
+
+                {{-- TOMBOL AKSI --}}
+                <div class="flex items-center gap-2 shrink-0 flex-wrap">
+                    @if($user->role === 'admin' && auth()->user()->role !== 'admin')
+                        <span class="text-xs text-white/70 italic">
+                            Dikelola Admin
+                        </span>
+                    @else
+                        {{-- Reset Password --}}
+                        <form method="POST" action="{{ route('kesiswaan.users.reset-password', $user) }}"
+                              onsubmit="return confirm('Yakin ingin mereset password akun {{ $user->siswa?->nama ?? $user->pembina?->nama ?? $user->username ?? $user->email }} ke kata sandi default: password?')">
+                            @csrf
+                            <button type="submit"
+                                    class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white/15 hover:bg-white/25 backdrop-blur border border-white/30 text-white font-bold rounded-xl transition text-xs shadow-sm cursor-pointer">
+                                <i class="fa-solid fa-key text-xs"></i>
+                                Reset Password
+                            </button>
+                        </form>
+
+                        {{-- Edit Akun --}}
+                        <a href="{{ route('kesiswaan.users.edit', $user) }}"
+                           class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-sky-700 hover:bg-sky-50 font-bold rounded-xl shadow-lg shadow-sky-900/10 hover:-translate-y-0.5 transition text-xs">
+                            <i class="fa-solid fa-pen-to-square text-xs"></i>
+                            Edit Akun
+                        </a>
                     @endif
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-2 shrink-0">
-                @if($user->siswa?->user_id)
-                    <a href="{{ route('kesiswaan.siswa.riwayat-profil', $user->siswa) }}"
-                       class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold rounded-xl transition text-xs">
-                        Riwayat Profil
-                    </a>
-                    <a href="{{ route('kesiswaan.siswa.riwayat-kelas', $user->siswa) }}"
-                       class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-xl transition text-xs">
-                        Riwayat Kelas
-                    </a>
-                @endif
-                @if($user->role === 'admin' && auth()->user()->role !== 'admin')
-                    <span class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-[11px] text-slate-400 italic">
-                        Dikelola Admin
-                    </span>
+            {{-- BARIS BAWAH: DATA & STATISTIK MINIMALIS TANPA PIL --}}
+            <div class="pt-5 border-t border-white/20 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+                @if($user->role === 'siswa')
+                    <div>
+                        <p class="text-[10px] font-bold text-white/75 uppercase tracking-wider">NIS</p>
+                        <p class="text-sm font-extrabold text-white mt-0.5 break-all">{{ $user->siswa?->nis ?? '—' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-white/75 uppercase tracking-wider">Email Akun</p>
+                        <p class="text-sm font-extrabold text-white mt-0.5 break-all truncate" title="{{ $user->email }}">{{ $user->email ?? '—' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-white/75 uppercase tracking-wider">Ekskul Aktif</p>
+                        <p class="text-sm font-extrabold text-white mt-0.5">{{ $pendaftaranAktif }} Terdaftar</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-white/75 uppercase tracking-wider">Kehadiran</p>
+                        <p class="text-sm font-extrabold text-white mt-0.5">
+                            @if($persenHadir !== null)
+                                {{ $persenHadir }}% <span class="text-xs font-normal text-white/70">({{ $hadirPresensi }}/{{ $totalPresensi }})</span>
+                            @else
+                                —
+                            @endif
+                        </p>
+                    </div>
+                @elseif($user->role === 'pembina')
+                    <div>
+                        <p class="text-[10px] font-bold text-white/75 uppercase tracking-wider">NIP</p>
+                        <p class="text-sm font-extrabold text-white mt-0.5 break-all">{{ $user->pembina?->nip ?? '—' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-white/75 uppercase tracking-wider">Email Akun</p>
+                        <p class="text-sm font-extrabold text-white mt-0.5 break-all truncate" title="{{ $user->email }}">{{ $user->email ?? '—' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-white/75 uppercase tracking-wider">Ekskul Dibina</p>
+                        <p class="text-sm font-extrabold text-white mt-0.5">{{ $pendaftaranAktif }} Ekskul</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-white/75 uppercase tracking-wider">No. Telepon</p>
+                        <p class="text-sm font-extrabold text-white mt-0.5">{{ $user->pembina?->no_telp ?? '—' }}</p>
+                    </div>
                 @else
-                    <a href="{{ route('kesiswaan.users.edit', $user) }}"
-                       class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl transition text-xs">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        Edit Akun
-                    </a>
+                    <div>
+                        <p class="text-[10px] font-bold text-white/75 uppercase tracking-wider">Username</p>
+                        <p class="text-sm font-extrabold text-white mt-0.5 break-all">{{ $user->username ?? '—' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-white/75 uppercase tracking-wider">Email</p>
+                        <p class="text-sm font-extrabold text-white mt-0.5 break-all truncate" title="{{ $user->email }}">{{ $user->email ?? '—' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-white/75 uppercase tracking-wider">Role</p>
+                        <p class="text-sm font-extrabold text-white mt-0.5 capitalize">{{ $user->role }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-white/75 uppercase tracking-wider">Terdaftar</p>
+                        <p class="text-sm font-extrabold text-white mt-0.5">{{ $user->created_at?->isoFormat('D MMM Y') ?? '—' }}</p>
+                    </div>
                 @endif
             </div>
         </div>
@@ -154,16 +183,17 @@
     <div class="bg-white rounded-3xl border border-sky-100 shadow-sm overflow-hidden">
         <div class="border-b border-slate-100 overflow-x-auto">
             <nav class="flex gap-1 px-4 -mb-px min-w-max" aria-label="Tabs">
-                <button type="button" data-tab="profil" class="tab-btn px-4 py-3 text-sm font-bold rounded-t-2xl border-b-2 border-amber-500 text-amber-600 bg-amber-50 whitespace-nowrap">Profil Lengkap</button>
+                <button type="button" data-tab="profil" class="tab-btn px-4 py-3 text-sm font-bold rounded-t-2xl border-b-2 border-sky-600 text-sky-700 whitespace-nowrap">Profil Lengkap</button>
                 @if($user->role === 'siswa')
-                    <button type="button" data-tab="ekskul" class="tab-btn px-4 py-3 text-sm font-bold rounded-t-2xl border-b-2 border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-200 whitespace-nowrap">Keanggotaan Ekskul</button>
-                    <button type="button" data-tab="riwayat" class="tab-btn px-4 py-3 text-sm font-bold rounded-t-2xl border-b-2 border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-200 whitespace-nowrap">Riwayat Jabatan</button>
-                    <button type="button" data-tab="pengajuan" class="tab-btn px-4 py-3 text-sm font-bold rounded-t-2xl border-b-2 border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-200 whitespace-nowrap">Pengajuan Keluar</button>
-                    <button type="button" data-tab="kelas" class="tab-btn px-4 py-3 text-sm font-bold rounded-t-2xl border-b-2 border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-200 whitespace-nowrap">Riwayat Kelas</button>
+                    <button type="button" data-tab="ekskul" class="tab-btn px-4 py-3 text-sm font-semibold rounded-t-2xl border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 whitespace-nowrap">Keanggotaan Ekskul</button>
+                    <button type="button" data-tab="riwayat" class="tab-btn px-4 py-3 text-sm font-semibold rounded-t-2xl border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 whitespace-nowrap">Riwayat Jabatan</button>
+                    <button type="button" data-tab="pengajuan" class="tab-btn px-4 py-3 text-sm font-semibold rounded-t-2xl border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 whitespace-nowrap">Pengajuan Keluar</button>
+                    <button type="button" data-tab="kelas" class="tab-btn px-4 py-3 text-sm font-semibold rounded-t-2xl border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 whitespace-nowrap">Riwayat Kelas</button>
+                    <button type="button" data-tab="nilai" class="tab-btn px-4 py-3 text-sm font-semibold rounded-t-2xl border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 whitespace-nowrap">Nilai</button>
                 @elseif($user->role === 'pembina')
-                    <button type="button" data-tab="ekskul" class="tab-btn px-4 py-3 text-sm font-bold rounded-t-2xl border-b-2 border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-200 whitespace-nowrap">Ekskul Dibina</button>
+                    <button type="button" data-tab="ekskul" class="tab-btn px-4 py-3 text-sm font-semibold rounded-t-2xl border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 whitespace-nowrap">Ekskul Dibina</button>
                 @endif
-                <button type="button" data-tab="riwayat-profil" class="tab-btn px-4 py-3 text-sm font-bold rounded-t-2xl border-b-2 border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-200 whitespace-nowrap">Riwayat Profil</button>
+                <button type="button" data-tab="riwayat-profil" class="tab-btn px-4 py-3 text-sm font-semibold rounded-t-2xl border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 whitespace-nowrap">Riwayat Profil</button>
             </nav>
         </div>
 
@@ -171,7 +201,7 @@
             {{-- TAB: PROFIL LENGKAP --}}
             <div id="tab-profil" class="tab-panel space-y-6">
                 <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <i class="fa-solid fa-id-card text-sky-500"></i>
                     Identitas
                 </h3>
                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
@@ -198,7 +228,7 @@
                         @endforeach
 
                         <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2 mt-6 pt-4 border-t border-slate-100 sm:col-span-2">
-                            <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            <i class="fa-solid fa-graduation-cap text-sky-500"></i>
                             Data Akademik
                         </h3>
                         @php
@@ -249,9 +279,9 @@
                             $pendaftaran = $user->siswa?->pendaftarans->firstWhere('ekskul_id', $ek->id);
                             $isKetua = ($user->siswa?->jabatan === 'ketua') && $pendaftaran;
                         @endphp
-                        <div class="rounded-2xl border {{ $isKetua ? 'border-sky-300 bg-sky-50/50 ring-2 ring-sky-200' : 'border-slate-100' }} p-5 relative">
+                        <div class="rounded-2xl border {{ $isKetua ? 'border-sky-300 bg-sky-50/30' : 'border-slate-100' }} p-5 relative">
                             @if($isKetua)
-                                <span class="absolute -top-2 -right-2 px-2 py-0.5 bg-sky-100 text-sky-700 text-[10px] font-bold rounded-full">KETUA EKSKUL INI</span>
+                                <span class="absolute -top-2 -right-2 px-2 py-0.5 bg-slate-800 text-white text-[10px] font-bold rounded-md">Ketua Ekskul</span>
                             @endif
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div class="flex items-center gap-3">
@@ -268,10 +298,10 @@
                                     </div>
                                 </div>
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <span class="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">{{ $statusLabels[$pendaftaran?->status] ?? ucfirst($pendaftaran?->status ?? 'Aktif') }}</span>
-                                    <span class="px-2.5 py-1 rounded-xl bg-slate-100 text-slate-600 text-[10px] font-bold">Daftar: {{ $pendaftaran?->tanggal_daftar?->format('d M Y') ?? '-' }}</span>
+                                    <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">{{ $statusLabels[$pendaftaran?->status] ?? ucfirst($pendaftaran?->status ?? 'Aktif') }}</span>
+                                    <span class="text-xs text-slate-400 font-medium">Daftar: {{ $pendaftaran?->tanggal_daftar?->format('d M Y') ?? '-' }}</span>
                                     <a href="{{ route('kesiswaan.ekskuls.show', $ek) }}"
-                                       class="px-2.5 py-1 rounded-xl bg-sky-50 text-sky-700 border border-sky-100 text-[10px] font-bold hover:bg-sky-100 transition">
+                                       class="px-3 py-1 rounded-lg bg-white border border-slate-200 hover:border-sky-300 hover:bg-sky-50 text-slate-600 hover:text-sky-700 text-xs font-medium transition">
                                         Lihat Ekskul &rarr;
                                     </a>
                                 </div>
@@ -291,17 +321,17 @@
             <div id="tab-ekskul" class="tab-panel hidden space-y-6">
                 @if($ekskuls && $ekskuls->isNotEmpty())
                     @foreach($ekskuls as $ek)
-                        <div class="rounded-2xl border border-slate-100 p-5">
+                        <div class="rounded-2xl border border-slate-200/80 p-5 bg-white">
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div>
                                     <h4 class="font-extrabold text-slate-900">{{ $ek->nama_ekskul }}</h4>
                                     <p class="text-xs text-slate-400 mt-0.5">{{ $ek->kategori ?? '-' }}{{ $ek->pelatih ? ' · Pelatih: ' . $ek->pelatih->nama : '' }}</p>
                                 </div>
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <span class="px-2.5 py-1 rounded-xl {{ $ek->status ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200' }} text-[10px] font-bold">{{ $ek->status ? 'Aktif' : 'Nonaktif' }}</span>
-                                    <span class="px-2.5 py-1 rounded-xl bg-sky-50 text-sky-700 text-[10px] font-bold border border-sky-100">{{ $ek->pendaftarans()->where('status', 'diterima')->count() }} Anggota</span>
+                                    <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">{{ $ek->status ? 'Aktif' : 'Nonaktif' }}</span>
+                                    <span class="text-xs text-slate-400 font-medium">{{ $ek->pendaftarans()->where('status', 'diterima')->count() }} Anggota</span>
                                     <a href="{{ route('kesiswaan.ekskuls.show', $ek) }}"
-                                       class="px-2.5 py-1 rounded-xl bg-sky-100 text-sky-700 text-[10px] font-bold hover:bg-sky-200 transition">
+                                       class="px-3 py-1 rounded-lg bg-white border border-slate-200 hover:border-sky-300 hover:bg-sky-50 text-slate-600 hover:text-sky-700 text-xs font-medium transition">
                                         Lihat Ekskul &rarr;
                                     </a>
                                 </div>
@@ -322,20 +352,15 @@
                 @php $riwayat = $user->siswa->riwayatJabatans()->with('ekskul')->latest('mulai')->latest('id')->get(); @endphp
                 @if($riwayat->isNotEmpty())
                     @foreach($riwayat as $r)
-                        <div class="bg-white border border-slate-100 rounded-2xl p-4 {{ $r->isActive() ? 'ring-2 ring-amber-200 bg-amber-50/30' : '' }}">
+                        <div class="bg-white border border-slate-200/80 rounded-2xl p-4">
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div>
                                     <div class="flex items-center gap-2 mb-1">
-                                        <span class="px-2.5 py-1 rounded-xl text-[10px] font-bold
-                                            @if($r->isActive()) bg-amber-100 text-amber-800 border border-amber-300
-                                            @elseif($r->alasan_selesai === 'diganti') bg-sky-100 text-sky-700 border border-sky-200
-                                            @elseif($r->alasan_selesai === 'dicopot') bg-rose-100 text-rose-600 border border-rose-200
-                                            @elseif($r->alasan_selesai === 'keluar') bg-violet-100 text-violet-700 border border-violet-200
-                                            @else bg-slate-100 text-slate-500 border border-slate-200 @endif">
+                                        <span class="px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
                                             {{ $r->isActive() ? 'Berlangsung' : ucfirst($r->alasan_selesai ?? 'selesai') }}
                                         </span>
                                         @if($r->isActive())
-                                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Periode aktif"></span>
+                                            <span class="w-2 h-2 rounded-full bg-emerald-500" title="Periode aktif"></span>
                                         @endif
                                     </div>
                                     <p class="font-bold text-slate-900">Ketua Ekskul {{ $r->ekskul->nama_ekskul ?? '-' }}</p>
@@ -346,7 +371,7 @@
                     @endforeach
                 @else
                     <div class="text-center py-8 text-slate-400">
-                        <svg class="w-12 h-12 mx-auto text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <i class="fa-solid fa-crown text-3xl mb-1 text-slate-300"></i>
                         <p class="mt-2 font-medium">Belum pernah menjabat Ketua.</p>
                     </div>
                 @endif
@@ -359,16 +384,13 @@
                 @php $pengajuan = $user->siswa->pengajuanKeluars()->with('ekskul')->latest()->get(); @endphp
                 @if($pengajuan->isNotEmpty())
                     @foreach($pengajuan as $p)
-                        <div class="bg-white border border-slate-100 rounded-2xl p-4">
+                        <div class="bg-white border border-slate-200/80 rounded-2xl p-4">
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h5 class="font-bold text-slate-900">Pengajuan Keluar Ekskul</h5>
                                     <p class="text-xs text-slate-400 mt-0.5">{{ $p->ekskul->nama_ekskul ?? '-' }} · {{ $p->tanggal_pengajuan ? \Carbon\Carbon::parse($p->tanggal_pengajuan)->isoFormat('DD MMM Y') : '-' }}</p>
                                 </div>
-                                <span class="px-2.5 py-1 rounded-xl text-[10px] font-bold
-                                    @if($p->status === 'pending') bg-amber-50 text-amber-700 border border-amber-200
-                                    @elseif($p->status === 'diterima') bg-emerald-50 text-emerald-700 border border-emerald-200
-                                    @else bg-rose-50 text-rose-600 border border-rose-200 @endif">
+                                <span class="px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
                                     {{ ucfirst($p->status) }}
                                 </span>
                             </div>
@@ -377,7 +399,7 @@
                     @endforeach
                 @else
                     <div class="text-center py-8 text-slate-400">
-                        <svg class="w-12 h-12 mx-auto text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        <i class="fa-solid fa-arrow-right-from-bracket text-3xl mb-1 text-slate-300"></i>
                         <p class="mt-2 font-medium">Belum ada pengajuan keluar.</p>
                     </div>
                 @endif
@@ -413,13 +435,48 @@
                             </tbody>
                         </table>
                     </div>
-                    <a href="{{ route('kesiswaan.siswa.riwayat-kelas', $user->siswa) }}" class="inline-block text-xs font-bold text-sky-600 hover:text-sky-700">
-                        Lihat riwayat kelas lengkap &rarr;
-                    </a>
                 @else
                     <div class="text-center py-8 text-slate-400">
-                        <svg class="w-12 h-12 mx-auto text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        <i class="fa-solid fa-chalkboard text-3xl mb-1 text-slate-300"></i>
                         <p class="mt-2 font-medium">Belum ada riwayat perpindahan atau kelulusan kelas.</p>
+                    </div>
+                @endif
+            </div>
+            @endif
+
+            {{-- TAB: NILAI --}}
+            @if($user->role === 'siswa')
+            <div id="tab-nilai" class="tab-panel hidden space-y-4">
+                @if($penilaians->isNotEmpty())
+                    <div class="overflow-x-auto rounded-2xl border border-slate-100">
+                        <table class="w-full min-w-[620px] text-left text-xs">
+                            <thead class="bg-slate-50 text-[11px] uppercase tracking-wide text-slate-500">
+                                <tr>
+                                    <th class="px-4 py-3 font-bold">Periode</th>
+                                    <th class="px-4 py-3 font-bold">Ekskul</th>
+                                    <th class="px-4 py-3 text-center font-bold">Kehadiran</th>
+                                    <th class="px-4 py-3 text-center font-bold">Nilai Akhir</th>
+                                    <th class="px-4 py-3 text-center font-bold">Predikat</th>
+                                    <th class="px-4 py-3 font-bold">Pembina</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                @foreach($penilaians as $penilaian)
+                                    <tr class="hover:bg-slate-50/70">
+                                        <td class="px-4 py-3 font-semibold text-slate-700">{{ $penilaian->periode }}</td>
+                                        <td class="px-4 py-3 text-slate-700">{{ $penilaian->pendaftaran?->ekskul?->nama_ekskul ?? '-' }}</td>
+                                        <td class="px-4 py-3 text-center text-slate-600">{{ number_format((float) $penilaian->persentase_kehadiran, 1) }}%</td>
+                                        <td class="px-4 py-3 text-center font-extrabold text-slate-900">{{ number_format((float) $penilaian->nilai_akhir, 2) }}</td>
+                                        <td class="px-4 py-3 text-center"><span class="inline-flex items-center justify-center w-7 h-7 rounded-lg border font-extrabold {{ \App\Models\Penilaian::warnaPredikat((string) $penilaian->predikat) }}">{{ $penilaian->predikat ?? '-' }}</span></td>
+                                        <td class="px-4 py-3 text-slate-600">{{ $penilaian->penilai?->nama ?? '-' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="py-8 text-center text-slate-400">
+                        <p class="font-medium">Belum ada nilai ekskul yang diterbitkan.</p>
                     </div>
                 @endif
             </div>
@@ -429,18 +486,18 @@
             <div id="tab-riwayat-profil" class="tab-panel hidden space-y-4">
                 @if($histories->isNotEmpty())
                     @foreach($histories as $riwayat)
-                        <div class="bg-white border border-slate-100 rounded-2xl p-4">
+                        <div class="bg-white border border-slate-200/80 rounded-2xl p-4">
                             <div class="flex justify-between items-start mb-2">
                                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">{{ $riwayat->field }}</p>
                                 <span class="text-[10px] text-slate-500">{{ $riwayat->created_at->isoFormat('DD MMM YYYY HH:mm') }}</span>
                             </div>
                             <div class="grid grid-cols-2 gap-4 text-sm">
-                                <div class="p-3 bg-rose-50 rounded-xl border border-rose-100">
-                                    <dt class="text-[10px] font-bold text-rose-600 uppercase tracking-wider">Sebelum</dt>
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/70">
+                                    <dt class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sebelum</dt>
                                     <dd class="text-slate-700 font-medium mt-1 break-all">{{ filled($riwayat->old_value) ? $riwayat->old_value : '—' }}</dd>
                                 </div>
-                                <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-                                    <dt class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Sesudah</dt>
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/70">
+                                    <dt class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sesudah</dt>
                                     <dd class="text-slate-700 font-medium mt-1 break-all">{{ filled($riwayat->new_value) ? $riwayat->new_value : '—' }}</dd>
                                 </div>
                             </div>
@@ -448,7 +505,7 @@
                     @endforeach
                 @else
                     <div class="text-center py-8 text-slate-400">
-                        <svg class="w-12 h-12 mx-auto text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2v2H9V5zm1 8l2 2 4-4"/></svg>
+                        <i class="fa-solid fa-clock-rotate-left text-3xl mb-1 text-slate-300"></i>
                         <p class="mt-2 font-medium">Belum ada riwayat perubahan profil.</p>
                     </div>
                 @endif
@@ -466,11 +523,11 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             const target = btn.dataset.tab;
             tabs.forEach(b => {
-                b.classList.remove('border-amber-500', 'text-amber-600', 'bg-amber-50');
-                b.classList.add('border-transparent', 'text-slate-400');
+                b.classList.remove('border-sky-600', 'text-sky-700', 'font-bold');
+                b.classList.add('border-transparent', 'text-slate-500', 'font-semibold');
             });
-            btn.classList.add('border-amber-500', 'text-amber-600', 'bg-amber-50');
-            btn.classList.remove('border-transparent', 'text-slate-400');
+            btn.classList.add('border-sky-600', 'text-sky-700', 'font-bold');
+            btn.classList.remove('border-transparent', 'text-slate-500', 'font-semibold');
 
             panels.forEach(p => p.classList.toggle('hidden', p.id !== 'tab-' + target));
         });

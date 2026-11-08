@@ -22,7 +22,7 @@
 <div class="space-y-5 animate-fade-up">
 
     {{-- HERO CARD BIRU --}}
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200">
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white soul-timbul">
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
             <div class="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
@@ -41,9 +41,7 @@
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
                 <a href="{{ route('kesiswaan.users.create') }}"
                    class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
+                    
                     Tambah Pembina
                 </a>
             </div>
@@ -78,12 +76,10 @@
             {{-- Search Bar --}}
             <div class="soul-search-wrap relative flex-1">
                 <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
+                    
                 </span>
                 <input type="search" name="q" data-soul-search value="{{ request('q') }}" placeholder="Cari nama, NIP, email, atau no. telp..."
-                       class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                       class="w-full pl-4 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
             </div>
 
             <div class="flex items-center gap-2 relative">
@@ -91,18 +87,14 @@
                 <button type="button" @click="openFilter = !openFilter"
                         class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold border transition shadow-sm"
                         :class="openFilter || {{ $activeFilterCount }} > 0 ? 'bg-sky-50 text-sky-700 border-sky-300 ring-2 ring-sky-100' : 'bg-slate-50 text-slate-700 border-slate-200/80 hover:bg-slate-100'">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                    </svg>
+                    
                     <span>Filter</span>
                     @if($activeFilterCount > 0)
                         <span class="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-extrabold rounded-full bg-sky-500 text-white">
                             {{ $activeFilterCount }}
                         </span>
                     @endif
-                    <svg class="w-3.5 h-3.5 text-slate-400 transition-transform" :class="openFilter ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
+                    
                 </button>
 
                 {{-- Tombol Cari --}}
@@ -135,7 +127,7 @@
                     <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                                
                             </div>
                             <div>
                                 <h3 class="text-xs font-extrabold text-slate-900">Filter Guru / Pembina</h3>
@@ -143,7 +135,7 @@
                             </div>
                         </div>
                         <button type="button" @click="openFilter = false" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-50 transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            
                         </button>
                     </div>
 
@@ -179,7 +171,7 @@
                         </a>
                         <button type="submit" @click="openFilter = false" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
                             <span>Terapkan Filter</span>
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            
                         </button>
                     </div>
                 </div>
@@ -223,9 +215,7 @@
                         <th class="py-3.5 px-5">
                             <a href="{{ $sortLink('nama') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
                                 Pembina
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('nama') }}"/>
-                                </svg>
+                                
                             </a>
                         </th>
                         <th class="py-3.5 px-5">Kategori Binaan</th>
@@ -253,7 +243,7 @@
                                             @if ($p->jenis_kelamin)
                                                 <span>&bull;</span>
                                                 <span class="{{ $p->jenis_kelamin === 'perempuan' ? 'text-rose-500' : 'text-sky-600' }} font-medium">
-                                                    {{ $p->jenis_kelamin === 'perempuan' ? '♀ Perempuan' : '♂ Laki-laki' }}
+                                                    {{ $p->jenis_kelamin === 'perempuan' ? 'P Perempuan' : 'L Laki-laki' }}
                                                 </span>
                                             @endif
                                         </div>
@@ -274,9 +264,7 @@
                                 @elseif ($p->kategori_pernah_dibina)
                                     <div>
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-bold text-[11px] bg-amber-50 text-amber-700 border border-amber-200" title="Data riwayat: pernah membina kategori ini">
-                                            <svg class="w-3 h-3 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
+                                            
                                             Pernah: {{ $p->kategori_pernah_dibina }}
                                         </span>
                                         <span class="block text-[10px] text-amber-600/80 mt-0.5 font-medium">Tidak membina (Riwayat)</span>
@@ -309,15 +297,13 @@
                             <td class="py-3.5 px-5 text-right whitespace-nowrap">
                                 <a href="{{ route('kesiswaan.pembina.riwayat-profil', $p) }}"
                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:border-sky-300 hover:bg-sky-50 text-slate-600 hover:text-sky-700 font-medium rounded-lg transition text-xs mr-1" title="Riwayat Profil">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    
                                     Riwayat
                                 </a>
                                 @if ($p->user_id)
                                     <a href="{{ route('kesiswaan.users.edit', $p->user_id) }}"
                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:border-sky-300 hover:bg-sky-50 text-slate-600 hover:text-sky-700 font-medium rounded-lg transition text-xs">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
+                                        
                                         Edit Akun
                                     </a>
                                 @else
@@ -329,9 +315,7 @@
                         <tr>
                             <td colspan="4" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-slate-400">
-                                    <svg class="w-10 h-10 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                    </svg>
+                                    
                                     <p class="text-xs font-semibold text-slate-600">Tidak ada pembina yang sesuai kriteria.</p>
                                     @if ($hasFilter || request('kategori'))
                                         <p class="text-[11px] text-slate-400 mt-0.5">Coba ubah kata kunci atau hapus filter.</p>
@@ -358,7 +342,7 @@
 </div>
 
 @foreach ($pembinas as $p)
-    <dialog id="modal-kelola-{{ $p->id }}" class="rounded-3xl backdrop:bg-slate-900/40 p-0 w-full max-w-lg shadow-2xl border border-sky-100">
+    <dialog id="modal-kelola-{{ $p->id }}" class="rounded-3xl backdrop:bg-slate-900/40 backdrop:backdrop-blur-sm p-0 w-full max-w-lg shadow-2xl border border-sky-100">
         <div class="p-6 space-y-4 bg-white">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div>

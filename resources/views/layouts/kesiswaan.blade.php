@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('partials.theme-mode-head')
@@ -21,7 +22,7 @@
     'psTitle' => 'Menu Kesiswaan',
     'psLogoBrand' => 'SOUL',
     'psDashboardUrl' => route('kesiswaan.dashboard'),
-    'psNotifUrl' => route('kesiswaan.notifikasi'),
+    'psNotifUrl' => '',
     'psProfileUrl' => route('kesiswaan.profile'),
     'psItems' => [
         ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('kesiswaan.dashboard'), 'is' => 'kesiswaan.dashboard'],
@@ -54,7 +55,7 @@
             <div class="flex items-center gap-3 flex-1 min-w-0">
                 <!-- Tombol Hamburger (Mobile) -->
                 <button onclick="openSidebar()" class="w-9 h-9 rounded-full bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 flex items-center justify-center text-slate-500 dark:text-slate-400 md:hidden shadow-sm shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    <i class="fa-solid fa-bars text-sm"></i>
                 </button>
 
                 <!-- Logo Mobile -->
@@ -68,23 +69,21 @@
 
                 <!-- Search (Desktop) -->
                 <form method="GET" action="{{ route('kesiswaan.users.index') }}" class="soul-search-wrap relative w-full max-w-sm hidden sm:block">
-                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center w-4 h-4 pointer-events-none text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </span>
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
                     <input type="search" name="q" data-soul-search value="{{ request('q') }}" placeholder="Cari akun, siswa, kelas, ekskul..." class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-neutral-800 border border-slate-200/70 dark:border-neutral-700 rounded-full text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition-all">
                 </form>
             </div>
 
+            <!-- KANAN: Bantuan & Notifikasi -->
+            <div class="flex items-center gap-2 md:gap-2.5 shrink-0">
+                <a href="{{ route('kesiswaan.bantuan') }}"
+                   title="Pusat Bantuan & Panduan Fitur Kesiswaan"
+                   class="w-9 h-9 rounded-full border flex items-center justify-center text-xs transition-all shadow-sm {{ request()->routeIs('kesiswaan.bantuan') ? 'bg-sky-500 text-white border-sky-500 shadow-sky-200' : 'bg-slate-50 dark:bg-neutral-800 border-slate-200/70 dark:border-neutral-700 text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-700 hover:border-sky-200 hover:text-sky-600' }}">
+                    <i class="fa-solid fa-circle-question text-sm"></i>
+                </a>
 
-
-            <!-- KANAN: Notifikasi -->
-            <div class="flex items-center gap-2.5 md:gap-3 shrink-0">
                 <a href="{{ route('kesiswaan.notifikasi') }}" class="w-9 h-9 rounded-full bg-slate-50 dark:bg-neutral-800 border border-slate-200/70 dark:border-neutral-700 flex items-center justify-center text-xs relative text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-700 hover:border-sky-200 dark:hover:border-neutral-700 transition-all shadow-sm">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                    </svg>
+                    <i class="fa-solid fa-bell text-xs"></i>
                     @if(($unreadNotifCount ?? 0) > 0)
                         <span class="w-2 h-2 rounded-full bg-amber-400 absolute top-1.5 right-1.5 border border-white dark:border-neutral-900 shadow-sm"></span>
                     @endif

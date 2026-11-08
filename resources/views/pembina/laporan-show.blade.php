@@ -99,20 +99,25 @@
         </div>
     </div>
 
-    <dialog id="modal-tolak" class="rounded-2xl border border-red-100 shadow-2xl shadow-red-200/50 p-0 backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm">
-        <form method="POST" action="{{ route('pembina.laporan.reject', $laporan) }}" class="w-[min(26rem,92vw)] bg-white rounded-2xl overflow-hidden">
+    <dialog id="modal-tolak" class="rounded-3xl border border-sky-100 shadow-2xl shadow-sky-900/10 p-0 backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm m-auto">
+        <form method="POST" action="{{ route('pembina.laporan.reject', $laporan) }}" class="w-[min(26rem,92vw)] bg-white rounded-3xl overflow-hidden">
             @csrf
             <div class="px-6 pt-6 pb-4">
-                <h2 class="text-sm font-extrabold text-slate-900">Tolak Laporan</h2>
-                <p class="text-xs text-slate-400 mt-1">Laporan akan dikembalikan ke ketua ekskul untuk diperbaiki.</p>
-                <label class="block mt-4">
+                <div class="flex justify-center">
+                    <img src="{{ asset('images/bingung.png') }}" alt="Tolak laporan" class="w-24 h-24 object-contain">
+                </div>
+                <div class="text-center mt-2">
+                    <h2 class="text-sm font-extrabold text-slate-900">Tolak Laporan</h2>
+                    <p class="text-xs text-slate-400 mt-1">Laporan akan dikembalikan ke ketua ekskul untuk diperbaiki.</p>
+                </div>
+                <label class="block mt-4 text-left">
                     <span class="text-[11px] font-bold text-slate-500 uppercase">Catatan untuk ketua</span>
-                    <textarea name="catatan_pembina" rows="4" placeholder="Jelaskan apa yang perlu diperbaiki..." class="w-full mt-1.5 px-3.5 py-2.5 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-red-400 focus:ring-4 focus:ring-red-100 transition"></textarea>
+                    <textarea name="catatan_pembina" rows="4" placeholder="Jelaskan apa yang perlu diperbaiki..." class="w-full mt-1.5 px-3.5 py-2.5 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition"></textarea>
                 </label>
             </div>
             <div class="flex gap-2 px-6 pb-6">
                 <button type="button" onclick="document.getElementById('modal-tolak').close()" class="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-lg transition">Batal</button>
-                <button type="submit" class="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-400 to-red-500 hover:from-red-500 hover:to-red-600 text-white text-xs font-semibold rounded-lg transition shadow-md shadow-red-200">Tolak Laporan</button>
+                <button type="submit" class="flex-1 px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg transition shadow-md shadow-sky-200">Tolak Laporan</button>
             </div>
         </form>
     </dialog>

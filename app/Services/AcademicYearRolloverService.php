@@ -14,7 +14,7 @@ use RuntimeException;
 class AcademicYearRolloverService
 {
     /**
-     * Activate a specific tahun ajaran and perform class promotion.
+     * Activate a specific tahun ajaran and mark the prior cohort for placement.
      * This is the new method used by TahunAjaranController.
      */
     public function activateTahunAjaran(TahunAjaran $newYear): array
@@ -57,73 +57,38 @@ class AcademicYearRolloverService
                 }
             }
             foreach ($currentClasses->where('tingkat', 'xi') as $class) {
+                $this->copyClass($class, 'xi', $newYear);
+                $this->copyClass($class, 'xii', $newYear);
+            }
+            foreach ($currentClasses->where('tingkat', 'xii') as $class) {
                 $this->copyClass($class, 'xii', $newYear);
             }
 
             $now = now('Asia/Jakarta');
-            $promoted = 0;
-            $pending = 0;
-            $graduated = 0;
+            foreach ($currentClasses->whereIn('tingkat', ['x', 'xi', 'xii']) as $class) {
+                $students = Siswa::query()->where('kelas_id', $class->id)->whereIn('status', ['aktif', 'menunggu_penempatan'])->lockForUpdate()->get();
 
-            foreach ($currentClasses as $class) {
-                $students = Siswa::query()->where('kelas_id', $class->id)->where('status', 'aktif')->lockForUpdate()->get();
-
-                if ($class->tingkat === 'xi') {
-                    // 11 → 12 automatic
-                    $target = $this->findTargetClass($class, 'xii', $newYear);
-                    foreach ($students as $student) {
-                        $this->recordHistory($student, $currentYear->nama, $class->nama, $target->nama, 'kenaikan', $now);
-                        $student->update(['kelas_id' => $target->id, 'status' => 'aktif']);
-                        $promoted++;
-                    }
-                } elseif ($class->tingkat === 'xii') {
-                    // 12 → graduate
-                    foreach ($students as $student) {
-                        $this->recordHistory($student, $currentYear->nama, $class->nama, null, 'kelulusan', $now);
-                        $student->update(['status' => 'nonaktif', 'angkatan' => $currentYear->nama]);
-                        $this->tutupKeanggotaanEkskul($student);
-                        if ($student->user) {
-                            $student->user->forceFill(['is_active' => false, 'remember_token' => null])->save();
-                            $student->user->tokens()->delete();
-                        }
-                        $graduated++;
-                    }
-                } elseif ($class->tingkat === 'x') {
-                    // Kelas 10 lama tetap berada di kelas 10 yang bersesuaian di tahun ajaran baru (misal 10 PPLG 1 ke 10 PPLG 1 baru)
-                    // Siswa tidak hilang, tetap ada di kelas itu dan status tetap aktif
-                    $targetX = $this->findTargetClass($class, 'x', $newYear);
-                    foreach ($students as $student) {
-                        $this->recordHistory($student, $currentYear->nama, $class->nama, $targetX->nama, 'penempatan', $now);
-                        $student->update(['kelas_id' => $targetX->id, 'status' => 'aktif']);
-                        $pending++;
-                    }
-                } else {
-                    // Kelas tingkat lainnya jika ada
-                    $targetOther = $this->findTargetClass($class, $class->tingkat, $newYear);
-                    foreach ($students as $student) {
-                        $this->recordHistory($student, $currentYear->nama, $class->nama, $targetOther->nama, 'penempatan', $now);
-                        $student->update(['kelas_id' => $targetOther->id, 'status' => 'aktif']);
-                    }
+                foreach ($students as $student) {
+                    $this->recordHistory($student, $currentYear->nama, $class->nama, null, 'penempatan', $now);
+                    $student->update(['status' => 'menunggu_penempatan']);
                 }
             }
 
+            // Students wait in prior classes with status 'menunggu_penempatan' until kesiswaan assigns them to new classes in newYear.
             $currentYear->update(['status' => 'historis']);
             $newYear->update(['status' => 'aktif']);
 
             return [
                 'from' => $currentYear->nama,
                 'to' => $newYear->nama,
-                'promoted' => $promoted,
-                'pending' => $pending,
-                'graduated' => $graduated,
+                'promoted' => 0,
+                'pending' => 0,
+                'graduated' => 0,
                 'already_done' => false,
             ];
         }, 3);
     }
 
-    /**
-     * Preview what will happen during activation.
-     */
     public function previewActivation(TahunAjaran $newYear): array
     {
         $currentYear = TahunAjaran::getActive();
@@ -249,7 +214,7 @@ class AcademicYearRolloverService
      * tidak muncul lagi di daftar anggota aktif. Pendaftaran nonaktif,
      * keluar, ditolak, atau pending dibiarkan apa adanya.
      */
-    private function tutupKeanggotaanEkskul(Siswa $student): void
+    public function tutupKeanggotaanEkskul(Siswa $student): void
     {
         $student->pendaftarans()
             ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])

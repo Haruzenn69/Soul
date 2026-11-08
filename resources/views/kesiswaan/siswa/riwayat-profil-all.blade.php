@@ -25,7 +25,7 @@
         @if ($riwayat->isEmpty())
             <div class="px-6 py-14 text-center">
                 <div class="w-12 h-12 mx-auto rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-400 mb-3">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    
                 </div>
                 <p class="text-sm font-bold text-slate-700">Belum ada riwayat perubahan profil</p>
                 <p class="text-xs text-slate-400 mt-1">Saat siswa memperbarui foto profil atau informasi profil lainnya, perubahannya akan otomatis tercatat di sini.</p>

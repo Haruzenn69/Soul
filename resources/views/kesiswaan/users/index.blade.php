@@ -22,7 +22,7 @@
 <div class="space-y-5 animate-fade-up">
 
     {{-- HERO CARD BIRU (STYLE SAMA DENGAN DASHBOARD KESISWAAN) --}}
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200">
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white soul-timbul">
         {{-- Ambient blur circles --}}
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
@@ -38,16 +38,14 @@
                     Akun Pengguna
                 </h1>
                 <p class="text-xs text-white/80 mt-1.5 max-w-xl leading-relaxed">
-                    Kelola data pengguna, perbarui akun siswa, guru/pembina, dan staf sekolah melalui panel kesiswaan.
+                    Informasi data pengguna, akun siswa, guru/pembina, dan staf sekolah melalui panel kesiswaan.
                 </p>
             </div>
 
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
                 <a href="{{ route('kesiswaan.users.create') }}"
                    class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
+                    <i class="fa-solid fa-user-plus text-xs"></i>
                     Buat Akun
                 </a>
             </div>
@@ -125,22 +123,16 @@
 
             {{-- Input Pencarian --}}
             <div class="soul-search-wrap relative flex-1">
-                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                </span>
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
                 <input type="search" name="q" data-soul-search value="{{ request('q') }}" placeholder="Cari nama, NIS, NIP, username, atau email..."
-                       class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                       class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
             </div>
 
             {{-- Tombol Filter & Popover Panel --}}
             <div class="relative flex items-center gap-2">
                 <button type="button" @click="openFilter = !openFilter"
                         class="px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-2 border {{ $activeFilterCount > 0 ? 'bg-sky-50 border-sky-300 text-sky-700 shadow-sm shadow-sky-100' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100' }}">
-                    <svg class="w-4 h-4 {{ $activeFilterCount > 0 ? 'text-sky-600' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                    </svg>
+                    <i class="fa-solid fa-filter text-xs"></i>
                     <span>Filter Data</span>
                     @if($activeFilterCount > 0)
                         <span class="w-5 h-5 rounded-full bg-sky-500 text-white text-[10px] font-black flex items-center justify-center">
@@ -149,14 +141,16 @@
                     @endif
                 </button>
 
-                <button type="submit" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
+                <button type="submit" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm transition">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
                     Cari
                 </button>
 
                 @if($hasActiveFilter)
                     <a href="{{ route('kesiswaan.users.index') }}"
-                       class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-2xl transition"
+                       class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-2xl transition"
                        title="Reset filter">
+                        <i class="fa-solid fa-rotate-left text-xs"></i>
                         Reset
                     </a>
                 @endif
@@ -176,9 +170,7 @@
                     <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                         <div class="flex items-center gap-2">
                             <span class="p-1.5 rounded-lg bg-sky-50 text-sky-600">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-                                </svg>
+                                <i class="fa-solid fa-sliders text-xs"></i>
                             </span>
                             <h4 class="text-xs font-bold text-slate-800">Opsi Filter Pengguna</h4>
                         </div>
@@ -249,17 +241,13 @@
                         <th class="py-3.5 px-5">
                             <a href="{{ $sortLink('username') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
                                 Pengguna
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('username') }}"/>
-                                </svg>
+                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
                             </a>
                         </th>
                         <th class="py-3.5 px-5">
                             <a href="{{ $sortLink('role') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
                                 Role
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('role') }}"/>
-                                </svg>
+                                <i class="fa-solid fa-sort text-[10px] text-slate-400"></i>
                             </a>
                         </th>
                         <th class="py-3.5 px-5 text-right">Aksi</th>
@@ -267,29 +255,36 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-xs">
                     @forelse ($users as $user)
-                        <tr class="hover:bg-sky-50/30 transition">
+                        @php
+                            $isNonaktif = ! $user->is_active
+                                || ($user->role === 'siswa' && $user->siswa?->status === 'nonaktif');
+                        @endphp
+                        <tr class="{{ $isNonaktif ? 'bg-slate-100/90 text-slate-400 hover:bg-slate-200/70 border-b border-slate-200' : 'hover:bg-sky-50/30' }} transition">
                             {{-- Pengguna / Nama --}}
                             <td class="py-3.5 px-5">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 font-extrabold flex items-center justify-center text-xs uppercase shrink-0 overflow-hidden">
+                                    <div class="w-8 h-8 rounded-xl {{ $isNonaktif ? 'bg-slate-200 text-slate-500' : 'bg-sky-100 text-sky-700' }} font-extrabold flex items-center justify-center text-xs uppercase shrink-0 overflow-hidden">
                                         @php
                                             $userFoto = $user->siswa?->foto_url ?? ($user->pembina?->foto ? asset('storage/'.$user->pembina->foto) : null);
                                         @endphp
                                         @if($userFoto)
-                                            <img src="{{ $userFoto }}" alt="Avatar" class="w-full h-full object-cover">
+                                            <img src="{{ $userFoto }}" alt="Avatar" class="w-full h-full object-cover {{ $isNonaktif ? 'grayscale opacity-75' : '' }}">
                                         @else
                                             {{ strtoupper(substr($user->siswa?->nama ?? $user->pembina?->nama ?? $user->username ?? 'U', 0, 2)) }}
                                         @endif
                                     </div>
                                     <div>
-                                        <div class="font-bold text-slate-900 leading-snug">
-                                            {{ $user->siswa?->nama ?? $user->pembina?->nama ?? ($user->username ?? 'User') }}
+                                        <div class="font-bold {{ $isNonaktif ? 'text-slate-500' : 'text-slate-900' }} leading-snug flex items-center gap-1.5">
+                                            <span>{{ $user->siswa?->nama ?? $user->pembina?->nama ?? ($user->username ?? 'User') }}</span>
+                                            @if ($isNonaktif)
+                                                <span class="inline-flex rounded-lg border border-slate-300 bg-slate-200/90 px-1.5 py-0.5 text-[10px] font-bold text-slate-600">Nonaktif</span>
+                                            @endif
                                         </div>
                                         <div class="text-[11px] text-slate-400">
                                             @if($user->username)
                                                 <span>{{ '@' . $user->username }}</span>
                                             @else
-                                                <span class="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200/60 px-1.5 py-0.5 rounded-lg text-[10px] font-semibold">
+                                                <span class="inline-flex items-center gap-1 {{ $isNonaktif ? 'text-slate-500 bg-slate-200 border border-slate-300' : 'text-amber-700 bg-amber-50 border border-amber-200/60' }} px-1.5 py-0.5 rounded-lg text-[10px] font-semibold">
                                                     Belum set username (Login: {{ $user->siswa?->nis ?? $user->pembina?->nip ?? $user->email }})
                                                 </span>
                                             @endif
@@ -300,50 +295,45 @@
 
                             {{-- Role (Bukan berbentuk pil, teks bersih dan rapi) --}}
                             <td class="py-3.5 px-5 whitespace-nowrap">
-                                <div class="text-xs font-semibold text-slate-700">
+                                <div class="text-xs font-semibold {{ $isNonaktif ? 'text-slate-500' : 'text-slate-700' }}">
                                     @if ($user->role === 'siswa')
                                         <span>Siswa</span>
+                                        @if ($isNonaktif)
+                                            <span class="ml-1 inline-flex rounded-lg border border-slate-300 bg-slate-200 px-1.5 py-0.5 text-[10px] font-bold text-slate-600">{{ $user->siswa?->status === 'nonaktif' ? 'Alumni / Nonaktif' : 'Akun Nonaktif' }}</span>
+                                        @endif
                                         @if ($user->siswa?->jabatan === 'ketua')
-                                            <span class="text-amber-600 font-bold ml-1">(Ketua)</span>
+                                            <span class="{{ $isNonaktif ? 'text-slate-500' : 'text-amber-600' }} font-bold ml-1">(Ketua)</span>
                                         @endif
                                     @elseif ($user->role === 'pembina')
                                         <span>Guru / Pembina</span>
+                                        @if ($isNonaktif)
+                                            <span class="ml-1 inline-flex rounded-lg border border-slate-300 bg-slate-200 px-1.5 py-0.5 text-[10px] font-bold text-slate-600">Akun Nonaktif</span>
+                                        @endif
                                     @elseif ($user->role === 'kesiswaan')
                                         <span>Kesiswaan</span>
+                                        @if ($isNonaktif)
+                                            <span class="ml-1 inline-flex rounded-lg border border-slate-300 bg-slate-200 px-1.5 py-0.5 text-[10px] font-bold text-slate-600">Akun Nonaktif</span>
+                                        @endif
                                     @elseif ($user->role === 'admin')
                                         <span>Admin</span>
+                                        @if ($isNonaktif)
+                                            <span class="ml-1 inline-flex rounded-lg border border-slate-300 bg-slate-200 px-1.5 py-0.5 text-[10px] font-bold text-slate-600">Akun Nonaktif</span>
+                                        @endif
                                     @else
                                         <span>{{ ucfirst($user->role) }}</span>
                                     @endif
                                 </div>
                             </td>
 
-                            {{-- Aksi (Hanya Edit Akun) --}}
+                            {{-- Aksi (Info Akun Saja) --}}
                             <td class="py-3.5 px-5 text-right">
                                 <div class="flex justify-end items-center">
-                                    @if ($user->role === 'admin' && auth()->user()->role !== 'admin')
-                                        <span class="text-[11px] text-slate-400 italic flex items-center gap-1.5">
-                                            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                                <rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>
-                                            </svg>
-                                            Dikelola Admin
-                                        </span>
-                                    @else
-                                        <a href="{{ route('kesiswaan.users.show', $user) }}"
-                                           class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold rounded-xl transition text-xs mr-1"
-                                           title="Lihat Detail Akun">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                            Detail
-                                        </a>
-                                        <a href="{{ route('kesiswaan.users.edit', $user) }}"
-                                           class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold rounded-xl transition text-xs"
-                                           title="Edit Akun">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                            </svg>
-                                            Edit Akun
-                                        </a>
-                                    @endif
+                                    <a href="{{ route('kesiswaan.users.show', $user) }}"
+                                       class="inline-flex items-center gap-1.5 px-3.5 py-1.5 {{ $isNonaktif ? 'bg-slate-200 hover:bg-slate-300 text-slate-700' : 'bg-sky-50 hover:bg-sky-100 text-sky-700' }} font-semibold rounded-xl transition text-xs"
+                                       title="Info Akun {{ $user->siswa?->nama ?? $user->pembina?->nama ?? ($user->username ?? $user->email) }}">
+                                        <i class="fa-solid fa-circle-info text-xs"></i>
+                                        Info Akun
+                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -351,9 +341,7 @@
                         <tr>
                             <td colspan="3" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-slate-400">
-                                    <svg class="w-10 h-10 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                                    </svg>
+                                    <i class="fa-solid fa-users-slash text-3xl mb-2 text-slate-300"></i>
                                     <p class="text-xs font-semibold text-slate-600">Tidak ada akun yang sesuai kriteria.</p>
                                     @if(request()->filled('q') || request()->filled('role'))
                                         <p class="text-[11px] text-slate-400 mt-0.5">Coba ubah kata kunci atau hapus filter yang diterapkan.</p>

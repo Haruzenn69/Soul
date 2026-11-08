@@ -11,6 +11,7 @@ use App\Models\Ekskul;
 use App\Models\Kelas;
 use App\Models\Pembina;
 use App\Models\Pendaftaran;
+use App\Models\Penilaian;
 use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use App\Models\User;
@@ -56,6 +57,7 @@ class UserController extends Controller
                     $query->where('role', $roleFilter);
                 }
             })
+            ->orderByRaw("CASE WHEN users.is_active = 0 OR (users.role = 'siswa' AND EXISTS (SELECT 1 FROM siswas WHERE siswas.user_id = users.id AND siswas.status = 'nonaktif')) THEN 2 WHEN users.role = 'pembina' AND EXISTS (SELECT 1 FROM pembinas INNER JOIN ekskuls ON ekskuls.pembina_id = pembinas.id WHERE pembinas.user_id = users.id) THEN 0 ELSE 1 END ASC")
             ->orderBy($sort, $direction)
             ->paginate(10)
             ->withQueryString();
@@ -197,8 +199,8 @@ class UserController extends Controller
                 'pembina_tanggal_lahir' => ['required', 'date'],
                 'pembina_agama' => ['required', 'string', 'max:50', 'in:Islam,Kristen,Katolik,Hindu,Buddha,Khonghucu'],
                 'pembina_jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
-                'pembina_no_telp' => ['required', 'string', 'max:25'],
-                'pembina_alamat' => ['required', 'string'],
+                'pembina_no_telp' => ['nullable', 'string', 'max:25'],
+                'pembina_alamat' => ['nullable', 'string'],
                 'pembina_medsos' => ['nullable', 'string', 'max:255'],
             ];
         }
@@ -248,9 +250,7 @@ class UserController extends Controller
             'pembina_tanggal_lahir.date' => 'Tanggal Lahir harus berupa tanggal yang valid.',
             'pembina_agama.required' => 'Kolom Agama wajib diisi.',
             'pembina_agama.in' => 'Agama tidak valid. Pilih dari: Islam, Kristen, Katolik, Hindu, Buddha, Khonghucu.',
-            'pembina_no_telp.required' => 'Kolom No. Telp / WA wajib diisi.',
             'pembina_no_telp.max' => 'No. Telp maksimal 25 karakter.',
-            'pembina_alamat.required' => 'Kolom Alamat wajib diisi.',
             'pembina_medsos.max' => 'Media Sosial maksimal 255 karakter.',
             'pembina_foto.image' => 'File foto pembina harus berupa gambar.',
             'pembina_foto.mimes' => 'Format foto harus JPG, PNG, atau WEBP.',
@@ -268,7 +268,7 @@ class UserController extends Controller
                 'password' => Hash::make('password'),
                 'role' => $data['role'],
                 'email_verified_at' => now(),
-                'onboarding_completed_at' => now(),
+                'onboarding_completed_at' => in_array($data['role'], ['siswa', 'pembina'], true) ? null : now(),
             ]);
 
             if ($data['role'] === 'siswa') {
@@ -360,14 +360,22 @@ class UserController extends Controller
             : ($user->pembina?->ekskuls()->count() ?? 0);
 
         $presensi = null;
+        $penilaians = collect();
         if ($user->role === 'siswa' && $user->siswa) {
             $presensi = \App\Models\Presensi::whereIn(
                 'pendaftaran_id',
                 $user->siswa->pendaftarans()->pluck('id')
             )->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
+
+            $penilaians = Penilaian::query()
+                ->whereHas('pendaftaran', fn ($query) => $query->where('siswa_id', $user->siswa->id))
+                ->where('status', Penilaian::STATUS_TERKIRIM)
+                ->with(['pendaftaran.ekskul', 'penilai'])
+                ->orderByDesc('dikirim_at')
+                ->get();
         }
 
-        return view('kesiswaan.users.show', compact('user', 'ekskuls', 'pendaftaranAktif', 'presensi'));
+        return view('kesiswaan.users.show', compact('user', 'ekskuls', 'pendaftaranAktif', 'presensi', 'penilaians'));
     }
 
     public function edit(User $user): View
@@ -391,6 +399,7 @@ class UserController extends Controller
         $rules = [
             'username' => [$isStaff ? 'required' : 'nullable', 'string', 'max:255', 'unique:users,username,'.$user->id],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
+            'is_active' => ['required', 'boolean'],
             // Role admin hanya bisa dipilih oleh admin (kesiswaan tidak boleh)
             'role' => ['required', 'in:'.$this->allowedRoles()],
         ];
@@ -462,10 +471,13 @@ class UserController extends Controller
                 $this->ensureEkskulCanHaveKetua((int) $data['ekskul_id'], $existingSiswa?->id);
             }
 
+            $isActive = (bool) $data['is_active'];
+
             $user->update([
                 'username' => filled($data['username']) ? $data['username'] : null,
                 'email' => $data['email'],
                 'role' => $data['role'],
+                'is_active' => $isActive,
             ]);
 
             if ($data['role'] === 'siswa') {
@@ -483,6 +495,7 @@ class UserController extends Controller
                     'alamat' => $data['alamat'] ?? null,
                     'medsos' => $data['medsos'] ?? null,
                     'jabatan' => $data['jabatan'],
+                    'status' => $isActive ? ($existingSiswa && $existingSiswa->status === 'nonaktif' ? 'aktif' : ($existingSiswa->status ?? 'aktif')) : 'nonaktif',
                 ];
 
                 if ($request->hasFile('foto')) {
@@ -587,23 +600,7 @@ class UserController extends Controller
     {
         $this->authorizeManage($user);
 
-        if ($user->id === auth()->id()) {
-            return back()->with('error', 'Anda tidak bisa menghapus akun sendiri.');
-        }
-
-        if ($user->siswa?->foto && Storage::disk('public')->exists($user->siswa->foto)) {
-            Storage::disk('public')->delete($user->siswa->foto);
-        }
-        if ($user->pembina?->foto && Storage::disk('public')->exists($user->pembina->foto)) {
-            Storage::disk('public')->delete($user->pembina->foto);
-        }
-
-        $username = $user->username;
-        $user->delete();
-
-        return redirect()
-            ->route('kesiswaan.users.index')
-            ->with('success', "Akun {$username} berhasil dihapus.");
+        return back()->with('error', 'Akun tidak dapat dihapus. Silakan gunakan opsi nonaktifkan akun.');
     }
 
     public function resetPassword(User $user): RedirectResponse
@@ -612,7 +609,9 @@ class UserController extends Controller
 
         $user->update(['password' => Hash::make('password')]);
 
-        return back()->with('success', "Password akun {$user->username} direset ke: password");
+        $displayName = $user->siswa?->nama ?? $user->pembina?->nama ?? $user->username ?? $user->email ?? 'Pengguna';
+
+        return back()->with('success', "Password akun {$displayName} berhasil direset ke password default: password");
     }
 
     /**

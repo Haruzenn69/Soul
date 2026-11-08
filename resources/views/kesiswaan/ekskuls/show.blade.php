@@ -40,7 +40,7 @@
 <div class="space-y-6 animate-fade-up">
 
     {{-- HERO CARD --}}
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200 dark:shadow-none">
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white soul-timbul">
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
             <div class="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
@@ -70,14 +70,14 @@
                             </span>
                         @endif
                         <span class="px-2.5 py-1 rounded-full text-[11px] font-bold {{ $ekskul->status ? 'bg-emerald-400/30 text-white' : 'bg-rose-500/30 text-white' }} backdrop-blur">
-                            {{ $ekskul->status ? '✓ Aktif' : '✕ Nonaktif' }}
+                            {{ $ekskul->status ? ' Aktif' : 'X Nonaktif' }}
                         </span>
                         <span class="px-2.5 py-1 rounded-full text-[11px] font-bold {{ $ekskul->is_open_recruitment ? 'bg-amber-300/30 text-white' : 'bg-white/10 text-white/70' }} backdrop-blur">
-                            {{ $ekskul->is_open_recruitment ? '● Buka Pendaftaran' : '○ Tutup Pendaftaran' }}
+                            {{ $ekskul->is_open_recruitment ? ' Buka Pendaftaran' : ' Tutup Pendaftaran' }}
                         </span>
                         @if ($ekskul->jadwal)
                             <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/15 text-white/90 backdrop-blur">
-                                🕐 {{ $ekskul->jadwal }}
+                                 {{ $ekskul->jadwal }}
                             </span>
                         @endif
                     </div>
@@ -86,7 +86,7 @@
 
             <a href="{{ route('kesiswaan.ekskuls.index') }}"
                class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/20 transition shrink-0">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                
                 Kembali
             </a>
         </div>
@@ -100,7 +100,7 @@
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-[11px] font-bold text-slate-400 dark:text-neutral-400 uppercase tracking-wider">Pembina Ekskul</span>
                     <div class="w-7 h-7 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        
                     </div>
                 </div>
                 @if ($ekskul->pembina)
@@ -133,7 +133,7 @@
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-[11px] font-bold text-slate-400 dark:text-neutral-400 uppercase tracking-wider">Ketua Ekskul</span>
                     <div class="w-7 h-7 rounded-xl bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><path d="M2 19l2-9 5 5 3-8 3 8 5-5 2 9H2z"/></svg>
+                        
                     </div>
                 </div>
                 @if ($ketua)
@@ -159,7 +159,7 @@
                 @else
                     <div class="flex flex-col items-center gap-2 py-3 text-center">
                         <div class="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 flex items-center justify-center text-amber-500">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                            
                         </div>
                         <span class="text-xs font-semibold text-slate-500 dark:text-neutral-400">Belum ada ketua</span>
                     </div>
@@ -173,7 +173,7 @@
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-[11px] font-bold text-slate-400 dark:text-neutral-400 uppercase tracking-wider">Pelatih Ekskul</span>
                     <div class="w-7 h-7 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        
                     </div>
                 </div>
                 @if ($ekskul->pelatih)
@@ -211,17 +211,15 @@
         @endif
         <div class="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center">
             <div class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 shrink-0">
-                <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                
                 <span>Anggota ({{ $anggota->total() }})</span>
             </div>
             <div class="relative flex-1">
                 <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
+                    
                 </span>
                 <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama atau NIS anggota..."
-                       class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-neutral-800/80 border border-slate-200 dark:border-neutral-700 rounded-2xl text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                       class="w-full pl-4 pr-4 py-2.5 bg-slate-50 dark:bg-neutral-800/80 border border-slate-200 dark:border-neutral-700 rounded-2xl text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
             </div>
             <select name="status_anggota" class="w-full lg:w-48 px-3.5 py-2.5 bg-slate-50 dark:bg-neutral-800/80 border border-slate-200 dark:border-neutral-700 rounded-2xl text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                 <option value="">Semua Status</option>
@@ -250,26 +248,20 @@
                         <th class="py-4 px-5">
                             <a href="{{ $sortLink('nama') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
                                 Siswa
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('nama') }}"/>
-                                </svg>
+                                
                             </a>
                         </th>
                         <th class="py-4 px-5">Kelas</th>
                         <th class="py-4 px-5">
                             <a href="{{ $sortLink('tanggal_daftar') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
                                 Bergabung
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('tanggal_daftar') }}"/>
-                                </svg>
+                                
                             </a>
                         </th>
                         <th class="py-4 px-5">
                             <a href="{{ $sortLink('status') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600 transition">
                                 Status
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortIcon('status') }}"/>
-                                </svg>
+                                
                             </a>
                         </th>
                         <th class="py-4 px-5 text-right">Aksi</th>
@@ -301,9 +293,9 @@
                                         <div class="text-[11px] text-slate-400 dark:text-neutral-400 truncate flex items-center gap-2">
                                             <span>NIS: {{ $s->nis ?? '-' }}</span>
                                             @if(($s->jenis_kelamin ?? '') === 'perempuan')
-                                                <span class="text-rose-400">♀</span>
+                                                <span class="text-rose-400">P</span>
                                             @else
-                                                <span class="text-sky-400">♂</span>
+                                                <span class="text-sky-400">L</span>
                                             @endif
                                         </div>
                                     </div>
@@ -328,13 +320,13 @@
                                         <a href="{{ route('kesiswaan.users.show', $s->user_id) }}"
                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold rounded-xl transition text-xs"
                                            title="Lihat Detail {{ $s->nama }}">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            
                                             <span>Detail</span>
                                         </a>
                                         <a href="{{ route('kesiswaan.users.edit', $s->user_id) }}"
                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sky-50 dark:bg-sky-950/40 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 font-bold rounded-xl transition text-xs"
                                            title="Edit Data {{ $s->nama }}">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                            
                                             <span>Edit</span>
                                         </a>
                                     </div>
@@ -347,9 +339,7 @@
                         <tr>
                             <td colspan="5" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-slate-400 dark:text-neutral-500">
-                                    <svg class="w-10 h-10 mb-2 text-slate-300 dark:text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                                    </svg>
+                                    
                                     <p class="text-xs font-semibold text-slate-600 dark:text-neutral-400">Belum ada anggota di ekskul ini.</p>
                                     @if ($hasFilter)
                                         <a href="{{ route('kesiswaan.ekskuls.show', $ekskul) }}" class="mt-3 text-xs font-bold text-sky-600 hover:text-sky-700">
