@@ -609,12 +609,14 @@ class PembinaController extends Controller
         $rutinKegiatans = (clone $kegiatanQuery)->whereNull('jenis_kegiatan')->get();
         $eventKegiatans = (clone $kegiatanQuery)->whereNotNull('jenis_kegiatan')->get();
 
-        $pdf = Pdf::loadView('ketua.laporan-bulanan.pdf', [
+        $rekapData = app(\App\Services\RekapAbsensiService::class)->rekap($ekskul, $laporanBulanan->bulan);
+
+        $pdf = Pdf::loadView('ketua.laporan-bulanan.pdf', array_merge($rekapData, [
             'laporan' => $laporanBulanan,
             'kelas' => $kelas,
             'rutinKegiatans' => $rutinKegiatans,
             'eventKegiatans' => $eventKegiatans,
-        ]);
+        ]));
         $filename = 'laporan-'.str_replace('/', '-', $laporanBulanan->bulan).'-'.($ekskul->nama_ekskul ?? 'ekskul').'.pdf';
 
         return $pdf->download($filename);

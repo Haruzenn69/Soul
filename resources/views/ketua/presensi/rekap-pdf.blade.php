@@ -376,8 +376,7 @@
         <div class="header-border"></div>
 
         <!-- JUDUL PERTEMUAN -->
-        <div class="title" style="margin-bottom: 2px;">DAFTAR HADIR PERTEMUAN EKSTRAKURIKULER</div>
-        <div class="subtitle">Pertemuan Ke-{{ $kegiatanIndex + 1 }} &bull; {{ $ekskul->nama_ekskul }}</div>
+        <div class="title" style="margin-bottom: 12px;">DAFTAR HADIR PERTEMUAN EKSTRAKURIKULER {{ strtoupper($ekskul->nama_ekskul) }}</div>
 
         @php
             $waktuKegiatanIni = $waktuJadwal ?: '15:30 - 17:30 WIB';
@@ -388,34 +387,25 @@
             <tr>
                 <td style="width: 120px; font-weight: bold;">Hari, Tanggal</td>
                 <td style="width: 250px;">: {{ $kegiatan->tanggal_kegiatan ? $kegiatan->tanggal_kegiatan->translatedFormat('l, d F Y') : '-' }}</td>
-                <td style="width: 80px; font-weight: bold;">Waktu</td>
-                <td>: {{ $waktuKegiatanIni }}</td>
-            </tr>
-            <tr>
-                <td style="font-weight: bold;">Materi Kegiatan</td>
-                <td>: {{ $kegiatan->materi ?: '-' }}</td>
-                <td style="font-weight: bold;">Pelatih</td>
+                <td style="width: 80px; font-weight: bold;">Pelatih</td>
                 <td>: {{ $namaPelatih }}</td>
             </tr>
-            @if($kegiatan->deskripsi)
-                <tr>
-                    <td style="font-weight: bold;">Deskripsi</td>
-                    <td colspan="3">: {{ $kegiatan->deskripsi }}</td>
-                </tr>
-            @endif
+            <tr>
+                <td style="font-weight: bold;">Waktu Kegiatan</td>
+                <td colspan="3">: {{ $waktuKegiatanIni }}</td>
+            </tr>
         </table>
 
         <!-- TABEL HISTORY PRESENSI -->
         <table class="matrix">
             <thead>
                 <tr>
-                    <th style="width: 5%;">No</th>
-                    <th style="width: 14%;">NIS</th>
-                    <th style="width: 29%; text-align: center;">Nama Siswa</th>
-                    <th style="width: 12%;">Tanggal</th>
-                    <th style="width: 12%;">Waktu</th>
+                    <th style="width: 6%;">No</th>
+                    <th style="width: 16%;">NIS</th>
+                    <th style="width: 38%; text-align: center;">Nama Siswa</th>
+                    <th style="width: 14%;">Tanggal</th>
+                    <th style="width: 13%;">Waktu</th>
                     <th style="width: 13%;">Keterangan</th>
-                    <th style="width: 15%;">TTD</th>
                 </tr>
             </thead>
             <tbody>
@@ -431,12 +421,12 @@
                         $status = $row->sel[$kegiatan->id] ?? null;
                         $presensiItem = isset($presensis) ? $presensis->get($row->pendaftaran->id . '-' . $kegiatan->id) : null;
 
-                        $waktuItem = '-';
+                        $waktuItem = ($presensiItem && $presensiItem->created_at)
+                            ? $presensiItem->created_at->format('H:i') . ' WIB'
+                            : '-';
+
                         if ($status === 'hadir') {
                             $countHadir++;
-                            $waktuItem = ($presensiItem && $presensiItem->created_at)
-                                ? $presensiItem->created_at->format('H:i') . ' WIB'
-                                : ($waktuJadwal ?: '15:30 WIB');
                         } elseif ($status === 'sakit') {
                             $countSakit++;
                         } elseif ($status === 'izin') {
@@ -467,17 +457,10 @@
                                 <span style="color: #6b7280;">&ndash;</span>
                             @endif
                         </td>
-                        <td style="text-align: {{ $loop->iteration % 2 === 1 ? 'left' : 'right' }}; padding-left: 6px; padding-right: 6px; font-size: 8.5pt;">
-                            @if($status === 'hadir')
-                                {{ $loop->iteration }}. ....................
-                            @else
-                                <span style="color: #999; font-style: italic;">&ndash;</span>
-                            @endif
-                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" style="text-align: center;">Belum ada anggota pada pertemuan ini.</td>
+                        <td colspan="6" style="text-align: center;">Belum ada anggota pada pertemuan ini.</td>
                     </tr>
                 @endforelse
             </tbody>
