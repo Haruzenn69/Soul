@@ -248,6 +248,11 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 
     // 9. NILAI EKSKUL
     Route::get('/nilai', [SiswaNilaiController::class, 'index'])->name('nilai');
+
+    // 10. PUSAT BANTUAN
+    Route::get('/bantuan', function () {
+        return view('siswa.bantuan');
+    })->name('bantuan');
 });
 
 // ============================================================

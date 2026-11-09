@@ -125,6 +125,11 @@
                     </a>
                 @endif
 
+                <a href="{{ route('siswa.bantuan') }}" aria-label="Pusat Bantuan" title="Pusat Bantuan & Panduan Fitur Siswa"
+                   class="w-9 h-9 rounded-full {{ request()->routeIs('siswa.bantuan') ? 'bg-sky-500 text-white border-sky-500 shadow-lg shadow-sky-200 dark:shadow-sky-900' : 'bg-slate-50 dark:bg-neutral-800 border-slate-200/70 dark:border-neutral-700 text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-700 hover:text-sky-600 dark:hover:text-sky-400 hover:border-sky-300 dark:hover:border-sky-800' }} border flex items-center justify-center text-xs transition-all shadow-sm">
+                    <i class="fa-solid fa-circle-question text-sm"></i>
+                </a>
+
                 <a href="{{ route('siswa.notifikasi') }}" aria-label="Notifikasi" class="w-9 h-9 rounded-xl {{ request()->routeIs('siswa.notifikasi') ? 'bg-gradient-to-r from-sky-100 to-blue-100 dark:from-sky-950/30 dark:to-blue-950/30 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800' : 'bg-white dark:bg-neutral-800 text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-700 hover:border-sky-200 dark:hover:border-neutral-700' }} border border-sky-100 dark:border-neutral-700 flex items-center justify-center text-xs relative transition-all shadow-sm">
                     <i class="fa-regular fa-bell text-sm"></i>
                     @if(($unreadNotifCount ?? 0) > 0)
