@@ -4,33 +4,33 @@
     $filterOptions = $filterOptions ?? [];
     $defaultSize = $defaultSize ?? 10;
 @endphp
-<div class="px-4 md:px-6 py-3 bg-sky-50/40 border-b border-sky-100 flex flex-wrap items-center gap-2.5" id="{{ $tableId }}-tools">
+<div class="px-4 md:px-6 py-3 bg-sky-50/40 dark:bg-neutral-800/40 border-b border-sky-100 dark:border-neutral-800 flex flex-wrap items-center gap-2.5" id="{{ $tableId }}-tools">
     <div class="relative flex-1 min-w-[200px]">
-        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-neutral-500 pointer-events-none">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         </span>
         <input type="search" id="{{ $tableId }}-search" placeholder="Cari..." autocomplete="off"
-            class="w-full pl-9 pr-4 py-2 bg-white/70 border border-sky-100 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+            class="w-full pl-9 pr-4 py-2 bg-white/70 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-800 dark:text-neutral-100 placeholder-slate-400 dark:placeholder-neutral-500 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 dark:focus:border-neutral-600 focus:ring-4 focus:ring-sky-100 dark:focus:ring-neutral-700 transition-all">
     </div>
     @if($filterCols)
-        <select id="{{ $tableId }}-filter" class="px-3 py-2 bg-white/70 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+        <select id="{{ $tableId }}-filter" class="px-3 py-2 bg-white/70 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-neutral-200 focus:outline-none focus:border-sky-400 dark:focus:border-neutral-600 focus:ring-4 focus:ring-sky-100 dark:focus:ring-neutral-700 transition-all">
             <option value="">Semua Status</option>
             @foreach ($filterOptions as $value => $label)
                 <option value="{{ $value }}">{{ $label }}</option>
             @endforeach
         </select>
     @endif
-    <select id="{{ $tableId }}-size" class="px-3 py-2 bg-white/70 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+    <select id="{{ $tableId }}-size" class="px-3 py-2 bg-white/70 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-neutral-200 focus:outline-none focus:border-sky-400 dark:focus:border-neutral-600 focus:ring-4 focus:ring-sky-100 dark:focus:ring-neutral-700 transition-all">
         @foreach ([5, 10, 20, 50] as $optionSize)
             <option value="{{ $optionSize }}" @selected($optionSize === $defaultSize)>{{ $optionSize }}/hal</option>
         @endforeach
     </select>
-    <span id="{{ $tableId }}-info" class="text-[10px] md:text-xs text-slate-400 font-semibold"></span>
-    <span class="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cari · Filter · Sort</span>
+    <span id="{{ $tableId }}-info" class="text-[10px] md:text-xs text-slate-400 dark:text-neutral-500 font-semibold"></span>
+    <span class="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-slate-400 dark:text-neutral-500 uppercase tracking-wider">Cari · Filter · Sort</span>
     <div class="flex items-center gap-1 ml-auto">
-        <button type="button" id="{{ $tableId }}-prev" class="w-7 h-7 rounded-lg bg-white border border-sky-100 text-slate-500 hover:bg-sky-50 transition flex items-center justify-center text-xs font-bold" aria-label="Sebelumnya">&lsaquo;</button>
-        <span id="{{ $tableId }}-page" class="text-[10px] font-semibold text-slate-500 w-20 text-center"></span>
-        <button type="button" id="{{ $tableId }}-next" class="w-7 h-7 rounded-lg bg-white border border-sky-100 text-slate-500 hover:bg-sky-50 transition flex items-center justify-center text-xs font-bold" aria-label="Berikutnya">&rsaquo;</button>
+        <button type="button" id="{{ $tableId }}-prev" class="w-7 h-7 rounded-lg bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 text-slate-500 dark:text-neutral-400 hover:bg-sky-50 dark:hover:bg-neutral-700 transition flex items-center justify-center text-xs font-bold" aria-label="Sebelumnya">&lsaquo;</button>
+        <span id="{{ $tableId }}-page" class="text-[10px] font-semibold text-slate-500 dark:text-neutral-400 w-20 text-center"></span>
+        <button type="button" id="{{ $tableId }}-next" class="w-7 h-7 rounded-lg bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 text-slate-500 dark:text-neutral-400 hover:bg-sky-50 dark:hover:bg-neutral-700 transition flex items-center justify-center text-xs font-bold" aria-label="Berikutnya">&rsaquo;</button>
     </div>
 </div>
 

@@ -50,10 +50,10 @@
 
     <div class="overflow-x-auto">
         <table id="rekap-matriks-table" class="card-table w-full text-left text-xs md:text-sm min-w-max">
-            <thead class="bg-gradient-to-r from-sky-50 to-blue-50 dark:from-neutral-800 dark:to-neutral-800/90">
+            <thead class="bg-slate-50 dark:bg-neutral-800">
                 <tr>
-                    <th class="px-4 md:px-5 py-3 font-semibold text-slate-500 dark:text-neutral-400 sticky left-0 bg-sky-50 dark:bg-neutral-800 z-10" rowspan="2">No</th>
-                    <th data-sort-index="1" class="px-4 md:px-5 py-3 font-semibold text-slate-500 dark:text-neutral-400 sticky left-10 bg-sky-50 dark:bg-neutral-800 z-10 cursor-pointer select-none hover:text-slate-800 dark:hover:text-neutral-200 transition" rowspan="2" title="Klik untuk urutkan">Nama</th>
+                    <th class="px-4 md:px-5 py-3 font-semibold text-slate-500 dark:text-neutral-400 sticky left-0 bg-slate-50 dark:bg-neutral-800 z-10" rowspan="2">No</th>
+                    <th data-sort-index="1" class="px-4 md:px-5 py-3 font-semibold text-slate-500 dark:text-neutral-400 sticky left-10 bg-slate-50 dark:bg-neutral-800 z-10 cursor-pointer select-none hover:text-slate-800 dark:hover:text-neutral-200 transition" rowspan="2" title="Klik untuk urutkan">Nama</th>
                     <th colspan="{{ max($kegiatans->count(), 1) }}" class="px-3 py-3 font-semibold text-slate-500 dark:text-neutral-400 text-center">Pertemuan (tanggal &amp; materi)</th>
                     <th colspan="5" class="px-3 py-3 font-semibold text-slate-500 dark:text-neutral-400 text-center">Total</th>
                 </tr>
@@ -78,7 +78,7 @@
                         $anggota = $row->pendaftaran->siswa;
                         $persen = (float) $row->persentaseKehadiran;
                     @endphp
-                    <tr class="hover:bg-sky-50/50 dark:hover:bg-neutral-800/60 transition">
+                    <tr class="hover:bg-slate-50/60 dark:hover:bg-neutral-800/60 transition">
                         <td class="px-4 md:px-5 py-3 whitespace-nowrap sticky left-0 bg-white dark:bg-neutral-900 z-10 text-slate-700 dark:text-neutral-300">{{ $loop->iteration }}</td>
                         <td class="px-4 md:px-5 py-3 whitespace-nowrap sticky left-10 bg-white dark:bg-neutral-900 z-10">
                             <span class="font-bold text-slate-800 dark:text-neutral-100">{{ $anggota->nama }}</span>
