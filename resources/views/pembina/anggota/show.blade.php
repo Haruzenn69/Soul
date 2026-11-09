@@ -2,66 +2,116 @@
 @section('title', 'Detail Anggota')
 
 @section('content')
+@php
+    $isKetua = $pendaftaran->siswa?->jabatan === 'ketua';
+    $currentKetuaEkskul = $pendaftaran->ekskul?->ketua();
+    $isKetuaInThisEkskul = $isKetua && ($currentKetuaEkskul?->id === $pendaftaran->siswa_id);
+
+    if ($persentase >= 80) {
+        $statusKeaktifan = 'sangat_aktif';
+        $labelKeaktifan = 'Sangat Aktif';
+        $keaktifanBadgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800/50';
+    } elseif ($persentase >= 50) {
+        $statusKeaktifan = 'cukup_aktif';
+        $labelKeaktifan = 'Cukup Aktif';
+        $keaktifanBadgeClass = 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-800/50';
+    } elseif ($persentase > 0) {
+        $statusKeaktifan = 'kurang_aktif';
+        $labelKeaktifan = 'Kurang Aktif';
+        $keaktifanBadgeClass = 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800/50';
+    } else {
+        $statusKeaktifan = 'pasif';
+        $labelKeaktifan = 'Pasif';
+        $keaktifanBadgeClass = 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-neutral-800 dark:text-slate-400 dark:border-neutral-700';
+    }
+@endphp
+
 <div class="space-y-6 animate-fade-up">
     {{-- HEADER --}}
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">Detail Anggota</h1>
+            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Detail Anggota</h1>
             <p class="text-xs text-slate-400 mt-0.5">Profil lengkap dan riwayat keanggotaan.</p>
         </div>
-        <a href="{{ url()->previous() }}" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition self-start">Kembali</a>
+        <div class="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+            @if($isKetuaInThisEkskul)
+                <form action="{{ route('pembina.ekskul.copot-ketua', ['ekskul' => $pendaftaran->ekskul_id, 'siswa' => $pendaftaran->siswa_id]) }}" method="POST"
+                      onsubmit="return confirm('Copot jabatan Ketua Ekskul {{ $pendaftaran->ekskul->nama_ekskul }} dari {{ $pendaftaran->siswa->nama }}?')">
+                    @csrf
+                    <button type="submit"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/30 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 font-bold text-xs rounded-xl border border-rose-200 dark:border-rose-800/50 transition shadow-xs">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        <span>Copot Jabatan Ketua</span>
+                    </button>
+                </form>
+            @elseif(!$isKetua && $pendaftaran->status === 'diterima')
+                <form action="{{ route('pembina.ekskul.pilih-ketua', ['ekskul' => $pendaftaran->ekskul_id, 'siswa' => $pendaftaran->siswa_id]) }}" method="POST"
+                      onsubmit="return confirm('Jadikan {{ $pendaftaran->siswa->nama }} sebagai Ketua di ekskul {{ $pendaftaran->ekskul->nama_ekskul }}?{{ $currentKetuaEkskul ? ' (Ketua lama: ' . $currentKetuaEkskul->nama . ' akan diturunkan)' : '' }}')">
+                    @csrf
+                    <button type="submit"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/30 dark:hover:bg-amber-900/40 text-amber-700 dark:text-amber-400 font-bold text-xs rounded-xl border border-amber-300 dark:border-amber-800/50 transition shadow-xs">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M2 19l2-9 5 5 3-8 3 8 5-5 2 9H2z"/></svg>
+                        <span>Jadikan Ketua Ekskul</span>
+                    </button>
+                </form>
+            @endif
+            <a href="{{ route('pembina.anggota') }}" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-xl transition">Kembali</a>
+        </div>
     </div>
 
     {{-- PROFILE CARD --}}
-    <div class="bg-white p-6 rounded-3xl border border-sky-100 shadow-sm">
+    <div class="bg-white dark:bg-[#18181b] p-6 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-sm">
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 border-2 border-sky-200">
+            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-slate-100 dark:bg-neutral-800 flex items-center justify-center overflow-hidden shrink-0 border-2 border-sky-200 dark:border-sky-800">
                 @if($pendaftaran->siswa?->foto_url)
                     <img src="{{ $pendaftaran->siswa->foto_url }}" alt="{{ $pendaftaran->siswa->nama }}" class="w-full h-full object-cover">
                 @else
-                    <span class="text-2xl font-black text-sky-600">{{ strtoupper(substr($pendaftaran->siswa->nama ?? 'S', 0, 2)) }}</span>
+                    <span class="text-2xl font-black text-sky-600 dark:text-sky-400">{{ strtoupper(substr($pendaftaran->siswa->nama ?? 'S', 0, 2)) }}</span>
                 @endif
             </div>
 
             <div class="flex-1 min-w-0">
                 <div class="flex flex-wrap items-center gap-2 mb-2">
-                    <h2 class="text-xl font-extrabold text-slate-900 truncate">{{ $pendaftaran->siswa->nama ?? '-' }}</h2>
+                    <h2 class="text-xl font-extrabold text-slate-900 dark:text-white truncate">{{ $pendaftaran->siswa->nama ?? '-' }}</h2>
                     @if($pendaftaran->siswa?->jabatan === 'ketua')
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800/50">
                             <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M2 19l2-9 5 5 3-8 3 8 5-5 2 9H2z"/></svg> Ketua
                         </span>
                     @endif
                     @if($pendaftaran->status === 'peringatan')
-                        <span class="px-2.5 py-1 rounded-xl bg-orange-50 text-orange-700 font-bold text-[10px] border border-orange-200">Peringatan</span>
+                        <span class="px-2.5 py-1 rounded-xl bg-orange-50 text-orange-700 font-bold text-[10px] border border-orange-200 dark:bg-orange-950/30 dark:text-orange-300 dark:border-orange-800/50">Peringatan</span>
                     @elseif($pendaftaran->status === 'nonaktif')
-                        <span class="px-2.5 py-1 rounded-xl bg-slate-100 text-slate-500 font-bold text-[10px] border border-slate-200">Nonaktif</span>
+                        <span class="px-2.5 py-1 rounded-xl bg-slate-100 text-slate-500 font-bold text-[10px] border border-slate-200 dark:bg-neutral-800 dark:text-slate-400 dark:border-neutral-700">Nonaktif</span>
                     @elseif($pendaftaran->status === 'keluar')
-                        <span class="px-2.5 py-1 rounded-xl bg-rose-50 text-rose-600 font-bold text-[10px] border border-rose-200">Keluar</span>
+                        <span class="px-2.5 py-1 rounded-xl bg-rose-50 text-rose-600 font-bold text-[10px] border border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-800/50">Keluar</span>
                     @else
-                        <span class="px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 font-bold text-[10px] border border-emerald-200">Aktif</span>
+                        <span class="px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 font-bold text-[10px] border border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800/50">Aktif</span>
                     @endif
+                    <span class="px-2.5 py-1 rounded-xl font-bold text-[10px] border {{ $keaktifanBadgeClass }}">
+                        Keaktifan: {{ $labelKeaktifan }}
+                    </span>
                 </div>
 
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px]">
                     <div class="flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        <span class="text-slate-600 font-medium">NIS</span>
-                        <span class="ml-auto font-bold text-slate-900">{{ $pendaftaran->siswa->nis ?? '-' }}</span>
+                        <span class="text-slate-600 dark:text-slate-400 font-medium">NIS</span>
+                        <span class="ml-auto font-bold text-slate-900 dark:text-white">{{ $pendaftaran->siswa->nis ?? '-' }}</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        <span class="text-slate-600 font-medium">Kelas</span>
-                        <span class="ml-auto font-bold text-slate-900">{{ $pendaftaran->siswa->kelas->nama ?? '-' }}</span>
+                        <span class="text-slate-600 dark:text-slate-400 font-medium">Kelas</span>
+                        <span class="ml-auto font-bold text-slate-900 dark:text-white">{{ $pendaftaran->siswa->kelas->nama ?? '-' }}</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <span class="text-slate-600 font-medium">Bergabung</span>
-                        <span class="ml-auto font-bold text-slate-900">{{ \Carbon\Carbon::parse($pendaftaran->tanggal_daftar)->isoFormat('DD MMM Y') }}</span>
+                        <span class="text-slate-600 dark:text-slate-400 font-medium">Bergabung</span>
+                        <span class="ml-auto font-bold text-slate-900 dark:text-white">{{ \Carbon\Carbon::parse($pendaftaran->tanggal_daftar)->isoFormat('DD MMM Y') }}</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <span class="text-slate-600 font-medium">Kehadiran</span>
-                        <span class="ml-auto font-bold text-slate-900">{{ $persentase }}%</span>
+                        <span class="text-slate-600 dark:text-slate-400 font-medium">Kehadiran</span>
+                        <span class="ml-auto font-bold text-slate-900 dark:text-white">{{ $persentase }}%</span>
                     </div>
                 </div>
             </div>

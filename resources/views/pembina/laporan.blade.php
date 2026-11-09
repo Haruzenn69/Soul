@@ -20,7 +20,7 @@
 
             {{-- Search & Filter Bar --}}
             <div class="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
-                <form method="GET" action="{{ route('pembina.laporan') }}" id="laporan-filter-form">
+                <form method="GET" action="{{ route('pembina.laporan.index') }}" id="laporan-filter-form">
                     <div class="p-4 flex flex-col sm:flex-row gap-3">
                         {{-- Search --}}
                         <div class="relative flex-1">
@@ -75,7 +75,7 @@
                                 Cari
                             </button>
                             @if(request('cari') || request('status') || request('ekskul'))
-                                <a href="{{ route('pembina.laporan') }}"
+                                <a href="{{ route('pembina.laporan.index') }}"
                                     class="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold rounded-2xl border border-slate-200 transition">
                                     Reset
                                 </a>
@@ -135,7 +135,7 @@
                     <p class="text-sm font-medium">
                         @if(request('cari') || request('status') || request('ekskul'))
                             Tidak ada laporan yang sesuai filter.
-                            <a href="{{ route('pembina.laporan') }}" class="text-sky-500 hover:underline text-xs block mt-1">Reset filter</a>
+                            <a href="{{ route('pembina.laporan.index') }}" class="text-sky-500 hover:underline text-xs block mt-1">Reset filter</a>
                         @else
                             Belum ada laporan bulanan dari ketua ekskul.
                         @endif

@@ -179,116 +179,271 @@ html.dark-mode :is([class~="text-violet-600"], [class~="text-violet-700"], [clas
     color: #d8b4fe !important;
 }
 
-html.dark-mode .ps-pill {
+:is(html.dark-mode, html.dark) .ps-pill {
     background: rgb(23 23 23 / .98);
     border-color: #3a3a3a;
     box-shadow: 0 10px 40px -16px rgb(0 0 0 / .7), inset 0 1px 0 rgb(163 163 163 / .08);
 }
 
-html.dark-mode .ps-logo:hover {
+:is(html.dark-mode, html.dark) .ps-logo:hover {
     background: rgb(48 48 48 / .72);
 }
 
-html.dark-mode .ps-logo-txt strong {
+:is(html.dark-mode, html.dark) .ps-logo-box {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .4);
+}
+
+:is(html.dark-mode, html.dark) .ps-logo-txt strong {
     color: #e2e8f0;
 }
 
-html.dark-mode .ps-logo-txt small {
+:is(html.dark-mode, html.dark) .ps-logo-txt small {
     color: #94a3b8;
 }
 
-html.dark-mode .ps-blob-1 { background: rgb(115 115 115 / .12); }
-html.dark-mode .ps-blob-2 { background: rgb(163 163 163 / .08); }
+:is(html.dark-mode, html.dark) .ps-blob-1 { background: rgb(115 115 115 / .12); }
+:is(html.dark-mode, html.dark) .ps-blob-2 { background: rgb(163 163 163 / .08); }
 
-html.dark-mode .ps-item:hover,
-html.dark-mode .ps-submenu a:hover,
-html.dark-mode .ps-menu a:hover,
-html.dark-mode .ps-menu button:hover {
-    background: #303030;
+:is(html.dark-mode, html.dark) .ps-item:hover,
+:is(html.dark-mode, html.dark) .ps-submenu a:hover,
+:is(html.dark-mode, html.dark) .ps-menu a:hover,
+:is(html.dark-mode, html.dark) .ps-menu button:hover {
+    background: #2a2a2a;
     color: #e0f2fe;
 }
 
-html.dark-mode .ps-item:not(.ps-active),
-html.dark-mode .ps-submenu a:not(.ps-active),
-html.dark-mode .ps-menu a:not(.ps-active),
-html.dark-mode .ps-section-lbl,
-html.dark-mode .ps-section-sub {
+:is(html.dark-mode, html.dark) .ps-item:not(.ps-active),
+:is(html.dark-mode, html.dark) .ps-submenu a:not(.ps-active),
+:is(html.dark-mode, html.dark) .ps-menu a:not(.ps-active),
+:is(html.dark-mode, html.dark) .ps-section-lbl,
+:is(html.dark-mode, html.dark) .ps-section-sub {
     color: #cbd5e1;
 }
 
-html.dark-mode .ps-item.ps-active,
-html.dark-mode .ps-item[aria-current="page"],
-html.dark-mode .ps-submenu a.ps-active,
-html.dark-mode .ps-menu .ps-active {
-    background: #262626 !important;
-    border-left: 3px solid #38bdf8 !important;
-    color: #f8fafc !important;
-    box-shadow: 0 1px 2px rgb(0 0 0 / .3) !important;
+/* Expanded active item in dark mode */
+:is(html.dark-mode, html.dark) .ps-item.ps-active,
+:is(html.dark-mode, html.dark) .ps-item[aria-current="page"],
+:is(html.dark-mode, html.dark) .ps-submenu a.ps-active,
+:is(html.dark-mode, html.dark) .ps-menu .ps-active {
+    background: rgba(56, 189, 248, 0.12) !important;
+    border-left: none !important;
+    color: #38bdf8 !important;
+    box-shadow: 0 1px 3px rgb(0 0 0 / .3) !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-item.ps-active svg,
+:is(html.dark-mode, html.dark) .ps-item[aria-current="page"] svg {
+    color: #38bdf8 !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-bar {
+    background: #38bdf8 !important;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.6) !important;
+}
+
+/* Collapsed active item in dark mode - beautifully centered & balanced */
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-item.ps-active,
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-item[aria-current="page"],
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-group[open] summary {
+    background: rgba(56, 189, 248, 0.16) !important;
+    border: 1px solid rgba(56, 189, 248, 0.45) !important;
+    border-left: 1px solid rgba(56, 189, 248, 0.45) !important;
+    color: #38bdf8 !important;
+    box-shadow: 0 0 14px -2px rgba(56, 189, 248, 0.3) !important;
+    border-radius: 12px !important;
+}
+
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-item.ps-active svg,
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-item[aria-current="page"] svg,
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-group[open] summary svg {
+    color: #38bdf8 !important;
+}
+
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-item:not(.ps-active):hover,
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-group summary:hover,
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-gear summary:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #f1f5f9 !important;
+    border-radius: 12px !important;
+}
+
+/* Sub-menu (accordion level 2) in expanded dark mode */
+:is(html.dark-mode, html.dark) .ps-submenu {
+    border-left: 1px solid #3f3f46 !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-submenu a {
+    color: #94a3b8 !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-submenu a:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #f1f5f9 !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-submenu a.ps-active,
+:is(html.dark-mode, html.dark) .ps-submenu a[aria-current="page"] {
+    background: rgba(56, 189, 248, 0.15) !important;
+    color: #38bdf8 !important;
+}
+
+/* Sub-group (level 2 dropdown like 'Data Anggota') in dark mode */
+:is(html.dark-mode, html.dark) .ps-submenu details.ps-subgroup summary {
+    color: #94a3b8 !important;
+    background: transparent !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-submenu details.ps-subgroup summary:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #f1f5f9 !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-submenu details.ps-subgroup[open] summary,
+:is(html.dark-mode, html.dark) .ps-submenu details.ps-subgroup summary.ps-active {
+    background: rgba(56, 189, 248, 0.12) !important;
+    color: #38bdf8 !important;
+    border: 1px solid rgba(56, 189, 248, 0.25) !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-submenu details.ps-subgroup summary svg {
+    color: currentColor !important;
+}
+
+/* Level 3: sub-sub-menu (e.g. Futsal, Bola Basket) */
+:is(html.dark-mode, html.dark) .ps-submenu3 {
+    border-left: 1px dashed #3f3f46 !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-submenu3 a {
+    color: #94a3b8 !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-submenu3 a:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #f1f5f9 !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-submenu3 a.ps-active,
+:is(html.dark-mode, html.dark) .ps-submenu3 a[aria-current="page"] {
+    background: rgba(56, 189, 248, 0.15) !important;
+    color: #38bdf8 !important;
+    border: 1px solid rgba(56, 189, 248, 0.2) !important;
 }
 
 /* Collapsed pill-sidebar flyouts are rendered outside the rail surface. */
-html.dark-mode .ps-submenu {
-    border-left-color: #525252;
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-group .ps-submenu {
+    background: rgba(24, 24, 27, 0.98) !important;
+    border-color: #3f3f46 !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 20px 40px -12px rgb(0 0 0 / .8), 0 2px 14px -6px rgb(0 0 0 / .5) !important;
 }
 
-html.dark-mode body.ps-collapsed .ps-group .ps-submenu {
-    background: rgb(23 23 23 / .98);
-    border-color: #3a3a3a;
-    box-shadow: 0 18px 40px -12px rgb(0 0 0 / .7), 0 2px 14px -6px rgb(0 0 0 / .45);
-}
-
-html.dark-mode body.ps-collapsed .ps-group[open] summary {
-    background: #262626 !important;
-    border-left: 3px solid #38bdf8 !important;
-    color: #f8fafc !important;
-    box-shadow: 0 1px 2px rgb(0 0 0 / .3) !important;
-}
-
-html.dark-mode body.ps-collapsed .ps-group .ps-submenu::before {
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-group .ps-submenu::before {
     color: #94a3b8;
 }
 
-html.dark-mode .ps-user {
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-group .ps-submenu a {
+    color: #cbd5e1 !important;
+}
+
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-group .ps-submenu a:hover,
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-group .ps-submenu a.ps-active {
+    background: rgba(56, 189, 248, 0.15) !important;
+    color: #38bdf8 !important;
+    border-left: none !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-user {
     background: #202020;
     border-color: #3a3a3a;
     box-shadow: 0 1px 3px rgb(0 0 0 / .45), inset 0 1px 0 rgb(163 163 163 / .06);
 }
 
-html.dark-mode body.ps-collapsed .ps-user {
+:is(html.dark-mode, html.dark) body.ps-collapsed .ps-user {
     background: transparent !important;
     border-color: transparent !important;
     box-shadow: none !important;
 }
 
-html.dark-mode .ps-user-txt strong { color: #e2e8f0; }
-html.dark-mode .ps-user-txt small { color: #a8b6c9; }
-html.dark-mode .ps-user-link:hover { background: #303030; }
-html.dark-mode .ps-dot { box-shadow: 0 0 0 2px #202020, 0 2px 6px rgb(245 158 11 / .5); }
-html.dark-mode .ps-toggle { background: #202020; border-color: #3a3a3a; color: #cbd5e1; }
-html.dark-mode .ps-menu { background: #171717; border-color: #3a3a3a; }
-html.dark-mode .ps-menu hr { border-color: #3a3a3a; }
-html.dark-mode .ps-tip {
-    background: rgb(23 23 23 / .98);
-    border-color: #3a3a3a;
-    color: #e2e8f0;
-    box-shadow: 0 18px 40px -12px rgb(0 0 0 / .7), 0 2px 14px -6px rgb(0 0 0 / .45);
+:is(html.dark-mode, html.dark) .ps-user-txt strong { color: #e2e8f0; }
+:is(html.dark-mode, html.dark) .ps-user-txt small { color: #a8b6c9; }
+:is(html.dark-mode, html.dark) .ps-user-link:hover { background: #303030; }
+
+:is(html.dark-mode, html.dark) .ps-dot {
+    box-shadow: 0 0 0 2px #18181b, 0 2px 6px rgb(245 158 11 / .6) !important;
 }
 
-html.dark-mode .ps-nav-main {
+:is(html.dark-mode, html.dark) .ps-toggle {
+    background: #1e293b !important;
+    border-color: #3f3f46 !important;
+    color: #94a3b8 !important;
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, .5) !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-toggle:hover {
+    background: #0f172a !important;
+    border-color: #38bdf8 !important;
+    color: #38bdf8 !important;
+    box-shadow: 0 0 12px rgba(56, 189, 248, .35) !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-menu {
+    background: rgba(24, 24, 27, 0.98) !important;
+    border: 1px solid #3f3f46 !important;
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, .85) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+:is(html.dark-mode, html.dark) .ps-menu a,
+:is(html.dark-mode, html.dark) .ps-menu button {
+    color: #cbd5e1 !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-menu a:hover,
+:is(html.dark-mode, html.dark) .ps-menu button:hover {
+    background: rgba(56, 189, 248, 0.15) !important;
+    color: #38bdf8 !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-menu hr {
+    border-top: 1px solid #3f3f46 !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-menu .ps-danger {
+    color: #f87171 !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-menu .ps-danger:hover {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #f87171 !important;
+}
+
+:is(html.dark-mode, html.dark) .ps-tip {
+    background: rgba(24, 24, 27, 0.98) !important;
+    border: 1px solid #3f3f46 !important;
+    color: #f8fafc !important;
+    box-shadow: 0 12px 30px -6px rgba(0, 0, 0, .8) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+:is(html.dark-mode, html.dark) .ps-nav-main {
     scrollbar-color: #525252 #171717;
 }
 
-html.dark-mode .ps-nav-main::-webkit-scrollbar {
+:is(html.dark-mode, html.dark) .ps-nav-main::-webkit-scrollbar {
     width: 5px;
     background: #171717;
 }
 
-html.dark-mode .ps-nav-main::-webkit-scrollbar-thumb {
+:is(html.dark-mode, html.dark) .ps-nav-main::-webkit-scrollbar-thumb {
     background: #525252;
     border-radius: 999px;
 }
 
-html.dark-mode .ps-nav-main::-webkit-scrollbar-thumb:hover {
+:is(html.dark-mode, html.dark) .ps-nav-main::-webkit-scrollbar-thumb:hover {
     background: #737373;
 }
 
@@ -605,10 +760,10 @@ html.dark-mode :is([class~="bg-red-50"], [class~="bg-rose-50"]) {
     border-color: #713642 !important;
 }
 
-html.dark-mode .ps-avatar {
+:is(html.dark-mode, html.dark) .ps-avatar {
     background: linear-gradient(135deg, #facc15, #eab308);
     color: #422006;
-    box-shadow: 0 4px 10px rgb(234 179 8 / .32);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .4);
 }
 
 html.dark-mode :is(
@@ -968,30 +1123,60 @@ html.dark-mode .divide-y > :not([hidden]) ~ :not([hidden]) {
 
 /* Canonical dark table treatment. Accent text on individual cells remains
    untouched, while all table surfaces and separators share one baseline. */
-html.dark-mode table {
+html.dark-mode table,
+html.dark table {
     color: #cbd5e1;
 }
 
 html.dark-mode table thead,
 html.dark-mode table thead tr,
-html.dark-mode table thead th {
+html.dark-mode table thead th,
+html.dark table thead,
+html.dark table thead tr,
+html.dark table thead th {
+    background-color: #262626 !important;
+    background-image: none !important;
+    color: #94a3b8 !important;
+}
+
+html.dark-mode table th,
+html.dark table th {
+    border-color: #333333 !important;
+}
+
+html.dark-mode table td,
+html.dark table td {
+    border-color: #333333 !important;
+    background-color: transparent;
+}
+
+html.dark-mode table tbody tr,
+html.dark table tbody tr {
+    border-color: #333333 !important;
+    background-color: #202020 !important;
+}
+
+html.dark-mode table tbody tr:hover,
+html.dark table tbody tr:hover {
+    background-color: #2a2a2a !important;
+}
+
+/* Sticky matrix columns must follow the exact same surface on normal & hover */
+html.dark-mode table thead th.sticky,
+html.dark table thead th.sticky {
     background-color: #262626 !important;
     background-image: none !important;
 }
 
-html.dark-mode table th {
-    border-color: #3a3a3a !important;
+html.dark-mode table tbody td.sticky,
+html.dark-mode table tbody tr td.sticky,
+html.dark table tbody td.sticky,
+html.dark table tbody tr td.sticky {
+    background-color: #202020 !important;
 }
 
-html.dark-mode table td {
-    border-color: #3a3a3a !important;
-}
-
-html.dark-mode table tbody tr {
-    border-color: #3a3a3a !important;
-}
-
-html.dark-mode table tbody tr:hover {
+html.dark-mode table tbody tr:hover td.sticky,
+html.dark table tbody tr:hover td.sticky {
     background-color: #2a2a2a !important;
 }
 
@@ -1386,10 +1571,23 @@ html.dark-mode #soul-theme-toggle {
 #soul-theme-toggle:hover { transform: translateY(-2px); }
 #soul-theme-toggle svg { width: 18px; height: 18px; }
 
-/* Sticky matrix columns must follow the same dark header surface. */
-html.dark-mode table thead th.sticky {
+/* Sticky matrix columns must follow the same dark header & body surface. */
+html.dark-mode table thead th.sticky,
+html.dark table thead th.sticky {
     background-color: #262626 !important;
     background-image: none !important;
+}
+
+html.dark-mode table tbody td.sticky,
+html.dark-mode table tbody tr td.sticky,
+html.dark table tbody td.sticky,
+html.dark table tbody tr td.sticky {
+    background-color: #202020 !important;
+}
+
+html.dark-mode table tbody tr:hover td.sticky,
+html.dark table tbody tr:hover td.sticky {
+    background-color: #2a2a2a !important;
 }
 
 /* ==========================================================================
@@ -1805,13 +2003,13 @@ html.dark-mode :is(
     [class*="bg-blue-"],
     [class*="bg-indigo-"],
     [class*="bg-cyan-"]
-),
+):not([class*="hover:"]):not([class*="focus:"]):not([class*="group-hover:"]):not([class*="dark:"]):not(tr):not(tbody):not(table),
 html.dark :is(
     [class*="bg-sky-"],
     [class*="bg-blue-"],
     [class*="bg-indigo-"],
     [class*="bg-cyan-"]
-) {
+):not([class*="hover:"]):not([class*="focus:"]):not([class*="group-hover:"]):not([class*="dark:"]):not(tr):not(tbody):not(table) {
     background-color: #262626 !important;
 }
 
@@ -1825,7 +2023,7 @@ html.dark-mode :is(
     [class*="bg-indigo-100"],
     [class*="bg-cyan-50"],
     [class*="bg-cyan-100"]
-),
+):not([class*="hover:"]):not([class*="focus:"]):not([class*="group-hover:"]):not([class*="dark:"]):not(tr):not(tbody):not(table),
 html.dark :is(
     [class*="bg-sky-50"],
     [class*="bg-sky-100"],
@@ -1835,7 +2033,7 @@ html.dark :is(
     [class*="bg-indigo-100"],
     [class*="bg-cyan-50"],
     [class*="bg-cyan-100"]
-) {
+):not([class*="hover:"]):not([class*="focus:"]):not([class*="group-hover:"]):not([class*="dark:"]):not(tr):not(tbody):not(table) {
     background-color: #2e2e2e !important;
 }
 

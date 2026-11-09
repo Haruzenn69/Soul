@@ -125,7 +125,7 @@
     .ps-toggle {
         position: absolute;
         top: 22px;
-        right: -16px;
+        right: -13px;
         z-index: 60;
         width: 26px;
         height: 26px;
@@ -190,13 +190,13 @@
     .ps-logo-box .ps-logo-img-light { display: block; }
     .ps-logo-box .ps-logo-img-dark  { display: none;  }
     /* Dark mode: balik keduanya */
-    html.dark .ps-logo-box .ps-logo-img-light { display: none;  }
-    html.dark .ps-logo-box .ps-logo-img-dark  { display: block; }
+    :is(html.dark-mode, html.dark) .ps-logo-box .ps-logo-img-light { display: none;  }
+    :is(html.dark-mode, html.dark) .ps-logo-box .ps-logo-img-dark  { display: block; }
     .ps-logo-txt { text-align: left; min-width: 0; }
     .ps-logo-txt strong { font-size: 13px; font-weight: 800; color: #0f172a; display: block; line-height: 1.2; letter-spacing: .01em; }
     .ps-logo-txt small { font-size: 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
     body.ps-collapsed .ps-logo-txt { display: none; }
-    html.dark .ps-logo-txt strong { color: #f1f5f9; }
+    :is(html.dark-mode, html.dark) .ps-logo-txt strong { color: #f1f5f9; }
 
     .ps-section {
         display: flex;
@@ -223,7 +223,12 @@
     body.ps-collapsed .ps-nav-main {
         overflow-y: auto;
         overflow-x: visible;
-        padding-right: 4px;
+        padding-right: 0;
+        scrollbar-gutter: auto;
+        scrollbar-width: none;       /* Firefox: sembunyikan scrollbar */
+    }
+    body.ps-collapsed .ps-nav-main::-webkit-scrollbar {
+        display: none;               /* Chrome/Safari: sembunyikan scrollbar */
     }
 
     .ps-group { position: relative; }
@@ -423,14 +428,19 @@
     body.ps-collapsed .ps-item {
         justify-content: center;
         gap: 0;
-        height: 36px;
-        min-height: 36px;
+        height: 38px;
+        min-height: 38px;
         padding: 0;
+        border-radius: 12px;
     }
     body.ps-collapsed .ps-item:hover { transform: none; }
     body.ps-collapsed .ps-item .ps-bar { display: none; }
     body.ps-collapsed .ps-item .ps-lb { display: none; }
     body.ps-collapsed .ps-nav { gap: 6px; }
+    body.ps-collapsed .ps-dot {
+        top: 6px;
+        right: calc(50% - 9px);
+    }
 
     .ps-tip {
         position: absolute;
@@ -799,7 +809,7 @@
 
         <div class="ps-section" aria-hidden="true">
             <span class="ps-section-lbl">Menu utama</span>
-            <span class="ps-section-sub">{{ strtoupper($psTitle ?? '') }}</span>
+            <span class="ps-section-sub">{{ strtoupper($psRole ?? ($psTitle ?? '')) }}</span>
         </div>
 
         <nav class="ps-nav ps-nav-main" aria-label="Menu utama">

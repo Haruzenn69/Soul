@@ -271,40 +271,37 @@
     </div>
 
     {{-- TABEL ANGGOTA --}}
-    <div id="tabel-anggota" class="bg-white p-6 rounded-3xl border border-sky-100 shadow-sm animate-fade-up">
+    <div id="tabel-anggota" class="bg-white dark:bg-neutral-900 p-6 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-sm animate-fade-up">
         <div class="flex flex-wrap justify-between items-center gap-2 mb-5">
             <div>
-                <h3 class="text-sm font-extrabold text-slate-900">
+                <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">
                     Daftar Anggota
                     @if($selectedEkskul && $ekskuls->firstWhere('id', $selectedEkskul))
-                        <span class="ml-2 text-xs font-bold px-2 py-0.5 rounded-lg bg-sky-100 text-sky-700">{{ $ekskuls->firstWhere('id', $selectedEkskul)->nama_ekskul }}</span>
+                        <span class="ml-2 text-xs font-bold px-2 py-0.5 rounded-lg bg-sky-100 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/50">{{ $ekskuls->firstWhere('id', $selectedEkskul)->nama_ekskul }}</span>
                     @else
-                        <span class="ml-2 text-xs font-semibold text-slate-400">Semua Ekskul</span>
+                        <span class="ml-2 text-xs font-semibold text-slate-400 dark:text-neutral-500">Semua Ekskul</span>
                     @endif
                 </h3>
-                <p class="text-xs text-slate-400 mt-0.5">Siswa biasa dapat diangkat menjadi Ketua Ekskul untuk membantu presensi dan kegiatan.</p>
+                <p class="text-xs text-slate-400 dark:text-neutral-400 mt-0.5">Siswa biasa dapat diangkat menjadi Ketua Ekskul untuk membantu presensi dan kegiatan.</p>
             </div>
-            <span class="text-xs font-bold px-3 py-1 bg-slate-100 text-slate-600 rounded-xl">Total {{ count($anggota) }} Anggota</span>
+            <span class="text-xs font-bold px-3 py-1 bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 rounded-xl">Total {{ count($anggota) }} Anggota</span>
         </div>
 
         @if(count($anggota) > 0)
             <div class="overflow-x-auto">
                 <table class="card-table w-full text-xs">
                     <thead>
-                        <tr class="bg-slate-50 text-slate-500 border-b border-slate-100">
+                        <tr class="bg-slate-50 dark:bg-neutral-800 text-slate-500 dark:text-neutral-400 border-b border-slate-100 dark:border-neutral-800">
                             <th class="p-3.5 font-bold rounded-l-2xl text-left">No</th>
                             <th class="p-3.5 font-bold text-left">Identitas Siswa</th>
                             <th class="p-3.5 font-bold text-left">Kelas</th>
-                            @if($ekskuls->count() > 1)<th class="p-3.5 font-bold text-left">Ekskul</th>@endif
+                            @if(!$selectedEkskul && $ekskuls->count() > 1)<th class="p-3.5 font-bold text-left">Ekskul</th>@endif
                             <th class="p-3.5 font-bold text-left">Jabatan</th>
-                            <th class="p-3.5 font-bold text-left">Bergabung</th>
                             <th class="p-3.5 font-bold text-left">Kehadiran</th>
-                            <th class="p-3.5 font-bold text-left">Keaktifan</th>
-                            <th class="p-3.5 font-bold text-left">Status</th>
-                            <th class="p-3.5 font-bold text-center rounded-r-2xl">Aksi</th>
+                            <th class="p-3.5 font-bold text-center rounded-r-2xl">Status</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100 dark:divide-neutral-800">
                         @foreach($anggota as $key => $item)
                         @php
                             $isKetua = $item->siswa?->jabatan === 'ketua';
@@ -314,11 +311,11 @@
                             $labelKeaktifan = $item->label_keaktifan ?? 'Belum Ada Presensi';
                             $statusKeaktifan = $item->status_keaktifan ?? 'pasif';
                         @endphp
-                        <tr class="hover:bg-sky-50/40 transition">
-                            <td class="p-3.5 text-slate-400 font-semibold">{{ $key + 1 }}</td>
+                        <tr class="hover:bg-slate-50/60 dark:hover:bg-neutral-800/60 transition">
+                            <td class="p-3.5 text-slate-400 dark:text-neutral-400 font-semibold">{{ $key + 1 }}</td>
                             <td class="p-3.5">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-xl overflow-hidden shrink-0 flex items-center justify-center font-bold text-xs {{ $isKetuaInThisEkskul ? 'bg-amber-100 text-amber-800 border-2 border-amber-300' : 'bg-slate-100 text-slate-600' }}">
+                                <a href="{{ route('pembina.anggota.show', $item) }}" class="flex items-center gap-3 group">
+                                    <div class="w-9 h-9 rounded-xl overflow-hidden shrink-0 flex items-center justify-center font-bold text-xs group-hover:ring-2 group-hover:ring-sky-400 transition {{ $isKetuaInThisEkskul ? 'bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 border-2 border-amber-300 dark:border-amber-800/60' : 'bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400' }}">
                                         @if($item->siswa?->foto_url)
                                             <img src="{{ $item->siswa->foto_url }}" alt="{{ $item->siswa->nama }}" class="w-full h-full object-cover">
                                         @else
@@ -326,98 +323,53 @@
                                         @endif
                                     </div>
                                     <div>
-                                        <a href="{{ route('pembina.anggota.show', $item) }}" class="font-extrabold text-slate-900 hover:text-sky-600 block transition">{{ $item->siswa->nama ?? '-' }}</a>
-                                        <span class="text-[11px] text-slate-400">NIS: {{ $item->siswa->nis ?? '-' }}</span>
+                                        <span class="font-extrabold text-slate-900 dark:text-neutral-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 block transition">{{ $item->siswa->nama ?? '-' }}</span>
+                                        <span class="text-[11px] text-slate-400 dark:text-neutral-500">NIS: {{ $item->siswa->nis ?? '-' }}</span>
                                     </div>
-                                </div>
+                                </a>
                             </td>
-                            <td class="p-3.5 font-semibold text-slate-700">{{ $item->siswa->kelas->nama ?? '-' }}</td>
-                            @if($ekskuls->count() > 1)
+                            <td class="p-3.5 font-semibold text-slate-700 dark:text-neutral-300">{{ $item->siswa->kelas->nama ?? '-' }}</td>
+                            @if(!$selectedEkskul && $ekskuls->count() > 1)
                                 <td class="p-3.5">
-                                    <span class="px-2.5 py-1 rounded-xl bg-sky-50 text-sky-700 font-semibold text-[11px] border border-sky-100">
+                                    <span class="px-2.5 py-1 rounded-xl bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-semibold text-[11px] border border-sky-100 dark:border-sky-800/50">
                                         {{ $item->ekskul->nama_ekskul ?? '-' }}
                                     </span>
                                 </td>
                             @endif
                             <td class="p-3.5">
                                 @if($isKetuaInThisEkskul)
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-xl text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300 shadow-xs">
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-xl text-[11px] font-bold bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-800/50 shadow-xs">
                                         <svg class="w-3 h-3 inline-block" viewBox="0 0 24 24" fill="currentColor"><path d="M2 19l2-9 5 5 3-8 3 8 5-5 2 9H2z"/></svg> Ketua
                                     </span>
                                 @elseif($isKetua)
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-xl text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200">Ketua Lain</span>
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-xl text-[11px] font-bold bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-400 border border-purple-200 dark:border-purple-800/50">Ketua Lain</span>
                                 @else
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-xl text-[11px] font-bold bg-slate-100 text-slate-600">Anggota</span>
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-xl text-[11px] font-bold bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400">Anggota</span>
                                 @endif
-                            </td>
-                            <td class="p-3.5 text-slate-400 font-medium">
-                                {{ \Carbon\Carbon::parse($item->tanggal_daftar)->isoFormat('DD MMM Y') }}
                             </td>
                             {{-- Kehadiran % --}}
                             <td class="p-3.5">
                                 <div class="flex items-center gap-2 min-w-[80px]">
-                                    <div class="flex-1 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                    <div class="flex-1 bg-slate-100 dark:bg-neutral-800 rounded-full h-1.5 overflow-hidden">
                                         <div class="h-full rounded-full transition-all
                                             {{ $pct >= 80 ? 'bg-emerald-400' : ($pct >= 50 ? 'bg-amber-400' : 'bg-rose-400') }}"
                                             style="width: {{ $pct }}%">
                                         </div>
                                     </div>
-                                    <span class="text-[11px] font-bold {{ $pct >= 80 ? 'text-emerald-600' : ($pct >= 50 ? 'text-amber-600' : 'text-rose-500') }} shrink-0">{{ $pct }}%</span>
+                                    <span class="text-[11px] font-bold {{ $pct >= 80 ? 'text-emerald-600 dark:text-emerald-400' : ($pct >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-500 dark:text-rose-400') }} shrink-0">{{ $pct }}%</span>
                                 </div>
-                            </td>
-                            {{-- Status Keaktifan --}}
-                            <td class="p-3.5">
-                                @if($statusKeaktifan === 'sangat_aktif')
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Sangat Aktif</span>
-                                @elseif($statusKeaktifan === 'cukup_aktif')
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">Cukup Aktif</span>
-                                @elseif($statusKeaktifan === 'kurang_aktif')
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Kurang Aktif</span>
-                                @else
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">Pasif</span>
-                                @endif
                             </td>
                             {{-- Status Keanggotaan --}}
-                            <td class="p-3.5">
-                                @if($item->status === 'diterima')
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Aktif</span>
-                                @elseif($item->status === 'peringatan')
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-orange-50 text-orange-700 border border-orange-200">Peringatan</span>
-                                @elseif($item->status === 'nonaktif')
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">Nonaktif</span>
-                                @else
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-200">Keluar</span>
-                                @endif
-                            </td>
-                            {{-- Aksi --}}
                             <td class="p-3.5 text-center">
-                                <div class="flex flex-wrap gap-2 justify-center">
-                                    <a href="{{ route('pembina.anggota.show', $item) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-600 font-bold text-[11px] rounded-xl border border-sky-200 transition">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                        Detail
-                                    </a>
-                                    @if($isKetuaInThisEkskul)
-                                        <form action="{{ route('pembina.ekskul.copot-ketua', ['ekskul' => $item->ekskul_id, 'siswa' => $item->siswa_id]) }}" method="POST"
-                                              onsubmit="return confirm('Copot jabatan Ketua Ekskul {{ $item->ekskul->nama_ekskul }} dari {{ $item->siswa->nama }}?')">
-                                            @csrf
-                                            <button type="submit"
-                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[11px] rounded-xl border border-rose-200 transition">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                                <span>Copot</span>
-                                            </button>
-                                        </form>
-                                    @elseif(!$isKetua && $item->status === 'diterima')
-                                        <form action="{{ route('pembina.ekskul.pilih-ketua', ['ekskul' => $item->ekskul_id, 'siswa' => $item->siswa_id]) }}" method="POST"
-                                              onsubmit="return confirm('Jadikan {{ $item->siswa->nama }} sebagai Ketua di ekskul {{ $item->ekskul->nama_ekskul }}?{{ $currentKetuaEkskul ? ' (Ketua lama: ' . $currentKetuaEkskul->nama . ' akan diturunkan)' : '' }}')">
-                                            @csrf
-                                            <button type="submit"
-                                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-[11px] rounded-xl border border-amber-300 transition shadow-xs">
-                                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M2 19l2-9 5 5 3-8 3 8 5-5 2 9H2z"/></svg>
-                                                <span>Jadikan Ketua</span>
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
+                                @if($item->status === 'diterima')
+                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">Aktif</span>
+                                @elseif($item->status === 'peringatan')
+                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800/60">Peringatan</span>
+                                @elseif($item->status === 'nonaktif')
+                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-neutral-800 text-slate-500 dark:text-neutral-400 border border-slate-200 dark:border-neutral-700">Nonaktif</span>
+                                @else
+                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60">Keluar</span>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
