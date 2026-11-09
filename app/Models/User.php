@@ -29,6 +29,11 @@ class User extends Authenticatable
         return $this->hasOne(Pembina::class);
     }
 
+    public function getFotoUrlAttribute(): string
+    {
+        return $this->siswa?->foto_url ?? $this->pembina?->foto_url ?? asset('images/default.png');
+    }
+
     public function needsProfileCompletion(): bool
     {
         if ($this->role === 'siswa') {

@@ -892,17 +892,6 @@
         <div class="ps-spacer" aria-hidden="true"></div>
 
         <nav class="ps-nav" aria-label="Lainnya">
-            @if(!empty($psNotifUrl))
-            <a href="{{ $psNotifUrl }}" class="ps-item" aria-label="Notifikasi">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    {!! $psIconSvg['bell'] !!}
-                </svg>
-                <span class="ps-lb">Notifikasi</span>
-                <span class="ps-dot" aria-hidden="true"></span>
-                <span class="ps-tip">Notifikasi</span>
-            </a>
-            @endif
-
             <details class="ps-gear">
                 <summary class="ps-item" aria-label="Menu lainnya">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1055,12 +1044,6 @@
                         <span>{{ $psMobileMore['label'] }}</span>
                     </a>
                 @endforeach
-                @if(!empty($psNotifUrl))
-                <a href="{{ $psNotifUrl }}" class="flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-800 hover:text-sky-700 dark:hover:text-slate-200">
-                    <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg['bell'] !!}</svg>
-                    <span>Notifikasi</span>
-                </a>
-                @endif
             </nav>
 
             <div class="mt-auto pt-6">

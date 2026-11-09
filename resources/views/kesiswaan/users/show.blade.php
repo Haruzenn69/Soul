@@ -285,12 +285,8 @@
                             @endif
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-11 h-11 rounded-2xl overflow-hidden bg-slate-100 shrink-0 flex items-center justify-center font-black text-sky-600 uppercase text-xs">
-                                        @if($ek->logo)
-                                            <img src="{{ asset('storage/' . $ek->logo) }}" alt="{{ $ek->nama_ekskul }}" class="w-full h-full object-cover">
-                                        @else
-                                            {{ strtoupper(substr($ek->nama_ekskul, 0, 2)) }}
-                                        @endif
+                                    <div class="w-11 h-11 rounded-2xl overflow-hidden bg-slate-100 shrink-0 flex items-center justify-center">
+                                        <img src="{{ $ek->logo_url }}" alt="{{ $ek->nama_ekskul }}" class="w-full h-full object-cover">
                                     </div>
                                     <div>
                                         <h4 class="font-extrabold text-slate-900">{{ $ek->nama_ekskul }}</h4>
