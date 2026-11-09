@@ -3,345 +3,309 @@
 @section('title', 'Dashboard Ketua' . ($ekskul ? ' ' . $ekskul->nama_ekskul : ''))
 
 @section('content')
-    {{-- HERO --}}
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 lg:pb-14 text-white shadow-xl shadow-sky-200 animate-fade-up">
+    {{-- HERO CARD --}}
+    <div data-tilt-card class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-4 md:p-6 md:pb-12 lg:pb-14 text-white soul-timbul tilt-card animate-fade-up">
         <div class="absolute inset-0 pointer-events-none">
-            <div class="absolute -top-20 -right-10 w-72 h-72 rounded-full bg-amber-200/40 blur-3xl"></div>
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
-            <div class="absolute top-10 right-1/4 w-16 h-16 rounded-full bg-amber-300/50 blur-2xl"></div>
         </div>
 
-        <div class="relative grid lg:grid-cols-5 gap-8 items-center">
-            <!-- TEXT + CTA -->
-            <div class="lg:col-span-3">
-                <div class="flex items-center gap-2 mb-3 flex-wrap">
-                    <span class="px-3 py-1 rounded-full bg-white/15 backdrop-blur border border-white/20 text-[10px] font-bold tracking-wide uppercase">Dashboard Ketua</span>
-                    @if($ekskul)
-                        <span class="px-3 py-1 rounded-full bg-amber-300/30 backdrop-blur border border-amber-200/40 text-[10px] font-bold tracking-wide uppercase flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse"></span>
-                            Memimpin {{ $ekskul->nama_ekskul }}
-                        </span>
-                    @endif
-                </div>
-                <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight">
+        <div class="relative grid md:grid-cols-5 gap-4 lg:gap-6 items-center">
+            {{-- TEXT + CTA --}}
+            <div class="md:col-span-3">
+                <h1 class="text-xl md:text-2xl font-extrabold tracking-tight leading-tight">
                     Halo, {{ auth()->user()->siswa->nama ?? 'Ketua' }}!
                 </h1>
-                <p class="text-sm text-white/85 mt-1.5 font-medium">
-                    {{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }} · Semester Ganjil 2026/2027
+                <p class="text-sm text-white/85 mt-1 font-medium">
+                    {{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }}
                 </p>
-                <p class="text-xs text-white/70 mt-3 max-w-lg leading-relaxed">
+                <p class="text-xs text-white/70 mt-2 max-w-lg leading-relaxed">
                     Kelola keanggotaan, tinjau pendaftaran, dan pantau kehadiran kegiatan ekskulmu di sini.
                 </p>
 
-                <div class="flex gap-3 flex-wrap mt-6">
-                    <a href="{{ route('ketua.kegiatan.create') }}" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
+                <div class="flex gap-2 flex-wrap mt-4">
+                    <a href="{{ route('ketua.kegiatan.create') }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white text-sky-700 font-bold text-xs rounded-xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
+                        <i class="fa-solid fa-plus text-xs"></i>
                         Buat Kegiatan Baru
                     </a>
-                    <a href="{{ route('ketua.anggota.index') }}" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/20 transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
+                    <a href="{{ route('ketua.anggota.index') }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-xl hover:bg-white/20 transition-all">
+                        <i class="fa-solid fa-users text-xs"></i>
                         Kelola Anggota
                     </a>
                 </div>
             </div>
 
-            <!-- ILLUSTRATIVE PANEL + FLOATING STATS (desktop only) -->
-            <div class="lg:col-span-2 relative hidden lg:block">
-                <div class="relative h-52 rounded-3xl bg-white/10 backdrop-blur border border-white/20 overflow-hidden flex items-center justify-center">
-                    <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-amber-300/30 blur-2xl"></div>
-                    <div class="absolute -bottom-10 -left-6 w-32 h-32 rounded-full bg-white/20 blur-2xl"></div>
-                    <div class="relative w-24 h-24 rounded-3xl bg-white/20 backdrop-blur border border-white/30 flex items-center justify-center text-white shadow-inner animate-floaty">
-                        <svg class="w-11 h-11" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14"/>
-                        </svg>
+            {{-- ILLUSTRATIVE PANEL + FLOATING STATS (desktop) --}}
+            <div class="md:col-span-2 relative hidden md:block">
+                <div class="relative h-36 md:h-40 lg:h-44 rounded-3xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center">
+                    <div class="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+                        <div class="absolute -bottom-10 -left-6 w-32 h-32 rounded-full bg-white/20 blur-2xl"></div>
                     </div>
+                    <img src="{{ asset('images/default.png') }}" alt="Ilustrasi Ketua"
+                         class="h-36 md:h-40 lg:h-44 w-auto max-w-[110px] md:max-w-[130px] lg:max-w-[150px] object-contain drop-shadow-xl animate-floaty select-none relative z-0 mb-1 md:mb-2 pointer-events-none">
                 </div>
 
-                <!-- floating stat card overlapping bottom edge -->
-                <div class="absolute -bottom-10 left-3 right-3 z-10 grid grid-cols-3 gap-2 bg-white rounded-2xl shadow-xl shadow-sky-900/10 p-3">
+                {{-- floating stat card --}}
+                <div class="absolute -bottom-6 md:-bottom-7 left-2 right-2 z-10 grid grid-cols-3 gap-1 bg-white rounded-xl shadow-xl shadow-sky-900/10 p-2">
                     <div class="text-center border-r border-slate-100 pr-1">
-                        <p class="text-base font-extrabold text-sky-700 leading-none">{{ $totalAnggota }}</p>
-                        <p class="text-[11px] text-slate-400 font-semibold mt-1">Anggota</p>
+                        <p class="text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalAnggota }}</p>
+                        <p class="text-[10px] md:text-xs text-slate-400 font-semibold mt-1">Anggota</p>
                     </div>
                     <div class="text-center border-r border-slate-100 px-1">
-                        <p class="text-base font-extrabold text-amber-600 leading-none">{{ $pendingCount }}</p>
-                        <p class="text-[11px] text-slate-400 font-semibold mt-1">Pendaftaran</p>
+                        <p class="text-sm md:text-base font-extrabold text-amber-600 leading-none">{{ $pendingCount }}</p>
+                        <p class="text-[10px] md:text-xs text-slate-400 font-semibold mt-1">Pendaftaran</p>
                     </div>
                     <div class="text-center pl-1">
-                        <p class="text-base font-extrabold text-sky-700 leading-none">{{ $kegiatanBulanIni ?? 0 }}</p>
-                        <p class="text-[11px] text-slate-400 font-semibold mt-1">Kegiatan</p>
+                        <p class="text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $kegiatanBulanIni ?? 0 }}</p>
+                        <p class="text-[10px] md:text-xs text-slate-400 font-semibold mt-1">Kegiatan</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="relative mt-6 pt-5 border-t border-white/15 grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <a href="{{ route('ketua.pendaftaran.index') }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+        {{-- Quick Actions --}}
+        <div class="relative mt-4 pt-3 md:mt-11 lg:mt-12 border-t border-white/15 grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <a href="{{ route('ketua.pendaftaran.index') }}" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <i class="fa-solid fa-clipboard-list text-sm text-white"></i>
                 </div>
                 <div class="text-left">
-                    <p class="text-xs font-bold leading-none">Pendaftaran</p>
-                    <p class="text-[10px] text-white/70 mt-1 leading-none">Tinjau Masuk</p>
+                    <p class="text-xs font-bold leading-none text-white">Pendaftaran</p>
+                    <p class="text-xs text-white/70 mt-1 leading-none">Tinjau Masuk</p>
                 </div>
             </a>
-            <a href="{{ route('ketua.kegiatan.index') }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
-                <div class="w-8 h-8 rounded-lg bg-amber-300/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <a href="{{ route('ketua.kegiatan.index') }}" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+                <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-calendar text-sm text-white"></i>
                 </div>
                 <div class="text-left">
-                    <p class="text-xs font-bold leading-none">Kegiatan</p>
-                    <p class="text-[10px] text-white/70 mt-1 leading-none">Agenda Ekskul</p>
+                    <p class="text-xs font-bold leading-none text-white">Kegiatan</p>
+                    <p class="text-xs text-white/70 mt-1 leading-none">Agenda Ekskul</p>
                 </div>
             </a>
-            <a href="{{ route('ketua.laporan-bulanan.index') }}" class="group flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+            <a href="{{ route('ketua.laporan-bulanan.index') }}" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 20h16M9 17V9m4 8V5m4 12v-6"/></svg>
+                    <i class="fa-solid fa-chart-simple text-sm text-white"></i>
                 </div>
                 <div class="text-left">
-                    <p class="text-xs font-bold leading-none">Laporan Bulanan</p>
-                    <p class="text-[10px] text-white/70 mt-1 leading-none">Rekap Bulanan</p>
+                    <p class="text-xs font-bold leading-none text-white">Laporan Bulanan</p>
+                    <p class="text-xs text-white/70 mt-1 leading-none">Rekap Bulanan</p>
                 </div>
             </a>
         </div>
     </div>
 
-    {{-- STATS CARDS - MOBILE/TABLET --}}
-    <div class="grid grid-cols-3 gap-3 lg:hidden">
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-3 md:p-5 shadow-md shadow-sky-100 animate-fade-up" style="animation-delay: .1s">
-            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Anggota Aktif</p>
-            <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $totalAnggota }}</h3>
-            <p class="text-[11px] font-semibold {{ $totalAnggota ? 'text-emerald-600' : 'text-amber-600' }} mt-0.5 md:mt-1">{{ $totalAnggota ? 'Terdaftar' : 'Belum' }}</p>
+    {{-- STATS CARDS - MOBILE (di desktop sudah di hero) --}}
+    <div class="grid grid-cols-3 gap-2.5 md:hidden">
+        <div class="relative overflow-hidden rounded-2xl bg-white dark:bg-[#1a1a1a] border border-sky-100 dark:border-neutral-800 p-3 shadow-sm">
+            <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Anggota</p>
+            <h3 class="text-lg font-extrabold mt-0.5 text-sky-700 dark:text-sky-400">{{ $totalAnggota }}</h3>
+            <p class="text-[10px] font-semibold text-sky-600 dark:text-sky-400">Terdaftar</p>
         </div>
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 to-yellow-50 border border-amber-200 p-3 md:p-5 shadow-md shadow-amber-100 animate-fade-up" style="animation-delay: .2s">
+        <div class="relative overflow-hidden rounded-2xl bg-white dark:bg-[#1a1a1a] border border-sky-100 dark:border-neutral-800 p-3 shadow-sm">
             <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Pendaftaran</p>
-            <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-amber-600">{{ $pendingCount }}</h3>
-            <p class="text-[11px] font-semibold text-amber-700 mt-0.5 md:mt-1">Menunggu</p>
+            <h3 class="text-lg font-extrabold mt-0.5 text-amber-600 dark:text-amber-400">{{ $pendingCount }}</h3>
+            <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400">Menunggu</p>
         </div>
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-3 md:p-5 shadow-md shadow-sky-100 animate-fade-up" style="animation-delay: .3s">
+        <div class="relative overflow-hidden rounded-2xl bg-white dark:bg-[#1a1a1a] border border-sky-100 dark:border-neutral-800 p-3 shadow-sm">
             <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Kegiatan</p>
-            <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $kegiatanBulanIni ?? 0 }}</h3>
-            <p class="text-[11px] font-semibold text-sky-600 mt-0.5 md:mt-1">Bulan Ini</p>
+            <h3 class="text-lg font-extrabold mt-0.5 text-sky-700 dark:text-sky-400">{{ $kegiatanBulanIni ?? 0 }}</h3>
+            <p class="text-[10px] font-semibold text-sky-600 dark:text-sky-400">Bulan Ini</p>
         </div>
     </div>
 
-    {{-- MAIN GRID --}}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:pt-6">
-
-        <!-- LEFT COLUMN: TREN KEHADIRAN -->
-        <div class="lg:col-span-2 space-y-6">
-            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .15s">
-                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
-                    <div>
-                        <h2 class="text-sm font-extrabold text-slate-900">Tren Kehadiran Pertemuan</h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Statistik kehadiran anggota pada 6 pertemuan terbaru</p>
-                    </div>
-                    <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center shadow-md shadow-sky-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14"/>
-                        </svg>
-                    </span>
-                </div>
-
-                <div class="p-5">
-                    <div class="relative h-64 w-full">
-                        @if(isset($chartKegiatan['labels']) && count($chartKegiatan['labels']) > 0)
-                            <canvas id="attendanceTrendChart"></canvas>
-                        @else
-                            <div class="h-full flex flex-col items-center justify-center text-slate-400 text-xs">
-                                <svg class="w-10 h-10 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                                </svg>
-                                <span class="mt-2 font-semibold text-slate-500">Belum ada data kegiatan dan presensi.</span>
-                            </div>
-                        @endif
-                    </div>
-                </div>
+    {{-- GRAFIK: TREN KEHADIRAN (full-width) --}}
+    <div class="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-sky-100 dark:border-neutral-800 shadow-sm overflow-hidden animate-fade-up">
+        <div class="px-5 py-4 flex justify-between items-center border-b border-sky-50 dark:border-neutral-800">
+            <div>
+                <h3 class="text-xs md:text-sm font-extrabold text-slate-900 dark:text-white">Tren Kehadiran Pertemuan</h3>
+                <p class="text-xs text-slate-400 font-medium mt-0.5">Statistik kehadiran anggota pada 6 pertemuan terbaru</p>
             </div>
-
-            @if($ekskul)
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                <!-- TESTIMONI -->
-                <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .25s">
-                    <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
-                        <div>
-                            <h2 class="text-sm font-extrabold text-slate-900">Testimoni</h2>
-                            <p class="text-xs text-slate-400 mt-0.5">Moderasi kontribusi siswa</p>
-                        </div>
-                        <span class="text-[11px] font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">{{ $testimoniPendingCount }} Pending</span>
-                    </div>
-
-                    <div class="p-5 space-y-3">
-                        <a href="{{ route('ketua.testimoni.index') }}" class="flex items-center justify-between gap-3 p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-xl border border-sky-100 hover:border-sky-300 transition">
-                            <span>
-                                <span class="block text-2xl font-extrabold text-sky-700 leading-none">{{ $testimoniPendingCount }}</span>
-                                <span class="block text-[10px] text-slate-400 mt-1">{{ $testimoniPendingCount > 0 ? 'menunggu persetujuan' : 'tidak ada antrian' }}</span>
-                            </span>
-                            <span class="text-[11px] font-bold text-sky-600">Kelola</span>
-                        </a>
-
-                        <form action="{{ route('ketua.testimoni.store') }}" method="POST" class="p-3.5 bg-gradient-to-r from-sky-50 to-white rounded-xl border border-sky-100 space-y-2.5">
-                            @csrf
-                            <p class="text-[11px] font-bold text-slate-700">Tambah Testimoni</p>
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="text" name="nama" required placeholder="Nama"
-                                    class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition">
-                                <input type="text" name="kelas" placeholder="Kelas (opsional)"
-                                    class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition">
-                            </div>
-                            <textarea name="quote" rows="2" required placeholder="Isi testimoni..."
-                                class="w-full px-3 py-2 bg-white border border-sky-100 rounded-xl text-xs focus:outline-none focus:border-sky-400 transition"></textarea>
-                            <button type="submit" class="px-3.5 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl transition">Simpan Testimoni</button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- FAQ -->
-                <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .3s">
-                    <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
-                        <div>
-                            <h2 class="text-sm font-extrabold text-slate-900">FAQ</h2>
-                            <p class="text-xs text-slate-400 mt-0.5">Moderasi kontribusi siswa</p>
-                        </div>
-                        <span class="text-[11px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-3 py-1.5 rounded-full">{{ $faqPendingCount }} Pending</span>
-                    </div>
-
-                    <div class="p-5 space-y-3">
-                        <a href="{{ route('ketua.faq.index') }}" class="flex items-center justify-between gap-3 p-3.5 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl border border-amber-100 hover:border-amber-300 transition">
-                            <span>
-                                <span class="block text-2xl font-extrabold text-amber-600 leading-none">{{ $faqPendingCount }}</span>
-                                <span class="block text-[10px] text-slate-400 mt-1">{{ $faqPendingCount > 0 ? 'menunggu jawaban' : 'tidak ada antrian' }}</span>
-                            </span>
-                            <span class="text-[11px] font-bold text-amber-600">Kelola</span>
-                        </a>
-
-                        <form action="{{ route('ketua.faq.store') }}" method="POST" class="p-3.5 bg-gradient-to-r from-amber-50 to-white rounded-xl border border-amber-100 space-y-2.5">
-                            @csrf
-                            <p class="text-[11px] font-bold text-slate-700">Tambah FAQ</p>
-                            <input type="text" name="pertanyaan" required placeholder="Pertanyaan umum..."
-                                class="w-full px-3 py-2 bg-white border border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 transition">
-                            <textarea name="jawaban" rows="2" required placeholder="Jawaban..."
-                                class="w-full px-3 py-2 bg-white border border-amber-100 rounded-xl text-xs focus:outline-none focus:border-amber-400 transition"></textarea>
-                            <button type="submit" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition">Simpan FAQ</button>
-                        </form>
-                    </div>
-                </div>
-
-            </div>
-            @endif
+            <span class="text-xs font-semibold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-800 px-3 py-1 rounded-full">{{ $totalAnggota }} Anggota</span>
         </div>
 
-        <!-- RIGHT COLUMN -->
-        <div class="space-y-6">
-
-            <!-- DISTRIBUSI ANGGOTA -->
-            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .2s">
-                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
-                    <div>
-                        <h2 class="text-sm font-extrabold text-slate-900">Distribusi Anggota</h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Komposisi berdasarkan tingkat kelas</p>
-                    </div>
-                    <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-300 to-yellow-400 text-amber-900 flex items-center justify-center shadow-md shadow-amber-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                        </svg>
-                    </span>
-                </div>
-
-                <div class="p-5">
-                    <div class="relative h-64 w-full flex items-center justify-center">
-                        @if(isset($chartKelas['data']) && array_sum($chartKelas['data']) > 0)
-                            <canvas id="classDistributionChart"></canvas>
-                        @else
-                            <div class="h-full flex flex-col items-center justify-center text-slate-400 text-xs">
-                                <svg class="w-10 h-10 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                </svg>
-                                <span class="mt-2 font-semibold text-slate-500">Belum ada data anggota aktif.</span>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            <!-- PRIORITY ACTIONS -->
-            <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .25s">
-                <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
-                    <div>
-                        <h2 class="text-sm font-extrabold text-slate-900">Yang perlu kamu cek</h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Aksi cepat untuk tugas yang menunggu</p>
-                    </div>
-                    <span class="inline-flex min-w-[88px] items-center justify-center whitespace-nowrap text-[11px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-3 py-1.5 rounded-full">{{ $pendingCount + $pengajuanCount }} Tertunda</span>
-                </div>
-
-                <div class="p-5 space-y-3">
-                    <a href="{{ route('ketua.pendaftaran.index') }}" class="flex items-center justify-between gap-3 rounded-xl border border-amber-100 bg-amber-50/70 px-4 py-3 hover:bg-amber-100/70 transition">
-                        <span class="flex items-center gap-3">
-                            <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            </span>
-                            <span>
-                                <span class="block text-xs font-bold text-slate-700">Pendaftaran baru</span>
-                                <span class="block text-[10px] text-slate-400">{{ $pendingCount }} menunggu tinjauan</span>
-                            </span>
-                        </span>
-                        <span class="text-amber-600 text-sm" aria-hidden="true">→</span>
-                    </a>
-                    <a href="{{ route('ketua.pengajuan-keluar.index') }}" class="flex items-center justify-between gap-3 rounded-xl border border-rose-100 bg-rose-50/70 px-4 py-3 hover:bg-rose-100/70 transition">
-                        <span class="flex items-center gap-3">
-                            <span class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                            </span>
-                            <span>
-                                <span class="block text-xs font-bold text-slate-700">Pengajuan keluar</span>
-                                <span class="block text-[10px] text-slate-400">{{ $pengajuanCount }} menunggu keputusan</span>
-                            </span>
-                        </span>
-                        <span class="text-rose-600 text-sm" aria-hidden="true">→</span>
-                    </a>
-                </div>
+        <div class="p-5">
+            <div class="h-48 md:h-56 lg:h-64 relative w-full">
+                <canvas id="attendanceTrendChart"></canvas>
             </div>
         </div>
-
     </div>
+
+    {{-- GRID: DISTRIBUSI KELAS + AKSI TERTUNDA --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
+        {{-- DISTRIBUSI ANGGOTA (bar chart) --}}
+        <div class="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-sky-100 dark:border-neutral-800 shadow-sm overflow-hidden animate-fade-up">
+            <div class="px-5 py-4 flex justify-between items-center border-b border-sky-50 dark:border-neutral-800">
+                <div>
+                    <h3 class="text-xs md:text-sm font-extrabold text-slate-900 dark:text-white">Distribusi Anggota</h3>
+                    <p class="text-xs text-slate-400 font-medium mt-0.5">Komposisi berdasarkan tingkat kelas</p>
+                </div>
+                <span class="text-xs font-semibold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-800 px-3 py-1 rounded-full">{{ $totalAnggota }} Total</span>
+            </div>
+
+            <div class="p-5">
+                <div class="h-40 md:h-48 lg:h-56 relative w-full">
+                    <canvas id="classDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        {{-- AKSI TERTUNDA --}}
+        <div class="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-sky-100 dark:border-neutral-800 shadow-sm overflow-hidden animate-fade-up">
+            <div class="px-5 py-4 flex justify-between items-center border-b border-sky-50 dark:border-neutral-800">
+                <div>
+                    <h3 class="text-xs md:text-sm font-extrabold text-slate-900 dark:text-white">Yang perlu kamu cek</h3>
+                    <p class="text-xs text-slate-400 font-medium mt-0.5">Aksi cepat untuk tugas yang menunggu</p>
+                </div>
+                <span class="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-800 px-3 py-1 rounded-full">{{ $pendingCount + $pengajuanCount }} Tertunda</span>
+            </div>
+
+            <div class="p-4 md:p-5 space-y-3">
+                <a href="{{ route('ketua.pendaftaran.index') }}" class="flex items-center justify-between gap-3 rounded-xl border border-sky-100 dark:border-neutral-800 bg-sky-50/50 dark:bg-neutral-900/40 px-4 py-3 hover:bg-sky-100/50 dark:hover:bg-neutral-800/60 transition">
+                    <span class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl bg-sky-100 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+                            <i class="fa-solid fa-clipboard-list text-sm"></i>
+                        </span>
+                        <span>
+                            <span class="block text-xs font-bold text-slate-700 dark:text-slate-200">Pendaftaran baru</span>
+                            <span class="block text-[10px] text-slate-400">{{ $pendingCount }} menunggu tinjauan</span>
+                        </span>
+                    </span>
+                    <i class="fa-solid fa-chevron-right text-sky-400 text-xs"></i>
+                </a>
+                <a href="{{ route('ketua.pengajuan-keluar.index') }}" class="flex items-center justify-between gap-3 rounded-xl border border-sky-100 dark:border-neutral-800 bg-sky-50/50 dark:bg-neutral-900/40 px-4 py-3 hover:bg-sky-100/50 dark:hover:bg-neutral-800/60 transition">
+                    <span class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+                            <i class="fa-solid fa-right-from-bracket text-sm"></i>
+                        </span>
+                        <span>
+                            <span class="block text-xs font-bold text-slate-700 dark:text-slate-200">Pengajuan keluar</span>
+                            <span class="block text-[10px] text-slate-400">{{ $pengajuanCount }} menunggu keputusan</span>
+                        </span>
+                    </span>
+                    <i class="fa-solid fa-chevron-right text-rose-400 text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {{-- TESTIMONI & FAQ --}}
+    @if($ekskul)
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
+        {{-- TESTIMONI --}}
+        <div class="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-sky-100 dark:border-neutral-800 shadow-sm overflow-hidden animate-fade-up">
+            <div class="px-5 py-4 flex justify-between items-center border-b border-sky-50 dark:border-neutral-800">
+                <div>
+                    <h3 class="text-xs md:text-sm font-extrabold text-slate-900 dark:text-white">Testimoni</h3>
+                    <p class="text-xs text-slate-400 font-medium mt-0.5">Moderasi kontribusi siswa</p>
+                </div>
+                <span class="text-xs font-semibold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-800 px-3 py-1 rounded-full">{{ $testimoniPendingCount }} Pending</span>
+            </div>
+
+            <div class="p-4 md:p-5 space-y-3">
+                <a href="{{ route('ketua.testimoni.index') }}" class="flex items-center justify-between gap-3 p-3 bg-sky-50/50 dark:bg-neutral-900/40 rounded-xl border border-sky-100 dark:border-neutral-800 hover:bg-sky-100/50 dark:hover:bg-neutral-800/60 transition">
+                    <span>
+                        <span class="block text-2xl font-extrabold text-sky-700 dark:text-sky-400 leading-none">{{ $testimoniPendingCount }}</span>
+                        <span class="block text-[10px] text-slate-400 mt-1">{{ $testimoniPendingCount > 0 ? 'menunggu persetujuan' : 'tidak ada antrian' }}</span>
+                    </span>
+                    <span class="text-[11px] font-bold text-sky-600 dark:text-sky-400">Kelola</span>
+                </a>
+
+                <form action="{{ route('ketua.testimoni.store') }}" method="POST" class="p-3 bg-sky-50/50 dark:bg-neutral-900/40 rounded-xl border border-sky-100 dark:border-neutral-800 space-y-2.5">
+                    @csrf
+                    <p class="text-[11px] font-bold text-slate-700 dark:text-slate-200">Tambah Testimoni</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" name="nama" required placeholder="Nama"
+                            class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-400 transition">
+                        <input type="text" name="kelas" placeholder="Kelas (opsional)"
+                            class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-400 transition">
+                    </div>
+                    <textarea name="quote" rows="2" required placeholder="Isi testimoni..."
+                        class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-sky-400 transition"></textarea>
+                    <button type="submit" class="px-3.5 py-2 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-xl transition shadow-sm">Simpan Testimoni</button>
+                </form>
+            </div>
+        </div>
+
+        {{-- FAQ --}}
+        <div class="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-sky-100 dark:border-neutral-800 shadow-sm overflow-hidden animate-fade-up">
+            <div class="px-5 py-4 flex justify-between items-center border-b border-sky-50 dark:border-neutral-800">
+                <div>
+                    <h3 class="text-xs md:text-sm font-extrabold text-slate-900 dark:text-white">FAQ</h3>
+                    <p class="text-xs text-slate-400 font-medium mt-0.5">Moderasi kontribusi siswa</p>
+                </div>
+                <span class="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-800 px-3 py-1 rounded-full">{{ $faqPendingCount }} Pending</span>
+            </div>
+
+            <div class="p-4 md:p-5 space-y-3">
+                <a href="{{ route('ketua.faq.index') }}" class="flex items-center justify-between gap-3 p-3 bg-amber-50/50 dark:bg-neutral-900/40 rounded-xl border border-amber-100 dark:border-neutral-800 hover:bg-amber-100/50 dark:hover:bg-neutral-800/60 transition">
+                    <span>
+                        <span class="block text-2xl font-extrabold text-amber-600 dark:text-amber-400 leading-none">{{ $faqPendingCount }}</span>
+                        <span class="block text-[10px] text-slate-400 mt-1">{{ $faqPendingCount > 0 ? 'menunggu jawaban' : 'tidak ada antrian' }}</span>
+                    </span>
+                    <span class="text-[11px] font-bold text-amber-600 dark:text-amber-400">Kelola</span>
+                </a>
+
+                <form action="{{ route('ketua.faq.store') }}" method="POST" class="p-3 bg-amber-50/50 dark:bg-neutral-900/40 rounded-xl border border-amber-100 dark:border-neutral-800 space-y-2.5">
+                    @csrf
+                    <p class="text-[11px] font-bold text-slate-700 dark:text-slate-200">Tambah FAQ</p>
+                    <input type="text" name="pertanyaan" required placeholder="Pertanyaan umum..."
+                        class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-amber-100 dark:border-neutral-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-400 transition">
+                    <textarea name="jawaban" rows="2" required placeholder="Jawaban..."
+                        class="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-amber-100 dark:border-neutral-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-400 transition"></textarea>
+                    <button type="submit" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition shadow-sm">Simpan FAQ</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const attendanceCanvas = document.getElementById('attendanceTrendChart');
+        if (typeof Chart === 'undefined') return;
+
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const anim = reduceMotion ? {} : { duration: 900, easing: 'easeOutQuart' };
+
+        Chart.defaults.font.family = '"Plus Jakarta Sans", system-ui, sans-serif';
+        Chart.defaults.font.size = 11;
+        Chart.defaults.color = '#64748b';
+
         function getChartColors() {
             const isDark = document.documentElement.classList.contains('dark-mode') || document.documentElement.classList.contains('dark');
             return {
                 isDark: isDark,
-                gridColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#F1F5F9',
+                gridColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(226, 232, 240, 0.6)',
                 tickColor: isDark ? '#94a3b8' : '#64748b',
-                legendColor: isDark ? '#cbd5e1' : '#475569',
                 tooltipBg: isDark ? '#1e293b' : '#0F172A',
-                doughnutBorder: isDark ? '#1f1f1f' : '#FFFFFF',
+                pointBorderColor: isDark ? '#1e293b' : '#fff',
             };
         }
 
-        let attendanceChart = null;
-        let classChart = null;
-
+        const ketuaCharts = [];
         const themeColors = getChartColors();
 
+        // --- TREN KEHADIRAN (line chart, kesiswaan style dengan grid garis-garis) ---
+        const attendanceCanvas = document.getElementById('attendanceTrendChart');
         if (attendanceCanvas) {
-            const labels = @json($chartKegiatan['labels'] ?? []);
-            const dataHadir = @json($chartKegiatan['hadir'] ?? []);
-            const dataIzin = @json($chartKegiatan['izin'] ?? []);
-            const dataSakit = @json($chartKegiatan['sakit'] ?? []);
-            const dataAlpha = @json($chartKegiatan['alpha'] ?? []);
+            let labels = @json($chartKegiatan['labels'] ?? []);
+            let dataHadir = @json($chartKegiatan['hadir'] ?? []);
+            let dataIzin = @json($chartKegiatan['izin'] ?? []);
+            let dataSakit = @json($chartKegiatan['sakit'] ?? []);
+            let dataAlpha = @json($chartKegiatan['alpha'] ?? []);
 
-            attendanceChart = new Chart(attendanceCanvas, {
+            // Fallback template jika belum ada agenda/presensi agar chart & grid tetap tampil cantik
+            if (!labels || labels.length === 0) {
+                labels = ['Pertemuan 1', 'Pertemuan 2', 'Pertemuan 3', 'Pertemuan 4', 'Pertemuan 5', 'Pertemuan 6'];
+                dataHadir = [0, 0, 0, 0, 0, 0];
+                dataIzin = [0, 0, 0, 0, 0, 0];
+                dataSakit = [0, 0, 0, 0, 0, 0];
+                dataAlpha = [0, 0, 0, 0, 0, 0];
+            }
+
+            const ctx = attendanceCanvas.getContext('2d');
+            const attendanceChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
@@ -350,55 +314,67 @@
                             label: 'Hadir',
                             data: dataHadir,
                             borderColor: '#2563EB',
-                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                            fill: true,
-                            tension: 0.35,
+                            backgroundColor: 'transparent',
+                            fill: false,
+                            tension: 0.4,
+                            borderWidth: 3,
                             pointBackgroundColor: '#2563EB',
+                            pointBorderColor: themeColors.pointBorderColor,
+                            pointBorderWidth: 2,
                             pointRadius: 4,
                             pointHoverRadius: 6,
-                            borderWidth: 2.5
                         },
                         {
                             label: 'Izin',
                             data: dataIzin,
                             borderColor: '#F59E0B',
                             backgroundColor: 'transparent',
-                            tension: 0.35,
+                            fill: false,
+                            tension: 0.4,
+                            borderWidth: 2,
                             pointBackgroundColor: '#F59E0B',
+                            pointBorderColor: themeColors.pointBorderColor,
+                            pointBorderWidth: 2,
                             pointRadius: 3,
+                            pointHoverRadius: 5,
                             borderDash: [4, 4],
-                            borderWidth: 2
                         },
                         {
                             label: 'Sakit',
                             data: dataSakit,
                             borderColor: '#8B5CF6',
                             backgroundColor: 'transparent',
-                            tension: 0.35,
+                            fill: false,
+                            tension: 0.4,
+                            borderWidth: 2,
                             pointBackgroundColor: '#8B5CF6',
+                            pointBorderColor: themeColors.pointBorderColor,
+                            pointBorderWidth: 2,
                             pointRadius: 3,
+                            pointHoverRadius: 5,
                             borderDash: [2, 2],
-                            borderWidth: 2
                         },
                         {
                             label: 'Alpha',
                             data: dataAlpha,
                             borderColor: '#EF4444',
                             backgroundColor: 'transparent',
-                            tension: 0.35,
+                            fill: false,
+                            tension: 0.4,
+                            borderWidth: 2,
                             pointBackgroundColor: '#EF4444',
+                            pointBorderColor: themeColors.pointBorderColor,
+                            pointBorderWidth: 2,
                             pointRadius: 3,
-                            borderWidth: 2
+                            pointHoverRadius: 5,
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
+                    animation: anim,
+                    interaction: { mode: 'index', intersect: false },
                     plugins: {
                         legend: {
                             position: 'top',
@@ -409,133 +385,168 @@
                                 usePointStyle: true,
                                 pointStyle: 'circle',
                                 font: { size: 11, weight: '500' },
-                                color: themeColors.legendColor,
+                                color: themeColors.tickColor,
                                 padding: 12
                             }
                         },
                         tooltip: {
                             backgroundColor: themeColors.tooltipBg,
-                            titleFont: { size: 12, weight: 'bold' },
-                            bodyFont: { size: 11 },
+                            titleFont: { weight: 700 },
                             padding: 10,
-                            cornerRadius: 12
+                            cornerRadius: 10,
+                            displayColors: true,
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                stepSize: 1,
-                                precision: 0,
-                                font: { size: 10 },
-                                color: themeColors.tickColor
-                            },
-                            grid: {
-                                color: themeColors.gridColor
-                            }
+                            ticks: { precision: 0, stepSize: 1, font: { size: 10 }, color: themeColors.tickColor },
+                            grid: { color: themeColors.gridColor, drawBorder: false }
                         },
                         x: {
-                            ticks: {
-                                font: { size: 10 },
-                                color: themeColors.tickColor
-                            },
-                            grid: {
-                                display: false
-                            }
+                            grid: { display: false },
+                            ticks: { font: { size: 10 }, maxRotation: 0, autoSkip: true, color: themeColors.tickColor }
                         }
                     }
                 }
             });
+            ketuaCharts.push(attendanceChart);
         }
 
+        // --- DISTRIBUSI KELAS (bar chart, kesiswaan style) ---
         const classCanvas = document.getElementById('classDistributionChart');
         if (classCanvas) {
-            const classLabels = @json($chartKelas['labels'] ?? []);
-            const classData = @json($chartKelas['data'] ?? []);
+            let classLabels = @json($chartKelas['labels'] ?? []);
+            let classData = @json($chartKelas['data'] ?? []);
 
-            classChart = new Chart(classCanvas, {
-                type: 'doughnut',
+            if (!classLabels || classLabels.length === 0) {
+                classLabels = ['Kelas 10', 'Kelas 11', 'Kelas 12'];
+                classData = [0, 0, 0];
+            }
+
+            const ctxClass = classCanvas.getContext('2d');
+            const classChart = new Chart(ctxClass, {
+                type: 'bar',
                 data: {
                     labels: classLabels,
                     datasets: [{
+                        label: 'Anggota',
                         data: classData,
-                        backgroundColor: ['#0EA5E9', '#FACC15', '#2563EB'],
-                        borderColor: themeColors.doughnutBorder,
-                        borderWidth: 3,
-                        hoverOffset: 6
+                        backgroundColor: '#0EA5E9',
+                        hoverBackgroundColor: '#0284C7',
+                        borderRadius: 6,
+                        maxBarThickness: 24,
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '70%',
+                    animation: anim,
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 10,
-                                boxHeight: 10,
-                                usePointStyle: true,
-                                pointStyle: 'circle',
-                                padding: 14,
-                                font: { size: 11, weight: '500' },
-                                color: themeColors.legendColor
-                            }
-                        },
+                        legend: { display: false },
                         tooltip: {
                             backgroundColor: themeColors.tooltipBg,
-                            titleFont: { size: 12, weight: 'bold' },
-                            bodyFont: { size: 11 },
+                            titleFont: { weight: 700 },
                             padding: 10,
-                            cornerRadius: 12,
+                            cornerRadius: 10,
+                            displayColors: false,
                             callbacks: {
-                                label: function(context) {
-                                    const value = context.parsed;
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                                    return ` ${context.label}: ${value} siswa (${percentage}%)`;
-                                }
+                                label: function(ctx) { return ctx.parsed.y + ' siswa'; }
                             }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0, stepSize: 1, font: { size: 10 }, color: themeColors.tickColor },
+                            grid: { color: themeColors.gridColor, drawBorder: false }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 10 }, maxRotation: 0, autoSkip: true, color: themeColors.tickColor }
                         }
                     }
                 }
             });
+            ketuaCharts.push(classChart);
         }
 
+        // --- Theme update handler ---
         function updateKetuaCharts() {
             const c = getChartColors();
-            if (attendanceChart) {
-                if (attendanceChart.options.scales?.y) {
-                    attendanceChart.options.scales.y.grid.color = c.gridColor;
-                    attendanceChart.options.scales.y.ticks.color = c.tickColor;
+            ketuaCharts.forEach(function(chart) {
+                if (!chart) return;
+                if (chart.options.scales?.y) {
+                    if (chart.options.scales.y.grid) chart.options.scales.y.grid.color = c.gridColor;
+                    if (chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = c.tickColor;
                 }
-                if (attendanceChart.options.scales?.x) {
-                    attendanceChart.options.scales.x.ticks.color = c.tickColor;
+                if (chart.options.scales?.x) {
+                    if (chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = c.tickColor;
                 }
-                if (attendanceChart.options.plugins?.legend?.labels) {
-                    attendanceChart.options.plugins.legend.labels.color = c.legendColor;
+                if (chart.options.plugins?.legend?.labels) {
+                    chart.options.plugins.legend.labels.color = c.tickColor;
                 }
-                if (attendanceChart.options.plugins?.tooltip) {
-                    attendanceChart.options.plugins.tooltip.backgroundColor = c.tooltipBg;
+                if (chart.options.plugins?.tooltip) {
+                    chart.options.plugins.tooltip.backgroundColor = c.tooltipBg;
                 }
-                attendanceChart.update('none');
-            }
-
-            if (classChart) {
-                if (classChart.data.datasets?.[0]) {
-                    classChart.data.datasets[0].borderColor = c.doughnutBorder;
+                if (chart.config.type === 'line') {
+                    chart.data.datasets.forEach(function(ds) {
+                        ds.pointBorderColor = c.pointBorderColor;
+                    });
                 }
-                if (classChart.options.plugins?.legend?.labels) {
-                    classChart.options.plugins.legend.labels.color = c.legendColor;
-                }
-                if (classChart.options.plugins?.tooltip) {
-                    classChart.options.plugins.tooltip.backgroundColor = c.tooltipBg;
-                }
-                classChart.update('none');
-            }
+                chart.update('none');
+            });
         }
 
         window.addEventListener('soul-theme-change', updateKetuaCharts);
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const card = document.querySelector('[data-tilt-card]');
+        if (!card) return;
+
+        const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!canHover || reduceMotion) return;
+
+        const MAX_TILT = 7;
+        let frame = null;
+
+        card.addEventListener('animationend', function () {
+            card.classList.remove('animate-fade-up');
+            if (card.matches(':hover')) card.classList.add('is-tilting');
+        }, { once: true });
+
+        card.addEventListener('pointerenter', function () {
+            card.classList.add('is-tilting');
+        });
+
+        card.addEventListener('pointermove', function (event) {
+            const rect = card.getBoundingClientRect();
+            const px = (event.clientX - rect.left) / rect.width;
+            const py = (event.clientY - rect.top) / rect.height;
+            const rotateX = (0.5 - py) * MAX_TILT * 2;
+            const rotateY = (px - 0.5) * MAX_TILT * 2;
+
+            if (frame) cancelAnimationFrame(frame);
+            frame = requestAnimationFrame(function () {
+                frame = null;
+                card.style.transform = 'perspective(1200px) rotateX(' + rotateX.toFixed(2) + 'deg) rotateY(' + rotateY.toFixed(2) + 'deg) scale(1.015)';
+            });
+        });
+
+        function resetTilt() {
+            if (frame) {
+                cancelAnimationFrame(frame);
+                frame = null;
+            }
+            card.classList.remove('is-tilting');
+            card.style.transform = '';
+        }
+
+        card.addEventListener('pointerleave', resetTilt);
+        card.addEventListener('pointercancel', resetTilt);
     });
 </script>
 @endpush

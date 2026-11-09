@@ -67,9 +67,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="mb-4">
                     <label class="block text-xs font-bold text-slate-700 mb-1.5">Logo <span class="font-normal text-slate-400">(opsional)</span></label>
-                    @if($ekskul->logo)
-                        <img src="{{ asset('storage/' . $ekskul->logo) }}" alt="Logo" class="w-20 h-20 object-contain rounded-2xl border border-sky-100 bg-sky-50 mb-2">
-                    @endif
+                    <img src="{{ $ekskul->logo_url }}" alt="Logo" class="w-20 h-20 object-contain rounded-2xl border border-sky-100 bg-sky-50 mb-2">
                     <input type="file" name="logo" accept="image/*"
                         class="soul-file-input">
                     @error('logo') <p class="text-rose-500 text-[10px] mt-1">{{ $message }}</p> @enderror

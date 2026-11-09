@@ -98,12 +98,12 @@ final class EkskulInfo
     }
 
     /**
-     * URL logo yang benar-benar ada di disk. Kalau berkasnya hilang, kembalikan
-     * null supaya kartu jatuh ke monogram, bukan gambar rusak.
+     * URL logo ekskul. Kalau berkasnya belum diunggah atau tidak ada di disk,
+     * fallback ke komunita.jpg sebagai gambar default.
      */
     public static function logo(?string $path): ?string
     {
-        return self::berkas($path);
+        return self::berkas($path) ?? asset('images/komunita.jpg');
     }
 
     /**

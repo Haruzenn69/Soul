@@ -74,6 +74,23 @@ class Ekskul extends Model
         return $this->hasMany(Testimoni::class);
     }
 
+    public function getLogoUrlAttribute(): string
+    {
+        if ($this->logo) {
+            if (str_starts_with($this->logo, 'http://') || str_starts_with($this->logo, 'https://')) {
+                return $this->logo;
+            }
+            if (str_starts_with($this->logo, 'images/')) {
+                return asset($this->logo);
+            }
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($this->logo)) {
+                return asset('storage/'.$this->logo);
+            }
+        }
+
+        return asset('images/komunita.jpg');
+    }
+
     public function faqs(): HasMany
     {
         return $this->hasMany(Faq::class);

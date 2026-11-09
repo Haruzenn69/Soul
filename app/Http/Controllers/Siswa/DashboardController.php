@@ -76,17 +76,27 @@ class DashboardController extends Controller
                 : collect();
         }
 
-        // Total hadir: filter by selected ekskul if multi
+        // Stats kehadiran (Hadir, Izin, Sakit, Alpha): filter by selected ekskul if multi
         if ($hasMultipleEkskul && $ekskul && $siswa) {
             $pendaftaranId = $siswa->activePendaftaranUntuk($ekskul)?->id;
-            $totalHadir = $pendaftaranId
-                ? Presensi::where('pendaftaran_id', $pendaftaranId)->where('status', Presensi::STATUS_HADIR)->count()
-                : 0;
+            $basePresensi = $pendaftaranId ? Presensi::where('pendaftaran_id', $pendaftaranId) : null;
+            $statsPresensi = [
+                'hadir' => $basePresensi ? (clone $basePresensi)->where('status', Presensi::STATUS_HADIR)->count() : 0,
+                'izin'  => $basePresensi ? (clone $basePresensi)->where('status', Presensi::STATUS_IZIN)->count() : 0,
+                'sakit' => $basePresensi ? (clone $basePresensi)->where('status', Presensi::STATUS_SAKIT)->count() : 0,
+                'alpha' => $basePresensi ? (clone $basePresensi)->where('status', Presensi::STATUS_ALPHA)->count() : 0,
+            ];
+            $totalHadir = $statsPresensi['hadir'];
         } else {
             $activePendaftaranIds = $siswa ? $siswa->activePendaftarans()->pluck('id') : collect();
-            $totalHadir = $activePendaftaranIds->isNotEmpty()
-                ? Presensi::whereIn('pendaftaran_id', $activePendaftaranIds)->where('status', Presensi::STATUS_HADIR)->count()
-                : 0;
+            $basePresensi = $activePendaftaranIds->isNotEmpty() ? Presensi::whereIn('pendaftaran_id', $activePendaftaranIds) : null;
+            $statsPresensi = [
+                'hadir' => $basePresensi ? (clone $basePresensi)->where('status', Presensi::STATUS_HADIR)->count() : 0,
+                'izin'  => $basePresensi ? (clone $basePresensi)->where('status', Presensi::STATUS_IZIN)->count() : 0,
+                'sakit' => $basePresensi ? (clone $basePresensi)->where('status', Presensi::STATUS_SAKIT)->count() : 0,
+                'alpha' => $basePresensi ? (clone $basePresensi)->where('status', Presensi::STATUS_ALPHA)->count() : 0,
+            ];
+            $totalHadir = $statsPresensi['hadir'];
         }
 
         $unreadNotifCount = $siswa ? $siswa->notifikasis()->where('is_read', false)->count() : 0;
@@ -117,6 +127,7 @@ class DashboardController extends Controller
             'siswa',
             'ekskul',
             'activeEkskuls',
+            'statsPresensi',
             'kegiatanMendatang',
             'totalHadir',
             'unreadNotifCount',

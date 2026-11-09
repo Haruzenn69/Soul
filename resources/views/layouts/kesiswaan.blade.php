@@ -17,7 +17,7 @@
     </style>
     @include('partials.responsive-tables')
 </head>
-<body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 text-slate-800 dark:text-slate-200 font-sans antialiased flex min-h-screen overflow-x-hidden selection:bg-sky-100 dark:selection:bg-sky-900 selection:text-sky-700 dark:selection:text-sky-300">
+<body class="bg-white dark:bg-neutral-950 text-slate-800 dark:text-slate-200 font-sans antialiased flex min-h-screen overflow-x-hidden selection:bg-sky-100 dark:selection:bg-sky-900 selection:text-sky-700 dark:selection:text-sky-300">
 @include('partials.pill-sidebar', [
     'psTitle' => 'Menu Kesiswaan',
     'psLogoBrand' => 'SOUL',
@@ -50,7 +50,7 @@
     <div class="w-full flex-1 flex flex-col min-w-0 ps-page">
 
         <!-- TOP NAVBAR HEADER -->
-        <header class="px-4 md:px-8 py-3.5 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-b border-sky-100/80 dark:border-neutral-800 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
+        <header class="px-4 md:px-8 py-3.5 bg-white dark:bg-neutral-900 border-b border-sky-100 dark:border-neutral-800 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
             <!-- KIRI: Hamburger (Mobile) + Logo + Search -->
             <div class="flex items-center gap-3 flex-1 min-w-0">
                 <!-- Tombol Hamburger (Mobile) -->

@@ -140,10 +140,12 @@
             <div class="coverflow-stage reveal reveal--right" style="--reveal-x: 140px; --reveal-delay: 0.1s;">
                 @foreach($ekskuls->take(6) as $ekskul)
                 <article class="coverflow-card">
-                    @if($ekskul->cover || $ekskul->logo)
-                        <img class="coverflow-card-img" src="{{ $ekskul->cover ? asset('storage/'.$ekskul->cover) : asset('storage/'.$ekskul->logo) }}" alt="{{ $ekskul->nama_ekskul }}">
+                    @if($ekskul->cover)
+                        <img class="coverflow-card-img" src="{{ asset('storage/'.$ekskul->cover) }}" alt="{{ $ekskul->nama_ekskul }}">
+                    @elseif($ekskul->logo)
+                        <img class="coverflow-card-img" src="{{ asset('storage/'.$ekskul->logo) }}" alt="{{ $ekskul->nama_ekskul }}">
                     @else
-                        <div class="coverflow-card-fallback"><span>{{ strtoupper(substr($ekskul->nama_ekskul, 0, 2)) }}</span></div>
+                        <img class="coverflow-card-img" src="{{ asset('images/komunita.jpg') }}" alt="{{ $ekskul->nama_ekskul }}">
                     @endif
                     <div class="coverflow-vignette"></div>
                     <div class="coverflow-content">

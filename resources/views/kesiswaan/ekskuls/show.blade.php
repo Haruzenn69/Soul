@@ -49,12 +49,8 @@
         <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div class="flex items-center gap-4">
                 {{-- Logo / Inisial --}}
-                <div class="w-16 h-16 rounded-2xl overflow-hidden shrink-0 border-2 border-white/30 shadow-lg bg-white/20 flex items-center justify-center font-black text-xl uppercase">
-                    @if ($ekskul->logo)
-                        <img src="{{ asset('storage/' . $ekskul->logo) }}" alt="{{ $ekskul->nama_ekskul }}" class="w-full h-full object-cover">
-                    @else
-                        {{ strtoupper(substr($ekskul->nama_ekskul, 0, 2)) }}
-                    @endif
+                <div class="w-16 h-16 rounded-2xl overflow-hidden shrink-0 border-2 border-white/30 shadow-lg bg-white/20 flex items-center justify-center">
+                    <img src="{{ $ekskul->logo_url }}" alt="{{ $ekskul->nama_ekskul }}" class="w-full h-full object-cover">
                 </div>
                 <div>
                     <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">

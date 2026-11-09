@@ -34,7 +34,7 @@
     'psTitle' => 'Menu Pembina',
     'psLogoBrand' => 'SOUL',
     'psDashboardUrl' => route('pembina.dashboard'),
-    'psNotifUrl' => route('pembina.notifikasi'),
+    'psNotifUrl' => '',
     'psProfileUrl' => route('pembina.profile'),
     'psItems' => [
         ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('pembina.dashboard'), 'is' => 'pembina.dashboard'],
