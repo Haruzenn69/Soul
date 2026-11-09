@@ -9,9 +9,16 @@
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white">Detail Kegiatan</h1>
             <p class="text-xs text-slate-400 dark:text-neutral-400 mt-1">{{ $kegiatan->materi }}</p>
         </div>
-        <div class="flex gap-2 flex-wrap">
-            <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 dark:shadow-none transition w-full sm:w-auto inline-flex items-center justify-center gap-2">Input Presensi</a>
-            <a href="{{ route('ketua.kegiatan.index') }}" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-600 dark:text-neutral-300 font-bold text-xs rounded-xl transition w-full sm:w-auto inline-flex items-center justify-center gap-2">Kembali</a>
+        <div class="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+            <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-sm transition inline-flex items-center justify-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Input Presensi</span>
+            </a>
+            <a href="{{ route('ketua.kegiatan.edit', $kegiatan) }}" class="px-4 py-2 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-400 font-bold text-xs rounded-xl border border-amber-300 dark:border-amber-800/50 transition inline-flex items-center justify-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.5-9.5a2.121 2.121 0 013 3L12 16l-4 1 1-4 8.5-8.5z"/></svg>
+                <span>Edit Kegiatan</span>
+            </a>
+            <a href="{{ route('ketua.kegiatan.index') }}" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-600 dark:text-neutral-300 font-bold text-xs rounded-xl transition inline-flex items-center justify-center gap-1.5">Kembali</a>
         </div>
     </div>
 

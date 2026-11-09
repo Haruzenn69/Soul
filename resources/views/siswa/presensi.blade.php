@@ -78,7 +78,7 @@
     @endphp
 
     <!-- Filter & Sort Form -->
-    <form method="GET" action="{{ route('siswa.presensi') }}" id="filter-presensi-form" class="bg-white p-4 rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 flex flex-wrap items-center gap-3 animate-fade-up" style="animation-delay: .3s">
+    <form method="GET" action="{{ route('siswa.presensi') }}" id="filter-presensi-form" class="bg-white dark:bg-neutral-900 p-4 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-sm flex flex-wrap items-center gap-3 animate-fade-up" style="animation-delay: .3s">
         @if($pendaftaran)
             <input type="hidden" name="ekskul" value="{{ $pendaftaran->ekskul_id }}">
         @endif
@@ -90,12 +90,12 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </span>
             <input type="search" name="cari" value="{{ request('cari') }}" placeholder="Cari materi kegiatan..."
-                class="w-full pl-9 pr-4 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+                class="w-full pl-9 pr-4 py-2 bg-sky-50/70 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-800 dark:text-neutral-100 placeholder-slate-400 dark:placeholder-neutral-500 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-950 transition-all">
         </div>
 
         <!-- Filter Bulan -->
         @if(isset($availableMonths) && count($availableMonths) > 0)
-            <select name="bulan" onchange="this.form.submit()" class="px-3 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+            <select name="bulan" onchange="this.form.submit()" class="px-3 py-2 bg-sky-50/70 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-neutral-200 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-950 transition-all">
                 <option value="semua">Semua Bulan</option>
                 @foreach($availableMonths as $bln)
                     @php
@@ -107,7 +107,7 @@
         @endif
 
         <!-- Filter Status Kehadiran -->
-        <select name="status" onchange="this.form.submit()" class="px-3 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+        <select name="status" onchange="this.form.submit()" class="px-3 py-2 bg-sky-50/70 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-neutral-200 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-950 transition-all">
             <option value="semua">Semua Status</option>
             <option value="hadir" {{ request('status') === 'hadir' ? 'selected' : '' }}>Hadir</option>
             <option value="sakit" {{ request('status') === 'sakit' ? 'selected' : '' }}>Sakit</option>
@@ -116,7 +116,7 @@
         </select>
 
         <!-- Dropdown Urutkan -->
-        <select id="sort-select" class="px-3 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
+        <select id="sort-select" class="px-3 py-2 bg-sky-50/70 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-neutral-200 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-950 transition-all">
             <option value="tanggal_desc" {{ $currentSortCombo === 'tanggal_desc' ? 'selected' : '' }}>Tanggal Terbaru</option>
             <option value="tanggal_asc" {{ $currentSortCombo === 'tanggal_asc' ? 'selected' : '' }}>Tanggal Terlama</option>
             <option value="materi_asc" {{ $currentSortCombo === 'materi_asc' ? 'selected' : '' }}>Materi (A-Z)</option>
@@ -124,36 +124,36 @@
             <option value="status_asc" {{ $currentSortCombo === 'status_asc' ? 'selected' : '' }}>Status Kehadiran</option>
         </select>
 
-        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 transition-all">Filter</button>
+        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-200 dark:shadow-none transition-all">Filter</button>
 
         @if($hasActiveFilter)
-            <a href="{{ route('siswa.presensi', $pendaftaran ? ['ekskul' => $pendaftaran->ekskul_id] : []) }}" class="px-3 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition">Reset</a>
+            <a href="{{ route('siswa.presensi', $pendaftaran ? ['ekskul' => $pendaftaran->ekskul_id] : []) }}" class="px-3 py-2 text-xs font-bold text-slate-500 dark:text-neutral-400 hover:text-slate-700 dark:hover:text-neutral-200 transition">Reset</a>
         @endif
     </form>
 
     <!-- Daftar Presensi -->
-    <div class="bg-white rounded-3xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden animate-fade-up" style="animation-delay: .35s">
-        <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50">
+    <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-sm overflow-hidden animate-fade-up" style="animation-delay: .35s">
+        <div class="px-6 py-5 flex justify-between items-center border-b border-sky-50 dark:border-neutral-800">
             <div>
-                <h2 class="text-sm font-extrabold text-slate-900">Riwayat Kegiatan</h2>
-                <p class="text-[11px] text-slate-400 mt-0.5">Daftar lengkap kehadiranmu</p>
+                <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Riwayat Kegiatan</h2>
+                <p class="text-[11px] text-slate-400 dark:text-neutral-400 mt-0.5">Daftar lengkap kehadiranmu</p>
             </div>
             @if(method_exists($presensis, 'total'))
-                <span class="text-xs font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">Total {{ $presensis->total() }} presensi</span>
+                <span class="text-xs font-semibold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-800/50 px-3 py-1.5 rounded-full">Total {{ $presensis->total() }} presensi</span>
             @else
-                <span class="text-xs font-semibold text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">Total {{ count($presensis) }} presensi</span>
+                <span class="text-xs font-semibold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-800/50 px-3 py-1.5 rounded-full">Total {{ count($presensis) }} presensi</span>
             @endif
         </div>
 
         @if(count($presensis) > 0)
-            <div class="divide-y divide-sky-50">
+            <div class="divide-y divide-sky-50 dark:divide-neutral-800">
                 @foreach($presensis as $presensi)
                     @php
                         $statusColors = [
-                            'hadir' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
-                            'izin' => 'bg-amber-100 text-amber-700 border-amber-200',
-                            'sakit' => 'bg-violet-100 text-violet-700 border-violet-200',
-                            'alpha' => 'bg-rose-100 text-rose-700 border-rose-200'
+                            'hadir' => 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/60',
+                            'izin' => 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/60',
+                            'sakit' => 'bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-400 dark:border-violet-800/60',
+                            'alpha' => 'bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/60'
                         ];
                         $statusLabels = [
                             'hadir' => 'Hadir',
@@ -164,36 +164,36 @@
                         $dayNum = $presensi->kegiatan ? \Carbon\Carbon::parse($presensi->kegiatan->tanggal_kegiatan)->format('d') : '-';
                         $dayMon = $presensi->kegiatan ? \Carbon\Carbon::parse($presensi->kegiatan->tanggal_kegiatan)->format('M') : '-';
                     @endphp
-                    <div class="px-6 py-4 hover:bg-sky-50/50 transition-colors">
+                    <div class="px-6 py-4 hover:bg-slate-50/60 dark:hover:bg-neutral-800/60 transition-colors">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div class="flex items-center gap-3 flex-1 min-w-0">
-                                <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex flex-col items-center justify-center shadow-sm shadow-sky-200">
+                                <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex flex-col items-center justify-center shadow-sm shadow-sky-200 dark:shadow-none">
                                     <span class="text-xs font-extrabold leading-none">{{ $dayNum }}</span>
                                     <span class="text-[7px] font-bold uppercase leading-tight opacity-80">{{ $dayMon }}</span>
                                 </div>
                                 <div class="min-w-0">
                                     <div class="flex items-center gap-2 flex-wrap">
-                                        <h4 class="text-xs font-bold text-slate-800 truncate">
+                                        <h4 class="text-xs font-bold text-slate-800 dark:text-neutral-100 truncate">
                                             {{ $presensi->kegiatan->materi ?? 'Kegiatan' }}
                                         </h4>
-                                        <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold border {{ $statusColors[$presensi->status] ?? 'bg-slate-100 text-slate-600 border-slate-200' }}">
+                                        <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold border {{ $statusColors[$presensi->status] ?? 'bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 border-slate-200 dark:border-neutral-700' }}">
                                             {{ $statusLabels[$presensi->status] ?? $presensi->status }}
                                         </span>
                                     </div>
-                                    <div class="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-slate-500">
+                                    <div class="flex flex-wrap items-center gap-2 mt-1 text-[11px] text-slate-500 dark:text-neutral-400">
                                         @if($presensi->kegiatan)
                                             <span>{{ \Carbon\Carbon::parse($presensi->kegiatan->tanggal_kegiatan)->isoFormat('dddd, DD MMM Y') }}</span>
                                             @if($presensi->kegiatan->ekskul)
-                                                <span class="text-sky-600 font-semibold">&middot; {{ $presensi->kegiatan->ekskul->nama_ekskul ?? '' }}</span>
+                                                <span class="text-sky-600 dark:text-sky-400 font-semibold">&middot; {{ $presensi->kegiatan->ekskul->nama_ekskul ?? '' }}</span>
                                             @endif
                                         @endif
                                     </div>
                                     @if($presensi->keterangan)
-                                        <p class="text-[11px] text-slate-500 mt-1 italic">{{ $presensi->keterangan }}</p>
+                                        <p class="text-[11px] text-slate-500 dark:text-neutral-400 mt-1 italic">{{ $presensi->keterangan }}</p>
                                     @endif
                                 </div>
                             </div>
-                            <div class="text-right text-[10px] text-slate-400 whitespace-nowrap shrink-0">
+                            <div class="text-right text-[10px] text-slate-400 dark:text-neutral-500 whitespace-nowrap shrink-0">
                                 @if($presensi->created_at)
                                     Dicatat {{ \Carbon\Carbon::parse($presensi->created_at)->isoFormat('DD MMM Y HH:mm') }}
                                 @endif

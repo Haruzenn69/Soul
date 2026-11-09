@@ -274,6 +274,7 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
     Route::get('/pendaftaran', [PembinaController::class, 'pendaftaran'])->name('pendaftaran');
     Route::patch('/pendaftaran/{pendaftaran}/status', [PembinaController::class, 'updatePendaftaran'])->name('pendaftaran.update');
     Route::get('/laporan', [PembinaController::class, 'laporan'])->name('laporan.index');
+    Route::get('/laporan/all', fn () => redirect()->route('pembina.laporan.index'))->name('laporan');
     Route::get('/laporan/{laporanBulanan}/detail', [PembinaController::class, 'laporanShow'])->name('laporan.show');
     Route::get('/laporan/{laporanBulanan}/download', [PembinaController::class, 'laporanDownload'])->name('laporan.download');
     Route::post('/laporan/{laporanBulanan}/approve', [PembinaController::class, 'laporanApprove'])->name('laporan.approve');
