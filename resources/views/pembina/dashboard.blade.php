@@ -39,7 +39,7 @@
                     <div class="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
                         <div class="absolute -bottom-10 -left-6 w-32 h-32 rounded-full bg-white/20 blur-2xl"></div>
                     </div>
-                    <img src="{{ asset('images/default.png') }}" alt="Ilustrasi Pembina"
+                    <img src="{{ asset('images/guru.png') }}" alt="Ilustrasi Pembina"
                          class="h-36 md:h-40 lg:h-44 w-auto max-w-[110px] md:max-w-[130px] lg:max-w-[150px] object-contain drop-shadow-xl animate-floaty select-none relative z-0 mb-1 md:mb-2 pointer-events-none">
                 </div>
 
@@ -140,7 +140,6 @@
             @if(($ekskulsByBidang ?? collect())->isNotEmpty())
                 @foreach($ekskulsByBidang as $bidangNama => $ekskulBidangList)
                 @php
-                    $badgeClass = \App\Support\EkskulInfo::bidangBadgeClass($bidangNama);
                     $totalAktifBidang = 0;
                     foreach($ekskulBidangList as $eksB) {
                         $totalAktifBidang += \App\Models\Pendaftaran::where('ekskul_id', $eksB->id)->where('status', 'diterima')->count();
@@ -153,10 +152,7 @@
                                 <i class="fa-solid fa-users"></i>
                             </div>
                             <div>
-                                <div class="flex items-center gap-2">
-                                    <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Anggota · Bidang {{ $bidangNama }}</h2>
-                                    <span class="px-2 py-0.5 rounded-lg border text-[10px] font-bold {{ $badgeClass }}">{{ $bidangNama }}</span>
-                                </div>
+                                <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Anggota · Bidang {{ $bidangNama }}</h2>
                                 <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{{ $ekskulBidangList->count() }} ekskul · {{ $totalAktifBidang }} anggota aktif</p>
                             </div>
                         </div>
@@ -164,20 +160,21 @@
                             Kelola <i class="fa-solid fa-arrow-right text-[10px]"></i>
                         </a>
                     </div>
-                    <div class="divide-y divide-sky-50 dark:divide-neutral-800">
+                    <div class="p-4 md:p-5 space-y-3">
                         @foreach($ekskulBidangList as $eksB)
                         @php
                             $ketuaEksB = $eksB->ketua();
                             $anggotaCount = \App\Models\Pendaftaran::where('ekskul_id', $eksB->id)->where('status', 'diterima')->count();
                         @endphp
-                        <div class="px-5 py-3.5 flex items-center justify-between gap-4">
-                            <div class="flex items-center gap-3 min-w-0">
-                                <div class="w-10 h-10 rounded-2xl bg-sky-50 dark:bg-sky-950/30 flex items-center justify-center text-sky-700 dark:text-sky-400 font-extrabold text-xs shrink-0 border border-sky-100 dark:border-sky-800/50">
-                                    {{ strtoupper(substr($eksB->nama_ekskul, 0, 2)) }}
-                                </div>
+                        <div class="p-3.5 md:p-4 rounded-2xl bg-slate-50/70 dark:bg-neutral-900/50 border border-slate-100 dark:border-neutral-800/80 hover:border-sky-200 dark:hover:border-neutral-700 flex items-center justify-between gap-4 transition">
+                            <div class="flex items-center gap-3.5 min-w-0">
+                                <img src="{{ $eksB->logo_url ?? asset('images/komunita.jpg') }}"
+                                     alt="{{ $eksB->nama_ekskul }}"
+                                     onerror="this.onerror=null; this.src='{{ asset('images/komunita.jpg') }}';"
+                                     class="w-12 h-12 rounded-2xl object-cover border border-slate-200/80 dark:border-neutral-700 shrink-0 shadow-sm">
                                 <div class="min-w-0">
-                                    <h4 class="text-xs font-extrabold text-slate-900 dark:text-white truncate">{{ $eksB->nama_ekskul }}</h4>
-                                    <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+                                    <h4 class="text-xs md:text-sm font-extrabold text-slate-900 dark:text-white truncate">{{ $eksB->nama_ekskul }}</h4>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                                         <i class="fa-solid fa-user-group text-[10px] mr-1 text-slate-400"></i>{{ $anggotaCount }} Anggota
                                         @if($ketuaEksB) · Ketua: <span class="font-semibold text-sky-700 dark:text-sky-400">{{ $ketuaEksB->nama }}</span>@endif
                                     </p>
@@ -185,9 +182,9 @@
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
                                 @if($eksB->status)
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">Aktif</span>
+                                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">Aktif</span>
                                 @else
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-50 dark:bg-neutral-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-neutral-700">Nonaktif</span>
+                                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-neutral-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-neutral-700">Nonaktif</span>
                                 @endif
                             </div>
                         </div>
