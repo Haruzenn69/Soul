@@ -263,15 +263,11 @@
                             {{-- Pengguna / Nama --}}
                             <td class="py-3.5 px-5">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-xl {{ $isNonaktif ? 'bg-slate-200 text-slate-500' : 'bg-sky-100 text-sky-700' }} font-extrabold flex items-center justify-center text-xs uppercase shrink-0 overflow-hidden">
-                                        @php
-                                            $userFoto = $user->siswa?->foto_url ?? ($user->pembina?->foto ? asset('storage/'.$user->pembina->foto) : null);
-                                        @endphp
-                                        @if($userFoto)
-                                            <img src="{{ $userFoto }}" alt="Avatar" class="w-full h-full object-cover {{ $isNonaktif ? 'grayscale opacity-75' : '' }}">
-                                        @else
-                                            {{ strtoupper(substr($user->siswa?->nama ?? $user->pembina?->nama ?? $user->username ?? 'U', 0, 2)) }}
-                                        @endif
+                                    <div class="w-8 h-8 rounded-xl {{ $isNonaktif ? 'bg-slate-200' : 'bg-slate-100' }} border border-slate-200/80 shrink-0 overflow-hidden shadow-xs">
+                                        <img src="{{ $user->foto_url ?? asset('images/default.png') }}"
+                                             alt="Avatar {{ $user->username }}"
+                                             class="w-full h-full object-cover {{ $isNonaktif ? 'grayscale opacity-75' : '' }}"
+                                             onerror="this.onerror=null;this.src='{{ asset('images/default.png') }}';">
                                     </div>
                                     <div>
                                         <div class="font-bold {{ $isNonaktif ? 'text-slate-500' : 'text-slate-900' }} leading-snug flex items-center gap-1.5">
