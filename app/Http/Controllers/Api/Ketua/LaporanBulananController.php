@@ -102,14 +102,16 @@ class LaporanBulananController extends ApiController
         $dokumentasiEvent = $eventKegiatans->whereNotNull('dokumentasi')
             ->pluck('dokumentasi')->values()->all();
 
-        $pdf = Pdf::loadView('ketua.laporan-bulanan.pdf', [
+        $rekapData = app(\App\Services\RekapAbsensiService::class)->rekap($ekskul, $laporan_bulanan->bulan);
+
+        $pdf = Pdf::loadView('ketua.laporan-bulanan.pdf', array_merge($rekapData, [
             'laporan' => $laporan_bulanan,
             'kelas' => $kelasLabel,
             'rutinKegiatans' => $rutinKegiatans,
             'eventKegiatans' => $eventKegiatans,
             'dokumentasiRutin' => $dokumentasiRutin,
             'dokumentasiEvent' => $dokumentasiEvent,
-        ]);
+        ]));
         $filename = 'laporan-'.str_replace('/', '-', $laporan_bulanan->bulan).'-'.Str::slug($ekskul->nama_ekskul ?? 'ekskul').'.pdf';
 
         return response($pdf->output(), 200, [
