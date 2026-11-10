@@ -19,32 +19,20 @@
         </button>
     </div>
 
-    {{-- HERO BANNER (Biru Muda di Light Mode, Hitam di Dark Mode) --}}
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-sky-500 to-blue-500 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-950 p-6 md:p-8 text-white border border-sky-200/50 dark:border-neutral-800 shadow-xl shadow-sky-200/50 dark:shadow-none">
+    {{-- HERO BANNER --}}
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white soul-timbul shadow-xl shadow-sky-200">
         <div class="absolute inset-0 pointer-events-none">
-            <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/20 dark:bg-neutral-800/20 blur-3xl"></div>
-            <div class="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-sky-200/30 dark:bg-neutral-800/20 blur-3xl"></div>
+            <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
+            <div class="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
         </div>
 
-        <div class="relative z-10 max-w-2xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 dark:bg-neutral-800 backdrop-blur-md border border-white/30 dark:border-neutral-700 text-[11px] font-extrabold uppercase tracking-wider text-white dark:text-sky-300 mb-3 shadow-xs">
-                <svg class="w-3.5 h-3.5 text-amber-300" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
-                Struktur Organisasi
-            </div>
-            <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
+        <div class="relative z-10 max-w-3xl">
+            <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">
                 Pengurus Inti {{ $ekskul->nama_ekskul }}
             </h2>
-            <p class="text-xs md:text-sm text-sky-50 dark:text-slate-300 mt-2 leading-relaxed">
+            <p class="text-[11px] sm:text-sm text-white/85 mt-2 leading-relaxed max-w-[52rem]">
                 Setiap ekskul memiliki 4 jabatan pokok: <strong>Ketua</strong>, <strong>Wakil Ketua</strong>, <strong>Sekretaris</strong>, dan <strong>Bendahara</strong> (1 orang per jabatan dari anggota berstatus diterima). Sebagai Ketua, Anda dapat mengusulkan calon untuk posisi Wakil Ketua, Sekretaris, dan Bendahara kepada Pembina untuk disetujui.
             </p>
-            <div class="mt-4 flex items-center gap-2.5 text-[11px] text-white/95 dark:text-amber-300/90 font-medium bg-white/15 dark:bg-neutral-950/70 border border-white/25 dark:border-neutral-800 px-3.5 py-2.5 rounded-2xl backdrop-blur-sm">
-                <svg class="w-4 h-4 shrink-0 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>Catatan: Sesuai regulasi sistem, hanya Pembina yang memiliki wewenang untuk menetapkan langsung, mengganti, atau mencopot pengurus yang telah aktif.</span>
-            </div>
         </div>
     </div>
 
@@ -87,10 +75,7 @@
                 <div>
                     {{-- HEADER JABATAN --}}
                     <div class="flex items-center justify-between gap-2 mb-4">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider border {{ $style['badge'] }}">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $style['icon'] }}"/>
-                            </svg>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/50 border border-sky-100 dark:border-sky-800">
                             {{ $jabatanNama }}
                         </span>
 

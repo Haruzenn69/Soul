@@ -3,10 +3,16 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-        <div>
-            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Kelola Anggota</h1>
-            <p class="text-xs text-slate-400 mt-1">Total: {{ $totalAnggotas }} anggota</p>
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-5 md:p-7 text-white soul-timbul shadow-xl shadow-sky-200 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
+            <div class="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
+        </div>
+        <div class="relative">
+            <div class="min-w-0">
+                <h1 class="text-xl md:text-2xl font-extrabold text-white">Kelola Anggota</h1>
+                <p class="text-xs text-white/80 mt-1">Total: {{ $totalAnggotas }} anggota</p>
+            </div>
         </div>
     </div>
 

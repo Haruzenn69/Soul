@@ -23,8 +23,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
-use Laravolt\Indonesia\Models\City;
-use Laravolt\Indonesia\Models\Province;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\Failure;
 
@@ -148,13 +146,6 @@ class UserController extends Controller
         return view('kesiswaan.users.create', [
             'kelas' => Kelas::with('tahunAjaran')->whereHas('tahunAjaran', fn ($query) => $query->where('status', 'aktif'))->orderBy('nama')->get(),
             'ekskuls' => $this->getEskulsWithKetuaStatus(),
-            'provinces' => Province::orderBy('name')->get(['code', 'name']),
-            'siswaProvinceCode' => old('siswa_provinsi') ?? (filled(old('tempat_lahir'))
-                ? City::where('name', old('tempat_lahir'))->value('province_code')
-                : null),
-            'pembinaProvinceCode' => old('pembina_provinsi') ?? (filled(old('pembina_tempat_lahir'))
-                ? City::where('name', old('pembina_tempat_lahir'))->value('province_code')
-                : null),
         ]);
     }
 
@@ -222,7 +213,7 @@ class UserController extends Controller
             'nama.regex' => 'Nama hanya boleh mengandung huruf alfabet, spasi, titik, koma, dan strip. Tidak boleh ada angka atau simbol lainnya.',
             'jenis_kelamin.required' => 'Kolom Jenis Kelamin wajib diisi.',
             'jenis_kelamin.in' => 'Jenis Kelamin harus "Laki-laki" atau "Perempuan".',
-            'tempat_lahir.required' => 'Kolom Tempat Lahir wajib diisi. Pilih provinsi lalu kota/kabupaten.',
+            'tempat_lahir.required' => 'Kolom Tempat Lahir wajib diisi.',
             'tempat_lahir.max' => 'Tempat Lahir maksimal 100 karakter.',
             'tanggal_lahir.required' => 'Kolom Tanggal Lahir wajib diisi.',
             'tanggal_lahir.date' => 'Tanggal Lahir harus berupa tanggal yang valid.',
@@ -244,7 +235,7 @@ class UserController extends Controller
             'pembina_nama.regex' => 'Nama Lengkap hanya boleh mengandung huruf alfabet, spasi, titik, koma, dan strip. Tidak boleh ada angka atau simbol lainnya.',
             'pembina_jenis_kelamin.required' => 'Kolom Jenis Kelamin wajib diisi.',
             'pembina_jenis_kelamin.in' => 'Jenis Kelamin harus "Laki-laki" atau "Perempuan".',
-            'pembina_tempat_lahir.required' => 'Kolom Tempat Lahir wajib diisi. Pilih provinsi lalu kota/kabupaten.',
+            'pembina_tempat_lahir.required' => 'Kolom Tempat Lahir wajib diisi.',
             'pembina_tempat_lahir.max' => 'Tempat Lahir maksimal 100 karakter.',
             'pembina_tanggal_lahir.required' => 'Kolom Tanggal Lahir wajib diisi.',
             'pembina_tanggal_lahir.date' => 'Tanggal Lahir harus berupa tanggal yang valid.',

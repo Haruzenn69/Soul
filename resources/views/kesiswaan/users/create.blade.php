@@ -49,13 +49,6 @@ function userCreateForm() {
         pembinaAlamat: @json(old('pembina_alamat', '')),
         calculatedAge: '',
         kolomKosong: [],
-        // Dropdown provinsi -> kota/kabupaten tempat lahir (laravolt/indonesia)
-        siswaProvinsi: '{{ $siswaProvinceCode ?? '' }}',
-        siswaCities: [],
-        siswaCitiesLoading: false,
-        pembinaProvinsi: '{{ $pembinaProvinceCode ?? '' }}',
-        pembinaCities: [],
-        pembinaCitiesLoading: false,
         peringatan: {
             isOpen: false,
             title: 'Peringatan Validasi',
@@ -70,8 +63,7 @@ function userCreateForm() {
             { id: 'input-pembina-nip', label: 'NIP (18 angka)' },
             { id: 'input-pembina-email', label: 'Email' },
             { id: 'input-pembina-jenis-kelamin', label: 'Jenis Kelamin' },
-            { id: 'input-pembina-provinsi', label: 'Provinsi Tempat Lahir' },
-            { id: 'input-pembina-tempat-lahir', label: 'Kota / Kabupaten Tempat Lahir' },
+            { id: 'input-pembina-tempat-lahir', label: 'Tempat Lahir' },
 
             { id: 'input-pembina-tanggal-lahir', label: 'Tanggal Lahir' },
             { id: 'input-pembina-agama', label: 'Agama' },
@@ -85,8 +77,6 @@ function userCreateForm() {
 
         init() {
             this.calculateAge();
-            if (this.siswaProvinsi) this.loadCities('siswa', this.siswaProvinsi);
-            if (this.pembinaProvinsi) this.loadCities('pembina', this.pembinaProvinsi);
             this.$nextTick(() => this.checkSiswaClassAvailability());
         },
 
@@ -125,45 +115,6 @@ function userCreateForm() {
             const d = new Date(this.pembinaTanggalLahir);
             const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
             return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
-        },
-
-        loadCities(target, provinceCode) {
-            const isP = target === 'pembina';
-            if (isP) { this.pembinaCities = []; this.pembinaCitiesLoading = true; }
-            else { this.siswaCities = []; this.siswaCitiesLoading = true; }
-
-            fetch(`{{ route('api.cities') }}?province_code=${encodeURIComponent(provinceCode)}`)
-                .then(r => r.json())
-                .then(data => {
-                    if (isP) { this.pembinaCities = data; this.pembinaCitiesLoading = false; }
-                    else { this.siswaCities = data; this.siswaCitiesLoading = false; }
-                    this.syncCitySelect(target);
-                })
-                .catch(() => {
-                    if (isP) this.pembinaCitiesLoading = false;
-                    else this.siswaCitiesLoading = false;
-                });
-        },
-
-        syncCitySelect(target) {
-            this.$nextTick(() => {
-                const isP = target === 'pembina';
-                const el = document.getElementById(isP ? 'input-pembina-tempat-lahir' : 'input-tempat-lahir');
-                if (el) el.value = isP ? this.pembinaTempatLahir : this.tempatLahir;
-            });
-        },
-
-        onProvinsiChange(target) {
-            const isP = target === 'pembina';
-            if (isP) {
-                this.pembinaTempatLahir = '';
-                if (this.pembinaProvinsi) this.loadCities('pembina', this.pembinaProvinsi);
-                else this.pembinaCities = [];
-            } else {
-                this.tempatLahir = '';
-                if (this.siswaProvinsi) this.loadCities('siswa', this.siswaProvinsi);
-                else this.siswaCities = [];
-            }
         },
 
         showWarning(options) {
@@ -282,23 +233,13 @@ function userCreateForm() {
                     });
                     return false;
                 }
-                if (!this.siswaProvinsi) {
-                    this.showWarning({
-                        title: 'Provinsi Tempat Lahir Belum Dipilih',
-                        message: 'Mohon pilih provinsi tempat lahir siswa.',
-                        focusId: 'input-siswa-provinsi',
-                        targetStep: 3,
-                        actionLabel: 'Pilih Provinsi'
-                    });
-                    return false;
-                }
                 if (!this.tempatLahir) {
                     this.showWarning({
-                        title: 'Kota / Kabupaten Tempat Lahir Belum Dipilih',
-                        message: 'Mohon pilih kota/kabupaten tempat lahir siswa.',
+                        title: 'Tempat Lahir Belum Diisi',
+                        message: 'Mohon isi tempat lahir siswa.',
                         focusId: 'input-tempat-lahir',
                         targetStep: 3,
-                        actionLabel: 'Pilih Kota / Kabupaten'
+                        actionLabel: 'Isi Tempat Lahir'
                     });
                     return false;
                 }
@@ -734,24 +675,8 @@ function userCreateForm() {
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Provinsi Tempat Lahir <span class="text-rose-500">*</span></label>
-                                <select name="siswa_provinsi" id="input-siswa-provinsi" x-model="siswaProvinsi" @change="onProvinsiChange('siswa')" :disabled="role !== 'siswa'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition disabled:opacity-60 disabled:cursor-not-allowed">
-                                    <option value="">Pilih provinsi...</option>
-                                    @foreach ($provinces as $province)
-                                        <option value="{{ $province->code }}" {{ ($siswaProvinceCode ?? null) === $province->code ? 'selected' : '' }}>{{ ucwords(strtolower($province->name)) }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Kota / Kabupaten Tempat Lahir <span class="text-rose-500">*</span></label>
-                                <select name="tempat_lahir" id="input-tempat-lahir" x-model="tempatLahir"
-                                        :disabled="role !== 'siswa' || !siswaProvinsi"
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition disabled:opacity-60 disabled:cursor-not-allowed">
-                                    <option value="" x-text="!siswaProvinsi ? 'Pilih provinsi terlebih dahulu' : (siswaCitiesLoading ? 'Memuat kota / kabupaten...' : 'Pilih kota / kabupaten')"></option>
-                                    <template x-for="city in siswaCities" :key="city.id">
-                                        <option :value="city.name" x-text="city.name" :selected="tempatLahir === city.name"></option>
-                                    </template>
-                                </select>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tempat Lahir <span class="text-rose-500">*</span></label>
+                                <input type="text" name="tempat_lahir" id="input-tempat-lahir" x-model="tempatLahir" :disabled="role !== 'siswa'" value="{{ old('tempat_lahir') }}" placeholder="Contoh: Bandung" maxlength="100" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition disabled:opacity-60 disabled:cursor-not-allowed">
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
@@ -989,24 +914,8 @@ function userCreateForm() {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Provinsi Tempat Lahir *</label>
-                                <select id="input-pembina-provinsi" x-model="pembinaProvinsi" @change="onProvinsiChange('pembina')" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs disabled:opacity-60 disabled:cursor-not-allowed">
-                                    <option value="">Pilih provinsi...</option>
-                                    @foreach ($provinces as $province)
-                                        <option value="{{ $province->code }}" {{ ($pembinaProvinceCode ?? null) === $province->code ? 'selected' : '' }}>{{ ucwords(strtolower($province->name)) }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Kota / Kabupaten Tempat Lahir *</label>
-                                <select name="pembina_tempat_lahir" id="input-pembina-tempat-lahir" x-model="pembinaTempatLahir"
-                                        :disabled="role !== 'pembina' || !pembinaProvinsi"
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs disabled:opacity-60 disabled:cursor-not-allowed">
-                                    <option value="" x-text="!pembinaProvinsi ? 'Pilih provinsi terlebih dahulu' : (pembinaCitiesLoading ? 'Memuat kota / kabupaten...' : 'Pilih kota / kabupaten')"></option>
-                                    <template x-for="city in pembinaCities" :key="city.id">
-                                        <option :value="city.name" x-text="city.name"></option>
-                                    </template>
-                                </select>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tempat Lahir *</label>
+                                <input type="text" name="pembina_tempat_lahir" id="input-pembina-tempat-lahir" x-model="pembinaTempatLahir" :disabled="role !== 'pembina'" value="{{ old('pembina_tempat_lahir') }}" placeholder="Contoh: Bandung" maxlength="100" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs disabled:opacity-60 disabled:cursor-not-allowed">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tanggal Lahir *</label>

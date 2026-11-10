@@ -21,7 +21,7 @@ class CreateCitiesTable extends Migration
      */
     public function up()
     {
-        Schema::connection($this->connection())->create(config('laravolt.indonesia.table_prefix').'cities', function (Blueprint $table) {
+        Schema::connection($this->connection())->create('indonesia_cities', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->char('code', 4)->unique();
             $table->char('province_code', 2);
@@ -31,7 +31,7 @@ class CreateCitiesTable extends Migration
 
             $table->foreign('province_code')
                 ->references('code')
-                ->on(config('laravolt.indonesia.table_prefix').'provinces')
+                ->on('indonesia_provinces')
                 ->onUpdate('cascade')->onDelete('restrict');
         });
     }
@@ -43,6 +43,6 @@ class CreateCitiesTable extends Migration
      */
     public function down()
     {
-        Schema::drop(config('laravolt.indonesia.table_prefix').'cities');
+        Schema::drop('indonesia_cities');
     }
 }

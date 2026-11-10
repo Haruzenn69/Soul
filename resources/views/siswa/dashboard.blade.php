@@ -51,16 +51,16 @@
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
         </div>
 
-        <div class="relative grid md:grid-cols-5 gap-4 lg:gap-6 items-center">
+        <div class="relative grid grid-cols-5 gap-2 md:gap-4 lg:gap-6 items-center">
             <!-- TEXT + CTA -->
-            <div class="md:col-span-3">
-                <h1 class="text-xl md:text-2xl font-extrabold tracking-tight leading-tight">
+            <div class="min-w-0 col-span-3">
+                <h1 class="text-base sm:text-xl md:text-2xl font-extrabold tracking-tight leading-tight break-words">
                     Halo, {{ $siswa->nama ?? auth()->user()->username }}
                 </h1>
-                <p class="text-sm text-white/85 mt-1 font-medium">
+                <p class="text-[11px] sm:text-sm text-white/85 mt-1 font-medium leading-snug">
                     {{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
                 </p>
-                <p class="text-xs text-white/70 mt-2 max-w-lg leading-relaxed">
+                <p class="text-[10px] sm:text-xs text-white/70 mt-2 max-w-[15rem] sm:max-w-[22rem] leading-relaxed text-justify">
                     @if($hasMultipleEkskul && $ekskul)
                         Menampilkan dashboard untuk ekskul <strong>{{ $ekskul->nama_ekskul }}</strong>. Gunakan tombol switch untuk berpindah dashboard ekskul.
                     @else
@@ -68,37 +68,37 @@
                     @endif
                 </p>
 
-                <div class="flex gap-2 flex-wrap mt-4">
+                <div class="flex flex-row flex-wrap items-center gap-1.5 sm:gap-2 mt-3 sm:mt-4">
                     @if(isset($activeEkskuls) && $activeEkskuls->isNotEmpty())
-                        <a href="{{ route('siswa.presensi', $ekskul ? ['ekskul' => $ekskul->id] : []) }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white text-sky-700 font-bold text-xs rounded-xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
-                            <i class="fa-solid fa-circle-check text-xs"></i>
+                        <a href="{{ route('siswa.presensi', $ekskul ? ['ekskul' => $ekskul->id] : []) }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2 py-2 sm:gap-1.5 sm:px-4 bg-white text-sky-700 font-bold text-[10px] sm:text-xs rounded-xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
+                            <i class="fa-solid fa-circle-check text-[10px] sm:text-xs shrink-0"></i>
                             Lihat Presensi
                         </a>
                     @else
-                        <a href="{{ route('siswa.daftar-ekskul') }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white text-sky-700 font-bold text-xs rounded-xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
-                            <i class="fa-solid fa-plus text-xs"></i>
+                        <a href="{{ route('siswa.daftar-ekskul') }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2 py-2 sm:gap-1.5 sm:px-4 bg-white text-sky-700 font-bold text-[10px] sm:text-xs rounded-xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
+                            <i class="fa-solid fa-plus text-[10px] sm:text-xs shrink-0"></i>
                             Daftar Ekskul
                         </a>
                     @endif
-                    <a href="{{ route('siswa.katalog') }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-xl hover:bg-white/20 transition-all">
-                        <i class="fa-solid fa-book-open text-xs"></i>
+                    <a href="{{ route('siswa.katalog') }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2 py-2 sm:gap-1.5 sm:px-4 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-[10px] sm:text-xs rounded-xl hover:bg-white/20 transition-all">
+                        <i class="fa-solid fa-book-open text-[10px] sm:text-xs shrink-0"></i>
                         Jelajahi Katalog
                     </a>
                 </div>
             </div>
 
             <!-- ILLUSTRATIVE PANEL + FLOATING STATS -->
-            <div class="md:col-span-2 relative hidden md:block">
-                <div class="relative h-36 md:h-40 lg:h-44 rounded-3xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center">
+            <div class="col-span-2 relative min-w-0">
+                <div class="relative h-32 sm:h-36 md:h-40 lg:h-44 rounded-2xl md:rounded-3xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center">
                     <div class="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
                         <div class="absolute -bottom-10 -left-6 w-32 h-32 rounded-full bg-white/20 blur-2xl"></div>
                     </div>
                     <img src="{{ asset('images/default.png') }}" alt="Ilustrasi Siswa"
-                         class="h-36 md:h-40 lg:h-44 w-auto max-w-[110px] md:max-w-[130px] lg:max-w-[150px] object-contain drop-shadow-xl animate-floaty select-none relative z-0 mb-1 md:mb-2 pointer-events-none">
+                         class="h-24 sm:h-28 md:h-40 lg:h-44 w-auto max-w-full md:max-w-[130px] lg:max-w-[150px] object-contain drop-shadow-xl animate-floaty select-none relative z-0 mb-8 md:mb-2 pointer-events-none">
                 </div>
 
                 <!-- floating stat card overlapping bottom edge -->
-                <div class="absolute -bottom-6 md:-bottom-7 left-2 right-2 z-10 grid grid-cols-3 gap-1 bg-white rounded-xl shadow-xl shadow-sky-900/10 p-2">
+                <div class="absolute bottom-2 md:-bottom-7 left-1 right-1 sm:left-2 sm:right-2 z-10 grid grid-cols-3 gap-0.5 sm:gap-1 bg-white rounded-lg sm:rounded-xl shadow-xl shadow-sky-900/10 p-1 sm:p-2">
                     <div class="text-center border-r border-slate-100 pr-1">
                         <p class="text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $hasMultipleEkskul ? 1 : $activeEkskuls->count() }}</p>
                         <p class="text-[10px] md:text-xs text-slate-400 font-semibold mt-1">Ekskul</p>
@@ -116,32 +116,32 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="relative mt-4 pt-3 md:mt-11 lg:mt-12 border-t border-white/15 grid grid-cols-1 sm:grid-cols-3 gap-2">
-            <a href="{{ route('siswa.presensi', $ekskul ? ['ekskul' => $ekskul->id] : []) }}" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+        <div class="relative mt-4 pt-3 md:mt-11 lg:mt-12 border-t border-white/15 grid grid-cols-3 gap-1.5 sm:gap-2">
+            <a href="{{ route('siswa.presensi', $ekskul ? ['ekskul' => $ekskul->id] : []) }}" class="group flex min-w-0 items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-calendar-check text-sm text-white"></i>
                 </div>
-                <div class="text-left">
+                <div class="min-w-0 text-left">
                     <p class="text-xs font-bold leading-none text-white">Presensi</p>
-                    <p class="text-xs text-white/70 mt-1 leading-none">Jadwal & Absen</p>
+                    <p class="text-[10px] sm:text-xs text-white/70 mt-1 leading-tight">Jadwal & Absen</p>
                 </div>
             </a>
-            <a href="{{ route('siswa.rekap', $ekskul ? ['ekskul' => $ekskul->id] : []) }}" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+            <a href="{{ route('siswa.rekap', $ekskul ? ['ekskul' => $ekskul->id] : []) }}" class="group flex min-w-0 items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-chart-simple text-sm text-white"></i>
                 </div>
-                <div class="text-left">
-                    <p class="text-xs font-bold leading-none text-white">Rekap Absensi</p>
-                    <p class="text-xs text-white/70 mt-1 leading-none">Riwayat Kehadiran</p>
+                <div class="min-w-0 text-left">
+                    <p class="text-[10px] sm:text-xs font-bold leading-tight text-white">Rekap</p>
+                    <p class="text-[10px] sm:text-xs text-white/70 mt-1 leading-tight">Absensi</p>
                 </div>
             </a>
-            <a href="{{ route('siswa.katalog') }}" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+            <a href="{{ route('siswa.katalog') }}" class="group flex min-w-0 items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-book-open text-sm text-white"></i>
                 </div>
-                <div class="text-left">
+                <div class="min-w-0 text-left">
                     <p class="text-xs font-bold leading-none text-white">Katalog</p>
-                    <p class="text-xs text-white/70 mt-1 leading-none">Cari Ekskul</p>
+                    <p class="text-[10px] sm:text-xs text-white/70 mt-1 leading-tight">Cari Ekskul</p>
                 </div>
             </a>
         </div>
@@ -191,7 +191,7 @@
     @endif
 
     {{-- STATS CARDS - MOBILE ONLY (di desktop sudah tampil di hero card) --}}
-    <div class="grid grid-cols-3 gap-2.5 md:hidden">
+    <div class="hidden grid-cols-3 gap-2.5 md:hidden">
         <div class="relative overflow-hidden rounded-2xl bg-white dark:bg-[#1a1a1a] border border-sky-100 dark:border-neutral-800 p-3 shadow-sm">
             <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Ekskul</p>
             <h3 class="text-lg font-extrabold mt-0.5 text-sky-700 dark:text-sky-400">{{ $hasMultipleEkskul ? 1 : $activeEkskuls->count() }}</h3>
@@ -237,7 +237,7 @@
                 @endif
             </div>
 
-            <div class="grid grid-cols-1 {{ $isSingleEkskul ? '' : 'md:grid-cols-2' }} gap-4">
+            <div class="grid {{ $isSingleEkskul ? 'grid-cols-1' : 'grid-cols-2 md:grid-cols-2' }} gap-2 sm:gap-4">
                 @foreach ($displayEkskuls as $ekskulAktif)
                     @php
                         $pendAktif = $siswa?->activePendaftaranUntuk($ekskulAktif);
@@ -248,7 +248,7 @@
                         {{-- Tampilan Penuh (Full-Width) jika hanya 1 ekskul agar rapi dan tidak ada space kosong --}}
                         <div class="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-sky-100 dark:border-neutral-800 shadow-sm p-4 md:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-5 animate-fade-up">
                             <div class="flex items-start sm:items-center gap-4 min-w-0 flex-1">
-                                <img src="{{ $ekskulAktif->logo_url }}" alt="{{ $ekskulAktif->nama_ekskul }}" class="w-13 h-13 md:w-14 md:h-14 rounded-xl object-cover border border-slate-100 dark:border-neutral-800 shrink-0 shadow-sm">
+                                <img src="{{ $ekskulAktif->logo_url }}" alt="{{ $ekskulAktif->nama_ekskul }}" class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl object-cover border border-slate-100 dark:border-neutral-800 shrink-0 shadow-sm">
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <h4 class="text-sm md:text-base font-extrabold text-slate-900 dark:text-white">{{ $ekskulAktif->nama_ekskul }}</h4>
@@ -278,7 +278,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-center justify-end gap-2 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-neutral-800 flex-wrap shrink-0 md:ml-auto">
+                            <div class="flex items-center justify-start md:justify-end gap-2 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-neutral-800 flex-wrap shrink-0 md:ml-auto">
                                 <a href="{{ route('ekskul.detail', $ekskulAktif) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition shadow-sm">
                                     <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i>
                                     Lihat Ekskul
@@ -295,11 +295,11 @@
                         </div>
                     @else
                         {{-- Tampilan Grid 2-Kolom jika mengikuti 2 ekskul sekaligus --}}
-                        <div class="bg-white dark:bg-[#1a1a1a] rounded-2xl border border-sky-100 dark:border-neutral-800 shadow-sm p-4 md:p-5 flex flex-col justify-between gap-3 animate-fade-up">
+                        <div class="min-w-0 bg-white dark:bg-[#1a1a1a] rounded-xl sm:rounded-2xl border border-sky-100 dark:border-neutral-800 shadow-sm p-2 sm:p-4 md:p-5 flex flex-col justify-between gap-2 sm:gap-3 animate-fade-up">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="min-w-0 flex-1">
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <h4 class="font-bold text-slate-800 dark:text-slate-100">{{ $ekskulAktif->nama_ekskul }}</h4>
+                                    <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
+                                        <h4 class="text-[10px] sm:text-base font-bold text-slate-800 dark:text-slate-100 truncate">{{ $ekskulAktif->nama_ekskul }}</h4>
                                         @if($isKetua)
                                             <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900/50 px-2 py-0.5 rounded-full">
                                                 <i class="fa-solid fa-crown text-[9px]"></i>
@@ -307,20 +307,20 @@
                                             </span>
                                         @endif
                                     </div>
-                                    <p class="mt-1 text-xs text-slate-500 dark:text-neutral-400">
-                                        {{ \Illuminate\Support\Str::limit($ekskulAktif->deskripsi, 90) ?: 'Ekskul aktif kamu saat ini.' }}
+                                    <p class="mt-1 text-[10px] sm:text-xs text-slate-500 dark:text-neutral-400">
+                                        {{ \Illuminate\Support\Str::limit($ekskulAktif->deskripsi, 60) ?: 'Ekskul aktif kamu saat ini.' }}
                                     </p>
                                 </div>
-                                <img src="{{ $ekskulAktif->logo_url }}" alt="{{ $ekskulAktif->nama_ekskul }}" class="w-12 h-12 rounded-xl object-cover border border-slate-100 dark:border-neutral-800 shrink-0 shadow-sm">
+                                <img src="{{ $ekskulAktif->logo_url }}" alt="{{ $ekskulAktif->nama_ekskul }}" class="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl object-cover border border-slate-100 dark:border-neutral-800 shrink-0 shadow-sm">
                             </div>
-                            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-neutral-800/80 flex-wrap mt-auto">
-                                <a href="{{ route('ekskul.detail', $ekskulAktif) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition shadow-sm">
+                            <div class="flex items-center justify-start sm:justify-end gap-1 pt-2 border-t border-slate-100 dark:border-neutral-800/80 flex-wrap mt-auto">
+                                <a href="{{ route('ekskul.detail', $ekskulAktif) }}" class="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg sm:rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-[9px] sm:text-xs font-bold transition shadow-sm">
                                     Lihat Ekskul
                                 </a>
-                                <a href="{{ route('siswa.presensi', ['ekskul' => $ekskulAktif->id]) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition">
+                                <a href="{{ route('siswa.presensi', ['ekskul' => $ekskulAktif->id]) }}" class="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg sm:rounded-xl bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700 text-slate-700 dark:text-slate-200 text-[9px] sm:text-xs font-bold transition">
                                     Presensi
                                 </a>
-                                <a href="{{ route('siswa.nilai', ['ekskul' => $ekskulAktif->id]) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition">
+                                <a href="{{ route('siswa.nilai', ['ekskul' => $ekskulAktif->id]) }}" class="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg sm:rounded-xl bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700 text-slate-700 dark:text-slate-200 text-[9px] sm:text-xs font-bold transition">
                                     Nilai
                                 </a>
                             </div>
@@ -369,28 +369,28 @@
                 ];
             @endphp
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="grid grid-cols-4 gap-1.5 sm:gap-3">
                 @foreach($jabatanLabels as $jKey => $jTitle)
                     @php
                         $pItem = $pengurusAktif->get($jKey);
                     @endphp
 
-                    <div class="rounded-xl border border-sky-100 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/40 p-3.5 flex flex-col justify-between">
+                    <div class="min-w-0 rounded-lg sm:rounded-xl border border-sky-100 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/40 p-1.5 sm:p-3.5 flex flex-col justify-between">
                         <div>
                             <div class="flex items-center justify-between mb-2.5">
-                                <span class="text-[10px] font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/50 border border-sky-100 dark:border-sky-800 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                                <span class="max-w-full text-[8px] sm:text-[10px] font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/50 border border-sky-100 dark:border-sky-800 px-1 sm:px-2 py-0.5 rounded-md uppercase tracking-normal sm:tracking-wider truncate">
                                     {{ $jTitle }}
                                 </span>
                             </div>
 
                             @if($pItem && $pItem->siswa)
-                                <div class="flex items-center gap-3">
-                                    <img src="{{ $pItem->siswa->foto_url ?? asset('images/default.png') }}" alt="{{ $pItem->siswa->nama }}" class="w-10 h-10 rounded-xl object-cover border border-slate-200 dark:border-neutral-700 shrink-0">
-                                    <div class="min-w-0 flex-1">
-                                        <h4 class="text-xs font-bold text-slate-900 dark:text-white truncate" title="{{ $pItem->siswa->nama }}">
+                                <div class="flex min-w-0 flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3">
+                                    <img src="{{ $pItem->siswa->foto_url ?? asset('images/default.png') }}" alt="{{ $pItem->siswa->nama }}" class="w-6 h-6 sm:w-10 sm:h-10 rounded-md sm:rounded-xl object-cover border border-slate-200 dark:border-neutral-700 shrink-0">
+                                    <div class="min-w-0 w-full sm:flex-1 text-center sm:text-left">
+                                        <h4 class="text-[9px] sm:text-xs font-bold text-slate-900 dark:text-white truncate" title="{{ $pItem->siswa->nama }}">
                                             {{ $pItem->siswa->nama }}
                                         </h4>
-                                        <p class="text-[11px] text-slate-400 mt-0.5 truncate">
+                                        <p class="hidden sm:block text-[11px] text-slate-400 mt-0.5 truncate">
                                             {{ $pItem->siswa->kelas?->nama ?? 'Siswa' }} • NIS: {{ $pItem->siswa->nis }}
                                         </p>
                                     </div>

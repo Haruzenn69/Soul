@@ -36,8 +36,8 @@
 
     <!-- Kartu Ekskul yang dipilih -->
     <div class="bg-gradient-to-r from-sky-400 to-blue-500 p-4 md:p-5 rounded-2xl shadow-lg shadow-sky-200 text-white flex items-center gap-3 animate-fade-up max-w-2xl" style="animation-delay: .05s">
-        <div class="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-white/20 backdrop-blur border border-white/30 flex items-center justify-center text-sm md:text-base font-extrabold uppercase shadow-inner shrink-0">
-            {{ substr($ekskul->nama_ekskul, 0, 2) }}
+        <div class="w-12 h-12 md:w-14 md:h-14 rounded-xl overflow-hidden bg-white/20 backdrop-blur border border-white/30 shadow-inner shrink-0">
+            <img src="{{ $ekskul->logo_url }}" alt="Logo {{ $ekskul->nama_ekskul }}" class="w-full h-full object-cover">
         </div>
         <div class="min-w-0">
             <p class="text-[10px] font-bold tracking-wider uppercase text-white/80">Ekskul yang Dipilih</p>

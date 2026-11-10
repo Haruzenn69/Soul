@@ -45,14 +45,6 @@
                     <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">
                         Siswa {{ $kelas->nama }}
                     </h1>
-                    <span class="px-3 py-1 rounded-full text-xs font-black bg-white/20 backdrop-blur border border-white/20 text-white">
-                        Tingkat {{ config('kelas.tingkat.' . $kelas->tingkat, $kelas->tingkat) }}
-                    </span>
-                    @if ($kelas->tahunAjaran?->is_active)
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-400/30 text-emerald-100 border border-emerald-300/30">
-                            TA Aktif
-                        </span>
-                    @endif
                 </div>
 
                 <p class="text-xs text-white/80 mt-1.5 max-w-xl leading-relaxed">

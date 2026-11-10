@@ -4,26 +4,37 @@
 @section('content')
 <div class="space-y-6">
     <!-- Page Header -->
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-        <div>
-            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Daftar Pendaftaran</h1>
-            <p class="text-xs text-slate-400 mt-1">Total: {{ $total }} pendaftar</p>
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-5 md:p-7 text-white soul-timbul shadow-xl shadow-sky-200">
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute -bottom-24 -left-10 h-72 w-72 rounded-full bg-white/10 blur-3xl"></div>
+            <div class="absolute -top-24 -right-10 h-72 w-72 rounded-full bg-white/10 blur-3xl"></div>
         </div>
-        <div class="flex gap-2 flex-wrap">
-            <div class="flex items-center gap-2">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                    Pending: {{ $pendingCount }}
-                </span>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    Diterima: {{ $diterimaCount }}
-                </span>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700 border border-rose-200">
-                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                    Ditolak: {{ $ditolakCount }}
-                </span>
-            </div>
+        <div class="relative">
+            <h1 class="text-xl md:text-2xl font-extrabold tracking-tight">Daftar Pendaftaran</h1>
+            <p class="mt-1 text-xs md:text-sm text-white/80">Ringkasan status pendaftar ekskul</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-4 gap-1.5 sm:gap-3 md:gap-4">
+        <div class="min-w-0 rounded-xl sm:rounded-2xl border border-sky-100 bg-white p-2 sm:p-4 md:p-5 shadow-md shadow-sky-100/60">
+            <p class="text-[9px] leading-tight sm:text-xs font-semibold text-slate-500">Total</p>
+            <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-slate-800">{{ $total }}</p>
+            <p class="mt-1 text-[8px] leading-tight sm:text-[11px] text-slate-400">Pendaftar</p>
+        </div>
+        <div class="min-w-0 rounded-xl sm:rounded-2xl border border-amber-100 bg-white p-2 sm:p-4 md:p-5 shadow-md shadow-amber-100/50">
+            <p class="text-[9px] leading-tight sm:text-xs font-semibold text-slate-500">Pending</p>
+            <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-amber-600">{{ $pendingCount }}</p>
+            <p class="mt-1 text-[8px] leading-tight sm:text-[11px] text-slate-400">Menunggu</p>
+        </div>
+        <div class="min-w-0 rounded-xl sm:rounded-2xl border border-emerald-100 bg-white p-2 sm:p-4 md:p-5 shadow-md shadow-emerald-100/50">
+            <p class="text-[9px] leading-tight sm:text-xs font-semibold text-slate-500">Diterima</p>
+            <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-emerald-600">{{ $diterimaCount }}</p>
+            <p class="mt-1 text-[8px] leading-tight sm:text-[11px] text-slate-400">Disetujui</p>
+        </div>
+        <div class="min-w-0 rounded-xl sm:rounded-2xl border border-rose-100 bg-white p-2 sm:p-4 md:p-5 shadow-md shadow-rose-100/50">
+            <p class="text-[9px] leading-tight sm:text-xs font-semibold text-slate-500">Ditolak</p>
+            <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-rose-600">{{ $ditolakCount }}</p>
+            <p class="mt-1 text-[8px] leading-tight sm:text-[11px] text-slate-400">Ditolak</p>
         </div>
     </div>
 
