@@ -136,7 +136,7 @@
     </div>
 
     {{-- CARDS GRID --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 animate-fade-up" style="animation-delay:.1s">
+    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 md:gap-5 animate-fade-up" style="animation-delay:.1s">
         @forelse ($ekskuls as $ekskul)
             @php
                 $logo = \App\Support\EkskulInfo::logo($ekskul->logo);
@@ -146,15 +146,15 @@
                 {{-- Card Header Strip --}}
                 <div class="h-1 w-full {{ $buka ? 'bg-blue-600' : 'bg-slate-200' }}"></div>
 
-                <div class="p-5 flex flex-col flex-1">
+                <div class="p-3 sm:p-5 flex flex-col flex-1">
                     {{-- Top Row: Logo + Status --}}
                     <div class="flex items-start justify-between gap-3 mb-3">
                         @if ($logo)
-                            <div class="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/80 p-1.5 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                            <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200/80 p-1 sm:p-1.5 flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
                                 <img src="{{ $logo }}" alt="Logo {{ $ekskul->nama_ekskul }}" class="w-full h-full object-contain">
                             </div>
                         @else
-                            <div class="w-12 h-12 rounded-xl bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm shadow-sm uppercase shrink-0 group-hover:scale-105 transition-transform">
+                            <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-blue-600 text-white font-extrabold flex items-center justify-center text-xs sm:text-sm shadow-sm uppercase shrink-0 group-hover:scale-105 transition-transform">
                                 {{ substr($ekskul->nama_ekskul, 0, 2) }}
                             </div>
                         @endif
@@ -178,7 +178,7 @@
 
                     {{-- Name & Desc --}}
                     <div class="flex items-center gap-1.5 mb-1 flex-wrap">
-                        <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+                        <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
                             {{ $ekskul->nama_ekskul }}
                         </h3>
                         @if ($ekskul->isWajib())
@@ -212,25 +212,25 @@
                     <div class="mt-4 pt-3.5 border-t border-slate-100 flex flex-col gap-2">
                         <div class="flex gap-2">
                             <a href="{{ route('ekskul.detail', $ekskul) }}"
-                               class="flex-1 py-2 px-2 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-semibold rounded-xl border border-slate-200 transition-all text-center">
+                               class="flex-1 py-2 px-1 sm:px-2 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-[10px] sm:text-xs font-semibold rounded-lg sm:rounded-xl border border-slate-200 transition-all text-center">
                                 Detail
                             </a>
                             @if (in_array($ekskul->id, $ekskulAktifIds, true))
-                                <span class="flex-1 py-2 px-2 bg-blue-50 text-blue-700 text-xs font-bold rounded-xl border border-blue-200 text-center select-none flex items-center justify-center gap-1.5">
-                                    <i class="fa-solid fa-check text-xs"></i>
+                                <span class="flex-1 py-2 px-1 sm:px-2 bg-blue-50 text-blue-700 text-[9px] sm:text-xs font-bold rounded-lg sm:rounded-xl border border-blue-200 text-center select-none flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-check text-[9px] sm:text-xs"></i>
                                     Ekskul Kamu
                                 </span>
                             @elseif (! $buka)
-                                <span class="catalog-unavailable flex-1 py-2 px-2 bg-slate-50 text-slate-400 text-xs font-semibold rounded-xl border border-slate-200 cursor-not-allowed text-center select-none">
+                                <span class="catalog-unavailable flex-1 py-2 px-1 sm:px-2 bg-slate-50 text-slate-400 text-[9px] sm:text-xs font-semibold rounded-lg sm:rounded-xl border border-slate-200 cursor-not-allowed text-center select-none">
                                     Ditutup
                                 </span>
                             @elseif ($alasanEkskul === null)
                                 <a href="{{ route('siswa.form-daftar', $ekskul->id) }}"
-                                   class="flex-1 py-2 px-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all text-center">
+                                   class="flex-1 py-2 px-1 sm:px-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl shadow-sm transition-all text-center">
                                     Daftar
                                 </a>
                             @else
-                                <span class="catalog-unavailable flex-1 py-2 px-2 bg-slate-50 text-slate-400 text-xs font-semibold rounded-xl border border-slate-200 cursor-not-allowed text-center select-none" title="{{ $alasanEkskul }}">
+                                <span class="catalog-unavailable flex-1 py-2 px-1 sm:px-2 bg-slate-50 text-slate-400 text-[9px] sm:text-xs font-semibold rounded-lg sm:rounded-xl border border-slate-200 cursor-not-allowed text-center select-none" title="{{ $alasanEkskul }}">
                                     Tidak Tersedia
                                 </span>
                             @endif

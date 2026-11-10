@@ -16,6 +16,13 @@
     }
 }">
 
+    <div class="-mb-4 flex justify-start relative z-10">
+        <a href="{{ route('siswa.dashboard') }}" class="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-sky-100 text-sky-700 text-xs font-bold shadow-sm hover:bg-sky-50 transition">
+            <i class="fa-solid fa-arrow-left text-[10px]"></i>
+            Kembali
+        </a>
+    </div>
+
     {{-- HERO CARD BIRU --}}
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200 dark:shadow-sky-900/30">
         {{-- Ambient blur circles --}}

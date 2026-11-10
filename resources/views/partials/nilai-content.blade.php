@@ -9,9 +9,15 @@
 @endphp
 
 <div class="bg-slate-50 -mx-4 md:-mx-8 px-4 md:px-8 py-6 md:py-8 min-h-[calc(100vh-5rem)] space-y-6 animate-fade-up">
-    <div>
-        <h1 class="text-lg md:text-2xl font-extrabold text-slate-900">Nilai Ekskul</h1>
-        <p class="text-xs text-slate-400 mt-0.5">Nilai akhir kamu pada periode berjalan</p>
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-5 md:p-7 text-white soul-timbul shadow-xl shadow-sky-200">
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
+            <div class="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
+        </div>
+        <div class="relative">
+            <h1 class="text-xl md:text-2xl font-extrabold text-white">Nilai Ekskul</h1>
+            <p class="text-xs text-white/80 mt-1">Nilai akhir kamu pada periode berjalan</p>
+        </div>
     </div>
 
     @include('siswa.partials.pemilih-ekskul')

@@ -110,8 +110,11 @@
 
                 <!-- Logo Mobile -->
                 <div class="flex items-center gap-2 md:hidden shrink-0">
-                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white flex items-center justify-center font-extrabold text-sm shadow-md shadow-sky-300">K</div>
-                    <span class="font-extrabold text-sm tracking-tight text-slate-900">SOUL</span>
+                    <div class="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center shadow-md shadow-sky-200 dark:shadow-sky-900">
+                        <img src="{{ asset('images/logo-light-nobg.png') }}" alt="SOUL" class="w-full h-full object-contain ps-logo-img-light">
+                        <img src="{{ asset('images/logo-dark-nobg.png') }}" alt="SOUL" class="w-full h-full object-contain ps-logo-img-dark">
+                    </div>
+                    <span class="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white">SOUL</span>
                 </div>
 
                 <!-- Search (Desktop) -->
@@ -181,12 +184,6 @@
                         <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 absolute top-1.5 right-1.5 border-2 border-white shadow-sm"></span>
                     @endif
                 </a>
-                <form method="POST" action="{{ route('logout') }}" class="hidden sm:block">
-                    @csrf
-                    <button type="submit" class="bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-950/50 text-red-500 dark:text-red-400 px-4 py-2 rounded-lg text-xs font-semibold border border-red-100 dark:border-red-900/50 transition shadow-sm">
-                        Logout
-                    </button>
-                </form>
             </div>
         </header>
 

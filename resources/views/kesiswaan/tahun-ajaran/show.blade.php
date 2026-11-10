@@ -22,6 +22,11 @@
 
 <div class="space-y-6 animate-fade-up">
 
+    <a href="{{ route('kesiswaan.tahun-ajaran.index') }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-sky-100 text-sky-700 text-xs font-bold shadow-sm hover:bg-sky-50 transition">
+        <i class="fa-solid fa-arrow-left text-[10px]"></i>
+        Kembali
+    </a>
+
     {{-- HERO CARD --}}
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-500 to-blue-600 p-6 md:p-8 text-white soul-timbul">
         <div class="absolute inset-0 pointer-events-none">
@@ -47,14 +52,6 @@
                     <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">
                         Kelas {{ $kela->nama }}
                     </h1>
-                    <span class="px-3 py-1 rounded-full text-xs font-black bg-white/20 backdrop-blur border border-white/20 text-white">
-                        Tingkat {{ strtoupper($kela->tingkat) }}
-                    </span>
-                    @if($isAktif)
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-400/30 text-emerald-100 border border-emerald-300/30">
-                            TA Aktif
-                        </span>
-                    @endif
                 </div>
 
                 <p class="text-xs text-white/80 mt-1.5 max-w-xl leading-relaxed">
@@ -65,11 +62,6 @@
             </div>
 
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
-                <a href="{{ route('kesiswaan.tahun-ajaran.index') }}"
-                   class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-xl hover:bg-white/20 transition-all">
-                    
-                    Daftar TA & Kelas
-                </a>
                 @if($isAktif && $hasPending)
                     <button type="button" onclick="document.getElementById('penempatan-section')?.scrollIntoView({behavior: 'smooth'})"
                        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold text-xs rounded-xl shadow-lg transition-all">

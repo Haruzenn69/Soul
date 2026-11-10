@@ -43,11 +43,9 @@ use App\Http\Controllers\Siswa\PengajuanController;
 use App\Http\Controllers\Siswa\PresensiController as SiswaPresensiController;
 use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
 use App\Http\Controllers\TestimoniController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
-use Laravolt\Indonesia\Models\City;
 
 Route::get('/storage/{path}', function (string $path) {
     $storageRoot = realpath(Storage::disk('public')->path(''));
@@ -103,37 +101,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/onboarding/setup', [OnboardingController::class, 'setup'])->name('onboarding.setup');
     Route::post('/onboarding/login', [OnboardingController::class, 'returnToLogin'])->name('onboarding.login');
 
-    // API: Cari kota/kabupaten (laravolt/indonesia)
-    Route::get('/api/cities', function (Request $request) {
-        $provinceCode = $request->input('province_code');
-
-        if (filled($provinceCode)) {
-            $cities = City::where('province_code', $provinceCode)
-                ->orderBy('name')
-                ->get(['id', 'name', 'province_code']);
-        } else {
-            $q = $request->input('q', '');
-            if (strlen($q) < 2) {
-                return response()->json([]);
-            }
-
-            $cities = City::where('name', 'like', "%{$q}%")
-                ->orderBy('name')
-                ->limit(20)
-                ->get(['id', 'name', 'province_code']);
-        }
-
-        // Eager load province names
-        $cities->load('province:code,name');
-
-        return response()->json(
-            $cities->map(fn ($city) => [
-                'id' => $city->id,
-                'name' => ucwords(strtolower($city->name)),
-                'province' => $city->province ? ucwords(strtolower($city->province->name)) : '',
-            ])
-        );
-    })->name('api.cities');
 });
 
 Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('kesiswaan.')->group(function () {

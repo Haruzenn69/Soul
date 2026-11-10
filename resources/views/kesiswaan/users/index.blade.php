@@ -30,22 +30,22 @@
         </div>
 
         {{-- Header + CTA --}}
-        <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div>
+        <div class="relative flex flex-row justify-between items-start md:items-center gap-3 md:gap-6">
+            <div class="min-w-0 flex-1">
                
             
-                <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">
+                <h1 class="text-xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">
                     Akun Pengguna
                 </h1>
-                <p class="text-xs text-white/80 mt-1.5 max-w-xl leading-relaxed">
+                <p class="text-[10px] sm:text-xs text-white/80 mt-1.5 max-w-[12rem] sm:max-w-xl leading-relaxed">
                     Informasi data pengguna, akun siswa, guru/pembina, dan staf sekolah melalui panel kesiswaan.
                 </p>
             </div>
 
-            <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
+            <div class="mt-4 mr-3 flex shrink-0 items-center md:mt-0 md:mr-0">
                 <a href="{{ route('kesiswaan.users.create') }}"
-                   class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
-                    <i class="fa-solid fa-user-plus text-xs"></i>
+                   class="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 sm:gap-2 sm:px-5 sm:py-3 bg-white text-sky-700 font-bold text-[10px] sm:text-xs rounded-xl sm:rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
+                    <i class="fa-solid fa-user-plus text-[10px] sm:text-xs"></i>
                     Buat Akun
                 </a>
             </div>

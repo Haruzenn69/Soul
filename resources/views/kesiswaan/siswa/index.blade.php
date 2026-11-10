@@ -314,7 +314,7 @@
                             {{-- Jabatan --}}
                             <td class="py-3.5 px-5 whitespace-nowrap">
                                 @if ($s->jabatan === 'ketua')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-bold text-[11px] bg-amber-50 text-amber-700 border border-amber-100">
+                                    <span class="font-bold text-[11px] text-amber-700">
                                         Ketua Ekskul
                                     </span>
                                 @else
@@ -371,7 +371,9 @@
             <p class="text-[11px] text-slate-400 font-semibold">
                 Menampilkan {{ $siswas->firstItem() ?? 0 }}-{{ $siswas->lastItem() ?? 0 }} dari {{ $siswas->total() }} siswa
             </p>
-            {{ $siswas->links() }}
+            <div class="w-full sm:w-auto">
+                {{ $siswas->links() }}
+            </div>
         </div>
     </div>
 
