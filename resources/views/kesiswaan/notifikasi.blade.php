@@ -2,45 +2,50 @@
 @section('title', 'Notifikasi')
 
 @section('content')
+    <a href="{{ route('kesiswaan.dashboard') }}" class="mb-3 inline-flex items-center justify-center gap-2 px-3.5 py-2 bg-white hover:bg-sky-50 text-slate-600 text-xs font-semibold rounded-lg border border-sky-100 shadow-sm transition">
+        <i class="fa-solid fa-arrow-left text-[10px]"></i>
+        Kembali
+    </a>
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 animate-fade-up">
         <div>
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Notifikasi</h1>
             <p class="text-xs text-slate-400 mt-0.5">Pemberitahuan terkait data kesiswaan</p>
         </div>
-        @if($notifikasis->isNotEmpty())
-            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                <form method="POST" action="{{ route('kesiswaan.notifikasi.read-all') }}" class="w-full sm:w-auto">
-                    @csrf
-                    <button type="submit" class="px-3.5 py-2 bg-white hover:bg-sky-50 text-slate-600 text-xs font-semibold rounded-lg border border-sky-100 shadow-sm transition w-full sm:w-auto">
-                        Tandai Semua Dibaca
-                    </button>
-                </form>
-                <form method="POST" action="{{ route('kesiswaan.notifikasi.clear-all') }}" class="w-full sm:w-auto" onsubmit="return confirm('Hapus semua notifikasi? Tindakan ini tidak bisa dibatalkan.')">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="px-3.5 py-2 bg-white hover:bg-rose-50 text-rose-600 text-xs font-semibold rounded-lg border border-rose-200 shadow-sm transition w-full sm:w-auto">
-                        Hapus Semua
-                    </button>
-                </form>
-            </div>
-        @endif
     </div>
 
     <!-- RINGKASAN STATISTIK -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
-        <div class="bg-white p-3.5 md:p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .1s">
-            <p class="text-xl md:text-2xl font-extrabold text-slate-900">{{ $notifikasis->count() }}</p>
-            <p class="text-xs font-bold text-slate-400">Total</p>
+    <div class="grid grid-cols-3 gap-2 md:gap-4">
+        <div class="bg-white p-2.5 sm:p-3.5 md:p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .1s">
+            <p class="text-lg md:text-2xl font-extrabold text-slate-900">{{ $notifikasis->count() }}</p>
+            <p class="text-[10px] sm:text-xs font-bold text-slate-400">Total</p>
         </div>
-        <div class="bg-white p-3.5 md:p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .2s">
-            <p class="text-xl md:text-2xl font-extrabold text-amber-600">{{ $notifikasis->where('is_read', false)->count() }}</p>
-            <p class="text-xs font-bold text-slate-400">Belum Dibaca</p>
+        <div class="bg-white p-2.5 sm:p-3.5 md:p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .2s">
+            <p class="text-lg md:text-2xl font-extrabold text-amber-600">{{ $notifikasis->where('is_read', false)->count() }}</p>
+            <p class="text-[10px] sm:text-xs font-bold text-slate-400">Belum Dibaca</p>
         </div>
-        <div class="bg-white p-3.5 md:p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .3s">
-            <p class="text-xl md:text-2xl font-extrabold text-emerald-600">{{ $notifikasis->where('tipe', 'diterima')->count() }}</p>
-            <p class="text-xs font-bold text-slate-400">Masuk</p>
+        <div class="bg-white p-2.5 sm:p-3.5 md:p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 text-center animate-fade-up" style="animation-delay: .3s">
+            <p class="text-lg md:text-2xl font-extrabold text-emerald-600">{{ $notifikasis->where('tipe', 'diterima')->count() }}</p>
+            <p class="text-[10px] sm:text-xs font-bold text-slate-400">Masuk</p>
         </div>
     </div>
+
+    @if($notifikasis->isNotEmpty())
+        <div class="grid grid-cols-2 gap-2 md:gap-3">
+            <form method="POST" action="{{ route('kesiswaan.notifikasi.read-all') }}" class="min-w-0">
+                @csrf
+                <button type="submit" class="w-full h-full px-2 sm:px-3.5 py-2.5 bg-white hover:bg-sky-50 text-slate-600 text-[10px] sm:text-xs font-semibold rounded-lg border border-sky-100 shadow-sm transition">
+                    Tandai Semua Dibaca
+                </button>
+            </form>
+            <form method="POST" action="{{ route('kesiswaan.notifikasi.clear-all') }}" class="min-w-0" onsubmit="return confirm('Hapus semua notifikasi? Tindakan ini tidak bisa dibatalkan.')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="w-full h-full px-2 sm:px-3.5 py-2.5 bg-white hover:bg-rose-50 text-rose-600 text-[10px] sm:text-xs font-semibold rounded-lg border border-rose-200 shadow-sm transition">
+                    Hapus Semua
+                </button>
+            </form>
+        </div>
+    @endif
 
     <!-- DAFTAR NOTIFIKASI -->
     <div class="space-y-3 md:space-y-4">
@@ -52,9 +57,9 @@
                     default => 'bg-sky-50 border-sky-200',
                 };
                 $typeIcon = match($notif->tipe) {
-                    'diterima' => '',
-                    'ditolak' => '',
-                    default => '',
+                    'diterima' => '<i class="fa-solid fa-circle-check text-emerald-600"></i>',
+                    'ditolak' => '<i class="fa-solid fa-circle-xmark text-rose-600"></i>',
+                    default => '<i class="fa-solid fa-bell text-sky-600"></i>',
                 };
             @endphp
             <div class="p-3.5 md:p-4 rounded-xl md:rounded-2xl border {{ $typeColor }} {{ $notif->is_read ? 'opacity-70' : '' }} bg-white/70 backdrop-blur shadow-sm animate-fade-up">

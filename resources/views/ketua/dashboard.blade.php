@@ -9,93 +9,93 @@
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
         </div>
 
-        <div class="relative grid md:grid-cols-5 gap-4 lg:gap-6 items-center">
+        <div class="relative grid grid-cols-5 gap-2 md:gap-4 lg:gap-6 items-center">
             {{-- TEXT + CTA --}}
-            <div class="md:col-span-3">
-                <h1 class="text-xl md:text-2xl font-extrabold tracking-tight leading-tight">
+            <div class="min-w-0 col-span-3">
+                <h1 class="text-base sm:text-xl md:text-2xl font-extrabold tracking-tight leading-tight break-words">
                     Halo, {{ auth()->user()->siswa->nama ?? 'Ketua' }}!
                 </h1>
-                <p class="text-sm text-white/85 mt-1 font-medium">
+                <p class="text-[11px] sm:text-sm text-white/85 mt-1 font-medium leading-snug">
                     {{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }}
                 </p>
-                <p class="text-xs text-white/70 mt-2 max-w-lg leading-relaxed">
-                    Kelola keanggotaan, tinjau pendaftaran, dan pantau kehadiran kegiatan ekskulmu di sini.
+                <p class="text-[10px] sm:text-xs text-white/70 mt-2 max-w-[15rem] sm:max-w-[22rem] leading-relaxed text-justify">
+                    Kelola anggota, kegiatan, dan kehadiran ekskulmu di sini.
                 </p>
 
-                <div class="flex gap-2 flex-wrap mt-4">
-                    <a href="{{ route('ketua.kegiatan.create') }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white text-sky-700 font-bold text-xs rounded-xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
-                        <i class="fa-solid fa-plus text-xs"></i>
+                <div class="flex flex-row flex-wrap items-center gap-1.5 sm:gap-2 mt-3 sm:mt-4">
+                    <a href="{{ route('ketua.kegiatan.create') }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2 py-2 sm:gap-1.5 sm:px-4 bg-white text-sky-700 font-bold text-[10px] sm:text-xs rounded-xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
+                        <i class="fa-solid fa-plus text-[10px] sm:text-xs shrink-0"></i>
                         Buat Kegiatan Baru
                     </a>
-                    <a href="{{ route('ketua.anggota.index') }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-xl hover:bg-white/20 transition-all">
-                        <i class="fa-solid fa-users text-xs"></i>
+                    <a href="{{ route('ketua.anggota.index') }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2 py-2 sm:gap-1.5 sm:px-4 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-[10px] sm:text-xs rounded-xl hover:bg-white/20 transition-all">
+                        <i class="fa-solid fa-users text-[10px] sm:text-xs shrink-0"></i>
                         Kelola Anggota
                     </a>
                 </div>
             </div>
 
             {{-- ILLUSTRATIVE PANEL + FLOATING STATS (desktop) --}}
-            <div class="md:col-span-2 relative hidden md:block">
-                <div class="relative h-36 md:h-40 lg:h-44 rounded-3xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center">
+            <div class="col-span-2 relative min-w-0">
+                <div class="relative h-32 sm:h-36 md:h-40 lg:h-44 rounded-2xl md:rounded-3xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center">
                     <div class="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
                         <div class="absolute -bottom-10 -left-6 w-32 h-32 rounded-full bg-white/20 blur-2xl"></div>
                     </div>
                     <img src="{{ asset('images/default.png') }}" alt="Ilustrasi Ketua"
-                         class="h-36 md:h-40 lg:h-44 w-auto max-w-[110px] md:max-w-[130px] lg:max-w-[150px] object-contain drop-shadow-xl animate-floaty select-none relative z-0 mb-1 md:mb-2 pointer-events-none">
+                         class="h-24 sm:h-28 md:h-40 lg:h-44 w-auto max-w-full md:max-w-[130px] lg:max-w-[150px] object-contain drop-shadow-xl animate-floaty select-none relative z-0 mb-8 md:mb-2 pointer-events-none">
                 </div>
 
                 {{-- floating stat card --}}
-                <div class="absolute -bottom-6 md:-bottom-7 left-2 right-2 z-10 grid grid-cols-3 gap-1 bg-white rounded-xl shadow-xl shadow-sky-900/10 p-2">
+                <div class="absolute bottom-2 md:-bottom-7 left-1 right-1 sm:left-2 sm:right-2 z-10 grid grid-cols-3 gap-0.5 sm:gap-1 bg-white rounded-lg sm:rounded-xl shadow-xl shadow-sky-900/10 p-1 sm:p-2">
                     <div class="text-center border-r border-slate-100 pr-1">
                         <p class="text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalAnggota }}</p>
-                        <p class="text-[10px] md:text-xs text-slate-400 font-semibold mt-1">Anggota</p>
+                        <p class="text-[9px] md:text-xs text-slate-400 font-semibold mt-1">Anggota</p>
                     </div>
                     <div class="text-center border-r border-slate-100 px-1">
                         <p class="text-sm md:text-base font-extrabold text-amber-600 leading-none">{{ $pendingCount }}</p>
-                        <p class="text-[10px] md:text-xs text-slate-400 font-semibold mt-1">Pendaftaran</p>
+                        <p class="text-[9px] md:text-xs text-slate-400 font-semibold mt-1">Pendaftaran</p>
                     </div>
                     <div class="text-center pl-1">
                         <p class="text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $kegiatanBulanIni ?? 0 }}</p>
-                        <p class="text-[10px] md:text-xs text-slate-400 font-semibold mt-1">Kegiatan</p>
+                        <p class="text-[9px] md:text-xs text-slate-400 font-semibold mt-1">Kegiatan</p>
                     </div>
                 </div>
             </div>
         </div>
 
         {{-- Quick Actions --}}
-        <div class="relative mt-4 pt-3 md:mt-11 lg:mt-12 border-t border-white/15 grid grid-cols-1 sm:grid-cols-3 gap-2">
-            <a href="{{ route('ketua.pendaftaran.index') }}" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+        <div class="relative mt-4 pt-3 md:mt-11 lg:mt-12 border-t border-white/15 grid grid-cols-3 gap-1.5 sm:gap-2">
+            <a href="{{ route('ketua.pendaftaran.index') }}" class="group flex min-w-0 items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-clipboard-list text-sm text-white"></i>
                 </div>
-                <div class="text-left">
+                <div class="min-w-0 text-left">
                     <p class="text-xs font-bold leading-none text-white">Pendaftaran</p>
-                    <p class="text-xs text-white/70 mt-1 leading-none">Tinjau Masuk</p>
+                    <p class="text-[10px] sm:text-xs text-white/70 mt-1 leading-tight">Tinjau Masuk</p>
                 </div>
             </a>
-            <a href="{{ route('ketua.kegiatan.index') }}" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+            <a href="{{ route('ketua.kegiatan.index') }}" class="group flex min-w-0 items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-calendar text-sm text-white"></i>
                 </div>
-                <div class="text-left">
+                <div class="min-w-0 text-left">
                     <p class="text-xs font-bold leading-none text-white">Kegiatan</p>
-                    <p class="text-xs text-white/70 mt-1 leading-none">Agenda Ekskul</p>
+                    <p class="text-[10px] sm:text-xs text-white/70 mt-1 leading-tight">Agenda Ekskul</p>
                 </div>
             </a>
-            <a href="{{ route('ketua.laporan-bulanan.index') }}" class="group flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+            <a href="{{ route('ketua.laporan-bulanan.index') }}" class="group flex min-w-0 items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-chart-simple text-sm text-white"></i>
                 </div>
-                <div class="text-left">
-                    <p class="text-xs font-bold leading-none text-white">Laporan Bulanan</p>
-                    <p class="text-xs text-white/70 mt-1 leading-none">Rekap Bulanan</p>
+                <div class="min-w-0 text-left">
+                    <p class="text-[10px] sm:text-xs font-bold leading-tight text-white">Laporan</p>
+                    <p class="text-[10px] sm:text-xs text-white/70 mt-1 leading-tight">Bulanan</p>
                 </div>
             </a>
         </div>
     </div>
 
     {{-- STATS CARDS - MOBILE (di desktop sudah di hero) --}}
-    <div class="grid grid-cols-3 gap-2.5 md:hidden">
+    <div class="hidden grid-cols-3 gap-2.5 md:hidden">
         <div class="relative overflow-hidden rounded-2xl bg-white dark:bg-[#1a1a1a] border border-sky-100 dark:border-neutral-800 p-3 shadow-sm">
             <p class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Anggota</p>
             <h3 class="text-lg font-extrabold mt-0.5 text-sky-700 dark:text-sky-400">{{ $totalAnggota }}</h3>

@@ -45,7 +45,7 @@
             ['icon' => 'user', 'label' => 'Profil Saya', 'url' => route('profile.edit', $__profileParam), 'is' => 'profile.edit'],
         ],
         'psMore' => [
-            ['label' => 'Daftar Ekskul', 'url' => route('siswa.daftar-ekskul'), 'is' => 'siswa.daftar-ekskul'],
+            ['label' => 'Katalog Ekskul', 'url' => route('siswa.katalog'), 'is' => 'siswa.katalog'],
             ['label' => 'Ajukan Keluar', 'url' => route('siswa.pengajuan-keluar', $__ekskulParam), 'is' => ['siswa.pengajuan-keluar', 'siswa.pengajuan-keluar.store']],
         ],
     ])

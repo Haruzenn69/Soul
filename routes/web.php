@@ -38,16 +38,13 @@ use App\Http\Controllers\ProfilEkskulController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
 use App\Http\Controllers\Siswa\KatalogController;
 use App\Http\Controllers\Siswa\NilaiController as SiswaNilaiController;
-use App\Http\Controllers\Siswa\PendaftaranController as SiswaPendaftaranController;
 use App\Http\Controllers\Siswa\PengajuanController;
 use App\Http\Controllers\Siswa\PresensiController as SiswaPresensiController;
 use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
 use App\Http\Controllers\TestimoniController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
-use Laravolt\Indonesia\Models\City;
 
 Route::get('/storage/{path}', function (string $path) {
     $storageRoot = realpath(Storage::disk('public')->path(''));
@@ -103,37 +100,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/onboarding/setup', [OnboardingController::class, 'setup'])->name('onboarding.setup');
     Route::post('/onboarding/login', [OnboardingController::class, 'returnToLogin'])->name('onboarding.login');
 
-    // API: Cari kota/kabupaten (laravolt/indonesia)
-    Route::get('/api/cities', function (Request $request) {
-        $provinceCode = $request->input('province_code');
-
-        if (filled($provinceCode)) {
-            $cities = City::where('province_code', $provinceCode)
-                ->orderBy('name')
-                ->get(['id', 'name', 'province_code']);
-        } else {
-            $q = $request->input('q', '');
-            if (strlen($q) < 2) {
-                return response()->json([]);
-            }
-
-            $cities = City::where('name', 'like', "%{$q}%")
-                ->orderBy('name')
-                ->limit(20)
-                ->get(['id', 'name', 'province_code']);
-        }
-
-        // Eager load province names
-        $cities->load('province:code,name');
-
-        return response()->json(
-            $cities->map(fn ($city) => [
-                'id' => $city->id,
-                'name' => ucwords(strtolower($city->name)),
-                'province' => $city->province ? ucwords(strtolower($city->province->name)) : '',
-            ])
-        );
-    })->name('api.cities');
 });
 
 Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('kesiswaan.')->group(function () {
@@ -227,13 +193,13 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
     Route::post('/profile/update-data', [SiswaProfilController::class, 'update'])->name('profile.update-data');
 
     // 5. HALAMAN DAFTAR EKSKUL (LIST CARD)
-    Route::get('/daftar-ekskul', [SiswaPendaftaranController::class, 'daftar'])->name('daftar-ekskul');
+    Route::get('/daftar-ekskul', fn () => redirect()->route('siswa.katalog'))->name('daftar-ekskul');
 
     // 6. FORM DAFTAR EKSKUL (HALAMAN FORM)
-    Route::get('/form-daftar/{ekskul}', [SiswaPendaftaranController::class, 'formDaftar'])->name('form-daftar');
+    Route::get('/form-daftar/{ekskul}', fn () => redirect()->route('siswa.katalog'))->name('form-daftar');
 
     // 7. PROSES DAFTAR EKSKUL (STORE)
-    Route::post('/daftar-ekskul', [SiswaPendaftaranController::class, 'store'])->name('daftar-ekskul.store');
+    Route::post('/daftar-ekskul', fn () => abort(403, 'Keanggotaan ekskul ditambahkan oleh Ketua Ekskul.'))->name('daftar-ekskul.store');
 
     // 7b. NOTIFIKASI
     Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi');
@@ -327,6 +293,8 @@ Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name
     Route::resource('pendaftaran', PendaftaranController::class)->only(['index', 'show', 'update']);
     Route::resource('pengajuan-keluar', PengajuanKeluarController::class)->only(['index', 'show', 'update']);
     Route::get('anggota', [AnggotaController::class, 'index'])->name('anggota.index');
+    Route::get('anggota/tambah', [AnggotaController::class, 'create'])->name('anggota.create');
+    Route::post('anggota/tambah', [AnggotaController::class, 'store'])->name('anggota.store');
     Route::patch('anggota/{pendaftaran}/status', [AnggotaController::class, 'updateStatus'])->name('anggota.update-status');
     Route::get('pengurus', [PengurusController::class, 'indexKetua'])->name('pengurus.index');
     Route::post('pengurus/usulkan', [PengurusController::class, 'usulkanKetua'])->name('pengurus.usulkan');

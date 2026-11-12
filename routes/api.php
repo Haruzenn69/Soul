@@ -41,7 +41,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/dashboard', [SiswaController::class, 'dashboard'])->name('dashboard');
         Route::get('/katalog', [SiswaController::class, 'katalog'])->name('katalog');
         Route::get('/daftar-exkul', [SiswaController::class, 'daftar'])->name('daftar');
-        Route::post('/daftar-ekskul', [SiswaController::class, 'storeDaftar'])->name('daftar.store');
         Route::get('/presensi', [SiswaController::class, 'presensi'])->name('presensi');
         Route::get('/rekap', [SiswaController::class, 'rekap'])->name('rekap');
         Route::get('/nilai', [SiswaController::class, 'nilai'])->name('nilai');

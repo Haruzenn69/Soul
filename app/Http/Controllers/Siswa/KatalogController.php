@@ -19,7 +19,6 @@ class KatalogController extends Controller
         // menampilkan semua ekskul yang sedang diikuti, bukan hanya satu.
         $ekskulAktifs = $siswa ? $siswa->activeEkskuls() : collect();
         $ekskulAktif = $ekskulAktifs->first();
-        $menunggu = $siswa?->pendingPendaftaran();
 
         $status = $request->query('status');
         $status = in_array($status, self::FILTER, true) ? $status : null;
@@ -38,9 +37,7 @@ class KatalogController extends Controller
                 });
             });
 
-        // Jumlah dihitung dari hasil pencarian, bukan dari seluruh tabel, supaya
-        // angka di rail selalu menjawab "dari ekskul yang ini, berapa yang bisa
-        // saya daftar?".
+        // Jumlah mengikuti pencarian dan filter, untuk memberi ringkasan katalog.
         $jumlah = [
             'semua' => (clone $cari)->count(),
             'buka' => (clone $cari)->where('is_open_recruitment', true)->count(),
@@ -52,24 +49,12 @@ class KatalogController extends Controller
             ->when($status === 'tutup', fn ($query) => $query->where('is_open_recruitment', false))
             ->get();
 
-        // Alasan per ekskul supaya tombol di kartu menyesuaikan aturan
-        // (maksimal dua ekskul & larangan dua ekskul 4P1I).
-        $alasanDaftar = $siswa?->alasanTidakBisaDaftar();
-        $bisaDaftar = $alasanDaftar === null;
-        $alasanPerEkskul = $siswa
-            ? $ekskuls->mapWithKeys(fn (Ekskul $e) => [$e->id => $siswa->alasanTidakBisaDaftar($e)])
-            : collect();
-
         return view('siswa.katalog', [
             'ekskuls' => $ekskuls,
             'jumlah' => $jumlah,
             'status' => $status,
             'ekskulAktif' => $ekskulAktif,
             'ekskulAktifs' => $ekskulAktifs,
-            'menunggu' => $menunggu !== null,
-            'alasanDaftar' => $alasanDaftar,
-            'bisaDaftar' => $bisaDaftar,
-            'alasanPerEkskul' => $alasanPerEkskul,
         ]);
     }
 }

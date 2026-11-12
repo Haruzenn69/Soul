@@ -337,29 +337,11 @@
                                         
                                         Lihat Siswa
                                     </a>
-
-                                    {{-- Tombol Edit --}}
-                                    <button type="button"
-                                            onclick='openEdit({{ json_encode([
-                                                "id" => $k->id,
-                                                "nama" => $k->nama,
-                                                "tingkat" => $k->tingkat,
-                                                "jurusan" => $k->jurusan,
-                                                "rombel" => $k->rombel,
-                                                "tahun_ajaran_id" => $k->tahun_ajaran_id,
-                                            ]) }})'
-                                            class="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition">
-                                        
-                                        Edit
-                                    </button>
-
-                                    {{-- Tombol Hapus --}}
                                     <form action="{{ route('kesiswaan.kelas.destroy', $k) }}" method="POST"
                                           onsubmit="return confirm('Hapus kelas {{ $k->nama }}?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-xl text-xs transition">
-                                            
                                             Hapus
                                         </button>
                                     </form>

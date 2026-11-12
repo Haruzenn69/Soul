@@ -16,28 +16,6 @@ class SpreadsheetProfileValue
             return null;
         }
 
-        if (class_exists(\Laravolt\Indonesia\Models\City::class)) {
-            $city = \Laravolt\Indonesia\Models\City::where('name', $value)->first();
-            if ($city) {
-                return ucwords(strtolower($city->name));
-            }
-
-            $city = \Laravolt\Indonesia\Models\City::where('name', 'KOTA ' . $value)->first();
-            if ($city) {
-                return ucwords(strtolower($city->name));
-            }
-
-            $city = \Laravolt\Indonesia\Models\City::where('name', 'KABUPATEN ' . $value)->first();
-            if ($city) {
-                return ucwords(strtolower($city->name));
-            }
-
-            $city = \Laravolt\Indonesia\Models\City::where('name', 'like', "%{$value}%")->first();
-            if ($city) {
-                return ucwords(strtolower($city->name));
-            }
-        }
-
         return ucwords(strtolower($value));
     }
 

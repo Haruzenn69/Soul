@@ -4,10 +4,14 @@
 @section('content')
 <div class="space-y-6">
     <!-- Page Header -->
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-        <div>
-            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Daftar Pengajuan Keluar</h1>
-            <p class="text-xs text-slate-400 mt-1">Total: {{ $total }} pengajuan</p>
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-5 md:p-7 text-white soul-timbul shadow-xl shadow-sky-200">
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute -bottom-24 -left-10 h-72 w-72 rounded-full bg-white/10 blur-3xl"></div>
+            <div class="absolute -top-24 -right-10 h-72 w-72 rounded-full bg-white/10 blur-3xl"></div>
+        </div>
+        <div class="relative">
+            <h1 class="text-xl md:text-2xl font-extrabold tracking-tight">Daftar Pengajuan Keluar</h1>
+            <p class="mt-1 text-xs md:text-sm text-white/80">Total: {{ $total }} pengajuan</p>
         </div>
     </div>
 

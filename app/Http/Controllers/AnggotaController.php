@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\KetuaEkskul;
+use App\Models\Kelas;
 use App\Models\Pendaftaran;
 use App\Models\Siswa;
 use App\Services\ArsipEkskulService;
 use App\Services\NotifikasiService;
 use App\Support\TableKit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AnggotaController extends Controller
 {
@@ -58,6 +60,100 @@ class AnggotaController extends Controller
             : ['ketuaSelesai' => collect(), 'anggotaLulus' => collect(), 'total' => $arsipTotal];
 
         return view('ketua.anggota.index', compact('anggotas', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal'));
+    }
+
+    public function create(Request $request)
+    {
+        $ekskul = $this->ekskul();
+        $cari = trim((string) $request->input('cari'));
+        $kelasId = $request->integer('kelas_id') ?: null;
+
+        $siswas = Siswa::query()
+            ->with('kelas')
+            ->where('status', 'aktif')
+            ->whereHas('user', fn ($query) => $query->where('is_active', true))
+            ->whereDoesntHave('pendaftarans', fn ($query) => $query
+                ->where('ekskul_id', $ekskul->id)
+                ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN]))
+            ->when($request->filled('cari'), fn ($query) => $query->where(fn ($sub) => $sub
+                ->where('nama', 'like', "%{$cari}%")
+                ->orWhere('nis', 'like', "%{$cari}%")))
+            ->when($kelasId, fn ($query) => $query->where('kelas_id', $kelasId))
+            ->orderBy('nama')
+            ->paginate(12)
+            ->withQueryString();
+
+        $kelasOptions = Kelas::query()
+            ->whereHas('tahunAjaran', fn ($query) => $query->where('status', 'aktif'))
+            ->whereHas('siswas', fn ($query) => $query->where('status', 'aktif'))
+            ->orderBy('nama')
+            ->get();
+
+        return view('ketua.anggota.create', compact('ekskul', 'siswas', 'kelasOptions', 'cari', 'kelasId'));
+    }
+
+    public function store(Request $request)
+    {
+        $ekskul = $this->ekskul();
+        $validated = $request->validate([
+            'siswa_id' => ['required', 'integer', 'exists:siswas,id'],
+        ]);
+
+        $result = DB::transaction(function () use ($ekskul, $validated) {
+            $siswa = Siswa::query()
+                ->with('user')
+                ->lockForUpdate()
+                ->findOrFail($validated['siswa_id']);
+
+            abort_unless($siswa->status === 'aktif' && $siswa->user?->is_active, 422, 'Akun siswa ini tidak aktif.');
+
+            $existing = Pendaftaran::query()
+                ->where('ekskul_id', $ekskul->id)
+                ->where('siswa_id', $siswa->id)
+                ->latest('id')
+                ->lockForUpdate()
+                ->first();
+
+            if ($existing?->isActive()) {
+                return ['error' => "{$siswa->nama} sudah menjadi anggota aktif ekskul ini."];
+            }
+
+            $candidate = $existing ?? new Pendaftaran;
+            $candidate->ekskul_id = $ekskul->id;
+            $candidate->setRelation('ekskul', $ekskul);
+
+            if ($alasan = $siswa->alasanTidakDapatMenerima($candidate)) {
+                return ['error' => $alasan];
+            }
+
+            if ($existing) {
+                $existing->update([
+                    'tanggal_daftar' => today(),
+                    'status' => Pendaftaran::STATUS_DITERIMA,
+                    'alasan' => 'Ditambahkan oleh Ketua Ekskul',
+                ]);
+                $pendaftaran = $existing->fresh();
+            } else {
+                $pendaftaran = Pendaftaran::create([
+                    'siswa_id' => $siswa->id,
+                    'ekskul_id' => $ekskul->id,
+                    'tanggal_daftar' => today(),
+                    'status' => Pendaftaran::STATUS_DITERIMA,
+                    'alasan' => 'Ditambahkan oleh Ketua Ekskul',
+                ]);
+            }
+
+            return ['pendaftaran' => $pendaftaran];
+        });
+
+        if (isset($result['error'])) {
+            return back()->with('error', $result['error']);
+        }
+
+        NotifikasiService::pendaftaranDiterima($result['pendaftaran']);
+
+        return redirect()->route('ketua.anggota.index')
+            ->with('success', $result['pendaftaran']->siswa->nama.' berhasil ditambahkan sebagai anggota.');
     }
 
     public function updateStatus(Request $request, Pendaftaran $pendaftaran)

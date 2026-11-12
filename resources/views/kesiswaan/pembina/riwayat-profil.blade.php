@@ -4,14 +4,15 @@
 
 @section('content')
 <div class="space-y-5">
+    <a href="{{ route('kesiswaan.pembina.index') }}" class="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 transition">
+        <i class="fa-solid fa-arrow-left text-[10px]"></i>
+        Kembali
+    </a>
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
             <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Riwayat Perubahan Profil</h1>
             <p class="text-xs text-slate-500 mt-1">{{ $pembina->nama }} · perubahan foto profil, nomor telepon, dan email</p>
         </div>
-        <a href="{{ route('kesiswaan.pembina.index') }}" class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">
-            Kembali ke Data Pembina
-        </a>
     </div>
 
     <div class="bg-white rounded-3xl border border-sky-100 shadow-sm overflow-hidden">
