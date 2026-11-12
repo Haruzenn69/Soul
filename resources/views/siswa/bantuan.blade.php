@@ -42,7 +42,7 @@
                         Pusat Bantuan & Panduan Siswa
                     </h1>
                     <p class="text-xs md:text-sm text-white/85 mt-1.5 max-w-2xl leading-relaxed">
-                        Temukan jawaban atas semua pertanyaan seputar fitur, alur pendaftaran, presensi, nilai, dan penggunaan platform SOUL.
+                        Temukan jawaban seputar akun, keanggotaan ekskul, presensi, nilai, dan penggunaan platform SOUL.
                     </p>
                 </div>
             </div>
@@ -168,28 +168,28 @@
                 </div>
             </div>
 
-            {{-- 3. Pendaftaran Ekskul --}}
+            {{-- 3. Keanggotaan Ekskul --}}
             <div x-show="(activeTab === 'semua' || activeTab === 'ekskul') && matches('daftar pendaftaran ekskul registrasi gabung ikut formulir kuota batas')"
                  class="bg-white dark:bg-neutral-800 rounded-2xl border border-slate-200 dark:border-neutral-700 p-5 shadow-sm hover:border-slate-300 dark:hover:border-neutral-600 transition flex flex-col justify-between">
                 <div>
                     <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-neutral-700 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-sm mb-3">
                         <i class="fa-solid fa-user-plus"></i>
                     </div>
-                    <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Pendaftaran Ekskul</h3>
+                    <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Keanggotaan Ekskul</h3>
                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-                        Daftarkan dirimu ke ekskul yang diminati melalui formulir pendaftaran online.
+                        Keanggotaan siswa dikelola oleh Ketua Ekskul setelah akun dibuat Kesiswaan.
                     </p>
                     <div class="mt-3 space-y-1.5 text-[11px] text-slate-600 dark:text-slate-400">
                         <p class="font-bold text-slate-800 dark:text-slate-200">Yang bisa dilakukan:</p>
-                        <p class="flex items-start gap-1.5"><i class="fa-solid fa-check text-sky-600 mt-0.5 text-[10px]"></i><span><strong>Lihat Ekskul Tersedia:</strong> Hanya ekskul yang buka rekrutmen yang bisa didaftar.</span></p>
-                        <p class="flex items-start gap-1.5"><i class="fa-solid fa-check text-sky-600 mt-0.5 text-[10px]"></i><span><strong>Isi Formulir:</strong> Lengkapi data pendaftaran pada form khusus ekskul tujuan.</span></p>
-                        <p class="flex items-start gap-1.5"><i class="fa-solid fa-check text-sky-600 mt-0.5 text-[10px]"></i><span><strong>Batas Maksimal:</strong> Kamu hanya bisa mengikuti maksimal <strong>2 ekskul pilihan</strong> secara bersamaan.</span></p>
-                        <p class="flex items-start gap-1.5"><i class="fa-solid fa-check text-sky-600 mt-0.5 text-[10px]"></i><span><strong>Notifikasi Otomatis:</strong> Ketua ekskul akan menerima pemberitahuan pendaftaranmu.</span></p>
+                        <p class="flex items-start gap-1.5"><i class="fa-solid fa-check text-sky-600 mt-0.5 text-[10px]"></i><span><strong>Akun siswa:</strong> Dibuat oleh Kesiswaan dan login menggunakan NIS.</span></p>
+                        <p class="flex items-start gap-1.5"><i class="fa-solid fa-check text-sky-600 mt-0.5 text-[10px]"></i><span><strong>Ketua:</strong> Ditunjuk oleh Pembina dari data siswa yang sudah memiliki akun.</span></p>
+                        <p class="flex items-start gap-1.5"><i class="fa-solid fa-check text-sky-600 mt-0.5 text-[10px]"></i><span><strong>Anggota:</strong> Ketua menambahkan siswa dari daftar akun yang tersedia.</span></p>
+                        <p class="flex items-start gap-1.5"><i class="fa-solid fa-check text-sky-600 mt-0.5 text-[10px]"></i><span>Setelah ditambahkan, ekskul akan muncul otomatis di dashboard siswa.</span></p>
                     </div>
                 </div>
                 <div class="pt-4 mt-4 border-t border-slate-100 dark:border-neutral-700 flex items-center justify-between">
-                    <a href="{{ route('siswa.daftar-ekskul') }}" class="text-xs font-bold text-sky-600 hover:text-sky-700 inline-flex items-center gap-1">
-                        Buka Daftar Ekskul <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    <a href="{{ route('siswa.katalog') }}" class="text-xs font-bold text-sky-600 hover:text-sky-700 inline-flex items-center gap-1">
+                        Buka Katalog <i class="fa-solid fa-arrow-right text-[10px]"></i>
                     </a>
                 </div>
             </div>
@@ -438,47 +438,41 @@
             </div>
 
             {{-- FAQ 4 --}}
-            <div x-show="(activeTab === 'semua' || activeTab === 'ekskul') && matches('bagaimana cara mendaftar ekskul daftar join ikut langkah')"
+            <div x-show="(activeTab === 'semua' || activeTab === 'ekskul') && matches('cara bergabung anggota ekskul daftar join ikut ketua pembina')"
                  class="bg-white dark:bg-neutral-800 rounded-2xl border border-slate-200 dark:border-neutral-700 overflow-hidden shadow-sm transition">
                 <button type="button"
                         @click="toggleFaq(4)"
                         class="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-slate-50 dark:hover:bg-neutral-700 transition cursor-pointer select-none">
                     <span class="text-xs md:text-sm font-extrabold text-slate-800 dark:text-white">
-                        4. Bagaimana cara mendaftar ke ekskul yang saya minati?
+                        4. Bagaimana cara bergabung dengan ekskul?
                     </span>
                     <i class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200"
                        :class="openFaq === 4 ? 'rotate-180 text-sky-600' : ''"></i>
                 </button>
                 <div x-show="openFaq === 4" x-collapse class="px-5 pb-5 pt-1 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-100 dark:border-neutral-700 space-y-2">
-                    <ol class="list-decimal list-inside space-y-1.5 pl-1 text-slate-700 dark:text-slate-300 font-medium">
-                        <li>Pastikan data profil kamu sudah lengkap (terutama email dan nomor telepon).</li>
-                        <li>Buka menu <strong>Daftar Ekskul</strong> melalui dropdown pengaturan di sidebar (ikon gerigi).</li>
-                        <li>Pilih ekskul yang berstatus <strong>Buka Rekrutmen</strong>.</li>
-                        <li>Klik tombol <strong>Daftar</strong> pada ekskul tujuan.</li>
-                        <li>Isi formulir pendaftaran yang muncul, lalu klik <strong>Kirim Pendaftaran</strong>.</li>
-                        <li>Pendaftaranmu akan berstatus <strong>Menunggu</strong> hingga diverifikasi oleh Ketua Ekskul.</li>
-                    </ol>
+                    <p>Siswa tidak mendaftar sendiri melalui aplikasi. Akun dibuat oleh <strong>Kesiswaan</strong>, Ketua dipilih oleh <strong>Pembina</strong>, lalu Ketua menambahkan siswa dari daftar akun yang tersedia. Setelah ditambahkan, ekskul langsung muncul di dashboard siswa.</p>
+                    <p>Kamu tetap dapat membuka <strong>Katalog Ekskul</strong> untuk melihat profil dan informasi setiap ekskul.</p>
                 </div>
             </div>
 
             {{-- FAQ 5 --}}
-            <div x-show="(activeTab === 'semua' || activeTab === 'ekskul') && matches('berapa batas maksimal ekskul kuota pendaftaran ditolak tidak bisa daftar')"
+            <div x-show="(activeTab === 'semua' || activeTab === 'ekskul') && matches('aturan jumlah anggota ekskul pembina ketua')"
                  class="bg-white dark:bg-neutral-800 rounded-2xl border border-slate-200 dark:border-neutral-700 overflow-hidden shadow-sm transition">
                 <button type="button"
                         @click="toggleFaq(5)"
                         class="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-slate-50 dark:hover:bg-neutral-700 transition cursor-pointer select-none">
                     <span class="text-xs md:text-sm font-extrabold text-slate-800 dark:text-white">
-                        5. Berapa maksimal ekskul yang boleh saya ikuti? Kenapa pendaftaran saya ditolak?
+                        5. Bagaimana pengaturan keanggotaan ekskul?
                     </span>
                     <i class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200"
                        :class="openFaq === 5 ? 'rotate-180 text-sky-600' : ''"></i>
                 </button>
                 <div x-show="openFaq === 5" x-collapse class="px-5 pb-5 pt-1 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-100 dark:border-neutral-700 space-y-2">
-                    <p>Aturan pendaftaran ekskul di SOUL:</p>
+                    <p>Pengelolaan keanggotaan dilakukan oleh petugas ekskul dan sekolah:</p>
                     <ul class="list-disc list-inside space-y-1 pl-1 text-slate-700 dark:text-slate-300">
-                        <li>Setiap siswa boleh mengikuti maksimal <strong>2 ekskul pilihan</strong> secara bersamaan.</li>
-                        <li>Jika kamu sudah terdaftar di 2 ekskul aktif, sistem akan <strong>otomatis menolak</strong> pendaftaran berikutnya.</li>
-                        <li>Jika ingin pindah ekskul, kamu harus mengajukan <strong>keluar</strong> dari salah satu ekskul terlebih dahulu, lalu mendaftar ke ekskul baru setelah pengajuan disetujui.</li>
+                        <li>Pembina memilih Ketua dan menetapkan struktur organisasi ekskul.</li>
+                        <li>Ketua menambahkan anggota dari data akun siswa yang sudah dibuat Kesiswaan.</li>
+                        <li>Jika ingin mengubah keanggotaan, hubungi Ketua atau Pembina ekskul.</li>
                     </ul>
                 </div>
             </div>
@@ -649,23 +643,23 @@
             </div>
 
             {{-- FAQ 13 --}}
-            <div x-show="(activeTab === 'semua' || activeTab === 'lainnya') && matches('pendaftaran menunggu pending lama status belum diterima diproses')"
+            <div x-show="(activeTab === 'semua' || activeTab === 'lainnya') && matches('anggota ekskul belum muncul dashboard ditambahkan ketua')"
                  class="bg-white dark:bg-neutral-800 rounded-2xl border border-slate-200 dark:border-neutral-700 overflow-hidden shadow-sm transition">
                 <button type="button"
                         @click="toggleFaq(13)"
                         class="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-slate-50 dark:hover:bg-neutral-700 transition cursor-pointer select-none">
                     <span class="text-xs md:text-sm font-extrabold text-slate-800 dark:text-white">
-                        13. Pendaftaran ekskul saya sudah lama berstatus "Menunggu". Apa yang harus saya lakukan?
+                        13. Bagaimana cara agar ekskul muncul di dashboard saya?
                     </span>
                     <i class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200"
                        :class="openFaq === 13 ? 'rotate-180 text-sky-600' : ''"></i>
                 </button>
                 <div x-show="openFaq === 13" x-collapse class="px-5 pb-5 pt-1 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-100 dark:border-neutral-700 space-y-2">
-                    <p>Status "Menunggu" berarti pendaftaranmu sudah masuk dan sedang menunggu verifikasi dari <strong>Ketua Ekskul</strong>. Yang bisa kamu lakukan:</p>
+                    <p>Siswa tidak mengajukan pendaftaran ekskul melalui aplikasi. Alurnya dikelola oleh petugas sekolah:</p>
                     <ul class="list-disc list-inside space-y-1.5 pl-1 text-slate-700 dark:text-slate-300">
-                        <li>Cek halaman <strong>Dashboard</strong> untuk melihat informasi status pendaftaran terkini.</li>
-                        <li>Hubungi <strong>Ketua Ekskul</strong> atau <strong>Guru Pembina</strong> secara langsung untuk menanyakan proses verifikasi.</li>
-                        <li>Bersabar menunggu, karena proses verifikasi memerlukan pengecekan oleh pengurus ekskul.</li>
+                        <li>Akun siswa dibuat oleh <strong>Kesiswaan</strong> dan siswa login menggunakan NIS.</li>
+                        <li><strong>Pembina</strong> memilih Ketua dari data siswa yang sudah tersedia.</li>
+                        <li><strong>Ketua</strong> menambahkan siswa sebagai anggota. Setelah itu ekskul muncul di dashboard siswa.</li>
                     </ul>
                 </div>
             </div>
@@ -688,7 +682,7 @@
                         <li><strong>Belum terdaftar di ekskul:</strong> Fitur Presensi, Rekap Absensi, dan Nilai hanya tersedia jika kamu sudah terdaftar aktif di minimal satu ekskul.</li>
                         <li><strong>Status Nonaktif:</strong> Jika akunmu dinonaktifkan oleh Kesiswaan (misalnya karena pindah sekolah atau lulus), kamu tidak bisa mengakses fitur apapun.</li>
                         <li><strong>Ekskul tidak aktif:</strong> Jika ekskul yang kamu ikuti sedang dalam status nonaktif, beberapa data mungkin tidak tampil.</li>
-                        <li><strong>Profil belum lengkap:</strong> Beberapa fitur (seperti Daftar Ekskul) memerlukan profil yang sudah dilengkapi terlebih dahulu.</li>
+                        <li><strong>Belum menjadi anggota:</strong> Presensi, rekap, dan nilai tampil setelah Ketua menambahkanmu ke ekskul.</li>
                     </ul>
                 </div>
             </div>
@@ -748,13 +742,13 @@
             {{-- Tip 2 --}}
             <div class="p-4 bg-slate-50 dark:bg-neutral-900/50 rounded-2xl border border-slate-200/70 dark:border-neutral-700 space-y-2">
                 <span class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 uppercase">
-                    Pendaftaran
+                    Akun & Ekskul
                 </span>
-                <h4 class="text-xs font-extrabold text-slate-900 dark:text-white pt-1">Siapkan Diri Sebelum Daftar</h4>
+                <h4 class="text-xs font-extrabold text-slate-900 dark:text-white pt-1">Mulai Menggunakan SOUL</h4>
                 <ul class="text-[11px] text-slate-600 dark:text-slate-400 space-y-1.5">
-                    <li class="flex items-start gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600 mt-0.5 text-[10px]"></i><span>Lengkapi profil (email & telepon) sebelum mendaftar ekskul.</span></li>
-                    <li class="flex items-start gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600 mt-0.5 text-[10px]"></i><span>Perhatikan batas maksimal 2 ekskul pilihan per siswa.</span></li>
-                    <li class="flex items-start gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600 mt-0.5 text-[10px]"></i><span>Cek halaman Katalog untuk melihat info ekskul sebelum mendaftar.</span></li>
+                    <li class="flex items-start gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600 mt-0.5 text-[10px]"></i><span>Masuk menggunakan NIS dan password akun dari Kesiswaan.</span></li>
+                    <li class="flex items-start gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600 mt-0.5 text-[10px]"></i><span>Gunakan Katalog untuk melihat informasi seluruh ekskul.</span></li>
+                    <li class="flex items-start gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600 mt-0.5 text-[10px]"></i><span>Hubungi Ketua ekskul jika akunmu belum ditambahkan sebagai anggota.</span></li>
                 </ul>
             </div>
 

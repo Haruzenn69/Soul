@@ -19,7 +19,7 @@
                     {{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }}
                 </p>
                 <p class="text-[10px] sm:text-xs text-white/70 mt-2 max-w-[15rem] sm:max-w-[22rem] leading-relaxed text-justify">
-                    Kelola keanggotaan, tinjau pendaftaran, dan pantau kehadiran kegiatan ekskulmu di sini.
+                    Kelola anggota, kegiatan, dan kehadiran ekskulmu di sini.
                 </p>
 
                 <div class="flex flex-row flex-wrap items-center gap-1.5 sm:gap-2 mt-3 sm:mt-4">

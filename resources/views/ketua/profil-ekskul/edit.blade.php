@@ -11,7 +11,7 @@
     <div class="bg-white p-5 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h3 class="text-sm font-bold text-slate-800">Status pendaftaran</h3>
-            <p class="text-[11px] text-slate-400 mt-0.5">{{ $ekskul->is_open_recruitment ? 'Pendaftaran sedang dibuka. Siswa bisa mendaftar.' : 'Pendaftaran sedang ditutup.' }}</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Status ini menjadi informasi pada katalog siswa. Keanggotaan ditambahkan oleh Ketua Ekskul.</p>
         </div>
         <form action="{{ route('ketua.profil-ekskul.toggle-recruitment') }}" method="POST">
             @csrf

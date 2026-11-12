@@ -436,9 +436,6 @@ function userCreateForm() {
     <form action="{{ route('kesiswaan.users.store') }}" method="POST" enctype="multipart/form-data" id="form-create-user" novalidate x-on:submit="handleSubmit($event)">
         @csrf
 
-        {{-- Hidden Jabatan Default: Siswa --}}
-        <input type="hidden" name="jabatan" value="siswa" :disabled="role !== 'siswa'">
-
         {{-- PILIH ROLE --}}
         <div class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-4 mb-5">
             <div>

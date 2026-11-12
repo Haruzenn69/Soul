@@ -8,11 +8,15 @@
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
             <div class="absolute -top-24 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
         </div>
-        <div class="relative">
+        <div class="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div class="min-w-0">
                 <h1 class="text-xl md:text-2xl font-extrabold text-white">Kelola Anggota</h1>
                 <p class="text-xs text-white/80 mt-1">Total: {{ $totalAnggotas }} anggota</p>
             </div>
+            <a href="{{ route('ketua.anggota.create') }}" class="inline-flex items-center justify-center gap-2 self-start sm:self-auto rounded-xl bg-white px-4 py-2.5 text-xs font-bold text-sky-700 shadow-sm transition hover:bg-sky-50">
+                <i class="fa-solid fa-user-plus"></i>
+                Tambahkan Anggota
+            </a>
         </div>
     </div>
 

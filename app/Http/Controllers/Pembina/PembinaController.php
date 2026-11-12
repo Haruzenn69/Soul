@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Pembina;
 use App\Http\Controllers\Controller;
 use App\Models\Ekskul;
 use App\Models\Faq;
+use App\Models\Kelas;
 use App\Models\Kegiatan;
 use App\Models\LaporanBulanan;
 use App\Models\Pelatih;
 use App\Models\PembinaProfileHistory;
 use App\Models\Pendaftaran;
+use App\Models\Pengurus;
 use App\Models\Presensi;
 use App\Models\RiwayatJabatan;
 use App\Models\Siswa;
@@ -322,47 +324,34 @@ class PembinaController extends Controller
         abort_unless($ekskulIds->contains($ekskul->id), 403);
 
         $currentKetua = $ekskul->ketua();
-
         $cari = trim((string) $request->input('cari'));
+        $kelasId = $request->integer('kelas_id') ?: null;
 
-        $query = Pendaftaran::where('ekskul_id', $ekskul->id)
-            ->where('status', Pendaftaran::STATUS_DITERIMA)
-            ->with(['siswa.kelas', 'siswa.riwayatJabatans.ekskul'])
-            ->withCount([
-                'presensis as hadir_count' => fn ($q) => $q->where('status', Presensi::STATUS_HADIR),
-                'presensis as total_presensi',
-            ]);
+        $siswas = Siswa::query()
+            ->with('kelas')
+            ->where('status', 'aktif')
+            ->whereHas('user', fn ($query) => $query->where('is_active', true))
+            ->when($cari !== '', fn ($query) => $query->where(fn ($sub) => $sub
+                ->where('nama', 'like', "%{$cari}%")
+                ->orWhere('nis', 'like', "%{$cari}%")))
+            ->when($kelasId, fn ($query) => $query->where('kelas_id', $kelasId))
+            ->orderBy('nama')
+            ->paginate(12)
+            ->withQueryString();
 
-        if ($cari !== '') {
-            $query->whereHas('siswa', function ($q) use ($cari) {
-                $q->where('nama', 'like', "%{$cari}%")
-                    ->orWhere('nis', 'like', "%{$cari}%");
-            });
-        }
-
-        $anggotaCollection = $query->get();
-
-        $anggotaCollection->each(function ($item) use ($ekskul, $currentKetua) {
-            $total = (int) $item->total_presensi;
-            $hadir = (int) $item->hadir_count;
-            $item->persentase_kehadiran = $total > 0 ? round(($hadir / $total) * 100, 1) : 0.0;
-
-            $siswa = $item->siswa;
-            $item->is_current_ketua = $currentKetua && $item->siswa_id === $currentKetua->id;
-
-            $ekskulDipimpin = $siswa?->ekskulDipimpin();
-            $item->is_ketua_di_lain = $ekskulDipimpin && $ekskulDipimpin->id !== $ekskul->id;
-            $item->ekskul_dipimpin_lain = $item->is_ketua_di_lain ? $ekskulDipimpin : null;
+        $siswas->getCollection()->each(function (Siswa $siswa) use ($ekskul, $currentKetua) {
+            $leaderEkskul = $siswa->ekskulDipimpin();
+            $siswa->is_current_ketua = $currentKetua?->id === $siswa->id;
+            $siswa->ekskul_dipimpin_lain = $leaderEkskul && $leaderEkskul->id !== $ekskul->id ? $leaderEkskul : null;
         });
 
-        // Urutkan: Ketua ekskul ini paling atas, lalu siswa nama ASC
-        $anggota = $anggotaCollection->sort(function ($a, $b) {
-            if ($a->is_current_ketua && ! $b->is_current_ketua) return -1;
-            if (! $a->is_current_ketua && $b->is_current_ketua) return 1;
-            return strcasecmp($a->siswa?->nama ?? '', $b->siswa?->nama ?? '');
-        })->values();
+        $kelasOptions = Kelas::query()
+            ->whereHas('tahunAjaran', fn ($query) => $query->where('status', 'aktif'))
+            ->whereHas('siswas', fn ($query) => $query->where('status', 'aktif'))
+            ->orderBy('nama')
+            ->get();
 
-        return view('pembina.pilih-ketua', compact('ekskul', 'anggota', 'currentKetua', 'cari'));
+        return view('pembina.pilih-ketua', compact('ekskul', 'siswas', 'kelasOptions', 'currentKetua', 'cari', 'kelasId'));
     }
 
     public function pilihKetua(Request $request, Ekskul $ekskul, Siswa $siswa)
@@ -370,14 +359,10 @@ class PembinaController extends Controller
         $pembina = auth()->user()?->pembina;
         abort_unless($pembina && $ekskul->pembina_id === $pembina->id, 403);
 
-        // Pastikan siswa terdaftar dengan status diterima di ekskul ini
-        $pendaftaran = Pendaftaran::where('ekskul_id', $ekskul->id)
-            ->where('siswa_id', $siswa->id)
-            ->where('status', 'diterima')
-            ->first();
+        abort_unless($siswa->status === 'aktif' && $siswa->user?->is_active, 422, 'Akun siswa ini tidak aktif.');
 
-        if (! $pendaftaran) {
-            return back()->with('error', 'Siswa yang dipilih bukan anggota aktif di ekskul '.$ekskul->nama_ekskul.'.');
+        if ($ekskul->ketua()?->id === $siswa->id) {
+            return back()->with('info', "{$siswa->nama} sudah menjadi Ketua Ekskul {$ekskul->nama_ekskul}.");
         }
 
         // Cek apakah siswa ini sudah menjadi ketua di ekskul lain
@@ -388,8 +373,43 @@ class PembinaController extends Controller
             return back()->with('error', "{$siswa->nama} saat ini sudah menjabat sebagai Ketua di ekskul {$ekskulDipimpin->nama_ekskul}. Satu siswa hanya dapat menjadi ketua pada 1 ekskul.");
         }
 
-        DB::transaction(function () use ($ekskul, $siswa) {
+        $pendaftaran = DB::transaction(function () use ($ekskul, $siswa) {
             $arsip = app(ArsipEkskulService::class);
+
+            $membership = Pendaftaran::query()
+                ->where('ekskul_id', $ekskul->id)
+                ->where('siswa_id', $siswa->id)
+                ->latest('id')
+                ->lockForUpdate()
+                ->first();
+
+            $membershipWasActive = $membership?->isActive() ?? false;
+            if (! $membershipWasActive) {
+                $candidate = $membership ?? new Pendaftaran;
+                $candidate->ekskul_id = $ekskul->id;
+                $candidate->setRelation('ekskul', $ekskul);
+
+                if ($alasan = $siswa->alasanTidakDapatMenerima($candidate)) {
+                    abort(422, $alasan);
+                }
+
+                if ($membership) {
+                    $membership->update([
+                        'tanggal_daftar' => today(),
+                        'status' => Pendaftaran::STATUS_DITERIMA,
+                        'alasan' => 'Ditetapkan sebagai Ketua oleh Pembina',
+                    ]);
+                    $membership = $membership->fresh();
+                } else {
+                    $membership = Pendaftaran::create([
+                        'siswa_id' => $siswa->id,
+                        'ekskul_id' => $ekskul->id,
+                        'tanggal_daftar' => today(),
+                        'status' => Pendaftaran::STATUS_DITERIMA,
+                        'alasan' => 'Ditetapkan sebagai Ketua oleh Pembina',
+                    ]);
+                }
+            }
 
             // Turunkan ketua lama di ekskul ini (jika ada) kembali menjadi siswa biasa
             $ketuaLamas = Siswa::where('jabatan', 'ketua')
@@ -402,6 +422,13 @@ class PembinaController extends Controller
             foreach ($ketuaLamas as $lama) {
                 $lama->update(['jabatan' => 'siswa']);
 
+                Pengurus::query()
+                    ->where('ekskul_id', $ekskul->id)
+                    ->where('siswa_id', $lama->id)
+                    ->where('jabatan', Pengurus::JABATAN_KETUA)
+                    ->where('status', Pengurus::STATUS_AKTIF)
+                    ->update(['status' => Pengurus::STATUS_SELESAI]);
+
                 // Digantikan, bukan dicopot, sehingga arsipnya beralasan "diganti".
                 $arsip->akhiriPeriodeKetua($ekskul, $lama, null, RiwayatJabatan::ALASAN_DIGANTI);
             }
@@ -409,9 +436,36 @@ class PembinaController extends Controller
             // Angkat siswa terpilih menjadi ketua
             $siswa->update(['jabatan' => 'ketua']);
 
+            Pengurus::query()
+                ->where('ekskul_id', $ekskul->id)
+                ->where('jabatan', Pengurus::JABATAN_KETUA)
+                ->where('status', Pengurus::STATUS_AKTIF)
+                ->update(['status' => Pengurus::STATUS_SELESAI]);
+
+            Pengurus::create([
+                'ekskul_id' => $ekskul->id,
+                'siswa_id' => $siswa->id,
+                'jabatan' => Pengurus::JABATAN_KETUA,
+                'status' => Pengurus::STATUS_AKTIF,
+                'diusulkan_oleh' => 'pembina',
+                'catatan' => 'Ditetapkan sebagai Ketua oleh Pembina',
+            ]);
+
             // Buka periode baru agar riwayat ketua lama tersimpan sebagai arsip
             $arsip->mulaiPeriodeKetua($ekskul, $siswa);
+
+            return ['pendaftaran' => $membership, 'anggota_baru' => ! $membershipWasActive];
         });
+
+        if ($pendaftaran['anggota_baru']) {
+            NotifikasiService::pendaftaranDiterima($pendaftaran['pendaftaran']);
+        }
+        \App\Models\Notifikasi::create([
+            'siswa_id' => $siswa->id,
+            'judul' => 'Penetapan Ketua Ekskul',
+            'pesan' => "Anda ditetapkan sebagai Ketua Ekskul {$ekskul->nama_ekskul} oleh Pembina.",
+            'tipe' => 'info',
+        ]);
 
         return back()->with('success', "Berhasil menetapkan {$siswa->nama} ({$siswa->nis}) sebagai Ketua Ekskul {$ekskul->nama_ekskul}.");
     }
@@ -424,6 +478,13 @@ class PembinaController extends Controller
         if ($siswa->jabatan === 'ketua') {
             DB::transaction(function () use ($ekskul, $siswa) {
                 $siswa->update(['jabatan' => 'siswa']);
+
+                Pengurus::query()
+                    ->where('ekskul_id', $ekskul->id)
+                    ->where('siswa_id', $siswa->id)
+                    ->where('jabatan', Pengurus::JABATAN_KETUA)
+                    ->where('status', Pengurus::STATUS_AKTIF)
+                    ->update(['status' => Pengurus::STATUS_SELESAI]);
 
                 app(ArsipEkskulService::class)->akhiriPeriodeKetua($ekskul, $siswa);
             });
