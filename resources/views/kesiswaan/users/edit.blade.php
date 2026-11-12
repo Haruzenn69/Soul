@@ -166,35 +166,6 @@
                     <input type="text" name="medsos" value="{{ old('medsos', $user->siswa?->medsos) }}" placeholder="@username / link medsos"
                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                 </div>
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Jabatan</label>
-                    <select name="jabatan" id="jabatan"
-                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
-                        @foreach (['siswa' => 'Siswa', 'ketua' => 'Ketua Ekskul'] as $value => $label)
-                            <option value="{{ $value }}" {{ old('jabatan', $user->siswa?->jabatan ?? 'siswa') === $value ? 'selected' : '' }}>{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                @php
-                    $currentEkskulId = $user->siswa?->pendaftarans->first()?->ekskul_id;
-                @endphp
-                <div id="field-ekskul" class="hidden">
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Ekskul</label>
-                    <select name="ekskul_id"
-                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
-                        <option value="">Pilih ekskul...</option>
-                        @foreach ($ekskuls as $ek)
-                            <option value="{{ $ek['id'] }}" {{ old('ekskul_id', $currentEkskulId) == $ek['id'] ? 'selected' : '' }}
-                                {{ $ek['has_ketua'] ? 'disabled' : '' }}>
-                                {{ $ek['label'] }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <p class="text-xs text-slate-400 mt-1 flex items-center gap-1">
-                        
-                        Ekskul yang sudah ada ketua tidak bisa dipilih.
-                    </p>
-                </div>
                 <div class="md:col-span-3 flex items-center gap-4 p-3 bg-slate-50/80 rounded-2xl border border-slate-200/80">
                     <img src="{{ $user->siswa?->foto_url ?? asset('images/default.png') }}"
                          alt="Foto Profil Siswa"
@@ -446,11 +417,6 @@
         pembinaFields.classList.toggle('hidden', role !== 'pembina');
         siswaFields.querySelectorAll('input, select, textarea').forEach(field => field.disabled = role !== 'siswa');
         pembinaFields.querySelectorAll('input, select, textarea').forEach(field => field.disabled = role !== 'pembina');
-        toggleEkskulField();
-    }
-    function toggleEkskulField() {
-        const jabatan = document.getElementById('jabatan')?.value;
-        document.getElementById('field-ekskul').classList.toggle('hidden', jabatan !== 'ketua');
     }
     let isDeactivationConfirmed = false;
 
@@ -491,8 +457,6 @@
     }
     document.addEventListener('DOMContentLoaded', () => {
         toggleRoleFields();
-        document.getElementById('jabatan')?.addEventListener('change', toggleEkskulField);
-
         document.getElementById('form-edit-user')?.addEventListener('submit', function (e) {
             const isActiveSelect = this.querySelector('select[name="is_active"]');
             if (isActiveSelect && isActiveSelect.value === '0' && !isDeactivationConfirmed && {{ $user->is_active ? 'true' : 'false' }}) {

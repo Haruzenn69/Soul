@@ -186,29 +186,10 @@
                                         </svg>
                                         Kamu Anggota Ekskul Ini
                                     </div>
-                                @elseif ($sedangMenunggu)
-                                    <div class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs font-bold shadow-sm">
-                                        <svg class="w-4 h-4 text-amber-500 shrink-0 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
-                                        Pendaftaran Menunggu Verifikasi
-                                    </div>
-                                @elseif ($bisaGabung)
-                                    <a href="{{ route('siswa.form-daftar', $ekskul) }}"
-                                       class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 hover:from-sky-500 hover:to-blue-700 text-white text-xs sm:text-sm font-bold shadow-lg shadow-sky-300 dark:shadow-none hover:shadow-sky-400 hover:-translate-y-0.5 transition-all">
-                                        <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                                        </svg>
-                                        Daftar Sekarang
-                                    </a>
                                 @else
-                                    <button disabled title="{{ $alasanTidakBisa ?? 'Pendaftaran Ditutup' }}"
-                                            class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-neutral-800 text-slate-400 dark:text-neutral-500 border border-slate-200 dark:border-neutral-700 text-xs font-bold cursor-not-allowed select-none">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                        </svg>
-                                        {{ $alasanTidakBisa ? 'Tidak Dapat Mendaftar' : 'Pendaftaran Ditutup' }}
-                                    </button>
+                                    <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-semibold text-slate-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-slate-300">
+                                        Keanggotaan ditambahkan oleh Ketua Ekskul
+                                    </div>
                                 @endif
 
                                 <a href="#faq" class="px-4 py-2.5 rounded-xl border border-sky-200 dark:border-neutral-700 bg-sky-50/70 dark:bg-neutral-800 hover:bg-sky-100 dark:hover:bg-neutral-700 text-sky-800 dark:text-sky-300 text-xs font-bold transition flex items-center gap-1.5">
@@ -787,10 +768,10 @@
                                 Pilihan Ekskul Terbaik
                             </span>
                             <h2 class="text-xl sm:text-3xl font-extrabold tracking-tight">
-                                Tertarik Bergabung dengan {{ $ekskul->nama_ekskul }}?
+                                Kenali {{ $ekskul->nama_ekskul }}
                             </h2>
                             <p class="mt-2 text-xs sm:text-sm text-sky-100 leading-relaxed">
-                                Jadilah bagian dari keluarga besar {{ $ekskul->nama_ekskul }}. Kembangkan potensi, raih prestasi, dan jalin persahabatan baru di SMKN 11 Bandung!
+                                Siswa dapat melihat informasi ekskul. Ketua Ekskul menambahkan anggota dari akun siswa yang sudah dibuat Kesiswaan.
                             </p>
                         </div>
 
@@ -804,14 +785,14 @@
                                     ⏳ Menunggu Verifikasi
                                 </div>
                             @elseif ($bisaGabung)
-                                <a href="{{ route('siswa.form-daftar', $ekskul) }}"
+                                <a href="{{ route('siswa.katalog') }}"
                                    class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 text-xs sm:text-sm font-extrabold shadow-lg shadow-amber-500/30 hover:scale-105 transition-all">
                                     <svg class="w-4 h-4 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                                    Daftar Sekarang
+                                    Lihat Katalog
                                 </a>
                             @else
-                                <span class="px-5 py-3 rounded-xl bg-white/20 backdrop-blur-md text-white/80 text-xs font-bold select-none cursor-not-allowed" title="{{ $alasanTidakBisa ?? 'Pendaftaran Ditutup' }}">
-                                    {{ $alasanTidakBisa ? 'Tidak Dapat Mendaftar' : 'Pendaftaran Ditutup' }}
+                                <span class="px-5 py-3 rounded-xl bg-white/20 backdrop-blur-md text-white/80 text-xs font-bold select-none" title="Keanggotaan ditambahkan oleh Ketua Ekskul">
+                                    Hubungi Ketua Ekskul
                                 </span>
                             @endif
                         </div>

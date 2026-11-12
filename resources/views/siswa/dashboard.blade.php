@@ -75,9 +75,9 @@
                             Lihat Presensi
                         </a>
                     @else
-                        <a href="{{ route('siswa.daftar-ekskul') }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2 py-2 sm:gap-1.5 sm:px-4 bg-white text-sky-700 font-bold text-[10px] sm:text-xs rounded-xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
-                            <i class="fa-solid fa-plus text-[10px] sm:text-xs shrink-0"></i>
-                            Daftar Ekskul
+                        <a href="{{ route('siswa.katalog') }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2 py-2 sm:gap-1.5 sm:px-4 bg-white text-sky-700 font-bold text-[10px] sm:text-xs rounded-xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
+                            <i class="fa-solid fa-book-open text-[10px] sm:text-xs shrink-0"></i>
+                            Lihat Katalog
                         </a>
                     @endif
                     <a href="{{ route('siswa.katalog') }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2 py-2 sm:gap-1.5 sm:px-4 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-[10px] sm:text-xs rounded-xl hover:bg-white/20 transition-all">
@@ -181,7 +181,7 @@
                     {{ $ekskulTerakhir->nama_ekskul ?? '' }}.
                 </p>
                 <p class="text-rose-600/90 dark:text-rose-400/90 mt-1">
-                    Kamu masih bisa menjelajahi katalog dan mendaftar ke ekskul lain yang membuka pendaftaran.
+                    Keanggotaan baru ditambahkan oleh Ketua Ekskul. Hubungi Ketua jika ingin bergabung kembali.
                 </p>
                 <a href="{{ route('siswa.katalog') }}" class="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold transition shadow-sm">
                     Jelajahi Katalog Ekskul
@@ -231,7 +231,7 @@
                 </div>
                 @if($activeEkskuls->count() === 1)
                     <a href="{{ route('siswa.katalog') }}" class="text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 flex items-center gap-1 transition">
-                        <span>Tambah Ekskul Lain (Slot 2/2)</span>
+                        <span>Lihat Ekskul Lain</span>
                         <i class="fa-solid fa-chevron-right text-[10px]"></i>
                     </a>
                 @endif
@@ -335,17 +335,11 @@
                 +
             </div>
             <h3 class="text-sm font-extrabold text-slate-900 dark:text-white mt-3">Kamu belum bergabung di ekskul apa pun</h3>
-            <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto leading-relaxed">Temukan ekskul yang sesuai dengan minat dan bakatmu. Bergabunglah sekarang!</p>
-            <div class="flex flex-wrap justify-center gap-2.5 mt-4">
-                <a href="{{ route('siswa.daftar-ekskul') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-xl shadow-sm transition-all">
-                    <i class="fa-solid fa-plus text-xs"></i>
-                    Daftar Ekskul
-                </a>
-                <a href="{{ route('siswa.katalog') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl hover:bg-slate-200 dark:hover:bg-neutral-700 transition-all">
-                    <i class="fa-solid fa-book-open text-xs"></i>
-                    Jelajahi Katalog
-                </a>
-            </div>
+            <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto leading-relaxed">Ketua Ekskul akan menambahkanmu setelah akun siswa dibuat oleh Kesiswaan.</p>
+            <a href="{{ route('siswa.katalog') }}" class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl hover:bg-slate-200 dark:hover:bg-neutral-700 transition-all">
+                <i class="fa-solid fa-book-open text-xs"></i>
+                Lihat Katalog Ekskul
+            </a>
         </div>
     @endif
 
