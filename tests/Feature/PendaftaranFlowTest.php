@@ -19,6 +19,23 @@ class PendaftaranFlowTest extends TestCase
         $this->getJson('/api/siswa/daftar-exkul')->assertNotFound();
     }
 
+    public function test_tombol_tambah_anggota_hanya_ada_di_halaman_pendaftaran(): void
+    {
+        $ekskul = $this->makeEkskul();
+        $ketua = $this->makeKetua($ekskul);
+
+        $this->actingAs($ketua['user'])
+            ->get(route('ketua.pendaftaran.index'))
+            ->assertOk()
+            ->assertSee('Tambah Anggota')
+            ->assertSee('modal-tambah-anggota');
+
+        $this->get(route('ketua.anggota.index'))
+            ->assertOk()
+            ->assertDontSee('Tambah Anggota')
+            ->assertDontSee('modal-tambah-anggota');
+    }
+
     public function test_ketua_dapat_menambahkan_siswa_dan_notifikasi_dikirim(): void
     {
         $ekskul = $this->makeEkskul();
@@ -26,8 +43,9 @@ class PendaftaranFlowTest extends TestCase
         $siswa = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('xi'));
 
         $this->actingAs($ketua['user'])
+            ->from(route('ketua.pendaftaran.index'))
             ->post(route('ketua.anggota.store'), ['siswa_ids' => [$siswa->id]])
-            ->assertRedirect()
+            ->assertRedirect(route('ketua.pendaftaran.index'))
             ->assertSessionHas('success');
 
         $pendaftaran = Pendaftaran::where('siswa_id', $siswa->id)->where('ekskul_id', $ekskul->id)->firstOrFail();
@@ -51,9 +69,9 @@ class PendaftaranFlowTest extends TestCase
         $this->daftarkan($siswa, $ekskulB);
 
         $this->actingAs($ketua['user'])
-            ->from(route('ketua.anggota.index'))
+            ->from(route('ketua.pendaftaran.index'))
             ->post(route('ketua.anggota.store'), ['siswa_ids' => [$siswa->id]])
-            ->assertRedirect(route('ketua.anggota.index'))
+            ->assertRedirect(route('ketua.pendaftaran.index'))
             ->assertSessionHasErrors('siswa_ids');
 
         $this->assertDatabaseMissing('pendaftarans', [
@@ -71,9 +89,9 @@ class PendaftaranFlowTest extends TestCase
         $this->daftarkan($siswa, $wajibAktif);
 
         $this->actingAs($ketua['user'])
-            ->from(route('ketua.anggota.index'))
+            ->from(route('ketua.pendaftaran.index'))
             ->post(route('ketua.anggota.store'), ['siswa_ids' => [$siswa->id]])
-            ->assertRedirect(route('ketua.anggota.index'))
+            ->assertRedirect(route('ketua.pendaftaran.index'))
             ->assertSessionHasErrors('siswa_ids');
 
         $this->assertDatabaseMissing('pendaftarans', [
@@ -91,9 +109,9 @@ class PendaftaranFlowTest extends TestCase
         $this->daftarkan($siswa, $paskibra);
 
         $this->actingAs($ketua['user'])
-            ->from(route('ketua.anggota.index'))
+            ->from(route('ketua.pendaftaran.index'))
             ->post(route('ketua.anggota.store'), ['siswa_ids' => [$siswa->id]])
-            ->assertRedirect(route('ketua.anggota.index'))
+            ->assertRedirect(route('ketua.pendaftaran.index'))
             ->assertSessionHasErrors('siswa_ids');
 
         $this->assertDatabaseMissing('pendaftarans', [

@@ -943,8 +943,8 @@
 </aside>
 
 @if (! request()->routeIs('profile.edit'))
-    <div id="sidebar-overlay" class="hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-[2px] md:hidden" onclick="closeSidebar()"></div>
-    <aside id="sidebar-mobile" class="hidden fixed inset-y-0 left-0 z-50 flex w-[min(21rem,88vw)] flex-col overflow-hidden border-r border-sky-100 bg-white p-4 shadow-2xl md:hidden dark:border-neutral-800 dark:bg-neutral-900" aria-label="Menu navigasi {{ $psRole }}">
+    <div id="sidebar-overlay" class="hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-[2px] lg:hidden" onclick="closeSidebar()"></div>
+    <aside id="sidebar-mobile" class="hidden fixed inset-y-0 left-0 z-50 flex w-[min(21rem,88vw)] flex-col overflow-hidden border-r border-sky-100 bg-white p-4 shadow-2xl lg:hidden dark:border-neutral-800 dark:bg-neutral-900" aria-label="Menu navigasi {{ $psRole }}">
         <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
             <div class="absolute -top-24 -right-16 h-64 w-64 rounded-full bg-slate-100/80 blur-3xl"></div>
             <div class="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-slate-100/80 blur-3xl"></div>
