@@ -102,12 +102,9 @@
                             Lihat Presensi
                         </a>
                     @else
-                        <a href="{{ route('siswa.daftar-ekskul') }}" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                            </svg>
-                            Daftar Ekskul
-                        </a>
+                        <span class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/20 text-white font-bold text-xs rounded-2xl">
+                            Hubungi ketua ekskul untuk pendaftaran
+                        </span>
                     @endif
                     <a href="{{ route('siswa.katalog') }}" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/20 transition-all">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -597,7 +594,7 @@
                                 </div>
 
                                 <div class="mt-4 p-4 rounded-2xl border border-dashed border-sky-200 text-center bg-sky-50/50">
-                                    <p class="text-[11px] text-slate-500 leading-relaxed">Kamu sudah terdaftar di 1 ekskul. Untuk mendaftar ekskul lain, ajukan keluar dari ekskul aktif terlebih dahulu.</p>
+                                    <p class="text-[11px] text-slate-500 leading-relaxed">Untuk bergabung di ekskul lain, silakan hubungi Ketua ekskul tersebut.</p>
                                     <a href="{{ route('siswa.katalog') }}" class="inline-flex items-center gap-1.5 mt-2 text-sky-600 text-xs font-bold hover:text-sky-700 hover:underline">
                                         Lihat semua ekskul
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
@@ -613,17 +610,11 @@
                                 </div>
                                 <h3 class="text-sm font-extrabold text-slate-900 mt-5">Kamu belum bergabung di ekskul apa pun</h3>
                                 <p class="text-xs text-slate-400 mt-1.5 max-w-sm mx-auto leading-relaxed">Temukan ekskul yang sesuai dengan minat dan bakatmu. Bergabunglah sekarang!</p>
-                                <div class="flex flex-wrap justify-center gap-3 mt-5">
-                                    <a href="{{ route('siswa.daftar-ekskul') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 hover:-translate-y-0.5 hover:shadow-xl transition-all">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                        </svg>
-                                        Daftar Ekskul
-                                    </a>
-                                    <a href="{{ route('siswa.katalog') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-100 text-amber-800 font-bold text-xs rounded-xl hover:bg-amber-200 transition-all">
-                                        Jelajahi Katalog
-                                    </a>
-                                </div>
+                                 <div class="flex flex-wrap justify-center gap-3 mt-5">
+                                     <a href="{{ route('siswa.katalog') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 hover:-translate-y-0.5 hover:shadow-xl transition-all">
+                                         Jelajahi Katalog Ekskul
+                                     </a>
+                                 </div>
                             </div>
                         @endif
                     </div>

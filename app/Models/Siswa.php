@@ -368,28 +368,38 @@ class Siswa extends Model
      */
     public function alasanTidakDapatMenerima(Pendaftaran $target): ?string
     {
-        $lain = $this->activePendaftarans()
-            ->where('id', '!=', $target->id)
+        return $this->alasanTidakDapatMengikutiEkskul($target->ekskul, $target);
+    }
+
+    public function alasanTidakDapatMengikutiEkskul(Ekskul $target, ?Pendaftaran $current = null): ?string
+    {
+        $lain = $this->pendaftarans()
+            ->whereIn('status', [
+                Pendaftaran::STATUS_PENDING,
+                Pendaftaran::STATUS_DITERIMA,
+                Pendaftaran::STATUS_PERINGATAN,
+            ])
+            ->when($current, fn ($query) => $query->where('id', '!=', $current->id))
             ->with('ekskul')
             ->get();
 
         if ($lain->count() >= AturanEkskul::MAKS_EKSKUL) {
-            return 'Siswa ini sudah aktif di '.AturanEkskul::MAKS_EKSKUL.' ekskul.';
+            return 'Siswa ini sudah terdaftar di '.AturanEkskul::MAKS_EKSKUL.' ekskul.';
         }
 
-        if ($target->ekskul && $target->ekskul->isWajib()) {
+        if ($target->isWajib()) {
             $bentrokWajib = $lain->first(fn (Pendaftaran $p) => $p->ekskul && $p->ekskul->isWajib());
 
             if ($bentrokWajib) {
-                return 'Siswa ini sudah aktif di ekskul wajib ('.$bentrokWajib->ekskul->nama_ekskul.'). Siswa hanya boleh mengikuti 1 ekskul wajib.';
+                return 'Siswa ini sudah terdaftar di ekskul wajib ('.$bentrokWajib->ekskul->nama_ekskul.'). Siswa hanya boleh mengikuti 1 ekskul wajib.';
             }
         }
 
-        if ($target->ekskul && AturanEkskul::isP1i($target->ekskul->nama_ekskul)) {
+        if (AturanEkskul::isP1i($target->nama_ekskul)) {
             $bentrok = $lain->first(fn (Pendaftaran $p) => $p->ekskul && AturanEkskul::isP1i($p->ekskul->nama_ekskul));
 
             if ($bentrok) {
-                return 'Siswa ini sudah aktif di ekskul '.AturanEkskul::LABEL_P1I.' ('.$bentrok->ekskul->nama_ekskul.').';
+                return 'Siswa ini sudah terdaftar di ekskul '.AturanEkskul::LABEL_P1I.' ('.$bentrok->ekskul->nama_ekskul.').';
             }
         }
 

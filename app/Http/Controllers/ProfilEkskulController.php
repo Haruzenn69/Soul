@@ -53,16 +53,6 @@ class ProfilEkskulController extends Controller
         return back()->with('success', 'Profil ekskul berhasil diperbarui.');
     }
 
-    public function toggleRecruitment()
-    {
-        $ekskul = $this->ekskul();
-        $ekskul->update(['is_open_recruitment' => ! $ekskul->is_open_recruitment]);
-
-        $status = $ekskul->is_open_recruitment ? 'dibuka' : 'ditutup';
-
-        return back()->with('success', "Pendaftaran ekskul telah {$status}.");
-    }
-
     public function storeGaleri(Request $request)
     {
         $ekskul = $this->ekskul();

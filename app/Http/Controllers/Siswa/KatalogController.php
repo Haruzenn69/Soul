@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 
 class KatalogController extends Controller
 {
-    /** Nilai yang diterima pada query string `status`. */
-    private const FILTER = ['buka', 'tutup'];
-
     public function index(Request $request)
     {
         $siswa = auth()->user()?->siswa;
@@ -20,9 +17,6 @@ class KatalogController extends Controller
         $ekskulAktifs = $siswa ? $siswa->activeEkskuls() : collect();
         $ekskulAktif = $ekskulAktifs->first();
         $menunggu = $siswa?->pendingPendaftaran();
-
-        $status = $request->query('status');
-        $status = in_array($status, self::FILTER, true) ? $status : null;
 
         $cari = Ekskul::query()
             ->with('pembina')
@@ -38,24 +32,12 @@ class KatalogController extends Controller
                 });
             });
 
-        // Jumlah dihitung dari hasil pencarian, bukan dari seluruh tabel, supaya
-        // angka di rail selalu menjawab "dari ekskul yang ini, berapa yang bisa
-        // saya daftar?".
         $jumlah = [
             'semua' => (clone $cari)->count(),
-            'buka' => (clone $cari)->where('is_open_recruitment', true)->count(),
-            'tutup' => (clone $cari)->where('is_open_recruitment', false)->count(),
         ];
 
-        $ekskuls = (clone $cari)
-            ->when($status === 'buka', fn ($query) => $query->where('is_open_recruitment', true))
-            ->when($status === 'tutup', fn ($query) => $query->where('is_open_recruitment', false))
-            ->get();
+        $ekskuls = $cari->get();
 
-        // Alasan per ekskul supaya tombol di kartu menyesuaikan aturan
-        // (maksimal dua ekskul & larangan dua ekskul 4P1I).
-        $alasanDaftar = $siswa?->alasanTidakBisaDaftar();
-        $bisaDaftar = $alasanDaftar === null;
         $alasanPerEkskul = $siswa
             ? $ekskuls->mapWithKeys(fn (Ekskul $e) => [$e->id => $siswa->alasanTidakBisaDaftar($e)])
             : collect();
@@ -63,12 +45,10 @@ class KatalogController extends Controller
         return view('siswa.katalog', [
             'ekskuls' => $ekskuls,
             'jumlah' => $jumlah,
-            'status' => $status,
+            'status' => null,
             'ekskulAktif' => $ekskulAktif,
             'ekskulAktifs' => $ekskulAktifs,
             'menunggu' => $menunggu !== null,
-            'alasanDaftar' => $alasanDaftar,
-            'bisaDaftar' => $bisaDaftar,
             'alasanPerEkskul' => $alasanPerEkskul,
         ]);
     }

@@ -182,9 +182,7 @@
                                 @else
                                     <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-50 dark:bg-neutral-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-neutral-700">Nonaktif</span>
                                 @endif
-                                @if($eksB->is_open_recruitment)
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/50">Buka Rekrutmen</span>
-                                @endif
+                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/50">Keanggotaan via Ketua</span>
                             </div>
                         </div>
                         @endforeach

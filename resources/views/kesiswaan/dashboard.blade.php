@@ -108,7 +108,7 @@
         <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-white border border-sky-200 p-3 md:p-5 shadow-md shadow-sky-100 animate-fade-up" style="animation-delay: .3s">
             <p class="text-xs font-bold text-slate-400 tracking-wider uppercase">Ekskul</p>
             <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $totalEkskul }}</h3>
-            <p class="text-xs font-semibold text-sky-600 mt-0.5 md:mt-1">{{ $ekskulBuka }} buka</p>
+            <p class="text-xs font-semibold text-sky-600 mt-0.5 md:mt-1">{{ $ekskulBuka }} aktif</p>
         </div>
     </div>
 

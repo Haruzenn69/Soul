@@ -31,9 +31,8 @@ class EkskulController extends Controller
         $kategoriList = $this->kategoriList();
         abort_unless(in_array($kategori, $kategoriList, true), 404);
 
-        $sort = in_array($request->input('sort'), ['nama_ekskul', 'status', 'rekrutmen', 'created_at'], true) ? $request->input('sort') : 'nama_ekskul';
+        $sort = in_array($request->input('sort'), ['nama_ekskul', 'status', 'created_at'], true) ? $request->input('sort') : 'nama_ekskul';
         $direction = $request->input('direction') === 'desc' ? 'desc' : 'asc';
-        $sortColumn = $sort === 'rekrutmen' ? 'is_open_recruitment' : $sort;
 
         $ekskuls = Ekskul::with(['pembina', 'pelatih'])
             ->where('kategori', $kategori)
@@ -46,10 +45,8 @@ class EkskulController extends Controller
             })
             ->when($request->input('status') === 'aktif', fn ($q) => $q->where('status', true))
             ->when($request->input('status') === 'nonaktif', fn ($q) => $q->where('status', false))
-            ->when($request->input('rekrutmen') === 'buka', fn ($q) => $q->where('is_open_recruitment', true))
-            ->when($request->input('rekrutmen') === 'tutup', fn ($q) => $q->where('is_open_recruitment', false))
             ->orderByDesc('status')
-            ->orderBy($sortColumn, $direction)
+            ->orderBy($sort, $direction)
             ->paginate(50)
             ->withQueryString();
 
@@ -128,8 +125,6 @@ class EkskulController extends Controller
             }
             $pembina->update(['kategori_pernah_dibina' => $data['kategori']]);
         }
-
-        $data['is_open_recruitment'] = true;
 
         Ekskul::create($data);
 

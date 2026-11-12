@@ -21,17 +21,11 @@ class Ekskul extends Model
         'logo',
         'cover',
         'jadwal',
-        'is_open_recruitment',
         'status',
     ];
 
     protected $casts = [
-        'is_open_recruitment' => 'boolean',
         'status' => 'boolean',
-    ];
-
-    protected $attributes = [
-        'is_open_recruitment' => true,
     ];
 
     public function pembina(): BelongsTo

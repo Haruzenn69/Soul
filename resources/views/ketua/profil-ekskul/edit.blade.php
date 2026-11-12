@@ -8,23 +8,11 @@
         <p class="text-xs text-slate-400 mt-1">Atur informasi yang tampil di katalog ekskul.</p>
     </div>
 
-    <div class="bg-white p-5 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="bg-white p-5 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl">
         <div>
-            <h3 class="text-sm font-bold text-slate-800">Status pendaftaran</h3>
-            <p class="text-[11px] text-slate-400 mt-0.5">{{ $ekskul->is_open_recruitment ? 'Pendaftaran sedang dibuka. Siswa bisa mendaftar.' : 'Pendaftaran sedang ditutup.' }}</p>
+            <h3 class="text-sm font-bold text-slate-800">Keanggotaan ekskul</h3>
+            <p class="text-[11px] text-slate-400 mt-0.5">Siswa yang ingin bergabung dapat menghubungi Ketua ekskul. Ketua menambahkan anggota melalui halaman Anggota.</p>
         </div>
-        <form action="{{ route('ketua.profil-ekskul.toggle-recruitment') }}" method="POST">
-            @csrf
-            @method('PATCH')
-            <button type="submit" class="w-full sm:w-auto px-5 py-2.5 text-xs font-bold rounded-xl transition shadow-sm {{ $ekskul->is_open_recruitment ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border border-emerald-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200 border border-slate-200' }}">
-                {{ $ekskul->is_open_recruitment ? 'Dibuka' : 'Ditutup' }}
-                @if($ekskul->is_open_recruitment)
-                    <svg class="w-3.5 h-3.5 inline-block ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M5 13l4 4L19 7"/>
-                    </svg>
-                @endif
-            </button>
-        </form>
     </div>
 
     <div class="bg-white p-5 md:p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 max-w-2xl">

@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\KetuaEkskul;
+use App\Models\Kelas;
 use App\Models\Pendaftaran;
+use App\Models\RiwayatPendaftaran;
 use App\Models\Siswa;
 use App\Services\ArsipEkskulService;
 use App\Services\NotifikasiService;
 use App\Support\TableKit;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class AnggotaController extends Controller
 {
@@ -57,7 +62,150 @@ class AnggotaController extends Controller
             ? $arsipService->arsip($ekskul)
             : ['ketuaSelesai' => collect(), 'anggotaLulus' => collect(), 'total' => $arsipTotal];
 
-        return view('ketua.anggota.index', compact('anggotas', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal'));
+        $kelasList = Kelas::whereHas('siswas')->orderBy('nama')->get(['id', 'nama']);
+
+        return view('ketua.anggota.index', compact('anggotas', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal', 'kelasList'));
+    }
+
+    public function calonSiswa(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'q' => ['nullable', 'string', 'max:100'],
+            'kelas_id' => ['nullable', 'integer', 'exists:kelas,id'],
+            'page' => ['nullable', 'integer', 'min:1'],
+        ]);
+        $ekskul = $this->ekskul();
+        $statusAktif = [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN];
+
+        $siswas = Siswa::query()
+            ->with('kelas')
+            ->whereDoesntHave('pendaftarans', fn ($query) => $query
+                ->where('ekskul_id', $ekskul->id)
+                ->whereIn('status', [Pendaftaran::STATUS_PENDING, Pendaftaran::STATUS_LULUS]))
+            ->when($validated['kelas_id'] ?? null, fn ($query, $kelasId) => $query->where('kelas_id', $kelasId))
+            ->when($validated['q'] ?? null, function ($query, $cari) {
+                $query->where(function ($search) use ($cari) {
+                    $search->where('nama', 'like', "%{$cari}%")
+                        ->orWhere('nis', 'like', "%{$cari}%")
+                        ->orWhereHas('kelas', fn ($kelas) => $kelas->where('nama', 'like', "%{$cari}%"));
+                });
+            })
+            ->orderByRaw(
+                'CASE WHEN EXISTS (
+                    SELECT 1 FROM pendaftarans
+                    WHERE pendaftarans.siswa_id = siswas.id
+                    AND pendaftarans.ekskul_id = ?
+                    AND pendaftarans.status IN (?, ?)
+                ) THEN 1 ELSE 0 END',
+                [$ekskul->id, ...$statusAktif]
+            )
+            ->orderBy('nama')
+            ->paginate(25)
+            ->withQueryString();
+
+        $ids = $siswas->getCollection()->pluck('id');
+        $statusSebelumnya = Pendaftaran::query()
+            ->where('ekskul_id', $ekskul->id)
+            ->whereIn('siswa_id', $ids)
+            ->pluck('status', 'siswa_id');
+        $tanggalSebelumnya = Pendaftaran::query()
+            ->where('ekskul_id', $ekskul->id)
+            ->whereIn('siswa_id', $ids)
+            ->pluck('tanggal_daftar', 'siswa_id');
+
+        return response()->json([
+            'items' => $siswas->getCollection()->map(fn (Siswa $siswa) => [
+                'id' => $siswa->id,
+                'nama' => $siswa->nama,
+                'nis' => $siswa->nis,
+                'kelas' => $siswa->kelas?->nama ?? 'Tanpa kelas',
+                'sudah_aktif' => in_array($statusSebelumnya->get($siswa->id), $statusAktif, true),
+                'status_sebelumnya' => $statusSebelumnya->get($siswa->id),
+                'tanggal_daftar_sebelumnya' => $tanggalSebelumnya->has($siswa->id)
+                    ? \Illuminate\Support\Carbon::parse($tanggalSebelumnya->get($siswa->id))->format('d/m/Y')
+                    : null,
+            ])->values(),
+            'total' => $siswas->total(),
+            'current_page' => $siswas->currentPage(),
+            'last_page' => $siswas->lastPage(),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $ekskul = $this->ekskul();
+
+        $validated = $request->validate([
+            'siswa_ids' => ['required', 'array', 'min:1', 'max:100'],
+            'siswa_ids.*' => ['required', 'integer', 'distinct', 'exists:siswas,id'],
+        ], [
+            'siswa_ids.required' => 'Pilih minimal satu siswa untuk didaftarkan.',
+        ]);
+
+        $count = DB::transaction(function () use ($validated, $ekskul) {
+            $count = 0;
+
+            foreach ($validated['siswa_ids'] as $siswaId) {
+                $siswa = Siswa::whereKey($siswaId)->lockForUpdate()->firstOrFail();
+                $pendaftaran = Pendaftaran::where('ekskul_id', $ekskul->id)
+                    ->where('siswa_id', $siswa->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($pendaftaran && ! in_array($pendaftaran->status, [
+                    Pendaftaran::STATUS_NONAKTIF,
+                    Pendaftaran::STATUS_KELUAR,
+                    Pendaftaran::STATUS_DITOLAK,
+                ], true)) {
+                    throw ValidationException::withMessages([
+                        'siswa_ids' => "{$siswa->nama} sudah aktif atau sedang menunggu di ekskul ini.",
+                    ]);
+                }
+
+                if ($alasan = $siswa->alasanTidakDapatMengikutiEkskul($ekskul)) {
+                    throw ValidationException::withMessages([
+                        'siswa_ids' => "{$siswa->nama}: {$alasan}",
+                    ]);
+                }
+
+                if ($pendaftaran) {
+                    RiwayatPendaftaran::create([
+                        'pendaftaran_id' => $pendaftaran->id,
+                        'siswa_id' => $pendaftaran->siswa_id,
+                        'ekskul_id' => $pendaftaran->ekskul_id,
+                        'tanggal_daftar' => $pendaftaran->tanggal_daftar,
+                        'status' => $pendaftaran->status,
+                        'alasan' => $pendaftaran->alasan,
+                        'dicatat_pada' => now(),
+                    ]);
+
+                    $pendaftaran->update([
+                        'status' => Pendaftaran::STATUS_DITERIMA,
+                        'tanggal_daftar' => now()->toDateString(),
+                        'alasan' => 'Diaktifkan kembali oleh ketua.',
+                    ]);
+                } else {
+                    $pendaftaran = Pendaftaran::create([
+                        'siswa_id' => $siswa->id,
+                        'ekskul_id' => $ekskul->id,
+                        'status' => Pendaftaran::STATUS_DITERIMA,
+                        'tanggal_daftar' => now()->toDateString(),
+                        'alasan' => 'Didaftarkan langsung oleh ketua.',
+                    ]);
+                }
+
+                if ($siswa->jabatan !== 'ketua') {
+                    $siswa->update(['jabatan' => 'anggota']);
+                }
+
+                NotifikasiService::anggotaDitambahkan($pendaftaran);
+                $count++;
+            }
+
+            return $count;
+        });
+
+        return back()->with('success', "Berhasil menambahkan {$count} siswa ke ekstrakurikuler.");
     }
 
     public function updateStatus(Request $request, Pendaftaran $pendaftaran)
@@ -73,11 +221,10 @@ class AnggotaController extends Controller
 
         $targetStatus = $validated['status'];
 
-        $protected = $pendaftaran->siswa_id === auth()->user()->siswa?->id
-            || $pendaftaran->siswa?->jabatan === 'ketua';
+        $protected = $pendaftaran->siswa_id === auth()->user()->siswa?->id;
 
         if ($protected && in_array($targetStatus, [Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_NONAKTIF])) {
-            return back()->with('error', 'Kamu (ketua) tidak bisa memberi peringatan atau menonaktifkan dirimu sendiri.');
+            return back()->with('error', 'Kamu tidak bisa memberi peringatan atau menonaktifkan dirimu sendiri.');
         }
 
         if ($pendaftaran->status === $targetStatus) {

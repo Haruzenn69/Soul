@@ -21,7 +21,6 @@
 
     $activeFilterCount = 0;
     if (request()->filled('status')) $activeFilterCount++;
-    if (request()->filled('rekrutmen')) $activeFilterCount++;
     $hasActiveSearch = request()->filled('q');
     $hasAnyFilterOrSearch = $activeFilterCount > 0 || $hasActiveSearch;
 @endphp
@@ -144,7 +143,7 @@
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div class="grid grid-cols-1 gap-3.5">
                         <div>
                             <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Status Ekskul</label>
                             <select name="status" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
@@ -154,14 +153,6 @@
                             </select>
                         </div>
 
-                        <div>
-                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Pendaftaran Anggota</label>
-                            <select name="rekrutmen" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
-                                <option value="">Semua Status</option>
-                                <option value="buka" {{ request('rekrutmen') === 'buka' ? 'selected' : '' }}>Buka Pendaftaran</option>
-                                <option value="tutup" {{ request('rekrutmen') === 'tutup' ? 'selected' : '' }}>Tutup Pendaftaran</option>
-                            </select>
-                        </div>
                     </div>
 
                     <div class="flex items-center justify-between pt-3 border-t border-slate-100">
@@ -193,12 +184,6 @@
                         <a href="{{ route('kesiswaan.ekskuls.by-kategori', array_merge([$kategori], request()->except('status','page'))) }}" class="hover:text-rose-500">&times;</a>
                     </span>
                 @endif
-                @if(request()->filled('rekrutmen'))
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-sky-50 border border-sky-200 text-sky-700 rounded-xl text-[11px] font-semibold">
-                        Rekrutmen: <span class="font-bold">{{ request('rekrutmen') === 'buka' ? 'Buka' : 'Tutup' }}</span>
-                        <a href="{{ route('kesiswaan.ekskuls.by-kategori', array_merge([$kategori], request()->except('rekrutmen','page'))) }}" class="hover:text-rose-500">&times;</a>
-                    </span>
-                @endif
             </div>
         @endif
     </form>
@@ -220,12 +205,6 @@
                             <a href="{{ $sortLink('status') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600">
                                 Status
                                 <x-icon :path="$sortIcon('status')" class="w-3 h-3" />
-                            </a>
-                        </th>
-                        <th class="py-3.5 px-5">
-                            <a href="{{ $sortLink('rekrutmen') }}" class="inline-flex items-center gap-1.5 hover:text-sky-600">
-                                Pendaftaran
-                                <x-icon :path="$sortIcon('rekrutmen')" class="w-3 h-3" />
                             </a>
                         </th>
                         <th class="py-3.5 px-5 text-right">Aksi</th>
@@ -268,15 +247,6 @@
                                     {{ $ekskul->status ? 'Aktif' : 'Nonaktif' }}
                                 </span>
                             </td>
-                            <td class="py-3.5 px-5 whitespace-nowrap">
-                                @if ($ekskul->status)
-                                    <span class="px-2.5 py-1 rounded-full font-bold text-[11px] {{ $ekskul->is_open_recruitment ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-100 text-slate-400' }}">
-                                        {{ $ekskul->is_open_recruitment ? 'Buka' : 'Tutup' }}
-                                    </span>
-                                @else
-                                    <span class="px-2.5 py-1 rounded-full font-semibold text-[11px] bg-slate-200 text-slate-500">-</span>
-                                @endif
-                            </td>
                             <td class="py-3.5 px-5 text-right whitespace-nowrap">
                                 <div class="flex gap-2 justify-end items-center">
                                     <a href="{{ route('kesiswaan.ekskuls.show', $ekskul) }}"
@@ -296,7 +266,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-5 py-8 text-center text-xs text-slate-400">Belum ada ekskul pada kategori ini.</td>
+                            <td colspan="4" class="px-5 py-8 text-center text-xs text-slate-400">Belum ada ekskul pada kategori ini.</td>
                         </tr>
                     @endforelse
                 </tbody>

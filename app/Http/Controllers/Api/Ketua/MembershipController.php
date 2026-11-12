@@ -8,13 +8,16 @@ use App\Http\Resources\PendaftaranResource;
 use App\Models\Pendaftaran;
 use App\Models\PengajuanKeluar;
 use App\Models\RiwayatJabatan;
+use App\Models\RiwayatPendaftaran;
 use App\Models\Siswa;
 use App\Services\ArsipEkskulService;
 use App\Services\NotifikasiService;
 use App\Support\MediaUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class MembershipController extends ApiController
 {
@@ -70,6 +73,147 @@ class MembershipController extends ApiController
                 'per_page' => $anggotas->perPage(),
             ],
         ]);
+    }
+
+    public function calonSiswa(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'q' => ['nullable', 'string', 'max:100'],
+            'kelas_id' => ['nullable', 'integer', 'exists:kelas,id'],
+            'page' => ['nullable', 'integer', 'min:1'],
+        ]);
+        $ekskul = $this->ekskul();
+        $statusAktif = [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN];
+
+        $siswas = Siswa::query()
+            ->with('kelas')
+            ->whereDoesntHave('pendaftarans', fn ($query) => $query
+                ->where('ekskul_id', $ekskul->id)
+                ->whereIn('status', [Pendaftaran::STATUS_PENDING, Pendaftaran::STATUS_LULUS]))
+            ->when($validated['kelas_id'] ?? null, fn ($query, $kelasId) => $query->where('kelas_id', $kelasId))
+            ->when($validated['q'] ?? null, function ($query, $search) {
+                $query->where(function ($studentQuery) use ($search) {
+                    $studentQuery->where('nama', 'like', "%{$search}%")
+                        ->orWhere('nis', 'like', "%{$search}%")
+                        ->orWhereHas('kelas', fn ($classQuery) => $classQuery->where('nama', 'like', "%{$search}%"));
+                });
+            })
+            ->orderByRaw(
+                'CASE WHEN EXISTS (
+                    SELECT 1 FROM pendaftarans
+                    WHERE pendaftarans.siswa_id = siswas.id
+                    AND pendaftarans.ekskul_id = ?
+                    AND pendaftarans.status IN (?, ?)
+                ) THEN 1 ELSE 0 END',
+                [$ekskul->id, ...$statusAktif]
+            )
+            ->orderBy('nama')
+            ->paginate(25)
+            ->withQueryString();
+
+        $studentIds = $siswas->getCollection()->pluck('id');
+        $previousStatuses = Pendaftaran::query()
+            ->where('ekskul_id', $ekskul->id)
+            ->whereIn('siswa_id', $studentIds)
+            ->pluck('status', 'siswa_id');
+        $previousDates = Pendaftaran::query()
+            ->where('ekskul_id', $ekskul->id)
+            ->whereIn('siswa_id', $studentIds)
+            ->pluck('tanggal_daftar', 'siswa_id');
+
+        return $this->ok([
+            'items' => $siswas->getCollection()->map(fn (Siswa $siswa) => [
+                'id' => $siswa->id,
+                'nama' => $siswa->nama,
+                'nis' => $siswa->nis,
+                'foto' => MediaUrl::for($siswa->foto),
+                'kelas' => $siswa->kelas?->nama ?? 'Tanpa kelas',
+                'sudah_aktif' => in_array($previousStatuses->get($siswa->id), $statusAktif, true),
+                'status_sebelumnya' => $previousStatuses->get($siswa->id),
+                'tanggal_daftar_sebelumnya' => $previousDates->has($siswa->id)
+                    ? Carbon::parse($previousDates->get($siswa->id))->format('d/m/Y')
+                    : null,
+            ])->values(),
+            'total' => $siswas->total(),
+            'current_page' => $siswas->currentPage(),
+            'last_page' => $siswas->lastPage(),
+        ]);
+    }
+
+    public function tambahAnggota(Request $request): JsonResponse
+    {
+        $ekskul = $this->ekskul();
+        $validated = $request->validate([
+            'siswa_ids' => ['required', 'array', 'min:1', 'max:100'],
+            'siswa_ids.*' => ['required', 'integer', 'distinct', 'exists:siswas,id'],
+        ], [
+            'siswa_ids.required' => 'Pilih minimal satu siswa untuk ditambahkan.',
+        ]);
+
+        $count = DB::transaction(function () use ($validated, $ekskul) {
+            $count = 0;
+
+            foreach ($validated['siswa_ids'] as $siswaId) {
+                $siswa = Siswa::whereKey($siswaId)->lockForUpdate()->firstOrFail();
+                $pendaftaran = Pendaftaran::where('ekskul_id', $ekskul->id)
+                    ->where('siswa_id', $siswa->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($pendaftaran && ! in_array($pendaftaran->status, [
+                    Pendaftaran::STATUS_NONAKTIF,
+                    Pendaftaran::STATUS_KELUAR,
+                    Pendaftaran::STATUS_DITOLAK,
+                ], true)) {
+                    throw ValidationException::withMessages([
+                        'siswa_ids' => "{$siswa->nama} sudah aktif atau sedang menunggu di ekskul ini.",
+                    ]);
+                }
+
+                if ($alasan = $siswa->alasanTidakDapatMengikutiEkskul($ekskul)) {
+                    throw ValidationException::withMessages([
+                        'siswa_ids' => "{$siswa->nama}: {$alasan}",
+                    ]);
+                }
+
+                if ($pendaftaran) {
+                    RiwayatPendaftaran::create([
+                        'pendaftaran_id' => $pendaftaran->id,
+                        'siswa_id' => $pendaftaran->siswa_id,
+                        'ekskul_id' => $pendaftaran->ekskul_id,
+                        'tanggal_daftar' => $pendaftaran->tanggal_daftar,
+                        'status' => $pendaftaran->status,
+                        'alasan' => $pendaftaran->alasan,
+                        'dicatat_pada' => now(),
+                    ]);
+
+                    $pendaftaran->update([
+                        'status' => Pendaftaran::STATUS_DITERIMA,
+                        'tanggal_daftar' => now()->toDateString(),
+                        'alasan' => 'Diaktifkan kembali oleh ketua.',
+                    ]);
+                } else {
+                    $pendaftaran = Pendaftaran::create([
+                        'siswa_id' => $siswa->id,
+                        'ekskul_id' => $ekskul->id,
+                        'status' => Pendaftaran::STATUS_DITERIMA,
+                        'tanggal_daftar' => now()->toDateString(),
+                        'alasan' => 'Didaftarkan langsung oleh ketua.',
+                    ]);
+                }
+
+                if ($siswa->jabatan !== 'ketua') {
+                    $siswa->update(['jabatan' => 'anggota']);
+                }
+
+                NotifikasiService::anggotaDitambahkan($pendaftaran);
+                $count++;
+            }
+
+            return $count;
+        });
+
+        return $this->noContent("Berhasil menambahkan {$count} siswa ke ekstrakurikuler.");
     }
 
     public function updateStatusAnggota(Request $request, Pendaftaran $pendaftaran): JsonResponse

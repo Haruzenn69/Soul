@@ -70,16 +70,6 @@ class ProfilEkskulController extends ApiController
         );
     }
 
-    public function toggleRecruitment(): JsonResponse
-    {
-        $ekskul = $this->ekskul();
-        $ekskul->update(['is_open_recruitment' => ! $ekskul->is_open_recruitment]);
-
-        return $this->noContent(
-            $ekskul->is_open_recruitment ? 'Pendaftaran ekskul telah dibuka.' : 'Pendaftaran ekskul telah ditutup.',
-        );
-    }
-
     public function storeGaleri(Request $request): JsonResponse
     {
         $ekskul = $this->ekskul();

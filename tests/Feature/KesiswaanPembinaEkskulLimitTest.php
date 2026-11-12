@@ -22,7 +22,6 @@ class KesiswaanPembinaEkskulLimitTest extends TestCase
             $ekskul = Ekskul::create([
                 'nama_ekskul' => 'Ekskul ' . $i,
                 'pembina_id' => null,
-                'is_open_recruitment' => true,
             ]);
 
             $response = $this->actingAs($admin)
@@ -40,7 +39,6 @@ class KesiswaanPembinaEkskulLimitTest extends TestCase
         $ekskul6 = Ekskul::create([
             'nama_ekskul' => 'Ekskul 6',
             'pembina_id' => null,
-            'is_open_recruitment' => true,
         ]);
 
         $response6 = $this->actingAs($admin)
@@ -62,7 +60,6 @@ class KesiswaanPembinaEkskulLimitTest extends TestCase
             Ekskul::create([
                 'nama_ekskul' => 'Ekskul ' . $i,
                 'pembina_id' => $pembina->id,
-                'is_open_recruitment' => true,
             ]);
         }
 

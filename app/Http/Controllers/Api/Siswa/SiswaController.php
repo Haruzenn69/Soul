@@ -19,7 +19,6 @@ use App\Models\Pendaftaran;
 use App\Models\Siswa;
 use App\Models\SiswaProfileHistory;
 use App\Rules\AlasanValid;
-use App\Support\AturanEkskul;
 use App\Services\NotifikasiService;
 use App\Services\RekapAbsensiService;
 use App\Support\MediaUrl;
@@ -303,7 +302,6 @@ class SiswaController extends ApiController
 
         $joinable = Ekskul::with('pembina')
             ->where('status', true)
-            ->where('is_open_recruitment', true)
             ->withCount([
                 'pendaftarans as anggota_count' => fn ($q) => $q->whereIn('status', ['diterima', 'peringatan']),
             ])
@@ -317,91 +315,8 @@ class SiswaController extends ApiController
             'active_pendaftarans' => PendaftaranResource::collection($activePendaftarans)->resolve(),
             'pending_pendaftarans' => PendaftaranResource::collection($pendingPendaftarans)->resolve(),
             'active_ekskuls' => $siswa ? EkskulResource::collection($siswa->activeEkskuls())->resolve() : [],
-            'bisa_daftar' => $siswa ? $siswa->alasanTidakBisaDaftar() === null : false,
-            'alasan_per_ekskul' => $siswa
-                ? $joinable->mapWithKeys(fn (Ekskul $ekskul) => [
-                    $ekskul->id => $siswa->alasanTidakBisaDaftar($ekskul),
-                ])
-                : [],
             'joinable' => EkskulResource::collection($joinable)->resolve(),
         ]);
-    }
-
-    public function daftar(Request $request): JsonResponse
-    {
-        $siswa = $this->siswa();
-
-        if (! $siswa->isProfileComplete()) {
-            return $this->error('Lengkapi data diri (nama, kelas, jenis kelamin) terlebih dahulu sebelum mendaftar ekskul.', 422);
-        }
-
-        $terpakai = $siswa->activePendaftarans()->count() + $siswa->pendingPendaftarans()->count();
-
-        if ($terpakai >= AturanEkskul::MAKS_EKSKUL) {
-            return $this->error('Kamu sudah terdaftar di '.AturanEkskul::MAKS_EKSKUL.' ekskul.', 422);
-        }
-
-        return $this->ok([
-            'ekskuls' => EkskulResource::collection(
-                Ekskul::with('pembina')->where('status', true)->where('is_open_recruitment', true)->get()
-            )->resolve(),
-        ]);
-    }
-
-    public function storeDaftar(Request $request): JsonResponse
-    {
-        $siswa = $this->siswa();
-
-        $validated = $request->validate([
-            'ekskul_id' => ['required', 'exists:ekskuls,id'],
-            'alasan' => ['required', 'string', 'max:1000', new AlasanValid],
-        ], [
-            'ekskul_id.required' => 'Pilih ekskul terlebih dahulu.',
-            'ekskul_id.exists' => 'Ekskul yang dipilih tidak valid.',
-            'alasan.required' => 'Alasan bergabung wajib diisi.',
-            'alasan.max' => 'Alasan bergabung maksimal 1000 karakter.',
-        ]);
-
-        if (! $siswa->isProfileComplete()) {
-            return $this->error('Lengkapi data diri terlebih dahulu sebelum mendaftar ekskul.', 422);
-        }
-
-        $target = Ekskul::findOrFail($validated['ekskul_id']);
-
-        if ($alasan = $siswa->alasanTidakBisaDaftar($target)) {
-            return $this->error($alasan, 422);
-        }
-
-        $pendaftaran = DB::transaction(function () use ($siswa, $validated) {
-            $siswa = Siswa::whereKey($siswa->id)->lockForUpdate()->firstOrFail();
-            $ekskul = Ekskul::findOrFail($validated['ekskul_id']);
-
-            if (! $ekskul->status || ! $ekskul->is_open_recruitment) {
-                abort(422, 'Pendaftaran ekskul ini sedang ditutup.');
-            }
-
-            if ($siswa->alasanTidakBisaDaftar($ekskul)) {
-                return null;
-            }
-
-            return $siswa->pendaftarans()->create([
-                'ekskul_id' => $ekskul->id,
-                'tanggal_daftar' => now()->toDateString(),
-                'status' => \App\Models\Pendaftaran::STATUS_PENDING,
-                'alasan' => $validated['alasan'],
-            ]);
-        });
-
-        if (! $pendaftaran) {
-            return $this->error('Kamu sudah mengajukan pendaftaran atau terdaftar di ekskul.', 422);
-        }
-
-        NotifikasiService::pendaftaranMasuk($pendaftaran);
-
-        return $this->created(
-            ['pendaftaran' => (new PendaftaranResource($pendaftaran->loadMissing('ekskul')))->resolve()],
-            'Pendaftaran kamu telah terkirim kepada ketua ekskul. Silakan menunggu konfirmasi dari ketua ekskul.',
-        );
     }
 
     public function presensi(Request $request): JsonResponse

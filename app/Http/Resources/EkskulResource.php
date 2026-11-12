@@ -26,7 +26,6 @@ class EkskulResource extends JsonResource
             'jadwal' => $this->jadwal,
             'logo' => MediaUrl::for($this->logo),
             'cover' => MediaUrl::for($this->cover),
-            'is_open_recruitment' => (bool) $this->is_open_recruitment,
             'status' => (bool) $this->status,
             'pembina' => $this->whenLoaded('pembina', fn () => $this->pembina ? [
                 'id' => $this->pembina->id,

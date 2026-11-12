@@ -40,8 +40,6 @@
         $pendaftaranUser = $userSiswa ? $userSiswa->pendaftarans()->where('ekskul_id', $ekskul->id)->latest()->first() : null;
         $sudahTerdaftar = $pendaftaranUser && in_array($pendaftaranUser->status, ['diterima', 'peringatan']);
         $sedangMenunggu = $pendaftaranUser && $pendaftaranUser->status === 'menunggu';
-        $alasanTidakBisa = ($userSiswa && ! $sudahTerdaftar && ! $sedangMenunggu) ? $userSiswa->alasanTidakBisaDaftar($ekskul) : null;
-        $bisaGabung = $ekskul->is_open_recruitment && $alasanTidakBisa === null;
     @endphp
 
     {{-- TOP NAVBAR --}}
@@ -110,20 +108,9 @@
 
                     {{-- Badges Floating over Cover --}}
                     <div class="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-10">
-                        @if ($bisaGabung)
-                            <div class="inline-flex items-center gap-2 rounded-full bg-emerald-500/90 backdrop-blur-md px-3.5 py-1.5 text-xs font-bold text-white shadow-md">
-                                <span class="relative flex h-2 w-2">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-200 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                                </span>
-                                Buka Pendaftaran
-                            </div>
-                        @else
-                            <div class="inline-flex items-center gap-1.5 rounded-full bg-slate-900/85 backdrop-blur-md px-3.5 py-1.5 text-xs font-semibold text-slate-200 shadow-md">
-                                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                Pendaftaran Ditutup
-                            </div>
-                        @endif
+                        <div class="inline-flex items-center gap-1.5 rounded-full bg-slate-900/85 backdrop-blur-md px-3.5 py-1.5 text-xs font-semibold text-slate-200 shadow-md">
+                            Keanggotaan melalui Ketua
+                        </div>
 
                         @if ($ekskul->jadwal)
                             <div class="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-md">
@@ -193,22 +180,10 @@
                                         </svg>
                                         Pendaftaran Menunggu Verifikasi
                                     </div>
-                                @elseif ($bisaGabung)
-                                    <a href="{{ route('siswa.form-daftar', $ekskul) }}"
-                                       class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 hover:from-sky-500 hover:to-blue-700 text-white text-xs sm:text-sm font-bold shadow-lg shadow-sky-300 dark:shadow-none hover:shadow-sky-400 hover:-translate-y-0.5 transition-all">
-                                        <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                                        </svg>
-                                        Daftar Sekarang
-                                    </a>
                                 @else
-                                    <button disabled title="{{ $alasanTidakBisa ?? 'Pendaftaran Ditutup' }}"
-                                            class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-neutral-800 text-slate-400 dark:text-neutral-500 border border-slate-200 dark:border-neutral-700 text-xs font-bold cursor-not-allowed select-none">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                        </svg>
-                                        {{ $alasanTidakBisa ? 'Tidak Dapat Mendaftar' : 'Pendaftaran Ditutup' }}
-                                    </button>
+                                    <div class="px-4 py-2.5 rounded-xl bg-sky-50 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 text-sky-800 dark:text-sky-300 text-xs font-bold">
+                                        Untuk bergabung, silakan hubungi Ketua ekskul.
+                                    </div>
                                 @endif
 
                                 <a href="#faq" class="px-4 py-2.5 rounded-xl border border-sky-200 dark:border-neutral-700 bg-sky-50/70 dark:bg-neutral-800 hover:bg-sky-100 dark:hover:bg-neutral-700 text-sky-800 dark:text-sky-300 text-xs font-bold transition flex items-center gap-1.5">
@@ -803,15 +778,9 @@
                                 <div class="px-5 py-3 rounded-xl bg-amber-400 text-slate-900 text-xs font-bold shadow-lg">
                                     ⏳ Menunggu Verifikasi
                                 </div>
-                            @elseif ($bisaGabung)
-                                <a href="{{ route('siswa.form-daftar', $ekskul) }}"
-                                   class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 text-xs sm:text-sm font-extrabold shadow-lg shadow-amber-500/30 hover:scale-105 transition-all">
-                                    <svg class="w-4 h-4 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                                    Daftar Sekarang
-                                </a>
                             @else
-                                <span class="px-5 py-3 rounded-xl bg-white/20 backdrop-blur-md text-white/80 text-xs font-bold select-none cursor-not-allowed" title="{{ $alasanTidakBisa ?? 'Pendaftaran Ditutup' }}">
-                                    {{ $alasanTidakBisa ? 'Tidak Dapat Mendaftar' : 'Pendaftaran Ditutup' }}
+                                <span class="px-5 py-3 rounded-xl bg-white/20 backdrop-blur-md text-white/80 text-xs font-bold select-none">
+                                    Hubungi Ketua untuk bergabung
                                 </span>
                             @endif
                         </div>

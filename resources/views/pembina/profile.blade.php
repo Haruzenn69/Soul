@@ -262,9 +262,6 @@
                             <div class="p-4 bg-gradient-to-r from-sky-50 to-amber-50 rounded-xl border border-sky-100">
                                 <div class="flex items-center justify-between gap-2">
                                     <h4 class="text-xs font-extrabold text-slate-900 truncate">{{ $ekskul->nama_ekskul }}</h4>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold border shrink-0 {{ $ekskul->is_open_recruitment ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200' }}">
-                                        {{ $ekskul->is_open_recruitment ? 'Open' : 'Tutup' }}
-                                    </span>
                                 </div>
                                 @if($ekskul->jadwal)
                                     <p class="text-[11px] text-slate-500 mt-2">Jadwal: {{ $ekskul->jadwal }}</p>

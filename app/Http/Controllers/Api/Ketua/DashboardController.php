@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Http\Resources\EkskulResource;
 use App\Models\Faq;
+use App\Models\Pendaftaran;
+use App\Models\PengajuanKeluar;
 use App\Models\Testimoni;
 use Illuminate\Http\JsonResponse;
 
@@ -22,7 +24,7 @@ class DashboardController extends ApiController
             return $this->ok([
                 'ekskul' => null,
                 'total_anggota' => 0,
-                'pending_count' => 0,
+                'anggota_baru_bulan_ini' => 0,
                 'pengajuan_count' => 0,
                 'testimoni_pending_count' => 0,
                 'faq_pending_count' => 0,
@@ -61,22 +63,31 @@ class DashboardController extends ApiController
             $chartKegiatan['alpha'][] = $kegiatan->presensis->where('status', 'alpha')->count();
         }
 
-        $anggotaAktif = $ekskul->pendaftarans()->where('status', 'diterima')->with('siswa.kelas')->get();
+        $anggotaAktif = $ekskul->pendaftarans()
+            ->where('status', Pendaftaran::STATUS_DITERIMA)
+            ->with('siswa.kelas')
+            ->get();
+
+        $countX = $anggotaAktif->filter(fn ($pendaftaran) => strtolower($pendaftaran->siswa?->kelas?->tingkat ?? '') === 'x')->count();
+        $countXI = $anggotaAktif->filter(fn ($pendaftaran) => strtolower($pendaftaran->siswa?->kelas?->tingkat ?? '') === 'xi')->count();
+        $countXII = $anggotaAktif->filter(fn ($pendaftaran) => strtolower($pendaftaran->siswa?->kelas?->tingkat ?? '') === 'xii')->count();
 
         $chartKelas = [
             'labels' => ['Kelas 10', 'Kelas 11', 'Kelas 12'],
-            'data' => [
-                $anggotaAktif->where('siswa.kelas.tingkat', 'x')->count(),
-                $anggotaAktif->where('siswa.kelas.tingkat', 'xi')->count(),
-                $anggotaAktif->where('siswa.kelas.tingkat', 'xii')->count(),
-            ],
+            'data' => [$countX, $countXI, $countXII],
         ];
 
         return $this->ok([
             'ekskul' => (new EkskulResource($ekskul))->resolve(),
             'total_anggota' => $anggotaAktif->count(),
-            'pending_count' => $ekskul->pendaftarans()->where('status', 'pending')->count(),
-            'pengajuan_count' => $ekskul->pengajuanKeluars()->where('status', 'pending')->count(),
+            'anggota_baru_bulan_ini' => $ekskul->pendaftarans()
+                ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
+                ->whereBetween('tanggal_daftar', [
+                    now()->startOfMonth()->toDateString(),
+                    now()->endOfMonth()->toDateString(),
+                ])
+                ->count(),
+            'pengajuan_count' => $ekskul->pengajuanKeluars()->where('status', PengajuanKeluar::STATUS_PENDING)->count(),
             'testimoni_pending_count' => $ekskul->testimoniss()->where('status', Testimoni::STATUS_PENDING)->count(),
             'faq_pending_count' => $ekskul->faqs()->where('status', Faq::STATUS_PENDING)->count(),
             'kegiatan_bulan_ini' => $kegiatanBulanIni,
