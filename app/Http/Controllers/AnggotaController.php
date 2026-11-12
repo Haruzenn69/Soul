@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\KetuaEkskul;
-use App\Models\Kelas;
 use App\Models\Pendaftaran;
 use App\Models\RiwayatPendaftaran;
 use App\Models\Siswa;
@@ -62,9 +61,7 @@ class AnggotaController extends Controller
             ? $arsipService->arsip($ekskul)
             : ['ketuaSelesai' => collect(), 'anggotaLulus' => collect(), 'total' => $arsipTotal];
 
-        $kelasList = Kelas::whereHas('siswas')->orderBy('nama')->get(['id', 'nama']);
-
-        return view('ketua.anggota.index', compact('anggotas', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal', 'kelasList'));
+        return view('ketua.anggota.index', compact('anggotas', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal'));
     }
 
     public function calonSiswa(Request $request): JsonResponse
@@ -205,7 +202,7 @@ class AnggotaController extends Controller
             return $count;
         });
 
-        return back()->with('success', "Berhasil menambahkan {$count} siswa ke ekstrakurikuler.");
+        return redirect()->route('ketua.pendaftaran.index')->with('success', "Berhasil menambahkan {$count} siswa ke ekstrakurikuler.");
     }
 
     public function updateStatus(Request $request, Pendaftaran $pendaftaran)

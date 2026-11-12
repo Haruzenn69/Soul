@@ -8,33 +8,41 @@
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -bottom-24 -left-10 h-72 w-72 rounded-full bg-white/10 blur-3xl"></div>
             <div class="absolute -top-24 -right-10 h-72 w-72 rounded-full bg-white/10 blur-3xl"></div>
+
         </div>
-        <div class="relative">
-            <h1 class="text-xl md:text-2xl font-extrabold tracking-tight">Daftar Pendaftaran</h1>
-            <p class="mt-1 text-xs md:text-sm text-white/80">Ringkasan status pendaftar ekskul</p>
+        <div class="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-xl md:text-2xl font-extrabold tracking-tight">Daftar Pendaftaran</h1>
+                <p class="mt-1 text-xs md:text-sm text-white/80">Ringkasan status pendaftar ekskul</p>
+            </div>
+            <button type="button" onclick="window.openAddMemberDialog()" class="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-white/30 bg-white/15 px-4 py-2.5 text-xs font-bold text-white shadow-sm backdrop-blur transition hover:bg-white/25 sm:self-auto">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Tambah Anggota
+            </button>
         </div>
+
     </div>
 
-    <div class="grid grid-cols-4 gap-1.5 sm:gap-3 md:gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
         <div class="min-w-0 rounded-xl sm:rounded-2xl border border-sky-100 bg-white p-2 sm:p-4 md:p-5 shadow-md shadow-sky-100/60">
-            <p class="text-[9px] leading-tight sm:text-xs font-semibold text-slate-500">Total</p>
+            <p class="text-[11px] leading-tight sm:text-xs font-semibold text-slate-500">Total</p>
             <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-slate-800">{{ $total }}</p>
-            <p class="mt-1 text-[8px] leading-tight sm:text-[11px] text-slate-400">Pendaftar</p>
+            <p class="mt-1 text-[10px] leading-tight sm:text-[11px] text-slate-400">Pendaftar</p>
         </div>
         <div class="min-w-0 rounded-xl sm:rounded-2xl border border-amber-100 bg-white p-2 sm:p-4 md:p-5 shadow-md shadow-amber-100/50">
-            <p class="text-[9px] leading-tight sm:text-xs font-semibold text-slate-500">Pending</p>
+            <p class="text-[11px] leading-tight sm:text-xs font-semibold text-slate-500">Pending</p>
             <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-amber-600">{{ $pendingCount }}</p>
-            <p class="mt-1 text-[8px] leading-tight sm:text-[11px] text-slate-400">Menunggu</p>
+            <p class="mt-1 text-[10px] leading-tight sm:text-[11px] text-slate-400">Menunggu</p>
         </div>
         <div class="min-w-0 rounded-xl sm:rounded-2xl border border-emerald-100 bg-white p-2 sm:p-4 md:p-5 shadow-md shadow-emerald-100/50">
-            <p class="text-[9px] leading-tight sm:text-xs font-semibold text-slate-500">Diterima</p>
+            <p class="text-[11px] leading-tight sm:text-xs font-semibold text-slate-500">Diterima</p>
             <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-emerald-600">{{ $diterimaCount }}</p>
-            <p class="mt-1 text-[8px] leading-tight sm:text-[11px] text-slate-400">Disetujui</p>
+            <p class="mt-1 text-[10px] leading-tight sm:text-[11px] text-slate-400">Disetujui</p>
         </div>
         <div class="min-w-0 rounded-xl sm:rounded-2xl border border-rose-100 bg-white p-2 sm:p-4 md:p-5 shadow-md shadow-rose-100/50">
-            <p class="text-[9px] leading-tight sm:text-xs font-semibold text-slate-500">Ditolak</p>
+            <p class="text-[11px] leading-tight sm:text-xs font-semibold text-slate-500">Ditolak</p>
             <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-rose-600">{{ $ditolakCount }}</p>
-            <p class="mt-1 text-[8px] leading-tight sm:text-[11px] text-slate-400">Ditolak</p>
+            <p class="mt-1 text-[10px] leading-tight sm:text-[11px] text-slate-400">Ditolak</p>
         </div>
     </div>
 
@@ -118,4 +126,7 @@
 
         @include('partials.table-pagination', ['rows' => $pendaftarans, 'label' => 'pendaftaran'])
     </div>
+
+    @include('ketua.partials.tambah-anggota')
+</div>
 @endsection

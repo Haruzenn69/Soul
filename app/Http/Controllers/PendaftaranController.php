@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\KetuaEkskul;
+use App\Models\Kelas;
 use App\Models\Pendaftaran;
 use App\Models\Siswa;
 use App\Services\NotifikasiService;
@@ -37,7 +38,9 @@ class PendaftaranController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('ketua.pendaftaran.index', compact('pendaftarans', 'pendingCount', 'diterimaCount', 'ditolakCount', 'total', 'sort', 'direction'));
+        $kelasList = Kelas::whereHas('siswas')->orderBy('nama')->get(['id', 'nama']);
+
+        return view('ketua.pendaftaran.index', compact('pendaftarans', 'pendingCount', 'diterimaCount', 'ditolakCount', 'total', 'sort', 'direction', 'kelasList'));
     }
 
     public function show(Pendaftaran $pendaftaran)
