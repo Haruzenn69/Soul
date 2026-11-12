@@ -182,7 +182,7 @@
                                     </div>
                                 @else
                                     <div class="px-4 py-2.5 rounded-xl bg-sky-50 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 text-sky-800 dark:text-sky-300 text-xs font-bold">
-                                        Untuk bergabung, silakan hubungi Ketua ekskul.
+                                        Keanggotaan ditambahkan oleh Ketua Ekskul.
                                     </div>
                                 @endif
 
@@ -762,10 +762,10 @@
                                 Pilihan Ekskul Terbaik
                             </span>
                             <h2 class="text-xl sm:text-3xl font-extrabold tracking-tight">
-                                Tertarik Bergabung dengan {{ $ekskul->nama_ekskul }}?
+                                Kenali {{ $ekskul->nama_ekskul }}
                             </h2>
                             <p class="mt-2 text-xs sm:text-sm text-sky-100 leading-relaxed">
-                                Jadilah bagian dari keluarga besar {{ $ekskul->nama_ekskul }}. Kembangkan potensi, raih prestasi, dan jalin persahabatan baru di SMKN 11 Bandung!
+                                Siswa dapat melihat informasi ekskul. Ketua Ekskul menambahkan anggota dari akun siswa yang sudah dibuat Kesiswaan.
                             </p>
                         </div>
 
@@ -779,8 +779,8 @@
                                     ⏳ Menunggu Verifikasi
                                 </div>
                             @else
-                                <span class="px-5 py-3 rounded-xl bg-white/20 backdrop-blur-md text-white/80 text-xs font-bold select-none">
-                                    Hubungi Ketua untuk bergabung
+                                <span class="px-5 py-3 rounded-xl bg-white/20 backdrop-blur-md text-white/80 text-xs font-bold select-none" title="Keanggotaan ditambahkan oleh Ketua Ekskul">
+                                    Hubungi Ketua Ekskul
                                 </span>
                             @endif
                         </div>

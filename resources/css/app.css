@@ -12,6 +12,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+    /* Tetap bisa digeser secara horizontal, tetapi scrollbar dan tombolnya
+       tidak mengambil ruang visual pada daftar filter yang overflow. */
+    .scrollbar-none {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .scrollbar-none::-webkit-scrollbar,
+    .scrollbar-none::-webkit-scrollbar-button {
+        display: none;
+        width: 0;
+        height: 0;
+    }
+}
+
 /* ---------------------------------------------------------------------
    Reusable Soul UI components
    Keep repeated form/card styling here instead of duplicating long

@@ -300,7 +300,7 @@ class SiswaController extends ApiController
         $activePendaftarans = $siswa?->activePendaftarans()->with('ekskul')->get() ?? collect();
         $pendingPendaftarans = $siswa?->pendingPendaftarans()->with('ekskul')->get() ?? collect();
 
-        $joinable = Ekskul::with('pembina')
+        $ekskuls = Ekskul::with('pembina')
             ->where('status', true)
             ->withCount([
                 'pendaftarans as anggota_count' => fn ($q) => $q->whereIn('status', ['diterima', 'peringatan']),
@@ -315,7 +315,9 @@ class SiswaController extends ApiController
             'active_pendaftarans' => PendaftaranResource::collection($activePendaftarans)->resolve(),
             'pending_pendaftarans' => PendaftaranResource::collection($pendingPendaftarans)->resolve(),
             'active_ekskuls' => $siswa ? EkskulResource::collection($siswa->activeEkskuls())->resolve() : [],
-            'joinable' => EkskulResource::collection($joinable)->resolve(),
+            'bisa_daftar' => false,
+            'joinable' => [],
+            'ekskuls' => EkskulResource::collection($ekskuls)->resolve(),
         ]);
     }
 

@@ -160,14 +160,31 @@ class PengurusController extends Controller
         $siswa = Siswa::findOrFail($validated['siswa_id']);
         $jabatan = $validated['jabatan'];
 
-        // 1. Pastikan siswa adalah anggota ekskul ini dengan status diterima
+        // Ketua dapat dipilih dari master siswa oleh Pembina. Keanggotaannya
+        // dibuat bersamaan dengan penetapan agar tidak tersimpan setengah.
         $pendaftaran = Pendaftaran::where('ekskul_id', $ekskul->id)
             ->where('siswa_id', $siswa->id)
-            ->where('status', Pendaftaran::STATUS_DITERIMA)
+            ->latest('id')
             ->first();
 
-        if (! $pendaftaran) {
-            return back()->with('error', "{$siswa->nama} bukan anggota aktif berstatus diterima pada ekskul {$ekskul->nama_ekskul}.");
+        $perluTambahAnggota = ! $pendaftaran?->isActive();
+        if ($perluTambahAnggota) {
+            if ($jabatan !== Pengurus::JABATAN_KETUA) {
+                return back()->with('error', "{$siswa->nama} belum menjadi anggota aktif ekskul {$ekskul->nama_ekskul}.");
+            }
+
+            $siswa->loadMissing('user');
+            if ($siswa->status !== 'aktif' || ! $siswa->user?->is_active) {
+                return back()->with('error', 'Akun siswa yang dipilih tidak aktif.');
+            }
+
+            $candidate = $pendaftaran ?? new Pendaftaran;
+            $candidate->ekskul_id = $ekskul->id;
+            $candidate->setRelation('ekskul', $ekskul);
+            if ($alasan = $siswa->alasanTidakDapatMenerima($candidate)) {
+                return back()->with('error', $alasan);
+            }
+
         }
 
         // 2. Pastikan siswa belum memegang jabatan aktif lain di ekskul ini (1 orang per jabatan)
@@ -191,8 +208,27 @@ class PengurusController extends Controller
             }
         }
 
-        DB::transaction(function () use ($ekskul, $siswa, $jabatan, $validated) {
+        DB::transaction(function () use ($ekskul, $siswa, $jabatan, $validated, $perluTambahAnggota, &$pendaftaran) {
             $arsip = app(ArsipEkskulService::class);
+
+            if ($perluTambahAnggota) {
+                if ($pendaftaran) {
+                    $pendaftaran->update([
+                        'tanggal_daftar' => now()->toDateString(),
+                        'status' => Pendaftaran::STATUS_DITERIMA,
+                        'alasan' => 'Ditetapkan sebagai Ketua oleh Pembina',
+                    ]);
+                    $pendaftaran = $pendaftaran->fresh();
+                } else {
+                    $pendaftaran = Pendaftaran::create([
+                        'siswa_id' => $siswa->id,
+                        'ekskul_id' => $ekskul->id,
+                        'tanggal_daftar' => now()->toDateString(),
+                        'status' => Pendaftaran::STATUS_DITERIMA,
+                        'alasan' => 'Ditetapkan sebagai Ketua oleh Pembina',
+                    ]);
+                }
+            }
 
             // Jika jabatan ini sebelumnya sudah memiliki pengurus aktif, copot/ganti pengurus lama
             $pengurusLama = Pengurus::where('ekskul_id', $ekskul->id)

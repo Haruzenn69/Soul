@@ -39,6 +39,11 @@
 
 <div class="space-y-6 animate-fade-up">
 
+    <a href="{{ route('kesiswaan.ekskuls.index') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-sky-100 text-sky-700 font-bold text-xs rounded-xl shadow-sm hover:bg-sky-50 transition">
+        <i class="fa-solid fa-arrow-left text-[10px]"></i>
+        Kembali
+    </a>
+
     {{-- HERO CARD --}}
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white soul-timbul">
         <div class="absolute inset-0 pointer-events-none">
@@ -49,12 +54,8 @@
         <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div class="flex items-center gap-4">
                 {{-- Logo / Inisial --}}
-                <div class="w-16 h-16 rounded-2xl overflow-hidden shrink-0 border-2 border-white/30 shadow-lg bg-white/20 flex items-center justify-center font-black text-xl uppercase">
-                    @if ($ekskul->logo)
-                        <img src="{{ asset('storage/' . $ekskul->logo) }}" alt="{{ $ekskul->nama_ekskul }}" class="w-full h-full object-cover">
-                    @else
-                        {{ strtoupper(substr($ekskul->nama_ekskul, 0, 2)) }}
-                    @endif
+                <div class="w-16 h-16 rounded-2xl overflow-hidden shrink-0 border-2 border-white/30 shadow-lg bg-white/20 flex items-center justify-center">
+                    <img src="{{ $ekskul->logo_url }}" alt="{{ $ekskul->nama_ekskul }}" class="w-full h-full object-cover">
                 </div>
                 <div>
                     <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">
@@ -65,11 +66,11 @@
                     </p>
                     <div class="flex items-center gap-2 mt-3 flex-wrap">
                         @if ($ekskul->kategori)
-                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/20 text-white backdrop-blur">
+                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/20 text-white shadow-sm">
                                 {{ $ekskul->kategori }}
                             </span>
                         @endif
-                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold {{ $ekskul->status ? 'bg-emerald-400/30 text-white' : 'bg-rose-500/30 text-white' }} backdrop-blur">
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/20 text-white shadow-sm">
                             {{ $ekskul->status ? ' Aktif' : 'X Nonaktif' }}
                         </span>
                         <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/10 text-white/80 backdrop-blur">
@@ -84,28 +85,20 @@
                 </div>
             </div>
 
-            <a href="{{ route('kesiswaan.ekskuls.index') }}"
-               class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/20 transition shrink-0">
-                
-                Kembali
-            </a>
         </div>
     </div>
 
     {{-- INFO CARDS: PEMBINA, KETUA, PELATIH --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-3 gap-2 sm:gap-4">
         {{-- Pembina --}}
-        <div class="bg-white dark:bg-[#1a1a1a] rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-sm p-5 flex flex-col justify-between">
+        <div class="min-w-0 bg-white dark:bg-[#1a1a1a] rounded-2xl sm:rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-sm p-2 sm:p-5 flex flex-col justify-between">
             <div>
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-[11px] font-bold text-slate-400 dark:text-neutral-400 uppercase tracking-wider">Pembina Ekskul</span>
-                    <div class="w-7 h-7 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center">
-                        
-                    </div>
+                <div class="flex items-center justify-between mb-2 sm:mb-3">
+                    <span class="text-[9px] sm:text-[11px] font-bold text-slate-400 dark:text-neutral-400 uppercase tracking-wide sm:tracking-wider">Pembina</span>
                 </div>
                 @if ($ekskul->pembina)
-                    <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-2xl overflow-hidden shrink-0 bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-extrabold flex items-center justify-center text-xs uppercase shadow-xs">
+                    <div class="flex min-w-0 flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3">
+                        <div class="w-7 h-7 sm:w-11 sm:h-11 rounded-lg sm:rounded-2xl overflow-hidden shrink-0 bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-extrabold flex items-center justify-center text-[10px] sm:text-xs uppercase shadow-xs">
                             @if ($ekskul->pembina->foto_url)
                                 <img src="{{ $ekskul->pembina->foto_url }}" alt="{{ $ekskul->pembina->nama }}" class="w-full h-full object-cover">
                             @else
@@ -113,9 +106,9 @@
                             @endif
                         </div>
                         <div class="min-w-0">
-                            <div class="font-bold text-sm text-slate-900 dark:text-white truncate">{{ $ekskul->pembina->nama }}</div>
-                            <div class="text-[11px] text-slate-400 dark:text-neutral-400 truncate">NIP: {{ $ekskul->pembina->nip ?? '-' }}</div>
-                            <div class="text-[11px] text-slate-400 dark:text-neutral-400 truncate">{{ $ekskul->pembina->email ?? '-' }}</div>
+                            <div class="font-bold text-[10px] sm:text-sm text-slate-900 dark:text-white truncate">{{ $ekskul->pembina->nama }}</div>
+                            <div class="text-[9px] sm:text-[11px] text-slate-400 dark:text-neutral-400 truncate">NIP: {{ $ekskul->pembina->nip ?? '-' }}</div>
+                            <div class="hidden sm:block text-[11px] text-slate-400 dark:text-neutral-400 truncate">{{ $ekskul->pembina->email ?? '-' }}</div>
                         </div>
                     </div>
                 @else
@@ -128,17 +121,14 @@
         </div>
 
         {{-- Ketua Ekskul --}}
-        <div class="bg-white dark:bg-[#1a1a1a] rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-sm p-5 flex flex-col justify-between">
+        <div class="min-w-0 bg-white dark:bg-[#1a1a1a] rounded-2xl sm:rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-sm p-2 sm:p-5 flex flex-col justify-between">
             <div>
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-[11px] font-bold text-slate-400 dark:text-neutral-400 uppercase tracking-wider">Ketua Ekskul</span>
-                    <div class="w-7 h-7 rounded-xl bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center">
-                        
-                    </div>
+                <div class="flex items-center justify-between mb-2 sm:mb-3">
+                    <span class="text-[9px] sm:text-[11px] font-bold text-slate-400 dark:text-neutral-400 uppercase tracking-wide sm:tracking-wider">Ketua</span>
                 </div>
                 @if ($ketua)
-                    <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-2xl overflow-hidden shrink-0 bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 font-extrabold flex items-center justify-center text-xs uppercase shadow-xs border border-amber-200 dark:border-amber-900/50">
+                    <div class="flex min-w-0 flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3">
+                        <div class="w-7 h-7 sm:w-11 sm:h-11 rounded-lg sm:rounded-2xl overflow-hidden shrink-0 bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 font-extrabold flex items-center justify-center text-[10px] sm:text-xs uppercase shadow-xs border border-amber-200 dark:border-amber-900/50">
                             @if ($ketua->foto_url)
                                 <img src="{{ $ketua->foto_url }}" alt="{{ $ketua->nama }}" class="w-full h-full object-cover">
                             @else
@@ -147,7 +137,7 @@
                         </div>
                         <div class="min-w-0">
                             <div class="flex items-center gap-1.5">
-                                <span class="font-bold text-sm text-slate-900 dark:text-white truncate">{{ $ketua->nama }}</span>
+                                <span class="font-bold text-[10px] sm:text-sm text-slate-900 dark:text-white truncate">{{ $ketua->nama }}</span>
                             </div>
                             <div class="text-[11px] text-slate-400 dark:text-neutral-400 truncate">NIS: {{ $ketua->nis }} · {{ $ketua->kelas->nama ?? '-' }}</div>
                             <div class="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1 mt-0.5">
@@ -168,22 +158,19 @@
         </div>
 
         {{-- Pelatih --}}
-        <div class="bg-white dark:bg-[#1a1a1a] rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-sm p-5 flex flex-col justify-between">
+        <div class="min-w-0 bg-white dark:bg-[#1a1a1a] rounded-2xl sm:rounded-3xl border border-sky-100 dark:border-neutral-800 shadow-sm p-2 sm:p-5 flex flex-col justify-between">
             <div>
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-[11px] font-bold text-slate-400 dark:text-neutral-400 uppercase tracking-wider">Pelatih Ekskul</span>
-                    <div class="w-7 h-7 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center">
-                        
-                    </div>
+                <div class="flex items-center justify-between mb-2 sm:mb-3">
+                    <span class="text-[9px] sm:text-[11px] font-bold text-slate-400 dark:text-neutral-400 uppercase tracking-wide sm:tracking-wider">Pelatih</span>
                 </div>
                 @if ($ekskul->pelatih)
-                    <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-2xl bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-extrabold flex items-center justify-center text-xs uppercase shrink-0 shadow-xs">
+                    <div class="flex min-w-0 flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3">
+                        <div class="w-7 h-7 sm:w-11 sm:h-11 rounded-lg sm:rounded-2xl bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-extrabold flex items-center justify-center text-[10px] sm:text-xs uppercase shrink-0 shadow-xs">
                             {{ strtoupper(substr($ekskul->pelatih->nama, 0, 2)) }}
                         </div>
                         <div class="min-w-0">
                             <div class="flex items-center gap-1.5 flex-wrap">
-                                <span class="font-bold text-sm text-slate-900 dark:text-white truncate">{{ $ekskul->pelatih->nama }}</span>
+                                <span class="font-bold text-[10px] sm:text-sm text-slate-900 dark:text-white truncate">{{ $ekskul->pelatih->nama }}</span>
                                 @if($ekskul->pelatih->isTerverifikasi())
                                     <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300">Terverifikasi</span>
                                 @endif

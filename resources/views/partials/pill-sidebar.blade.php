@@ -125,7 +125,7 @@
     .ps-toggle {
         position: absolute;
         top: 22px;
-        right: -13px;
+        right: -16px;
         z-index: 60;
         width: 26px;
         height: 26px;
@@ -190,13 +190,13 @@
     .ps-logo-box .ps-logo-img-light { display: block; }
     .ps-logo-box .ps-logo-img-dark  { display: none;  }
     /* Dark mode: balik keduanya */
-    :is(html.dark-mode, html.dark) .ps-logo-box .ps-logo-img-light { display: none;  }
-    :is(html.dark-mode, html.dark) .ps-logo-box .ps-logo-img-dark  { display: block; }
+    html.dark .ps-logo-box .ps-logo-img-light { display: none;  }
+    html.dark .ps-logo-box .ps-logo-img-dark  { display: block; }
     .ps-logo-txt { text-align: left; min-width: 0; }
     .ps-logo-txt strong { font-size: 13px; font-weight: 800; color: #0f172a; display: block; line-height: 1.2; letter-spacing: .01em; }
     .ps-logo-txt small { font-size: 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
     body.ps-collapsed .ps-logo-txt { display: none; }
-    :is(html.dark-mode, html.dark) .ps-logo-txt strong { color: #f1f5f9; }
+    html.dark .ps-logo-txt strong { color: #f1f5f9; }
 
     .ps-section {
         display: flex;
@@ -223,12 +223,7 @@
     body.ps-collapsed .ps-nav-main {
         overflow-y: auto;
         overflow-x: visible;
-        padding-right: 0;
-        scrollbar-gutter: auto;
-        scrollbar-width: none;       /* Firefox: sembunyikan scrollbar */
-    }
-    body.ps-collapsed .ps-nav-main::-webkit-scrollbar {
-        display: none;               /* Chrome/Safari: sembunyikan scrollbar */
+        padding-right: 4px;
     }
 
     .ps-group { position: relative; }
@@ -428,19 +423,14 @@
     body.ps-collapsed .ps-item {
         justify-content: center;
         gap: 0;
-        height: 38px;
-        min-height: 38px;
+        height: 36px;
+        min-height: 36px;
         padding: 0;
-        border-radius: 12px;
     }
     body.ps-collapsed .ps-item:hover { transform: none; }
     body.ps-collapsed .ps-item .ps-bar { display: none; }
     body.ps-collapsed .ps-item .ps-lb { display: none; }
     body.ps-collapsed .ps-nav { gap: 6px; }
-    body.ps-collapsed .ps-dot {
-        top: 6px;
-        right: calc(50% - 9px);
-    }
 
     .ps-tip {
         position: absolute;
@@ -809,7 +799,7 @@
 
         <div class="ps-section" aria-hidden="true">
             <span class="ps-section-lbl">Menu utama</span>
-            <span class="ps-section-sub">{{ strtoupper($psRole ?? ($psTitle ?? '')) }}</span>
+            <span class="ps-section-sub">{{ strtoupper($psTitle ?? '') }}</span>
         </div>
 
         <nav class="ps-nav ps-nav-main" aria-label="Menu utama">
@@ -902,17 +892,6 @@
         <div class="ps-spacer" aria-hidden="true"></div>
 
         <nav class="ps-nav" aria-label="Lainnya">
-            @if(!empty($psNotifUrl))
-            <a href="{{ $psNotifUrl }}" class="ps-item" aria-label="Notifikasi">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    {!! $psIconSvg['bell'] !!}
-                </svg>
-                <span class="ps-lb">Notifikasi</span>
-                <span class="ps-dot" aria-hidden="true"></span>
-                <span class="ps-tip">Notifikasi</span>
-            </a>
-            @endif
-
             <details class="ps-gear">
                 <summary class="ps-item" aria-label="Menu lainnya">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1065,12 +1044,6 @@
                         <span>{{ $psMobileMore['label'] }}</span>
                     </a>
                 @endforeach
-                @if(!empty($psNotifUrl))
-                <a href="{{ $psNotifUrl }}" class="flex min-h-[42px] items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-800 hover:text-sky-700 dark:hover:text-slate-200">
-                    <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $psIconSvg['bell'] !!}</svg>
-                    <span>Notifikasi</span>
-                </a>
-                @endif
             </nav>
 
             <div class="mt-auto pt-6">

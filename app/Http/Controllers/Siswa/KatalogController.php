@@ -16,7 +16,6 @@ class KatalogController extends Controller
         // menampilkan semua ekskul yang sedang diikuti, bukan hanya satu.
         $ekskulAktifs = $siswa ? $siswa->activeEkskuls() : collect();
         $ekskulAktif = $ekskulAktifs->first();
-        $menunggu = $siswa?->pendingPendaftaran();
 
         $cari = Ekskul::query()
             ->with('pembina')
@@ -32,6 +31,7 @@ class KatalogController extends Controller
                 });
             });
 
+        // Jumlah mengikuti pencarian dan filter, untuk memberi ringkasan katalog.
         $jumlah = [
             'semua' => (clone $cari)->count(),
         ];
@@ -48,7 +48,6 @@ class KatalogController extends Controller
             'status' => null,
             'ekskulAktif' => $ekskulAktif,
             'ekskulAktifs' => $ekskulAktifs,
-            'menunggu' => $menunggu !== null,
             'alasanPerEkskul' => $alasanPerEkskul,
         ]);
     }

@@ -218,8 +218,8 @@
                                 
                             </a>
                         </th>
-                        <th class="py-3.5 px-5">Kategori Binaan</th>
                         <th class="py-3.5 px-5">Ekskul Dibina</th>
+                        <th class="py-3.5 px-5">Kategori Binaan</th>
                         <th class="py-3.5 px-5 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -251,29 +251,6 @@
                                 </div>
                             </td>
 
-                            {{-- Kategori Binaan & Riwayat --}}
-                            <td class="py-3.5 px-5 whitespace-nowrap">
-                                @if ($p->kategori_aktif)
-                                    <div>
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-bold text-[11px] bg-sky-50 text-sky-700 border border-sky-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
-                                            {{ $p->kategori_aktif }}
-                                        </span>
-                                        <span class="block text-[10px] text-slate-400 mt-0.5">Membina {{ $p->ekskuls->count() }} ekskul</span>
-                                    </div>
-                                @elseif ($p->kategori_pernah_dibina)
-                                    <div>
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-bold text-[11px] bg-amber-50 text-amber-700 border border-amber-200" title="Data riwayat: pernah membina kategori ini">
-                                            
-                                            Pernah: {{ $p->kategori_pernah_dibina }}
-                                        </span>
-                                        <span class="block text-[10px] text-amber-600/80 mt-0.5 font-medium">Tidak membina (Riwayat)</span>
-                                    </div>
-                                @else
-                                    <span class="text-[11px] text-slate-400 italic">Belum ada kategori</span>
-                                @endif
-                            </td>
-
                             {{-- Ekskul Dibina --}}
                             <td class="py-3.5 px-5">
                                 <div class="flex flex-col gap-1.5 items-start">
@@ -287,10 +264,33 @@
                                         @endforelse
                                     </div>
                                     <button type="button" onclick="document.getElementById('modal-kelola-{{ $p->id }}').showModal()"
-                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-bold text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition">
-                                        Kelola Ekskul ({{ $p->ekskuls->count() }}/{{ \App\Support\AturanEkskul::MAKS_EKSKUL_PEMBINA }})
+                                            class="inline-flex items-center gap-1 px-2 py-1 sm:px-2.5 rounded-full font-bold text-[10px] sm:text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition whitespace-nowrap">
+                                        <span class="sm:hidden">Kelola ({{ $p->ekskuls->count() }}/{{ \App\Support\AturanEkskul::MAKS_EKSKUL_PEMBINA }})</span>
+                                        <span class="hidden sm:inline">Kelola Ekskul ({{ $p->ekskuls->count() }}/{{ \App\Support\AturanEkskul::MAKS_EKSKUL_PEMBINA }})</span>
                                     </button>
                                 </div>
+                            </td>
+
+                            {{-- Kategori Binaan & Riwayat --}}
+                            <td class="py-3.5 px-5 whitespace-nowrap">
+                                @if ($p->kategori_aktif)
+                                    <div>
+                                        <span class="inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-full font-bold text-[10px] sm:text-[11px] bg-sky-50 text-sky-700 border border-sky-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                                            {{ $p->kategori_aktif }}
+                                        </span>
+                                        <span class="block text-[10px] text-slate-400 mt-0.5">Membina {{ $p->ekskuls->count() }} ekskul</span>
+                                    </div>
+                                @elseif ($p->kategori_pernah_dibina)
+                                    <div>
+                                        <span class="inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-full font-bold text-[10px] sm:text-[11px] bg-amber-50 text-amber-700 border border-amber-200" title="Data riwayat: pernah membina kategori ini">
+                                            Pernah: {{ $p->kategori_pernah_dibina }}
+                                        </span>
+                                        <span class="block text-[10px] text-amber-600/80 mt-0.5 font-medium">Tidak membina (Riwayat)</span>
+                                    </div>
+                                @else
+                                    <span class="text-[11px] text-slate-400 italic">Belum ada kategori</span>
+                                @endif
                             </td>
 
                             {{-- Aksi --}}
@@ -335,7 +335,9 @@
             <p class="text-[11px] text-slate-400 font-semibold">
                 Menampilkan {{ $pembinas->firstItem() ?? 0 }}-{{ $pembinas->lastItem() ?? 0 }} dari {{ $pembinas->total() }} pembina
             </p>
-            {{ $pembinas->links() }}
+            <div class="w-full sm:w-auto">
+                {{ $pembinas->links() }}
+            </div>
         </div>
     </div>
 

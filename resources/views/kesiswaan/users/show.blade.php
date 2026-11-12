@@ -44,15 +44,10 @@
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
                 <div class="flex items-center gap-4 sm:gap-5 min-w-0">
                     <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center overflow-hidden shrink-0 border-2 border-white/30 shadow-md">
-                        @if($user->siswa?->foto_url)
-                            <img src="{{ $user->siswa->foto_url }}" alt="{{ $user->siswa->nama }}" class="w-full h-full object-cover">
-                        @elseif($user->pembina?->foto_url)
-                            <img src="{{ $user->pembina->foto_url }}" alt="{{ $user->pembina->nama }}" class="w-full h-full object-cover">
-                        @else
-                            <span class="text-2xl font-black text-white">
-                                {{ strtoupper(substr($user->siswa?->nama ?? $user->pembina?->nama ?? $user->username ?? $user->email ?? 'U', 0, 2)) }}
-                            </span>
-                        @endif
+                        <img src="{{ $user->foto_url ?? asset('images/default.png') }}"
+                             alt="{{ $user->username }}"
+                             class="w-full h-full object-cover"
+                             onerror="this.onerror=null;this.src='{{ asset('images/default.png') }}';">
                     </div>
 
                     <div class="min-w-0">
@@ -285,12 +280,8 @@
                             @endif
                             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-11 h-11 rounded-2xl overflow-hidden bg-slate-100 shrink-0 flex items-center justify-center font-black text-sky-600 uppercase text-xs">
-                                        @if($ek->logo)
-                                            <img src="{{ asset('storage/' . $ek->logo) }}" alt="{{ $ek->nama_ekskul }}" class="w-full h-full object-cover">
-                                        @else
-                                            {{ strtoupper(substr($ek->nama_ekskul, 0, 2)) }}
-                                        @endif
+                                    <div class="w-11 h-11 rounded-2xl overflow-hidden bg-slate-100 shrink-0 flex items-center justify-center">
+                                        <img src="{{ $ek->logo_url }}" alt="{{ $ek->nama_ekskul }}" class="w-full h-full object-cover">
                                     </div>
                                     <div>
                                         <h4 class="font-extrabold text-slate-900">{{ $ek->nama_ekskul }}</h4>

@@ -36,7 +36,7 @@
         {{-- Total --}}
         <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-sm flex items-center gap-3.5">
             <div class="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold shrink-0">
-                
+                <i class="fa-solid fa-users text-lg" aria-hidden="true"></i>
             </div>
             <div>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Pelatih</p>
@@ -47,7 +47,7 @@
         {{-- Pending --}}
         <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-sm flex items-center gap-3.5">
             <div class="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold shrink-0">
-                
+                <i class="fa-solid fa-hourglass-half text-lg" aria-hidden="true"></i>
             </div>
             <div>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Perlu Diverifikasi</p>
@@ -58,7 +58,7 @@
         {{-- Terverifikasi --}}
         <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-sm flex items-center gap-3.5">
             <div class="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold shrink-0">
-                
+                <i class="fa-solid fa-circle-check text-lg" aria-hidden="true"></i>
             </div>
             <div>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Terverifikasi</p>
@@ -69,7 +69,7 @@
         {{-- Ditolak --}}
         <div class="bg-white rounded-2xl p-4 border border-sky-100 shadow-sm flex items-center gap-3.5">
             <div class="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold shrink-0">
-                
+                <i class="fa-solid fa-circle-xmark text-lg" aria-hidden="true"></i>
             </div>
             <div>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ditolak</p>

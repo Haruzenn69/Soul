@@ -46,23 +46,16 @@
     <!-- Hero Persentase Kehadiran -->
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-6 md:p-8 text-white shadow-xl shadow-sky-200 dark:shadow-none animate-fade-up" style="animation-delay: .15s">
         <div class="absolute inset-0 pointer-events-none">
-            <div class="absolute -top-20 -right-10 w-72 h-72 rounded-full bg-amber-200/40 blur-3xl"></div>
-            <div class="absolute -bottom-24 -left-10 w-64 h-64 rounded-full bg-white/10 blur-3xl"></div>
+            <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
         </div>
         <div class="relative grid lg:grid-cols-3 gap-6 items-center">
             <div class="lg:col-span-2">
-                <div class="flex items-center gap-2 flex-wrap">
-                    @if($ekskul)
-                        <span class="px-3 py-1 rounded-full bg-amber-300/30 backdrop-blur border border-amber-200/40 text-[10px] font-bold tracking-wide uppercase">{{ $ekskul->nama_ekskul }}</span>
-                    @endif
-                    <span class="px-3 py-1 rounded-full bg-white/15 backdrop-blur border border-white/20 text-[10px] font-bold tracking-wide uppercase">{{ \Carbon\Carbon::createFromFormat('Y-m', $bulan)->translatedFormat('F Y') }}</span>
-                </div>
-                <h2 class="text-2xl md:text-3xl font-extrabold mt-3 tracking-tight">Tingkat Kehadiran</h2>
-                <p class="text-xs text-white/75 mt-1.5 max-w-lg leading-relaxed">
+                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">Tingkat Kehadiran</h2>
+                <p class="text-xs text-white/85 mt-1.5 max-w-lg leading-relaxed">
                     Dari {{ $total }} kegiatan yang tercatat pada bulan ini, kamu hadir sebanyak {{ $hadir }} kali.
                 </p>
-                <div class="mt-5 h-3 rounded-full bg-white/20 backdrop-blur overflow-hidden">
-                    <div id="hero-bar" class="h-full rounded-full bg-gradient-to-r from-amber-300 to-yellow-400 transition-all duration-1000" style="width: 0%"></div>
+                <div class="mt-5 h-3 rounded-full bg-white/20 overflow-hidden">
+                    <div id="hero-bar" class="h-full rounded-full bg-white transition-all duration-1000" style="width: 0%"></div>
                 </div>
                 <p class="text-[10px] text-white/70 mt-2 font-semibold">Persentase kehadiran dibanding seluruh kegiatan yang tercatat</p>
             </div>
@@ -145,6 +138,52 @@
                 bar.style.width = '{{ $persentaseKehadiran }}%';
             });
         }
+
+        // Tilt card interaktif
+        const card = document.querySelector('[data-tilt-card]');
+        if (!card) return;
+
+        const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!canHover || reduceMotion) return;
+
+        const MAX_TILT = 6;
+        let frame = null;
+
+        card.addEventListener('animationend', function () {
+            card.classList.remove('animate-fade-up');
+            if (card.matches(':hover')) card.classList.add('is-tilting');
+        }, { once: true });
+
+        card.addEventListener('pointerenter', function () {
+            card.classList.add('is-tilting');
+        });
+
+        card.addEventListener('pointermove', function (event) {
+            const rect = card.getBoundingClientRect();
+            const px = (event.clientX - rect.left) / rect.width;
+            const py = (event.clientY - rect.top) / rect.height;
+            const rotateX = (0.5 - py) * MAX_TILT * 2;
+            const rotateY = (px - 0.5) * MAX_TILT * 2;
+
+            if (frame) cancelAnimationFrame(frame);
+            frame = requestAnimationFrame(function () {
+                frame = null;
+                card.style.transform = 'perspective(1200px) rotateX(' + rotateX.toFixed(2) + 'deg) rotateY(' + rotateY.toFixed(2) + 'deg) scale(1.012)';
+            });
+        });
+
+        function resetTilt() {
+            if (frame) {
+                cancelAnimationFrame(frame);
+                frame = null;
+            }
+            card.classList.remove('is-tilting');
+            card.style.transform = '';
+        }
+
+        card.addEventListener('pointerleave', resetTilt);
+        card.addEventListener('pointercancel', resetTilt);
     });
 </script>
 @endpush

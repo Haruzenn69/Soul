@@ -215,8 +215,8 @@
                         <tr class="hover:bg-sky-50/30 transition {{ ! $ekskul->status ? 'opacity-70' : '' }}">
                             <td class="py-3.5 px-5">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-xl {{ $ekskul->status ? 'bg-sky-100 text-sky-700' : 'bg-slate-100 text-slate-500' }} flex items-center justify-center font-extrabold">
-                                        {{ strtoupper(substr($ekskul->nama_ekskul, 0, 2)) }}
+                                    <div class="w-8 h-8 rounded-xl overflow-hidden shrink-0 {{ $ekskul->status ? 'bg-sky-100' : 'bg-slate-100' }}">
+                                        <img src="{{ $ekskul->logo_url }}" alt="Logo {{ $ekskul->nama_ekskul }}" class="w-full h-full object-cover {{ $ekskul->status ? '' : 'grayscale opacity-70' }}">
                                     </div>
                                     <div>
                                         <p class="font-bold text-slate-900">{{ $ekskul->nama_ekskul }}</p>
@@ -255,12 +255,6 @@
                                         <x-icon name="eye" class="w-3.5 h-3.5" />
                                         Detail
                                     </a>
-                                    <button type="button"
-                                            onclick='openEdit({{ json_encode(["id" => $ekskul->id, "nama_ekskul" => $ekskul->nama_ekskul, "kategori" => $ekskul->kategori, "pembina_id" => $ekskul->pembina_id, "deskripsi" => $ekskul->deskripsi, "jadwal" => $ekskul->jadwal, "status" => $ekskul->status ? 1 : 0]) }})'
-                                            class="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition">
-                                        <x-icon name="pencil" class="w-3 h-3 text-slate-500" />
-                                        Edit
-                                    </button>
                                 </div>
                             </td>
                         </tr>
