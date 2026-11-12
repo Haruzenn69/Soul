@@ -445,7 +445,6 @@ class DummyDataSeeder extends Seeder
                 'tagline' => $eData['tagline'],
                 'tujuan' => $eData['tujuan'],
                 'jadwal' => $eData['jadwal'],
-                'is_open_recruitment' => $eData['open'],
                 'status' => true,
                 'pembina_id' => $eData['pembina'],
             ]);

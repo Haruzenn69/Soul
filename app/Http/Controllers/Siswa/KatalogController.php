@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 
 class KatalogController extends Controller
 {
-    /** Nilai yang diterima pada query string `status`. */
-    private const FILTER = ['buka', 'tutup'];
-
     public function index(Request $request)
     {
         $siswa = auth()->user()?->siswa;
@@ -19,9 +16,6 @@ class KatalogController extends Controller
         // menampilkan semua ekskul yang sedang diikuti, bukan hanya satu.
         $ekskulAktifs = $siswa ? $siswa->activeEkskuls() : collect();
         $ekskulAktif = $ekskulAktifs->first();
-
-        $status = $request->query('status');
-        $status = in_array($status, self::FILTER, true) ? $status : null;
 
         $cari = Ekskul::query()
             ->with('pembina')
@@ -40,21 +34,21 @@ class KatalogController extends Controller
         // Jumlah mengikuti pencarian dan filter, untuk memberi ringkasan katalog.
         $jumlah = [
             'semua' => (clone $cari)->count(),
-            'buka' => (clone $cari)->where('is_open_recruitment', true)->count(),
-            'tutup' => (clone $cari)->where('is_open_recruitment', false)->count(),
         ];
 
-        $ekskuls = (clone $cari)
-            ->when($status === 'buka', fn ($query) => $query->where('is_open_recruitment', true))
-            ->when($status === 'tutup', fn ($query) => $query->where('is_open_recruitment', false))
-            ->get();
+        $ekskuls = $cari->get();
+
+        $alasanPerEkskul = $siswa
+            ? $ekskuls->mapWithKeys(fn (Ekskul $e) => [$e->id => $siswa->alasanTidakBisaDaftar($e)])
+            : collect();
 
         return view('siswa.katalog', [
             'ekskuls' => $ekskuls,
             'jumlah' => $jumlah,
-            'status' => $status,
+            'status' => null,
             'ekskulAktif' => $ekskulAktif,
             'ekskulAktifs' => $ekskulAktifs,
+            'alasanPerEkskul' => $alasanPerEkskul,
         ]);
     }
 }

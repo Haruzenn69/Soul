@@ -192,14 +192,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
     Route::get('/profile', [SiswaProfilController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update-data', [SiswaProfilController::class, 'update'])->name('profile.update-data');
 
-    // 5. HALAMAN DAFTAR EKSKUL (LIST CARD)
-    Route::get('/daftar-ekskul', fn () => redirect()->route('siswa.katalog'))->name('daftar-ekskul');
-
-    // 6. FORM DAFTAR EKSKUL (HALAMAN FORM)
-    Route::get('/form-daftar/{ekskul}', fn () => redirect()->route('siswa.katalog'))->name('form-daftar');
-
-    // 7. PROSES DAFTAR EKSKUL (STORE)
-    Route::post('/daftar-ekskul', fn () => abort(403, 'Keanggotaan ekskul ditambahkan oleh Ketua Ekskul.'))->name('daftar-ekskul.store');
+    // (Pendaftaran mandiri siswa dihapus - siswa didaftarkan langsung oleh ketua ekskul)
 
     // 7b. NOTIFIKASI
     Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi');
@@ -293,14 +286,13 @@ Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name
     Route::resource('pendaftaran', PendaftaranController::class)->only(['index', 'show', 'update']);
     Route::resource('pengajuan-keluar', PengajuanKeluarController::class)->only(['index', 'show', 'update']);
     Route::get('anggota', [AnggotaController::class, 'index'])->name('anggota.index');
-    Route::get('anggota/tambah', [AnggotaController::class, 'create'])->name('anggota.create');
-    Route::post('anggota/tambah', [AnggotaController::class, 'store'])->name('anggota.store');
+    Route::get('anggota/calon-siswa', [AnggotaController::class, 'calonSiswa'])->name('anggota.calon-siswa');
+    Route::post('anggota', [AnggotaController::class, 'store'])->name('anggota.store');
     Route::patch('anggota/{pendaftaran}/status', [AnggotaController::class, 'updateStatus'])->name('anggota.update-status');
     Route::get('pengurus', [PengurusController::class, 'indexKetua'])->name('pengurus.index');
     Route::post('pengurus/usulkan', [PengurusController::class, 'usulkanKetua'])->name('pengurus.usulkan');
     Route::get('profil-ekskul', [ProfilEkskulController::class, 'edit'])->name('profil-ekskul.edit');
     Route::patch('profil-ekskul', [ProfilEkskulController::class, 'update'])->name('profil-ekskul.update');
-    Route::patch('profil-ekskul/toggle-recruitment', [ProfilEkskulController::class, 'toggleRecruitment'])->name('profil-ekskul.toggle-recruitment');
     Route::post('profil-ekskul/galeri', [ProfilEkskulController::class, 'storeGaleri'])->name('profil-ekskul.galeri-store');
     Route::delete('profil-ekskul/galeri/{galeri}', [ProfilEkskulController::class, 'destroyGaleri'])->name('profil-ekskul.galeri-destroy');
     Route::get('prestasi', [PrestasiController::class, 'index'])->name('prestasi.index');

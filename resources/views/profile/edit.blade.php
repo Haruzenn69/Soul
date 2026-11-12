@@ -65,7 +65,7 @@
             ['icon' => 'user', 'label' => 'Profil Saya', 'url' => route('profile.edit', array_merge($ekskul ? ['ekskul' => $ekskul->id] : [], ['from' => 'siswa'])), 'is' => 'profile.edit'],
         ],
         'more' => [
-            ['label' => 'Katalog Ekskul', 'url' => route('siswa.katalog'), 'is' => 'siswa.katalog'],
+            {{-- (Menu daftar ekskul dihapus sesuai kebijakan baru) --}}
             ['label' => 'Ajukan Keluar', 'url' => route('siswa.pengajuan-keluar', $ekskul ? ['ekskul' => $ekskul->id] : []), 'is' => ['siswa.pengajuan-keluar', 'siswa.pengajuan-keluar.store']],
         ],
     ];

@@ -222,14 +222,19 @@
                 <div>
                     <h3 class="text-xs md:text-sm font-extrabold text-slate-900 dark:text-white">
                         @if($hasMultipleEkskul && $ekskul)
-                            Ekskul Aktif · {{ $ekskul->nama_ekskul }}
+                            Aktif di {{ $ekskul->nama_ekskul }}
                         @else
                             Ekskul Saya
                         @endif
                     </h3>
                     <p class="text-xs text-slate-400 font-medium mt-0.5">Informasi ekstrakurikuler yang kamu ikuti</p>
                 </div>
-                @if($activeEkskuls->count() === 1)
+                @if($hasMultipleEkskul && $otherEkskul)
+                    <a href="{{ route('siswa.dashboard', ['ekskul' => $otherEkskul->id]) }}" class="shrink-0 text-[10px] sm:text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 flex items-center gap-1 transition">
+                        <span>Switch ke {{ $otherEkskul->nama_ekskul }}</span>
+                        <i class="fa-solid fa-arrow-right-arrow-left text-[10px]"></i>
+                    </a>
+                @elseif($activeEkskuls->count() === 1)
                     <a href="{{ route('siswa.katalog') }}" class="text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 flex items-center gap-1 transition">
                         <span>Lihat Ekskul Lain</span>
                         <i class="fa-solid fa-chevron-right text-[10px]"></i>

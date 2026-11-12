@@ -61,7 +61,6 @@ trait CreatesFixtures
             'pelatih_id' => $this->makePelatih()->id,
             'nama_ekskul' => 'Ekskul '.fake()->unique()->word(),
             'deskripsi' => fake()->sentence(),
-            'is_open_recruitment' => true,
         ], $overrides));
     }
 

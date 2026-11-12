@@ -40,7 +40,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('siswa')->middleware('role:siswa')->name('api.siswa.')->group(function () {
         Route::get('/dashboard', [SiswaController::class, 'dashboard'])->name('dashboard');
         Route::get('/katalog', [SiswaController::class, 'katalog'])->name('katalog');
-        Route::get('/daftar-exkul', [SiswaController::class, 'daftar'])->name('daftar');
         Route::get('/presensi', [SiswaController::class, 'presensi'])->name('presensi');
         Route::get('/rekap', [SiswaController::class, 'rekap'])->name('rekap');
         Route::get('/nilai', [SiswaController::class, 'nilai'])->name('nilai');
@@ -75,6 +74,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/rekap/pdf', [KetuaKegiatanController::class, 'downloadRekapPdf'])->name('rekap.pdf');
 
         Route::get('/anggota', [KetuaMembershipController::class, 'anggota'])->name('anggota');
+        Route::get('/anggota/calon-siswa', [KetuaMembershipController::class, 'calonSiswa'])->name('anggota.calon-siswa');
+        Route::post('/anggota', [KetuaMembershipController::class, 'tambahAnggota'])->name('anggota.tambah');
         Route::post('/anggota/{pendaftaran}/status', [KetuaMembershipController::class, 'updateStatusAnggota'])->name('anggota.status');
         Route::get('/pendaftaran', [KetuaMembershipController::class, 'pendaftaran'])->name('pendaftaran');
         Route::post('/pendaftaran/{pendaftaran}', [KetuaMembershipController::class, 'prosesPendaftaran'])->name('pendaftaran.proses');
@@ -90,7 +91,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/profil-ekskul', [KetuaProfilEkskulController::class, 'show'])->name('profil-ekskul.show');
         Route::post('/profil-ekskul/update', [KetuaProfilEkskulController::class, 'update'])->name('profil-ekskul.update');
-        Route::post('/profil-ekskul/toggle-recruitment', [KetuaProfilEkskulController::class, 'toggleRecruitment'])->name('profil-ekskul.toggle');
         Route::post('/profil-ekskul/galeri', [KetuaProfilEkskulController::class, 'storeGaleri'])->name('profil-ekskul.galeri');
         Route::delete('/profil-ekskul/galeri/{galeri}', [KetuaProfilEkskulController::class, 'destroyGaleri'])->name('profil-ekskul.galeri-destroy');
         Route::get('/prestasi', [KetuaProfilEkskulController::class, 'prestasi'])->name('prestasi');

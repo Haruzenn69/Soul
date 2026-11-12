@@ -27,10 +27,6 @@ class CatalogController extends ApiController
                 ->orWhereHas('pembina', fn ($p) => $p->where('nama', 'like', "%{$cari}%")));
         }
 
-        if ($request->boolean('open_only')) {
-            $query->where('is_open_recruitment', true);
-        }
-
         $ekskuls = $query->withCount([
             'pendaftarans as anggota_count' => fn ($q) => $q->whereIn('status', ['diterima', 'peringatan']),
         ])->get();

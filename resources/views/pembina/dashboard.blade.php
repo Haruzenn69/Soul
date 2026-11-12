@@ -184,8 +184,9 @@
                                 @if($eksB->status)
                                     <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">Aktif</span>
                                 @else
-                                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-neutral-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-neutral-700">Nonaktif</span>
+                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-50 dark:bg-neutral-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-neutral-700">Nonaktif</span>
                                 @endif
+                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/50">Keanggotaan via Ketua</span>
                             </div>
                         </div>
                         @endforeach

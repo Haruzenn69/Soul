@@ -19,8 +19,6 @@
     @php
         $filters = [
             'semua' => ['label' => 'Semua', 'count' => $jumlah['semua'] ?? 0],
-            'buka'  => ['label' => 'Dibuka', 'count' => $jumlah['buka'] ?? 0],
-            'tutup' => ['label' => 'Ditutup', 'count' => $jumlah['tutup'] ?? 0],
         ];
         $ekskulAktifIds = ($ekskulAktifs ?? collect())->pluck('id')->all();
     @endphp
@@ -115,8 +113,8 @@
                 <i class="fa-solid fa-door-open text-sm"></i>
             </div>
             <div class="min-w-0">
-                <p class="text-base font-extrabold text-slate-900 leading-none">{{ $jumlah['buka'] }}</p>
-                <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Buka Daftar</p>
+                <p class="text-base font-extrabold text-slate-900 leading-none">{{ $ekskulAktifs->count() }}</p>
+                <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Ekskul Diikuti</p>
             </div>
         </div>
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm px-4 py-3 flex items-center gap-3">
@@ -124,8 +122,8 @@
                 <i class="fa-solid fa-door-closed text-sm"></i>
             </div>
             <div class="min-w-0">
-                <p class="text-base font-extrabold text-slate-900 leading-none">{{ $jumlah['tutup'] }}</p>
-                <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Ditutup</p>
+                <p class="text-base font-extrabold text-slate-900 leading-none">Ketua</p>
+                <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Menambahkan Anggota</p>
             </div>
         </div>
     </div>
@@ -135,11 +133,10 @@
         @forelse ($ekskuls as $ekskul)
             @php
                 $logo = \App\Support\EkskulInfo::logo($ekskul->logo);
-                $buka = $ekskul->is_open_recruitment;
             @endphp
             <div class="catalog-card group flex flex-col bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden hover:shadow-md hover:border-slate-300 hover:-translate-y-0.5 transition-all duration-200">
                 {{-- Card Header Strip --}}
-                <div class="h-1 w-full {{ $buka ? 'bg-blue-600' : 'bg-slate-200' }}"></div>
+                <div class="h-1.5 w-full bg-gradient-to-r from-sky-400 to-blue-500"></div>
 
                 <div class="p-3 sm:p-5 flex flex-col flex-1">
                     {{-- Top Row: Logo + Status --}}
@@ -159,14 +156,9 @@
                                 <i class="fa-solid fa-check text-[10px]"></i>
                                 Ekskul Kamu
                             </span>
-                        @elseif ($buka)
-                            <span class="recruitment-open-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold shrink-0">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
-                                Buka
-                            </span>
                         @else
-                            <span class="catalog-closed-badge inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-500 text-[10px] font-semibold shrink-0">
-                                Ditutup
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-sky-50 border border-sky-100 text-sky-700 text-[10px] font-semibold shrink-0">
+                                Hubungi Ketua
                             </span>
                         @endif
                     </div>
@@ -215,11 +207,14 @@
                                     Ekskul Kamu
                                 </span>
                             @else
-                                <span class="flex-1 py-2 px-1 sm:px-2 bg-slate-50 text-slate-500 text-[9px] sm:text-xs font-semibold rounded-lg sm:rounded-xl border border-slate-200 text-center select-none">
-                                    Lihat Informasi
+                                <span class="flex-1 py-2 px-2 bg-sky-50 text-sky-700 text-xs font-semibold rounded-xl border border-sky-100 text-center select-none">
+                                    Hubungi Ketua untuk bergabung
                                 </span>
                             @endif
                         </div>
+                        @if (! in_array($ekskul->id, $ekskulAktifIds, true) && $alasanEkskul !== null)
+                            <p class="text-[10px] text-center text-amber-600 leading-relaxed">{{ $alasanEkskul }}</p>
+                        @endif
                     </div>
                 </div>
             </div>

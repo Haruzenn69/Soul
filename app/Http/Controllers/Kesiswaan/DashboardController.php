@@ -42,15 +42,6 @@ class DashboardController extends Controller
         $kelasPerBulan = $buildTrend(Kelas::query());
         $ekskulPerBulan = $buildTrend(Ekskul::query());
 
-        $ekskulStatus = Ekskul::selectRaw("is_open_recruitment, COUNT(*) as total, GROUP_CONCAT(nama_ekskul SEPARATOR ', ') as nama_list")
-            ->groupBy('is_open_recruitment')
-            ->pluck('total', 'is_open_recruitment');
-
-        $ekskulDetail = Ekskul::select('nama_ekskul', 'is_open_recruitment')
-            ->orderBy('is_open_recruitment', 'desc')
-            ->orderBy('nama_ekskul')
-            ->get();
-
         // Notifications for dashboard
         $notifikasis = Notifikasi::where('user_id', auth()->id())
             ->latest()
@@ -71,13 +62,11 @@ class DashboardController extends Controller
             'totalUsers' => User::count(),
             'totalSiswa' => Siswa::whereIn('status', ['aktif', 'menunggu_penempatan'])->count(),
             'totalEkskul' => Ekskul::count(),
-            'ekskulBuka' => Ekskul::where('is_open_recruitment', true)->count(),
+            'ekskulBuka' => Ekskul::where('status', true)->count(),
             'totalKelas' => Kelas::count(),
             'akunPerBulan' => $akunPerBulan,
             'kelasPerBulan' => $kelasPerBulan,
             'ekskulPerBulan' => $ekskulPerBulan,
-            'ekskulStatus' => $ekskulStatus,
-            'ekskulDetail' => $ekskulDetail,
             'notifikasis' => $notifikasis,
             'unreadCount' => $unreadCount,
             'pendingPendaftaran' => $pendingPendaftaran,

@@ -73,8 +73,8 @@
                         <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/20 text-white shadow-sm">
                             {{ $ekskul->status ? ' Aktif' : 'X Nonaktif' }}
                         </span>
-                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/20 text-white shadow-sm">
-                            {{ $ekskul->is_open_recruitment ? ' Buka Pendaftaran' : ' Tutup Pendaftaran' }}
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/10 text-white/80 backdrop-blur">
+                            Keanggotaan melalui Ketua
                         </span>
                         @if ($ekskul->jadwal)
                             <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/15 text-white/90 backdrop-blur">

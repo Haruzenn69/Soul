@@ -121,6 +121,29 @@ class NotifikasiService
         }
     }
 
+    public static function anggotaDitambahkan(Pendaftaran $pendaftaran): void
+    {
+        $ekskul = $pendaftaran->ekskul;
+
+        Notifikasi::create([
+            'siswa_id' => $pendaftaran->siswa_id,
+            'pendaftaran_id' => $pendaftaran->id,
+            'judul' => 'Ditambahkan ke Ekskul',
+            'pesan' => 'Ketua ekskul telah menambahkan kamu sebagai anggota '.$ekskul->nama_ekskul.'.',
+            'tipe' => 'diterima',
+        ]);
+
+        if ($ekskul->pembina) {
+            Notifikasi::create([
+                'pembina_id' => $ekskul->pembina->id,
+                'pendaftaran_id' => $pendaftaran->id,
+                'judul' => 'Anggota Baru Ditambahkan',
+                'pesan' => $pendaftaran->siswa->nama.' telah ditambahkan sebagai anggota ekskul '.$ekskul->nama_ekskul.'.',
+                'tipe' => 'diterima',
+            ]);
+        }
+    }
+
     public static function pendaftaranDitolak(Pendaftaran $pendaftaran): void
     {
         $ekskul = $pendaftaran->ekskul;

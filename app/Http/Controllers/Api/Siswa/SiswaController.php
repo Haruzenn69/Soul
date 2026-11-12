@@ -321,20 +321,6 @@ class SiswaController extends ApiController
         ]);
     }
 
-    public function daftar(Request $request): JsonResponse
-    {
-        return $this->ok([
-            'ekskuls' => EkskulResource::collection(
-                Ekskul::with('pembina')->where('status', true)->get()
-            )->resolve(),
-        ]);
-    }
-
-    public function storeDaftar(Request $request): JsonResponse
-    {
-        return $this->error('Siswa tidak dapat mendaftar ekskul. Keanggotaan ditambahkan oleh Ketua Ekskul.', 403);
-    }
-
     public function presensi(Request $request): JsonResponse
     {
         $siswa = $this->siswa();

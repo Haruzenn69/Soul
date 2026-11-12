@@ -181,17 +181,26 @@ class ArsipAnggotaTest extends TestCase
         $response->assertDontSee($keluar->nis);
     }
 
-    public function test_anggota_nonaktif_tidak_ditampilkan_tanpa_filter(): void
+    public function test_anggota_nonaktif_muncul_di_pencarian_dan_dapat_diaktifkan_kembali(): void
     {
         [, $ekskul] = $this->setupEkskulDenganKetua();
         $nonaktif = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
         $this->daftarkan($nonaktif, $ekskul, Pendaftaran::STATUS_NONAKTIF);
 
-        $this->actingAs($ekskul->ketua()->user)
+        $ketuaUser = $ekskul->ketua()->user;
+
+        $this->actingAs($ketuaUser)
             ->get(route('ketua.anggota.index'))
             ->assertOk()
             ->assertDontSee('Arsip Anggota &amp; Ketua Sebelumnya')
-            ->assertDontSee($nonaktif->nama);
+            ->assertSee('Cari berdasarkan nama, NIS, atau kelas')
+            ->assertSee('window.openAddMemberDialog()');
+
+        $this->actingAs($ketuaUser)
+            ->getJson(route('ketua.anggota.calon-siswa', ['q' => $nonaktif->nis]))
+            ->assertOk()
+            ->assertJsonPath('items.0.id', $nonaktif->id)
+            ->assertJsonPath('items.0.status_sebelumnya', Pendaftaran::STATUS_NONAKTIF);
     }
 
     /**
@@ -205,7 +214,6 @@ class ArsipAnggotaTest extends TestCase
             'pembina_id' => $pembina->id,
             'nama_ekskul' => 'Ekskul Arsip',
             'deskripsi' => fake()->sentence(),
-            'is_open_recruitment' => true,
         ]);
 
         return [$user, $ekskul];
