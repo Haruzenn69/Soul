@@ -56,7 +56,7 @@
         <header class="px-4 md:px-8 py-4 bg-white dark:bg-neutral-900 border-b border-sky-100 dark:border-neutral-800 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
             <!-- KIRI: Hamburger (Mobile) + Logo + Search -->
             <div class="flex items-center gap-3 flex-1 min-w-0">
-                <button onclick="openSidebar()" aria-label="Buka menu navigasi" class="w-9 h-9 rounded-full bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 flex items-center justify-center text-slate-500 dark:text-slate-400 md:hidden shadow-sm shrink-0">
+                <button onclick="openSidebar()" aria-label="Buka menu navigasi" class="w-9 h-9 rounded-full bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 flex items-center justify-center text-slate-500 dark:text-slate-400 lg:hidden shadow-sm shrink-0">
                     <i class="fa-solid fa-bars text-sm"></i>
                 </button>
 

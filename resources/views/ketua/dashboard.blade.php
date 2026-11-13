@@ -63,7 +63,7 @@
         </div>
 
         {{-- Quick Actions --}}
-        <div class="relative mt-4 pt-3 md:mt-11 lg:mt-12 border-t border-white/15 grid grid-cols-3 gap-1.5 sm:gap-2">
+        <div class="relative mt-4 pt-3 md:mt-11 lg:mt-12 border-t border-white/15 grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2">
             <a href="{{ route('ketua.pendaftaran.index') }}" class="group flex min-w-0 items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-clipboard-list text-sm text-white"></i>

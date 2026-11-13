@@ -31,22 +31,41 @@
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -bottom-24 -left-10 h-72 w-72 rounded-full bg-white/10 blur-3xl"></div>
             <div class="absolute -top-24 -right-10 h-72 w-72 rounded-full bg-white/10 blur-3xl"></div>
+
         </div>
-        <div class="relative">
-            <h1 class="text-xl md:text-2xl font-extrabold tracking-tight">Daftar Pendaftaran: {{ $ekskul->nama_ekskul }}</h1>
-            <p class="mt-1 text-xs md:text-sm text-white/80">Ringkasan status pendaftar ekskul</p>
+        <div class="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-xl md:text-2xl font-extrabold tracking-tight">Daftar Pendaftaran{{ isset($ekskul) ? ': ' . $ekskul->nama_ekskul : '' }}</h1>
+                <p class="mt-1 text-xs md:text-sm text-white/80">Ringkasan status pendaftar ekskul</p>
+            </div>
+            <button type="button" onclick="window.openAddMemberDialog()" class="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-white/30 bg-white/15 px-4 py-2.5 text-xs font-bold text-white shadow-sm backdrop-blur transition hover:bg-white/25 sm:self-auto">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Tambah Anggota
+            </button>
         </div>
+
     </div>
 
-    <div class="inline-flex items-center gap-4 rounded-2xl border border-sky-100 bg-white px-5 py-4 shadow-md shadow-sky-100/60 dark:bg-neutral-800 dark:border-neutral-700">
-        <div class="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-900/30 flex items-center justify-center shrink-0">
-            <svg class="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+        <div class="min-w-0 rounded-xl sm:rounded-2xl border border-sky-100 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-2 sm:p-4 md:p-5 shadow-md shadow-sky-100/60 dark:shadow-none">
+            <p class="text-[11px] leading-tight sm:text-xs font-semibold text-slate-500 dark:text-slate-400">Total</p>
+            <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-slate-800 dark:text-white">{{ $total }}</p>
+            <p class="mt-1 text-[10px] leading-tight sm:text-[11px] text-slate-400">Pendaftar</p>
         </div>
-        <div>
-            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Pendaftar</p>
-            <p class="text-2xl font-extrabold tracking-tight text-slate-800 dark:text-white">{{ $total }}</p>
+        <div class="min-w-0 rounded-xl sm:rounded-2xl border border-amber-100 dark:border-amber-900/40 bg-white dark:bg-neutral-800 p-2 sm:p-4 md:p-5 shadow-md shadow-amber-100/50 dark:shadow-none">
+            <p class="text-[11px] leading-tight sm:text-xs font-semibold text-slate-500 dark:text-slate-400">Pending</p>
+            <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-amber-600 dark:text-amber-400">{{ $pendingCount }}</p>
+            <p class="mt-1 text-[10px] leading-tight sm:text-[11px] text-slate-400">Menunggu</p>
+        </div>
+        <div class="min-w-0 rounded-xl sm:rounded-2xl border border-emerald-100 dark:border-emerald-900/40 bg-white dark:bg-neutral-800 p-2 sm:p-4 md:p-5 shadow-md shadow-emerald-100/50 dark:shadow-none">
+            <p class="text-[11px] leading-tight sm:text-xs font-semibold text-slate-500 dark:text-slate-400">Diterima</p>
+            <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-emerald-600 dark:text-emerald-400">{{ $diterimaCount }}</p>
+            <p class="mt-1 text-[10px] leading-tight sm:text-[11px] text-slate-400">Disetujui</p>
+        </div>
+        <div class="min-w-0 rounded-xl sm:rounded-2xl border border-rose-100 dark:border-rose-900/40 bg-white dark:bg-neutral-800 p-2 sm:p-4 md:p-5 shadow-md shadow-rose-100/50 dark:shadow-none">
+            <p class="text-[11px] leading-tight sm:text-xs font-semibold text-slate-500 dark:text-slate-400">Ditolak</p>
+            <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-rose-600 dark:text-rose-400">{{ $ditolakCount }}</p>
+            <p class="mt-1 text-[10px] leading-tight sm:text-[11px] text-slate-400">Ditolak</p>
         </div>
     </div>
 
@@ -128,6 +147,7 @@
 
         @include('partials.table-pagination', ['rows' => $pendaftarans, 'label' => 'pendaftaran'])
     </div>
+    @include('ketua.partials.tambah-anggota')
 </div>
 @endif
 @endsection

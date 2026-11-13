@@ -30,28 +30,6 @@
         #sidebar-mobile nav > a:hover {
             transform: translateX(2px);
         }
-        #sidebar-mobile nav > a[href*="profil-ekskul"],
-        #sidebar-mobile nav > a[href*="prestasi"],
-        #sidebar-mobile nav > a[href*="testimoni"],
-        #sidebar-mobile nav > a[href*="faq"] {
-            display: none;
-        }
-        #sidebar-mobile nav > a[href*="kegiatan"],
-        #sidebar-mobile nav > a[href*="rekap-absensi"],
-        #sidebar-mobile nav > a[href*="presensi/rekap"],
-        #sidebar-mobile nav > a[href*="laporan-bulanan"],
-        #sidebar-mobile nav > a[href*="pendaftaran"],
-        #sidebar-mobile nav > a[href*="anggota"],
-        #sidebar-mobile nav > a[href*="pengajuan-keluar"] {
-            display: none !important;
-        }
-        #sidebar-mobile .legacy-katalog-link {
-            display: none !important;
-        }
-        #sidebar-mobile .legacy-membership-link,
-        #sidebar-mobile .legacy-activity-link {
-            display: none !important;
-        }
         #sidebar-mobile {
             animation: sidebarIn .22s cubic-bezier(.22,1,.36,1);
         }
@@ -115,7 +93,7 @@
         <header class="px-4 md:px-8 py-4 bg-white dark:bg-neutral-900 border-b border-sky-100 dark:border-neutral-800 flex items-center justify-between gap-3 md:gap-4 sticky top-0 z-30">
             <!-- KIRI: Hamburger (Mobile) + Logo + Search -->
             <div class="flex items-center gap-3 flex-1 min-w-0">
-                <button type="button" aria-label="Buka menu navigasi" aria-controls="sidebar-mobile" aria-expanded="false" onclick="openSidebar()" class="w-9 h-9 rounded-full bg-white border border-sky-100 flex items-center justify-center text-slate-500 md:hidden shadow-sm shrink-0">
+                <button type="button" aria-label="Buka menu navigasi" aria-controls="sidebar-mobile" aria-expanded="false" onclick="openSidebar()" class="w-9 h-9 rounded-full bg-white border border-sky-100 flex items-center justify-center text-slate-500 lg:hidden shadow-sm shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
 
@@ -226,7 +204,7 @@
         </main>
     </div>
 
-        {{-- Pencarian global dengan suggestion (seperti Google) --}}
+    {{-- Pencarian global dengan suggestion (seperti Google) --}}
     @include('partials.search-autocomplete')
 
 @stack('scripts')
