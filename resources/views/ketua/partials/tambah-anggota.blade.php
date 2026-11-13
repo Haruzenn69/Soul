@@ -30,7 +30,7 @@
                             <label for="calon-siswa-kelas" class="text-[11px] font-bold text-slate-600 mb-2 block">Filter kelas</label>
                             <select id="calon-siswa-kelas" class="w-full py-3 px-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                                 <option value="">Semua kelas</option>
-                                @foreach($kelasList as $kelas)
+                                @foreach(($kelasList ?? []) as $kelas)
                                     <option value="{{ $kelas->id }}">{{ $kelas->nama }}</option>
                                 @endforeach
                             </select>
