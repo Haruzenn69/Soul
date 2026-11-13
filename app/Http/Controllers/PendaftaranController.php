@@ -17,6 +17,45 @@ class PendaftaranController extends Controller
 
     public function index(Request $request)
     {
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+
+        if ($isKesiswaan && ! $request->filled('ekskul')) {
+            $ekskuls = \App\Models\Ekskul::orderBy('nama_ekskul')->get();
+            $cards = $ekskuls->map(function (\App\Models\Ekskul $e) {
+                $base = Pendaftaran::where('ekskul_id', $e->id);
+                $total = (clone $base)->count();
+                $pendingCount = (clone $base)->where('status', 'pending')->count();
+                $diterimaCount = (clone $base)->where('status', 'diterima')->count();
+                $ditolakCount = (clone $base)->where('status', 'ditolak')->count();
+
+                $badge = null;
+                if ($pendingCount > 0) {
+                    $badge = ['text' => $pendingCount.' Menunggu', 'class' => 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300'];
+                }
+
+                $stats = [
+                    ['label' => 'Perlu Verifikasi', 'value' => $pendingCount.' Pendaftar', 'class' => $pendingCount > 0 ? 'font-extrabold text-amber-600 dark:text-amber-400' : 'font-semibold text-slate-500 dark:text-slate-400'],
+                    ['label' => 'Total Diterima', 'value' => $diterimaCount.' Siswa', 'class' => 'font-bold text-emerald-600 dark:text-emerald-400'],
+                    ['label' => 'Total Ditolak', 'value' => $ditolakCount.' Siswa', 'class' => 'font-semibold text-slate-500 dark:text-slate-400'],
+                ];
+
+                return (object) [
+                    'ekskul' => $e,
+                    'stats' => $stats,
+                    'badge' => $badge,
+                    'actionText' => 'Tinjau Pendaftaran',
+                    'actionUrl' => route('ketua.pendaftaran.index', ['ekskul' => $e->id]),
+                ];
+            });
+
+            return view('ketua.pendaftaran.index', [
+                'isCatalog' => true,
+                'cards' => $cards,
+                'isKesiswaan' => true,
+            ]);
+        }
+
         $ekskul = $this->ekskul();
         $base = Pendaftaran::where('ekskul_id', $ekskul->id);
 
@@ -40,7 +79,7 @@ class PendaftaranController extends Controller
 
         $kelasList = Kelas::whereHas('siswas')->orderBy('nama')->get(['id', 'nama']);
 
-        return view('ketua.pendaftaran.index', compact('pendaftarans', 'pendingCount', 'diterimaCount', 'ditolakCount', 'total', 'sort', 'direction', 'kelasList'));
+        return view('ketua.pendaftaran.index', compact('pendaftarans', 'pendingCount', 'diterimaCount', 'ditolakCount', 'total', 'sort', 'direction', 'ekskul', 'isKesiswaan', 'kelasList'));
     }
 
     public function show(Pendaftaran $pendaftaran)

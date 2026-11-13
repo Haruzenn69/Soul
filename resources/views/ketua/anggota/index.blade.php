@@ -1,8 +1,31 @@
 @extends('ketua.layout')
-@section('title', 'Kelola Anggota')
+@section('title', 'Kelola Anggota' . (isset($ekskul) ? ' - ' . $ekskul->nama_ekskul : ''))
 
 @section('content')
+@if(isset($isCatalog) && $isCatalog)
+    @include('partials.ketua-card-catalog', [
+        'title' => 'Kelola Anggota Ekskul',
+        'subtitle' => 'Pilih salah satu ekstrakurikuler di bawah ini untuk melihat daftar anggota, menambah anggota baru, atau memperbarui status keanggotaan.',
+        'featureBadge' => 'Operasional Ketua • Keanggotaan',
+        'icon' => 'fa-solid fa-users',
+        'cards' => $cards,
+    ])
+@else
 <div class="space-y-6">
+    @if(isset($isKesiswaan) && $isKesiswaan)
+        <div class="flex items-center justify-between gap-4">
+            <a href="{{ route('ketua.anggota.index') }}"
+               class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition shrink-0"
+               title="Kembali ke Pilihan Ekskul">
+                <i class="fa-solid fa-arrow-left text-xs"></i>
+                <span>Pilih Ekskul Lain</span>
+            </a>
+            <span class="px-2.5 py-1 rounded-xl text-xs font-extrabold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/50">
+                Ekskul: {{ $ekskul->nama_ekskul }}
+            </span>
+        </div>
+    @endif
+
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-5 md:p-7 text-white soul-timbul shadow-xl shadow-sky-200 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
@@ -10,7 +33,7 @@
         </div>
         <div class="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div class="min-w-0">
-                <h1 class="text-xl md:text-2xl font-extrabold text-white">Kelola Anggota</h1>
+                <h1 class="text-xl md:text-2xl font-extrabold text-white">Kelola Anggota: {{ $ekskul->nama_ekskul }}</h1>
                 <p class="text-xs text-white/80 mt-1">Total: {{ $totalAnggotas }} anggota</p>
             </div>
         </div>
@@ -20,32 +43,62 @@
         $statusOptions = ['diterima' => 'Aktif', 'peringatan' => 'Peringatan', 'nonaktif' => 'Nonaktif', 'keluar' => 'Keluar'];
         $hasFilter = request()->filled('cari') || request()->filled('status') || $tampilArsip;
     @endphp
-    <form method="GET" action="{{ route('ketua.anggota.index') }}" class="white-card-filter bg-white p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 flex flex-wrap items-center gap-3">
-        <div class="relative flex-1 min-w-[220px]">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            </span>
-            <input type="search" name="cari" value="{{ request('cari') }}" placeholder="Cari nama / NIS anggota..."
-                class="w-full pl-9 pr-4 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
-        </div>
+    <div x-data="{ openFilter: {{ (request()->filled('status') || $tampilArsip) ? 'true' : 'false' }} }"
+         class="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-sky-100 dark:border-neutral-800 shadow-sm">
+        <form method="GET" action="{{ route('ketua.anggota.index') }}" class="space-y-3">
+            <input type="hidden" name="ekskul" value="{{ $ekskul->id }}">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                <div class="relative flex-1">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                    </span>
+                    <input type="search" name="cari" value="{{ request('cari') }}" placeholder="Cari nama / NIS anggota..."
+                        class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-500 transition-all">
+                </div>
 
-        <select name="status" onchange="this.form.submit()" class="px-3 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
-            <option value="">Anggota Aktif</option>
-            @foreach ($statusOptions as $value => $label)
-                <option value="{{ $value }}" {{ request('status') === $value ? 'selected' : '' }}>{{ $label }}</option>
-            @endforeach
-            <option value="semua" {{ request('status') === 'semua' ? 'selected' : '' }}>Semua Status</option>
-        </select>
+                <button type="button" @click="openFilter = !openFilter"
+                    class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border text-xs font-bold transition shadow-xs"
+                    :class="openFilter || {{ (request()->filled('status') || $tampilArsip) ? 'true' : 'false' }} ? 'bg-sky-50 dark:bg-sky-950/50 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300' : 'bg-white dark:bg-neutral-800 border-slate-200 dark:border-neutral-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50'">
+                    <i class="fa-solid fa-sliders text-xs"></i>
+                    <span>Filter</span>
+                    @if(request()->filled('status') || $tampilArsip)
+                        <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+                    @endif
+                    <i class="fa-solid text-[10px] text-slate-400 transition-transform duration-200" :class="openFilter ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                </button>
 
-        <select name="arsip" onchange="this.form.submit()" class="px-3 py-2 bg-sky-50/70 border border-sky-100 rounded-xl text-xs text-slate-700 focus:outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition-all">
-            <option value="0" {{ ! $tampilArsip ? 'selected' : '' }}>Tanpa Arsip</option>
-            <option value="1" {{ $tampilArsip ? 'selected' : '' }}>Tampilkan Arsip ({{ $arsipTotal }})</option>
-        </select>
+                <button type="submit" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs font-bold rounded-xl transition shadow-xs">
+                    Cari
+                </button>
 
-        @if($hasFilter)
-            <a href="{{ route('ketua.anggota.index') }}" class="px-3 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 transition">Reset</a>
-        @endif
-    </form>
+                @if($hasFilter)
+                    <a href="{{ route('ketua.anggota.index') }}" class="px-3.5 py-2 text-xs font-semibold text-slate-500 hover:text-rose-600 transition text-center">Reset</a>
+                @endif
+            </div>
+
+            <div x-show="openFilter" x-cloak x-transition
+                 class="pt-3 border-t border-slate-100 dark:border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Status Keanggotaan</label>
+                    <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition-all appearance-none font-medium">
+                        <option value="">Anggota Aktif</option>
+                        @foreach ($statusOptions as $value => $label)
+                            <option value="{{ $value }}" {{ request('status') === $value ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                        <option value="semua" {{ request('status') === 'semua' ? 'selected' : '' }}>Semua Status</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Arsip Alumni / Nonaktif</label>
+                    <select name="arsip" onchange="this.form.submit()" class="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition-all appearance-none font-medium">
+                        <option value="0" {{ ! $tampilArsip ? 'selected' : '' }}>Tanpa Arsip</option>
+                        <option value="1" {{ $tampilArsip ? 'selected' : '' }}>Tampilkan Arsip ({{ $arsipTotal }})</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
 
     <div class="bg-white p-4 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 mb-4">
         <p class="text-xs font-bold text-slate-500 mb-3 flex items-center gap-2">
@@ -200,4 +253,5 @@
 
 
 </div>
+@endif
 @endsection

@@ -79,14 +79,14 @@
                 <button type="button" @click="openFilter = !openFilter"
                         class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold border transition shadow-sm"
                         :class="openFilter || {{ $activeFilterCount }} > 0 ? 'bg-sky-50 text-sky-700 border-sky-300 ring-2 ring-sky-100' : 'bg-slate-50 text-slate-700 border-slate-200/80 hover:bg-slate-100'">
-                    
+                    <i class="fa-solid fa-sliders text-xs"></i>
                     <span>Filter</span>
                     @if($activeFilterCount > 0)
                         <span class="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-extrabold rounded-full bg-sky-500 text-white">
                             {{ $activeFilterCount }}
                         </span>
                     @endif
-                    
+                    <i class="fa-solid text-[10px] text-slate-400 transition-transform duration-200" :class="openFilter ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                 </button>
 
                 {{-- Tombol Submit Cari --}}

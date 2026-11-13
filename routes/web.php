@@ -215,9 +215,9 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->grou
 });
 
 // ============================================================
-// ROUTE PEMBINA
+// ROUTE PEMBINA (dan Kesiswaan / Admin)
 // ============================================================
-Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')->group(function () {
+Route::middleware(['auth', 'role:pembina,kesiswaan,admin'])->prefix('pembina')->name('pembina.')->group(function () {
     Route::get('/dashboard', [PembinaController::class, 'dashboard'])->name('dashboard');
     Route::patch('/ekskuls/{ekskul}/pelatih', [PembinaController::class, 'updatePelatih'])->name('ekskul.pelatih');
     Route::get('/pelatih', [PembinaPelatihController::class, 'index'])->name('pelatih.index');
@@ -271,9 +271,9 @@ Route::middleware(['auth', 'role:pembina'])->prefix('pembina')->name('pembina.')
 });
 
 // ============================================================
-// ROUTE KETUA (hanya siswa dengan jabatan 'ketua')
+// ROUTE KETUA (Siswa dengan jabatan 'ketua', serta Kesiswaan / Admin)
 // ============================================================
-Route::middleware(['auth', 'role:siswa', 'ketua_ekskul'])->prefix('ketua')->name('ketua.')->group(function () {
+Route::middleware(['auth', 'role:siswa,kesiswaan,admin', 'ketua_ekskul'])->prefix('ketua')->name('ketua.')->group(function () {
     Route::get('/dashboard', [KetuaDashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/nilai', [SiswaNilaiController::class, 'index'])->name('nilai');

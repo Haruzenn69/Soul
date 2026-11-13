@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Pembina;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ekskul;
+use App\Models\Kelas;
 use App\Models\Pendaftaran;
 use App\Models\Penilaian;
 use App\Services\NotifikasiService;
@@ -16,7 +17,13 @@ class PenilaianController extends Controller
 {
     private function getEkskuls(): Collection
     {
-        $pembina = auth()->user()?->pembina;
+        $user = auth()->user();
+
+        if ($user && in_array($user->role, ['kesiswaan', 'admin'], true)) {
+            return Ekskul::orderBy('nama_ekskul')->get();
+        }
+
+        $pembina = $user?->pembina;
 
         return $pembina ? $pembina->ekskuls()->get() : collect();
     }
@@ -26,7 +33,16 @@ class PenilaianController extends Controller
         $ekskuls = $this->getEkskuls();
         $id = $request->integer('ekskul');
 
-        return $id && $ekskuls->pluck('id')->contains($id) ? $ekskuls->firstWhere('id', $id) : $ekskuls->first();
+        if ($id && $ekskuls->pluck('id')->contains($id)) {
+            return $ekskuls->firstWhere('id', $id);
+        }
+
+        // Jika hanya membina 1 ekskul, otomatis pilih ekskul tersebut
+        if ($ekskuls->count() === 1) {
+            return $ekskuls->first();
+        }
+
+        return null;
     }
 
     public function index(Request $request)
@@ -36,9 +52,68 @@ class PenilaianController extends Controller
 
         $periode = Penilaian::periodeSekarang();
 
-        $rows = $ekskul
-            ? app(PenilaianExportService::class)->rows($ekskul, null, $periode['label'])
-            : collect();
+        // JIKA BELUM MEMILIH EKSKUL: TAMPILKAN PILIHAN EKSKUL TERLEBIH DAHULU
+        if (! $ekskul) {
+            $ekskulCards = $ekskuls->map(function (Ekskul $e) use ($periode) {
+                $anggotaIds = $e->pendaftarans()
+                    ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
+                    ->pluck('id');
+                $totalAnggota = $anggotaIds->count();
+                $sudahDinilai = Penilaian::where('periode', $periode['label'])
+                    ->whereIn('pendaftaran_id', $anggotaIds)
+                    ->count();
+                $terkirim = Penilaian::where('periode', $periode['label'])
+                    ->whereIn('pendaftaran_id', $anggotaIds)
+                    ->where('status', Penilaian::STATUS_TERKIRIM)
+                    ->exists();
+
+                return (object) [
+                    'ekskul' => $e,
+                    'totalAnggota' => $totalAnggota,
+                    'sudahDinilai' => $sudahDinilai,
+                    'terkirim' => $terkirim,
+                ];
+            });
+
+            return view('pembina.penilaian', compact('ekskuls', 'ekskul', 'ekskulCards', 'periode'));
+        }
+
+        $allRows = app(PenilaianExportService::class)->rows($ekskul, null, $periode['label']);
+
+        // Ambil daftar kelas dari anggota ekskul agar opsi filter relevan
+        $kelasOptions = $allRows->map(fn ($r) => $r->siswa?->kelas)
+            ->filter()
+            ->unique('id')
+            ->sortBy('nama')
+            ->values();
+
+        // Jika ekskul belum ada anggota, tampilkan daftar kelas aktif sekolah
+        if ($kelasOptions->isEmpty()) {
+            $kelasOptions = Kelas::query()
+                ->whereHas('tahunAjaran', fn ($query) => $query->where('status', 'aktif'))
+                ->whereHas('siswas', fn ($query) => $query->where('status', 'aktif'))
+                ->orderBy('nama')
+                ->get();
+        }
+
+        $selectedKelasId = $request->input('kelas_id') ?: $request->input('kelas');
+        $statusPenilaian = $request->input('status_penilaian');
+
+        $rows = $allRows;
+        if ($selectedKelasId) {
+            $rows = $rows->filter(function ($row) use ($selectedKelasId) {
+                if (is_numeric($selectedKelasId)) {
+                    return (int) ($row->siswa?->kelas_id ?? 0) === (int) $selectedKelasId;
+                }
+                return ($row->kelas ?? '') === $selectedKelasId;
+            })->values();
+        }
+
+        if ($statusPenilaian === 'sudah') {
+            $rows = $rows->filter(fn ($row) => $row->penilaian !== null)->values();
+        } elseif ($statusPenilaian === 'belum') {
+            $rows = $rows->filter(fn ($row) => $row->penilaian === null)->values();
+        }
 
         $sudahDikirim = (bool) $ekskul
             && Penilaian::where('periode', $periode['label'])
@@ -46,7 +121,7 @@ class PenilaianController extends Controller
                 ->where('status', Penilaian::STATUS_TERKIRIM)
                 ->exists();
 
-        return view('pembina.penilaian', compact('ekskuls', 'ekskul', 'rows', 'periode', 'sudahDikirim'));
+        return view('pembina.penilaian', compact('ekskuls', 'ekskul', 'rows', 'allRows', 'kelasOptions', 'selectedKelasId', 'statusPenilaian', 'periode', 'sudahDikirim'));
     }
 
     public function store(Request $request)
@@ -113,14 +188,39 @@ class PenilaianController extends Controller
 
         $rows = $this->exportRows($ekskul);
 
+        $selectedKelasId = $request->input('kelas_id') ?: $request->input('kelas');
+        $statusPenilaian = $request->input('status_penilaian');
+        $namaKelasFilter = null;
+
+        if ($selectedKelasId) {
+            $rows = $rows->filter(function ($row) use ($selectedKelasId) {
+                if (is_numeric($selectedKelasId)) {
+                    return (int) ($row->siswa?->kelas_id ?? 0) === (int) $selectedKelasId;
+                }
+                return ($row->kelas ?? '') === $selectedKelasId;
+            })->values();
+
+            $kelasModel = is_numeric($selectedKelasId) ? Kelas::find($selectedKelasId) : null;
+            $namaKelasFilter = $kelasModel?->nama ?? $selectedKelasId;
+        }
+
+        if ($statusPenilaian === 'sudah') {
+            $rows = $rows->filter(fn ($row) => $row->penilaian !== null)->values();
+        } elseif ($statusPenilaian === 'belum') {
+            $rows = $rows->filter(fn ($row) => $row->penilaian === null)->values();
+        }
+
         $pdf = Pdf::loadView('penilaian.pdf', [
             'ekskul' => $ekskul,
             'periode' => Penilaian::periodeSekarang()['label'],
             'rows' => $rows,
             'pembina' => auth()->user()?->pembina,
+            'namaKelasFilter' => $namaKelasFilter,
         ])->setPaper('a4', 'landscape');
 
-        return $pdf->download('laporan-penilaian-'.str_replace(' ', '-', $ekskul->nama_ekskul).'.pdf');
+        $kelasSuffix = $namaKelasFilter ? '-kelas-'.str_replace(' ', '-', $namaKelasFilter) : '';
+
+        return $pdf->download('laporan-penilaian-'.str_replace(' ', '-', $ekskul->nama_ekskul).$kelasSuffix.'.pdf');
     }
 
     /**

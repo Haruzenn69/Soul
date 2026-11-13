@@ -4,36 +4,141 @@
 @section('content')
     <div class="bg-[#F8FAFC] -mx-4 md:-mx-8 px-4 md:px-8 py-6 md:py-8 min-h-[calc(100vh-5rem)] space-y-6 animate-fade-up">
         @if (! $ekskul)
-            <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-10 md:p-16 text-center">
-                <div class="w-14 h-14 mx-auto rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 mb-4">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2v2H9V5zm1 8l2 2 4-4"/>
-                    </svg>
+            {{-- STEP 1: PILIH EKSKUL TERLEBIH DAHULU --}}
+            <div class="space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Input Penilaian Ekskul</h1>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            Pilih ekstrakurikuler terlebih dahulu untuk mulai mengisi atau meninjau penilaian anggota periode <span class="font-bold text-sky-600 dark:text-sky-400">{{ $periode['label'] }}</span>.
+                        </p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 dark:bg-neutral-800 border border-sky-200/60 dark:border-neutral-700 text-sky-700 dark:text-sky-300 text-xs font-semibold self-start sm:self-auto">
+                        <i class="fa-solid fa-shapes text-xs"></i>
+                        <span>{{ $ekskuls->count() }} Ekskul Tersedia</span>
+                    </span>
                 </div>
-                <h2 class="text-sm font-bold text-slate-900">Belum Ada Ekskul</h2>
-                <p class="text-xs text-slate-400 mt-1">Akun pembina ini belum memiliki ekskul untuk dinilai.</p>
+
+                @if($ekskuls->isEmpty())
+                    <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-slate-200/80 dark:border-neutral-800 shadow-sm p-12 text-center">
+                        <div class="w-14 h-14 mx-auto rounded-2xl bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 flex items-center justify-center text-slate-400 mb-4">
+                            <i class="fa-solid fa-folder-open text-xl"></i>
+                        </div>
+                        <h2 class="text-sm font-bold text-slate-900 dark:text-white">Belum Ada Ekskul</h2>
+                        <p class="text-xs text-slate-400 mt-1">Anda belum memiliki ekstrakurikuler binaan untuk dinilai.</p>
+                    </div>
+                @else
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        @foreach($ekskulCards as $card)
+                            <div class="bg-white dark:bg-[#1a1a1a] rounded-2xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-sm flex flex-col justify-between transition-all hover:border-sky-300 dark:hover:border-sky-700 hover:shadow-md group">
+                                <div>
+                                    <div class="flex items-start justify-between gap-2 mb-3">
+                                        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-lg bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/50">
+                                            {{ $card->ekskul->kategori ?? 'Ekskul' }}
+                                        </span>
+                                        @if($card->terkirim)
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/50">
+                                                <i class="fa-solid fa-circle-check text-[9px]"></i> Terkirim
+                                            </span>
+                                        @elseif($card->sudahDinilai > 0)
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-md border border-amber-200/60 dark:border-amber-800/50">
+                                                <i class="fa-solid fa-clock text-[9px]"></i> Draf
+                                            </span>
+                                        @else
+                                            <span class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                                                Belum Dinilai
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                                        {{ $card->ekskul->nama_ekskul }}
+                                    </h3>
+
+                                    <div class="mt-4 pt-3 border-t border-slate-100 dark:border-neutral-800 grid grid-cols-2 gap-2 text-xs">
+                                        <div>
+                                            <span class="text-[10px] text-slate-400 block font-medium">Anggota Aktif</span>
+                                            <span class="font-extrabold text-slate-800 dark:text-slate-200">{{ $card->totalAnggota }} Siswa</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-[10px] text-slate-400 block font-medium">Sudah Dinilai</span>
+                                            <span class="font-extrabold text-sky-600 dark:text-sky-400">{{ $card->sudahDinilai }} / {{ $card->totalAnggota }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-5 pt-3 border-t border-slate-100 dark:border-neutral-800">
+                                    <a href="{{ route('pembina.penilaian', ['ekskul' => $card->ekskul->id]) }}"
+                                       class="w-full inline-flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 text-xs font-bold transition shadow-sm">
+                                        <span>Input Penilaian</span>
+                                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         @else
+            {{-- STEP 2: FORM PENILAIAN EKSKUL TERPILIH --}}
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                <div>
-                    <h1 class="text-lg md:text-2xl font-extrabold text-slate-900">Penilaian Ekskul</h1>
-                    <p class="text-xs text-slate-400 mt-0.5">Nilai akhir untuk anggota ekskul pada periode berjalan</p>
+                <div class="flex items-center gap-3">
+                    @if($ekskuls->count() > 1)
+                        <a href="{{ route('pembina.penilaian') }}"
+                           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-50 dark:hover:bg-neutral-700 transition shadow-xs"
+                           title="Kembali memilih ekskul lain">
+                            <i class="fa-solid fa-arrow-left text-xs"></i>
+                            <span class="hidden sm:inline">Pilih Ekskul Lain</span>
+                        </a>
+                    @endif
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-lg md:text-2xl font-extrabold text-slate-900 dark:text-white">Penilaian: {{ $ekskul->nama_ekskul }}</h1>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-0.5">Nilai akhir untuk anggota ekskul pada periode berjalan</p>
+                    </div>
                 </div>
-                <form method="GET" action="{{ route('pembina.penilaian') }}" class="w-full lg:w-auto">
-                    <label for="ekskul" class="sr-only">Pilih ekskul</label>
+                <form method="GET" action="{{ route('pembina.penilaian') }}" class="w-full lg:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <input type="hidden" name="ekskul" value="{{ $ekskul->id }}">
+
+                    {{-- FILTER KELAS SISWA --}}
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/>
                             </svg>
                         </span>
-                        <select name="ekskul" id="ekskul" onchange="this.form.submit()"
-                                class="w-full lg:w-64 pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all shadow-sm appearance-none">
-                            @foreach ($ekskuls as $e)
-                                <option value="{{ $e->id }}" @selected(($ekskul->id ?? null) === $e->id)>{{ $e->nama_ekskul }}</option>
+                        <select name="kelas_id" id="kelas_id" onchange="this.form.submit()"
+                                class="w-full sm:w-44 pl-9 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all shadow-sm appearance-none">
+                            <option value="">Semua Kelas</option>
+                            @foreach ($kelasOptions as $k)
+                                <option value="{{ $k->id }}" @selected((string)$selectedKelasId === (string)$k->id)>
+                                    Kelas {{ $k->nama }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
+
+                    {{-- FILTER STATUS PENILAIAN --}}
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                            <i class="fa-solid fa-clipboard-check text-xs"></i>
+                        </span>
+                        <select name="status_penilaian" id="status_penilaian" onchange="this.form.submit()"
+                                class="w-full sm:w-44 pl-9 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all shadow-sm appearance-none">
+                            <option value="">Semua Status Nilai</option>
+                            <option value="sudah" @selected(($statusPenilaian ?? '') === 'sudah')>Sudah Dinilai</option>
+                            <option value="belum" @selected(($statusPenilaian ?? '') === 'belum')>Belum Dinilai</option>
+                        </select>
+                    </div>
+
+                    @if ($selectedKelasId || !empty($statusPenilaian))
+                        <a href="{{ route('pembina.penilaian', ['ekskul' => $ekskul->id]) }}"
+                           class="inline-flex items-center justify-center px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition shadow-sm"
+                           title="Reset filter">
+                            Reset Filter
+                        </a>
+                    @endif
                 </form>
             </div>
 
@@ -70,12 +175,12 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <a href="{{ route('pembina.penilaian.download-pdf', ['ekskul' => $ekskul->id]) }}"
+                    <a href="{{ route('pembina.penilaian.download-pdf', ['ekskul' => $ekskul->id, 'kelas_id' => $selectedKelasId, 'status_penilaian' => $statusPenilaian ?? null]) }}"
                        class="inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-blue-50 text-slate-700 text-xs font-semibold rounded-lg border border-slate-200 shadow-sm transition">
                         <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        Download PDF
+                        Download PDF {{ $selectedKelasId ? '(Kelas Terpilih)' : '' }}
                     </a>
                 </div>
             </div>
@@ -83,7 +188,9 @@
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                 <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-3.5 md:p-4">
                     <p class="text-lg md:text-2xl font-extrabold text-slate-900">{{ $rows->count() }}</p>
-                    <p class="text-[10px] md:text-[11px] font-bold text-slate-400 mt-0.5">Total Anggota</p>
+                    <p class="text-[10px] md:text-[11px] font-bold text-slate-400 mt-0.5">
+                        {{ $selectedKelasId ? 'Anggota Kelas Ini' : 'Total Anggota' }}
+                    </p>
                 </div>
                 <div class="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-3.5 md:p-4">
                     <p class="text-lg md:text-2xl font-extrabold text-amber-600">30%</p>
@@ -102,9 +209,30 @@
             <form method="POST" action="{{ route('pembina.penilaian.store') }}" id="form-penilaian" class="bg-white rounded-2xl border border-slate-200/70 shadow-sm overflow-hidden">
                 @csrf
                 <input type="hidden" name="ekskul" value="{{ $ekskul->id }}">
+                @if ($selectedKelasId)
+                    <input type="hidden" name="kelas_id" value="{{ $selectedKelasId }}">
+                @endif
+                @if (!empty($statusPenilaian))
+                    <input type="hidden" name="status_penilaian" value="{{ $statusPenilaian }}">
+                @endif
 
                 <div class="p-4 md:p-5 border-b border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <h3 class="text-sm font-bold text-slate-900">Daftar Anggota</h3>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h3 class="text-sm font-bold text-slate-900">Daftar Anggota</h3>
+                        @if ($selectedKelasId)
+                            @php $currentKelasModel = $kelasOptions->firstWhere('id', $selectedKelasId); @endphp
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                                Filter: Kelas {{ $currentKelasModel?->nama ?? $selectedKelasId }}
+                            </span>
+                        @endif
+                        @if (!empty($statusPenilaian))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-bold {{ $statusPenilaian === 'sudah' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
+                                <i class="fa-solid fa-clipboard-check text-[10px]"></i>
+                                Status: {{ $statusPenilaian === 'sudah' ? 'Sudah Dinilai' : 'Belum Dinilai' }}
+                            </span>
+                        @endif
+                    </div>
                     <p class="text-[11px] text-slate-400">Kehadiran diisi otomatis dari presensi kegiatan ekskul.</p>
                 </div>
 
@@ -215,7 +343,13 @@
                             @empty
                                 <tr>
                                     <td colspan="11" class="px-4 py-12 text-center">
-                                        <p class="text-sm font-semibold text-slate-500">Belum ada anggota aktif</p>
+                                        <p class="text-sm font-semibold text-slate-500">
+                                            @if ($selectedKelasId)
+                                                Tidak ada anggota aktif di ekskul ini dari kelas yang dipilih.
+                                            @else
+                                                Belum ada anggota aktif
+                                            @endif
+                                        </p>
                                     </td>
                                 </tr>
                             @endforelse

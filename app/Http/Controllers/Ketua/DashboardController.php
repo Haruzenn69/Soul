@@ -12,8 +12,17 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $siswa = $user->siswa;
-        $ekskul = $siswa?->ekskulDipimpin() ?? $siswa?->activeEkskul();
+
+        if ($user && in_array($user->role, ['kesiswaan', 'admin'], true)) {
+            $ekskulId = request('ekskul') ?? request('ekskul_id') ?? session('kesiswaan_active_ekskul_id');
+            $ekskul = $ekskulId ? \App\Models\Ekskul::find($ekskulId) : \App\Models\Ekskul::orderBy('nama_ekskul')->first();
+            if ($ekskul) {
+                session(['kesiswaan_active_ekskul_id' => $ekskul->id]);
+            }
+        } else {
+            $siswa = $user->siswa;
+            $ekskul = $siswa?->ekskulDipimpin() ?? $siswa?->activeEkskul();
+        }
 
         if (! $ekskul) {
             return view('ketua.dashboard', [

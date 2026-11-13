@@ -128,7 +128,7 @@
             <div class="relative flex items-center gap-2">
                 <button type="button" @click="openFilter = !openFilter"
                         class="px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-2 border {{ $activeFilterCount > 0 ? 'bg-sky-50 border-sky-300 text-sky-700 shadow-sm shadow-sky-100' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100' }}">
-                    
+                    <i class="fa-solid fa-sliders text-xs"></i>
                     <span>Filter Data</span>
                     @if($activeFilterCount > 0)
                         <span class="w-5 h-5 rounded-full bg-sky-500 text-white text-[10px] font-black flex items-center justify-center">

@@ -1,10 +1,33 @@
 @extends('ketua.layout')
-@section('title', 'Profil Ekskul')
+@section('title', 'Profil Ekskul' . (isset($ekskul) ? ' - ' . $ekskul->nama_ekskul : ''))
 
 @section('content')
+@if(isset($isCatalog) && $isCatalog)
+    @include('partials.ketua-card-catalog', [
+        'title' => 'Profil & Galeri Ekskul',
+        'subtitle' => 'Pilih salah satu ekstrakurikuler di bawah ini untuk mengubah deskripsi, jadwal latihan, logo, dan foto galeri publik.',
+        'featureBadge' => 'Operasional Ketua • Profil & Galeri',
+        'icon' => 'fa-solid fa-shapes',
+        'cards' => $cards,
+    ])
+@else
 <div class="space-y-6">
+    @if(isset($isKesiswaan) && $isKesiswaan)
+        <div class="flex items-center justify-between gap-4">
+            <a href="{{ route('ketua.profil-ekskul.edit') }}"
+               class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition shrink-0"
+               title="Kembali ke Pilihan Ekskul">
+                <i class="fa-solid fa-arrow-left text-xs"></i>
+                <span>Pilih Ekskul Lain</span>
+            </a>
+            <span class="px-2.5 py-1 rounded-xl text-xs font-extrabold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/50">
+                Ekskul: {{ $ekskul->nama_ekskul }}
+            </span>
+        </div>
+    @endif
+
     <div>
-        <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Profil Ekskul</h1>
+        <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Profil Ekskul: {{ $ekskul->nama_ekskul }}</h1>
         <p class="text-xs text-slate-400 mt-1">Atur informasi yang tampil di katalog ekskul.</p>
     </div>
 
@@ -122,4 +145,5 @@
         </form>
     </div>
 </div>
+@endif
 @endsection

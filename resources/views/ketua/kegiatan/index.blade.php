@@ -1,16 +1,39 @@
 @extends('ketua.layout')
-@section('title', 'Daftar Kegiatan')
+@section('title', 'Daftar Kegiatan' . (isset($ekskul) ? ' - ' . $ekskul->nama_ekskul : ''))
 
 @section('content')
+@if(isset($isCatalog) && $isCatalog)
+    @include('partials.ketua-card-catalog', [
+        'title' => 'Jadwal & Presensi Kegiatan',
+        'subtitle' => 'Pilih salah satu ekstrakurikuler di bawah ini untuk melihat jadwal, mengelola kegiatan, dan input presensi.',
+        'featureBadge' => 'Operasional Ketua • Kegiatan',
+        'icon' => 'fa-solid fa-calendar-check',
+        'cards' => $cards,
+    ])
+@else
 <div class="space-y-6">
+    @if(isset($isKesiswaan) && $isKesiswaan)
+        <div class="flex items-center justify-between gap-4">
+            <a href="{{ route('ketua.kegiatan.index') }}"
+               class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition shrink-0"
+               title="Kembali ke Pilihan Ekskul">
+                <i class="fa-solid fa-arrow-left text-xs"></i>
+                <span>Pilih Ekskul Lain</span>
+            </a>
+            <span class="px-2.5 py-1 rounded-xl text-xs font-extrabold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/50">
+                Ekskul: {{ $ekskul->nama_ekskul }}
+            </span>
+        </div>
+    @endif
+
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
         <div>
-            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white">Daftar Kegiatan</h1>
+            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white">Daftar Kegiatan: {{ $ekskul->nama_ekskul }}</h1>
             <p class="text-xs text-slate-400 dark:text-neutral-400 mt-1">Total: {{ $total }} kegiatan</p>
         </div>
         <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <a href="{{ route('ketua.kegiatan.create') }}" class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 dark:shadow-none transition inline-flex items-center justify-center gap-2 shrink-0">
+            <a href="{{ route('ketua.kegiatan.create', ['ekskul' => $ekskul->id]) }}" class="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-sky-200 dark:shadow-none transition inline-flex items-center justify-center gap-2 shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Kegiatan baru
             </a>
@@ -99,4 +122,5 @@
         @include('partials.table-pagination', ['rows' => $kegiatans, 'label' => 'kegiatan'])
     </div>
 </div>
+@endif
 @endsection

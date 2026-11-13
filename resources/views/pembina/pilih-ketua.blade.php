@@ -53,17 +53,20 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
         @forelse($siswas as $siswa)
-            <article class="flex min-w-0 items-center gap-3 rounded-2xl border border-sky-100 bg-white p-4 shadow-sm">
-                <img src="{{ $siswa->foto_url }}" alt="{{ $siswa->nama }}" class="h-12 w-12 shrink-0 rounded-xl border border-slate-100 object-cover">
+            <article class="flex min-w-0 items-center gap-3 rounded-2xl border {{ $siswa->is_current_ketua ? 'border-sky-300 bg-sky-50/60 dark:border-sky-700 dark:bg-sky-950/20' : 'border-sky-100 bg-white dark:border-neutral-800 dark:bg-neutral-900' }} p-4 shadow-sm">
+                <img src="{{ $siswa->foto_url }}" alt="{{ $siswa->nama }}" class="h-12 w-12 shrink-0 rounded-xl border border-slate-100 dark:border-neutral-700 object-cover">
                 <div class="min-w-0 flex-1">
-                    <h2 class="truncate text-sm font-bold text-slate-800">{{ $siswa->nama }}</h2>
-                    <p class="mt-0.5 text-[11px] text-slate-500">NIS {{ $siswa->nis }} · {{ $siswa->kelas?->nama ?? 'Kelas belum tersedia' }}</p>
+                    <h2 class="truncate text-sm font-bold text-slate-800 dark:text-slate-100">{{ $siswa->nama }}</h2>
+                    <p class="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">NIS {{ $siswa->nis }} · {{ $siswa->kelas?->nama ?? 'Kelas belum tersedia' }}</p>
                     @if($siswa->ekskul_dipimpin_lain)
-                        <p class="mt-1 text-[10px] text-slate-500">Ketua {{ $siswa->ekskul_dipimpin_lain->nama_ekskul }}</p>
+                        <p class="mt-1 text-[10px] text-slate-500 dark:text-slate-400">Ketua {{ $siswa->ekskul_dipimpin_lain->nama_ekskul }}</p>
+                    @endif
+                    @if(!$siswa->punya_akun)
+                        <p class="mt-1 text-[10px] text-amber-600 dark:text-amber-400 font-medium">⚠ Belum punya akun aktif</p>
                     @endif
                 </div>
                 @if($siswa->is_current_ketua)
-                    <span class="shrink-0 text-[11px] font-semibold text-slate-500">Ketua aktif</span>
+                    <span class="shrink-0 text-[11px] font-semibold text-sky-600 dark:text-sky-400">Ketua aktif</span>
                 @elseif($siswa->ekskul_dipimpin_lain)
                     <span class="shrink-0 text-[11px] text-slate-400">Tidak tersedia</span>
                 @else

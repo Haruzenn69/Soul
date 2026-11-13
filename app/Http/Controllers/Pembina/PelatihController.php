@@ -14,18 +14,30 @@ class PelatihController extends Controller
 {
     private function getPembina()
     {
-        $pembina = auth()->user()?->pembina;
+        $user = auth()->user();
+        if ($user && in_array($user->role, ['kesiswaan', 'admin'], true)) {
+            return null;
+        }
+
+        $pembina = $user?->pembina;
         abort_unless($pembina, 403, 'Akses khusus pembina.');
         return $pembina;
     }
 
     private function getEkskuls()
     {
+        $user = auth()->user();
+        if ($user && in_array($user->role, ['kesiswaan', 'admin'], true)) {
+            return Ekskul::orderBy('nama_ekskul')->get();
+        }
+
         return $this->getPembina()->ekskuls;
     }
 
     public function index(Request $request)
     {
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
         $pembina = $this->getPembina();
         $ekskuls = $this->getEkskuls();
         $ekskulIds = $ekskuls->pluck('id');
@@ -33,9 +45,11 @@ class PelatihController extends Controller
         [$sort, $direction] = TableKit::sort(['nama', 'created_at', 'status_verifikasi'], 'created_at', 'desc');
 
         $query = Pelatih::query()
-            ->where(function ($q) use ($pembina, $ekskulIds) {
-                $q->where('pembina_id', $pembina->id)
-                  ->orWhereIn('ekskul_id', $ekskulIds);
+            ->when(! $isKesiswaan, function ($q) use ($pembina, $ekskulIds) {
+                $q->where(function ($sub) use ($pembina, $ekskulIds) {
+                    $sub->where('pembina_id', $pembina?->id)
+                        ->orWhereIn('ekskul_id', $ekskulIds);
+                });
             })
             ->with(['ekskul', 'verifiedBy']);
 
@@ -58,19 +72,18 @@ class PelatihController extends Controller
 
         $pelatihs = $query->orderBy($sort, $direction)->paginate(10)->withQueryString();
 
+        $statsQuery = Pelatih::query()
+            ->when(! $isKesiswaan, function ($q) use ($pembina, $ekskulIds) {
+                $q->where(function ($sub) use ($pembina, $ekskulIds) {
+                    $sub->where('pembina_id', $pembina?->id)->orWhereIn('ekskul_id', $ekskulIds);
+                });
+            });
+
         $stats = [
-            'total' => Pelatih::where(function ($q) use ($pembina, $ekskulIds) {
-                $q->where('pembina_id', $pembina->id)->orWhereIn('ekskul_id', $ekskulIds);
-            })->count(),
-            'pending' => Pelatih::where(function ($q) use ($pembina, $ekskulIds) {
-                $q->where('pembina_id', $pembina->id)->orWhereIn('ekskul_id', $ekskulIds);
-            })->where('status_verifikasi', Pelatih::VERIFIKASI_PENDING)->count(),
-            'terverifikasi' => Pelatih::where(function ($q) use ($pembina, $ekskulIds) {
-                $q->where('pembina_id', $pembina->id)->orWhereIn('ekskul_id', $ekskulIds);
-            })->where('status_verifikasi', Pelatih::VERIFIKASI_TERVERIFIKASI)->count(),
-            'ditolak' => Pelatih::where(function ($q) use ($pembina, $ekskulIds) {
-                $q->where('pembina_id', $pembina->id)->orWhereIn('ekskul_id', $ekskulIds);
-            })->where('status_verifikasi', Pelatih::VERIFIKASI_DITOLAK)->count(),
+            'total' => (clone $statsQuery)->count(),
+            'pending' => (clone $statsQuery)->where('status_verifikasi', Pelatih::VERIFIKASI_PENDING)->count(),
+            'terverifikasi' => (clone $statsQuery)->where('status_verifikasi', Pelatih::VERIFIKASI_TERVERIFIKASI)->count(),
+            'ditolak' => (clone $statsQuery)->where('status_verifikasi', Pelatih::VERIFIKASI_DITOLAK)->count(),
         ];
 
         return view('pembina.pelatih.index', compact('pelatihs', 'ekskuls', 'stats', 'sort', 'direction'));
@@ -86,8 +99,10 @@ class PelatihController extends Controller
 
     public function store(Request $request)
     {
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
         $pembina = $this->getPembina();
-        $ekskulIds = $pembina->ekskuls->pluck('id')->toArray();
+        $ekskulIds = $this->getEkskuls()->pluck('id')->toArray();
 
         $validated = $request->validate([
             'ekskul_id' => ['required', 'in:'.implode(',', $ekskulIds)],
@@ -117,8 +132,10 @@ class PelatihController extends Controller
         $cvPath = $request->file('cv')->store('pelatih/cv', 'public');
         $sertifikatPath = $request->file('sertifikat')->store('pelatih/sertifikat', 'public');
 
+        $pembinaId = $pembina?->id ?? Ekskul::find($validated['ekskul_id'])?->pembina_id;
+
         $pelatih = Pelatih::create([
-            'pembina_id' => $pembina->id,
+            'pembina_id' => $pembinaId,
             'ekskul_id' => $validated['ekskul_id'],
             'nama' => $validated['nama'],
             'jenis_kelamin' => $validated['jenis_kelamin'],
@@ -130,12 +147,14 @@ class PelatihController extends Controller
             'cv' => $cvPath,
             'sertifikat' => $sertifikatPath,
             'status' => 'aktif',
-            'status_verifikasi' => Pelatih::VERIFIKASI_PENDING,
+            'status_verifikasi' => $isKesiswaan ? Pelatih::VERIFIKASI_TERVERIFIKASI : Pelatih::VERIFIKASI_PENDING,
         ]);
 
-        // Kirim notifikasi pendaftaran pelatih
-        NotifikasiService::pelatihDiajukan($pelatih);
+        // Kirim notifikasi pendaftaran pelatih jika diajukan pembina
+        if (! $isKesiswaan) {
+            NotifikasiService::pelatihDiajukan($pelatih);
+        }
 
-        return redirect()->route('pembina.pelatih.index')->with('success', "Pendaftaran pelatih {$pelatih->nama} berhasil diajukan dan sedang menunggu verifikasi kesiswaan.");
+        return redirect()->route('pembina.pelatih.index')->with('success', $isKesiswaan ? "Pelatih {$pelatih->nama} berhasil didaftarkan langsung ke ekskul." : "Pendaftaran pelatih {$pelatih->nama} berhasil diajukan dan sedang menunggu verifikasi kesiswaan.");
     }
 }

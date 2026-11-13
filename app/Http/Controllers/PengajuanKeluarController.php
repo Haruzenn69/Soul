@@ -19,6 +19,45 @@ class PengajuanKeluarController extends Controller
 
     public function index(Request $request)
     {
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+
+        if ($isKesiswaan && ! $request->filled('ekskul')) {
+            $ekskuls = \App\Models\Ekskul::orderBy('nama_ekskul')->get();
+            $cards = $ekskuls->map(function (\App\Models\Ekskul $e) {
+                $base = PengajuanKeluar::where('ekskul_id', $e->id);
+                $total = (clone $base)->count();
+                $menungguCount = (clone $base)->where('status', 'menunggu')->count();
+                $disetujuiCount = (clone $base)->where('status', 'disetujui')->count();
+                $ditolakCount = (clone $base)->where('status', 'ditolak')->count();
+
+                $badge = null;
+                if ($menungguCount > 0) {
+                    $badge = ['text' => $menungguCount.' Menunggu', 'class' => 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300'];
+                }
+
+                $stats = [
+                    ['label' => 'Perlu Persetujuan', 'value' => $menungguCount.' Pengajuan', 'class' => $menungguCount > 0 ? 'font-extrabold text-amber-600 dark:text-amber-400' : 'font-semibold text-slate-500 dark:text-slate-400'],
+                    ['label' => 'Disetujui', 'value' => $disetujuiCount.' Siswa', 'class' => 'font-bold text-emerald-600 dark:text-emerald-400'],
+                    ['label' => 'Ditolak', 'value' => $ditolakCount.' Siswa', 'class' => 'font-semibold text-slate-500 dark:text-slate-400'],
+                ];
+
+                return (object) [
+                    'ekskul' => $e,
+                    'stats' => $stats,
+                    'badge' => $badge,
+                    'actionText' => 'Lihat Pengajuan',
+                    'actionUrl' => route('ketua.pengajuan-keluar.index', ['ekskul' => $e->id]),
+                ];
+            });
+
+            return view('ketua.pengajuan-keluar.index', [
+                'isCatalog' => true,
+                'cards' => $cards,
+                'isKesiswaan' => true,
+            ]);
+        }
+
         $ekskul = $this->ekskul();
         $base = PengajuanKeluar::where('ekskul_id', $ekskul->id);
         $total = (clone $base)->count();
@@ -39,7 +78,7 @@ class PengajuanKeluarController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('ketua.pengajuan-keluar.index', compact('pengajuanKeluars', 'total', 'sort', 'direction'));
+        return view('ketua.pengajuan-keluar.index', compact('pengajuanKeluars', 'total', 'sort', 'direction', 'ekskul', 'isKesiswaan'));
     }
 
     public function show(PengajuanKeluar $pengajuanKeluar)

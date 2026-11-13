@@ -18,42 +18,43 @@
     @include('partials.responsive-tables')
 </head>
 <body class="bg-gradient-to-br from-sky-50 via-white to-amber-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 text-slate-800 dark:text-slate-200 font-sans antialiased flex min-h-screen overflow-x-hidden selection:bg-sky-100 dark:selection:bg-sky-900 selection:text-sky-700 dark:selection:text-sky-300">@php
-    $__pembinaEkskuls = auth()->user()?->pembina?->ekskuls ?? collect();
-    $__anggotaItem = [
-        'icon'     => 'users',
-        'label'    => 'Data Anggota',
-        'is'       => ['pembina.anggota*', 'pembina.ekskul.pilih-ketua*'],
-        'children' => $__pembinaEkskuls->map(fn ($e) => [
-            'icon'  => 'users',
-            'label' => $e->nama_ekskul,
-            'url'   => route('pembina.anggota', ['ekskul' => $e->id]),
-            'is'    => (request()->routeIs('pembina.anggota') && (int) request()->input('ekskul') === $e->id) || (request()->routeIs('pembina.ekskul.pilih-ketua*') && (request()->route('ekskul') instanceof \App\Models\Ekskul ? request()->route('ekskul')->id : request()->route('ekskul')) == $e->id) ? 'pembina.*' : null,
-        ])->toArray(),
-    ];
+    $__isKesiswaan = in_array(auth()->user()?->role, ['kesiswaan', 'admin'], true);
+    if ($__isKesiswaan) {
+        $__pembinaEkskuls = collect();
+        $__anggotaItem = [];
+    } else {
+        $__pembinaEkskuls = auth()->user()?->pembina?->ekskuls ?? collect();
+        $__anggotaItem = [
+            'icon'     => 'users',
+            'label'    => 'Data Anggota',
+            'is'       => ['pembina.anggota*', 'pembina.ekskul.pilih-ketua*'],
+            'children' => $__pembinaEkskuls->map(fn ($e) => [
+                'icon'  => 'users',
+                'label' => $e->nama_ekskul,
+                'url'   => route('pembina.anggota', ['ekskul' => $e->id]),
+                'is'    => (request()->routeIs('pembina.anggota') && (int) request()->input('ekskul') === $e->id) || (request()->routeIs('pembina.ekskul.pilih-ketua*') && (request()->route('ekskul') instanceof \App\Models\Ekskul ? request()->route('ekskul')->id : request()->route('ekskul')) == $e->id) ? 'pembina.*' : null,
+            ])->toArray(),
+        ];
+    }
 @endphp
 @include('partials.pill-sidebar', [
-    'psTitle' => 'Menu Pembina',
+    'psTitle' => $__isKesiswaan ? 'Menu Kesiswaan' : 'Menu Pembina',
     'psLogoBrand' => 'SOUL',
-    'psDashboardUrl' => route('pembina.dashboard'),
+    'psDashboardUrl' => $__isKesiswaan ? route('kesiswaan.dashboard') : route('pembina.dashboard'),
     'psNotifUrl' => '',
-    'psProfileUrl' => route('pembina.profile'),
-    'psItems' => [
+    'psProfileUrl' => $__isKesiswaan ? route('kesiswaan.profile') : route('pembina.profile'),
+    'psItems' => $__isKesiswaan ? \App\Support\MenuKesiswaan::items() : [
         ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('pembina.dashboard'), 'is' => 'pembina.dashboard'],
         ['icon' => 'users', 'label' => 'Keanggotaan', 'children' => [
-            ['icon' => 'clipboard-list', 'label' => 'Pendaftaran', 'url' => route('pembina.pendaftaran'), 'is' => 'pembina.pendaftaran'],
             $__anggotaItem,
-            ['icon' => 'user-check', 'label' => 'Kelola Pengurus', 'url' => route('pembina.pengurus.index'), 'is' => 'pembina.pengurus.*'],
+            ['icon' => 'user-check', 'label' => 'Pilih Ketua & Pengurus', 'url' => route('pembina.pengurus.index'), 'is' => ['pembina.pengurus.*', 'pembina.ekskul.pilih-ketua*']],
             ['icon' => 'user-check', 'label' => 'Kelola Pelatih', 'url' => route('pembina.pelatih.index'), 'is' => 'pembina.pelatih.*'],
         ]],
         ['icon' => 'calendar', 'label' => 'Presensi', 'url' => route('pembina.presensi'), 'is' => 'pembina.presensi'],
         ['icon' => 'clipboard-check', 'label' => 'Penilaian & Laporan', 'children' => [
             ['icon' => 'clipboard-check', 'label' => 'Penilaian', 'url' => route('pembina.penilaian'), 'is' => 'pembina.penilaian*'],
             ['icon' => 'bars', 'label' => 'Rekap Absensi', 'url' => route('pembina.rekap'), 'is' => 'pembina.rekap'],
-            ['icon' => 'document', 'label' => 'Laporan Bulanan', 'url' => route('pembina.laporan.index'), 'is' => 'pembina.laporan.*'],
-        ]],
-        ['icon' => 'chat', 'label' => 'Kelola Konten', 'children' => [
-            ['icon' => 'chat', 'label' => 'Testimoni', 'url' => route('pembina.testimoni.index'), 'is' => 'pembina.testimoni.*'],
-            ['icon' => 'help', 'label' => 'FAQ', 'url' => route('pembina.faq.index'), 'is' => 'pembina.faq.*'],
+            ['icon' => 'document', 'label' => 'Cetak Laporan Ekskul', 'url' => route('pembina.laporan.index'), 'is' => 'pembina.laporan.*'],
         ]],
         ['icon' => 'user', 'label' => 'Profil', 'url' => route('pembina.profile'), 'is' => 'pembina.profile'],
     ],
@@ -91,10 +92,22 @@
 
             <!-- KANAN: Info User + Notifikasi + Logout -->
             <div class="flex items-center gap-2 md:gap-3 shrink-0">
-                <div class="bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-900/50 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 hidden sm:block">
-                    <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Pembina
-                </div>
-                <a href="{{ route('pembina.notifikasi') }}" class="w-9 h-9 rounded-xl bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 flex items-center justify-center text-xs relative text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-700 hover:border-sky-200 dark:hover:border-neutral-600 transition-all shadow-sm">
+                @if($__isKesiswaan)
+                    <a href="{{ route('kesiswaan.dashboard') }}"
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition shadow-sm">
+                        <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                        <span>Panel Kesiswaan</span>
+                    </a>
+                    <div class="bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 hidden sm:flex">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        Akses Kesiswaan (Semua Ekskul)
+                    </div>
+                @else
+                    <div class="bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-900/50 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 hidden sm:block">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Pembina
+                    </div>
+                @endif
+                <a href="{{ $__isKesiswaan ? route('kesiswaan.notifikasi') : route('pembina.notifikasi') }}" class="w-9 h-9 rounded-xl bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 flex items-center justify-center text-xs relative text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-700 hover:border-sky-200 dark:hover:border-neutral-600 transition-all shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                     </svg>

@@ -133,6 +133,7 @@
         @forelse ($ekskuls as $ekskul)
             @php
                 $logo = \App\Support\EkskulInfo::logo($ekskul->logo);
+                $alasanEkskul = ($alasanPerEkskul ?? collect())[$ekskul->id] ?? null;
             @endphp
             <div class="catalog-card group flex flex-col bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden hover:shadow-md hover:border-slate-300 hover:-translate-y-0.5 transition-all duration-200">
                 {{-- Card Header Strip --}}

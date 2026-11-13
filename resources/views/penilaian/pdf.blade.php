@@ -182,6 +182,12 @@
             <td class="label">Periode</td>
             <td>: {{ $periode }}</td>
         </tr>
+        @if(!empty($namaKelasFilter))
+        <tr>
+            <td class="label">Kelas</td>
+            <td>: {{ $namaKelasFilter }}</td>
+        </tr>
+        @endif
     </table>
 
     <!-- TABEL PENILAIAN -->
