@@ -1,8 +1,31 @@
 @extends('ketua.layout')
-@section('title', 'Daftar Pendaftaran')
+@section('title', 'Daftar Pendaftaran' . (isset($ekskul) ? ' - ' . $ekskul->nama_ekskul : ''))
 
 @section('content')
+@if(isset($isCatalog) && $isCatalog)
+    @include('partials.ketua-card-catalog', [
+        'title' => 'Pendaftaran Anggota Ekskul',
+        'subtitle' => 'Pilih salah satu ekstrakurikuler di bawah ini untuk melihat daftar siswa yang mendaftar dan memverifikasi status pendaftarannya.',
+        'featureBadge' => 'Operasional Ketua • Pendaftaran',
+        'icon' => 'fa-solid fa-clipboard-list',
+        'cards' => $cards,
+    ])
+@else
 <div class="space-y-6">
+    @if(isset($isKesiswaan) && $isKesiswaan)
+        <div class="flex items-center justify-between gap-4">
+            <a href="{{ route('ketua.pendaftaran.index') }}"
+               class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition shrink-0"
+               title="Kembali ke Pilihan Ekskul">
+                <i class="fa-solid fa-arrow-left text-xs"></i>
+                <span>Pilih Ekskul Lain</span>
+            </a>
+            <span class="px-2.5 py-1 rounded-xl text-xs font-extrabold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/50">
+                Ekskul: {{ $ekskul->nama_ekskul }}
+            </span>
+        </div>
+    @endif
+
     <!-- Page Header -->
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-5 md:p-7 text-white soul-timbul shadow-xl shadow-sky-200">
         <div class="absolute inset-0 pointer-events-none">
@@ -10,40 +33,27 @@
             <div class="absolute -top-24 -right-10 h-72 w-72 rounded-full bg-white/10 blur-3xl"></div>
         </div>
         <div class="relative">
-            <h1 class="text-xl md:text-2xl font-extrabold tracking-tight">Daftar Pendaftaran</h1>
+            <h1 class="text-xl md:text-2xl font-extrabold tracking-tight">Daftar Pendaftaran: {{ $ekskul->nama_ekskul }}</h1>
             <p class="mt-1 text-xs md:text-sm text-white/80">Ringkasan status pendaftar ekskul</p>
         </div>
     </div>
 
-    <div class="grid grid-cols-4 gap-1.5 sm:gap-3 md:gap-4">
-        <div class="min-w-0 rounded-xl sm:rounded-2xl border border-sky-100 bg-white p-2 sm:p-4 md:p-5 shadow-md shadow-sky-100/60">
-            <p class="text-[9px] leading-tight sm:text-xs font-semibold text-slate-500">Total</p>
-            <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-slate-800">{{ $total }}</p>
-            <p class="mt-1 text-[8px] leading-tight sm:text-[11px] text-slate-400">Pendaftar</p>
+    <div class="inline-flex items-center gap-4 rounded-2xl border border-sky-100 bg-white px-5 py-4 shadow-md shadow-sky-100/60 dark:bg-neutral-800 dark:border-neutral-700">
+        <div class="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-900/30 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
         </div>
-        <div class="min-w-0 rounded-xl sm:rounded-2xl border border-amber-100 bg-white p-2 sm:p-4 md:p-5 shadow-md shadow-amber-100/50">
-            <p class="text-[9px] leading-tight sm:text-xs font-semibold text-slate-500">Pending</p>
-            <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-amber-600">{{ $pendingCount }}</p>
-            <p class="mt-1 text-[8px] leading-tight sm:text-[11px] text-slate-400">Menunggu</p>
-        </div>
-        <div class="min-w-0 rounded-xl sm:rounded-2xl border border-emerald-100 bg-white p-2 sm:p-4 md:p-5 shadow-md shadow-emerald-100/50">
-            <p class="text-[9px] leading-tight sm:text-xs font-semibold text-slate-500">Diterima</p>
-            <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-emerald-600">{{ $diterimaCount }}</p>
-            <p class="mt-1 text-[8px] leading-tight sm:text-[11px] text-slate-400">Disetujui</p>
-        </div>
-        <div class="min-w-0 rounded-xl sm:rounded-2xl border border-rose-100 bg-white p-2 sm:p-4 md:p-5 shadow-md shadow-rose-100/50">
-            <p class="text-[9px] leading-tight sm:text-xs font-semibold text-slate-500">Ditolak</p>
-            <p class="mt-1 sm:mt-2 text-base sm:text-2xl md:text-3xl font-extrabold tracking-tight text-rose-600">{{ $ditolakCount }}</p>
-            <p class="mt-1 text-[8px] leading-tight sm:text-[11px] text-slate-400">Ditolak</p>
+        <div>
+            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Pendaftar</p>
+            <p class="text-2xl font-extrabold tracking-tight text-slate-800 dark:text-white">{{ $total }}</p>
         </div>
     </div>
 
     @include('partials.table-filters', [
         'action' => route('ketua.pendaftaran.index'),
         'placeholder' => 'Cari nama / NIS...',
-        'filters' => [
-            ['name' => 'status', 'allLabel' => 'Semua Status', 'options' => ['pending' => 'Pending', 'diterima' => 'Diterima', 'ditolak' => 'Ditolak']],
-        ],
+        'filters' => [],
     ])
 
     <!-- Table Card dengan overflow-x-auto -->
@@ -118,4 +128,6 @@
 
         @include('partials.table-pagination', ['rows' => $pendaftarans, 'label' => 'pendaftaran'])
     </div>
+</div>
+@endif
 @endsection

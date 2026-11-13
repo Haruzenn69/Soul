@@ -12,6 +12,11 @@ class KetuaEkskulMiddleware
     {
         $user = auth()->user();
 
+        // Kesiswaan dan Admin memiliki akses penuh ke fitur ketua untuk seluruh ekskul
+        if ($user && in_array($user->role, ['kesiswaan', 'admin'], true)) {
+            return $next($request);
+        }
+
         if ($user->role !== 'siswa') {
             abort(403, 'Akses ditolak.');
         }

@@ -166,7 +166,7 @@
                             $ketuaEksB = $eksB->ketua();
                             $anggotaCount = \App\Models\Pendaftaran::where('ekskul_id', $eksB->id)->where('status', 'diterima')->count();
                         @endphp
-                        <div class="p-3.5 md:p-4 rounded-2xl bg-slate-50/70 dark:bg-neutral-900/50 border border-slate-100 dark:border-neutral-800/80 hover:border-sky-200 dark:hover:border-neutral-700 flex items-center justify-between gap-4 transition">
+                        <div class="p-3.5 md:p-4 rounded-2xl {{ $ketuaEksB ? 'bg-slate-50/70 dark:bg-neutral-900/50 border-slate-100 dark:border-neutral-800/80 hover:border-sky-200 dark:hover:border-neutral-700' : 'bg-amber-50/60 dark:bg-amber-950/10 border-amber-200/80 dark:border-amber-800/30 hover:border-amber-300 dark:hover:border-amber-700/50' }} border rounded-2xl flex items-center justify-between gap-4 transition">
                             <div class="flex items-center gap-3.5 min-w-0">
                                 <img src="{{ $eksB->logo_url ?? asset('images/komunita.jpg') }}"
                                      alt="{{ $eksB->nama_ekskul }}"
@@ -176,17 +176,30 @@
                                     <h4 class="text-xs md:text-sm font-extrabold text-slate-900 dark:text-white truncate">{{ $eksB->nama_ekskul }}</h4>
                                     <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                                         <i class="fa-solid fa-user-group text-[10px] mr-1 text-slate-400"></i>{{ $anggotaCount }} Anggota
-                                        @if($ketuaEksB) · Ketua: <span class="font-semibold text-sky-700 dark:text-sky-400">{{ $ketuaEksB->nama }}</span>@endif
+                                        @if($ketuaEksB)
+                                            · Ketua: <span class="font-semibold text-sky-700 dark:text-sky-400">{{ $ketuaEksB->nama }}</span>
+                                        @else
+                                            · <span class="font-semibold text-amber-600 dark:text-amber-400">Belum ada ketua</span>
+                                        @endif
                                     </p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
-                                @if($eksB->status)
-                                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">Aktif</span>
+                                @if($ketuaEksB)
+                                    @if($eksB->status)
+                                        <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">Aktif</span>
+                                    @else
+                                        <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-50 dark:bg-neutral-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-neutral-700">Nonaktif</span>
+                                    @endif
                                 @else
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-50 dark:bg-neutral-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-neutral-700">Nonaktif</span>
+                                    <a href="{{ route('pembina.ekskul.pilih-ketua-page', $eksB) }}"
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold transition shadow-sm shadow-amber-200 dark:shadow-amber-900/30">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                        </svg>
+                                        Pilih Ketua
+                                    </a>
                                 @endif
-                                    <span class="px-2 py-1 rounded-lg text-[10px] font-bold bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/50">Keanggotaan via Ketua</span>
                             </div>
                         </div>
                         @endforeach

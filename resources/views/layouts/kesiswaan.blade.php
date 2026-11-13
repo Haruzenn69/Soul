@@ -24,25 +24,7 @@
     'psDashboardUrl' => route('kesiswaan.dashboard'),
     'psNotifUrl' => '',
     'psProfileUrl' => route('kesiswaan.profile'),
-    'psItems' => [
-        ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('kesiswaan.dashboard'), 'is' => 'kesiswaan.dashboard'],
-        [
-            'icon' => 'users',
-            'label' => 'Akun Pengguna',
-            'is' => ['kesiswaan.users.*', 'kesiswaan.siswa.*', 'kesiswaan.pembina.*', 'kesiswaan.pelatih.*'],
-            'children' => [
-                ['icon' => 'users', 'label' => 'Akun Pengguna', 'url' => route('kesiswaan.users.index'), 'is' => ['kesiswaan.users.*']],
-                ['icon' => 'users', 'label' => 'Data Siswa', 'url' => route('kesiswaan.siswa.index'), 'is' => ['kesiswaan.siswa.*']],
-                ['icon' => 'user', 'label' => 'Data Pembina', 'url' => route('kesiswaan.pembina.index'), 'is' => ['kesiswaan.pembina.*']],
-                ['icon' => 'user-check', 'label' => 'Data Pelatih', 'url' => route('kesiswaan.pelatih.index'), 'is' => ['kesiswaan.pelatih.*']],
-            ],
-        ],
-        ['icon' => 'building', 'label' => 'Data Ekskul', 'url' => route('kesiswaan.ekskuls.index'), 'is' => 'kesiswaan.ekskuls.*'],
-        ['icon' => 'document', 'label' => 'Data Kelas', 'url' => route('kesiswaan.kelas.index'), 'is' => 'kesiswaan.kelas.*'],
-        ['icon' => 'calendar', 'label' => 'Tahun Ajaran', 'url' => route('kesiswaan.tahun-ajaran.index'), 'is' => 'kesiswaan.tahun-ajaran.*'],
-        ['icon' => 'clipboard-check', 'label' => 'Laporan Penilaian', 'url' => route('kesiswaan.laporan-penilaian.index'), 'is' => 'kesiswaan.laporan-penilaian.*'],
-        ['icon' => 'user', 'label' => 'Profile', 'url' => route('kesiswaan.profile'), 'is' => 'kesiswaan.profile'],
-    ],
+    'psItems' => \App\Support\MenuKesiswaan::items(),
     'psMore' => [],
 ])
 

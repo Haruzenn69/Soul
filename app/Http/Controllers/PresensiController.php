@@ -85,13 +85,45 @@ class PresensiController extends Controller
 
     public function rekap(Request $request)
     {
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+
+        if ($isKesiswaan && ! $request->filled('ekskul')) {
+            $ekskuls = \App\Models\Ekskul::orderBy('nama_ekskul')->get();
+            $cards = $ekskuls->map(function (\App\Models\Ekskul $e) {
+                $totalKegiatan = Kegiatan::where('ekskul_id', $e->id)->count();
+                $totalAnggota = Pendaftaran::where('ekskul_id', $e->id)->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])->count();
+
+                $stats = [
+                    ['label' => 'Total Pertemuan', 'value' => $totalKegiatan.' Kegiatan', 'class' => 'font-bold text-slate-800 dark:text-slate-200'],
+                    ['label' => 'Anggota Aktif', 'value' => $totalAnggota.' Siswa', 'class' => 'font-semibold text-slate-600 dark:text-slate-300'],
+                ];
+
+                return (object) [
+                    'ekskul' => $e,
+                    'stats' => $stats,
+                    'badge' => null,
+                    'actionText' => 'Lihat Rekap Absensi',
+                    'actionUrl' => route('ketua.presensi.rekap', ['ekskul' => $e->id]),
+                ];
+            });
+
+            return view('ketua.presensi.rekap', [
+                'isCatalog' => true,
+                'cards' => $cards,
+                'isKesiswaan' => true,
+                'ekskul' => null,
+                'bulan' => now()->format('Y-m'),
+            ]);
+        }
+
         $service = app(RekapAbsensiService::class);
         $bulan = $service->normalizeBulan($request->input('bulan'));
         $ekskul = $this->ekskul();
 
         $data = $service->rekap($ekskul, $bulan);
 
-        return view('ketua.presensi.rekap', $data);
+        return view('ketua.presensi.rekap', array_merge($data, ['isKesiswaan' => $isKesiswaan]));
     }
 
     public function rekapPdf(Request $request)

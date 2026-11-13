@@ -21,6 +21,46 @@ class AnggotaController extends Controller
 
     public function index(Request $request)
     {
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+
+        if ($isKesiswaan && ! $request->filled('ekskul')) {
+            $ekskuls = \App\Models\Ekskul::orderBy('nama_ekskul')->get();
+            $cards = $ekskuls->map(function (\App\Models\Ekskul $e) {
+                $totalAktif = Pendaftaran::where('ekskul_id', $e->id)
+                    ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
+                    ->count();
+                $peringatan = Pendaftaran::where('ekskul_id', $e->id)
+                    ->where('status', Pendaftaran::STATUS_PERINGATAN)
+                    ->count();
+                $ketua = $e->ketua();
+
+                $badge = null;
+                if ($peringatan > 0) {
+                    $badge = ['text' => $peringatan.' Peringatan', 'class' => 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300'];
+                }
+
+                $stats = [
+                    ['label' => 'Anggota Aktif', 'value' => $totalAktif.' Siswa', 'class' => 'font-bold text-slate-800 dark:text-slate-200'],
+                    ['label' => 'Ketua Ekskul', 'value' => $ketua?->nama ?? 'Belum ada', 'class' => 'font-semibold text-slate-600 dark:text-slate-300 truncate max-w-[120px]'],
+                ];
+
+                return (object) [
+                    'ekskul' => $e,
+                    'stats' => $stats,
+                    'badge' => $badge,
+                    'actionText' => 'Kelola Anggota',
+                    'actionUrl' => route('ketua.anggota.index', ['ekskul' => $e->id]),
+                ];
+            });
+
+            return view('ketua.anggota.index', [
+                'isCatalog' => true,
+                'cards' => $cards,
+                'isKesiswaan' => true,
+            ]);
+        }
+
         $ekskul = $this->ekskul();
         $base = Pendaftaran::where('ekskul_id', $ekskul->id)
             ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_NONAKTIF, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_KELUAR]);
@@ -64,7 +104,7 @@ class AnggotaController extends Controller
 
         $kelasList = Kelas::whereHas('siswas')->orderBy('nama')->get(['id', 'nama']);
 
-        return view('ketua.anggota.index', compact('anggotas', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal', 'kelasList'));
+        return view('ketua.anggota.index', compact('anggotas', 'ekskul', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal', 'kelasList', 'isKesiswaan'));
     }
 
     public function calonSiswa(Request $request): JsonResponse

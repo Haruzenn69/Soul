@@ -29,11 +29,18 @@ use Illuminate\Validation\Rule;
 class PembinaController extends Controller
 {
     /**
-     * Semua ekskul yang dibina oleh pembina yang sedang login.
+     * Semua ekskul yang dibina oleh pembina yang sedang login,
+     * atau seluruh ekskul jika diakses oleh Kesiswaan / Admin.
      */
     private function getEkskuls(): Collection
     {
-        $pembina = auth()->user()?->pembina;
+        $user = auth()->user();
+
+        if ($user && in_array($user->role, ['kesiswaan', 'admin'], true)) {
+            return Ekskul::orderBy('nama_ekskul')->get();
+        }
+
+        $pembina = $user?->pembina;
 
         if (! $pembina) {
             return collect();
@@ -127,24 +134,42 @@ class PembinaController extends Controller
         $ekskulIds = $ekskuls->pluck('id');
 
         $selectedEkskul = $request->input('ekskul');
-        if (! $selectedEkskul || $selectedEkskul === 'semua' || ! $ekskulIds->contains((int) $selectedEkskul)) {
-            if ($ekskuls->isNotEmpty()) {
-                $selectedEkskul = $ekskuls->first()->id;
-            } else {
-                $selectedEkskul = null;
-            }
+
+        // Jika hanya membina 1 ekskul, otomatis pilih ekskul tersebut
+        if (! $selectedEkskul && $ekskuls->count() === 1) {
+            $selectedEkskul = $ekskuls->first()->id;
         }
 
-        $query = Pendaftaran::whereIn('ekskul_id', $ekskulIds)
+        // TAMPILKAN KATALOG KARTU EKSKUL JIKA BELUM MEMILIH EKSKUL
+        if (! $selectedEkskul || ! $ekskulIds->contains((int) $selectedEkskul)) {
+            $ekskulCards = $ekskuls->map(function (Ekskul $e) {
+                $anggotaCount = Pendaftaran::where('ekskul_id', $e->id)
+                    ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
+                    ->count();
+                $ketua = $e->ketua();
+
+                return (object) [
+                    'ekskul' => $e,
+                    'totalAnggota' => $anggotaCount,
+                    'ketua' => $ketua,
+                ];
+            });
+
+            return view('pembina.anggota', [
+                'ekskuls' => $ekskuls,
+                'selectedEkskul' => null,
+                'ekskulCards' => $ekskulCards,
+            ]);
+        }
+
+        $selectedEkskul = (int) $selectedEkskul;
+
+        $query = Pendaftaran::where('ekskul_id', $selectedEkskul)
             ->with(['siswa.kelas', 'ekskul'])
             ->withCount([
                 'presensis as hadir_count' => fn ($q) => $q->where('status', Presensi::STATUS_HADIR),
                 'presensis as total_presensi',
             ]);
-
-        if ($selectedEkskul) {
-            $query->where('ekskul_id', $selectedEkskul);
-        }
 
         // 2. Search: Nama siswa, NIS, email
         $cari = trim((string) $request->input('cari'));
@@ -328,9 +353,8 @@ class PembinaController extends Controller
         $kelasId = $request->integer('kelas_id') ?: null;
 
         $siswas = Siswa::query()
-            ->with('kelas')
+            ->with(['kelas', 'user'])
             ->where('status', 'aktif')
-            ->whereHas('user', fn ($query) => $query->where('is_active', true))
             ->when($cari !== '', fn ($query) => $query->where(fn ($sub) => $sub
                 ->where('nama', 'like', "%{$cari}%")
                 ->orWhere('nis', 'like', "%{$cari}%")))
@@ -343,6 +367,7 @@ class PembinaController extends Controller
             $leaderEkskul = $siswa->ekskulDipimpin();
             $siswa->is_current_ketua = $currentKetua?->id === $siswa->id;
             $siswa->ekskul_dipimpin_lain = $leaderEkskul && $leaderEkskul->id !== $ekskul->id ? $leaderEkskul : null;
+            $siswa->punya_akun = $siswa->user !== null && $siswa->user->is_active;
         });
 
         $kelasOptions = Kelas::query()
@@ -356,10 +381,13 @@ class PembinaController extends Controller
 
     public function pilihKetua(Request $request, Ekskul $ekskul, Siswa $siswa)
     {
-        $pembina = auth()->user()?->pembina;
-        abort_unless($pembina && $ekskul->pembina_id === $pembina->id, 403);
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+        $pembina = $user?->pembina;
 
-        abort_unless($siswa->status === 'aktif' && $siswa->user?->is_active, 422, 'Akun siswa ini tidak aktif.');
+        abort_unless($isKesiswaan || ($pembina && $ekskul->pembina_id === $pembina->id), 403);
+
+        abort_unless($siswa->status === 'aktif', 422, 'Siswa ini tidak aktif.');
 
         if ($ekskul->ketua()?->id === $siswa->id) {
             return back()->with('info', "{$siswa->nama} sudah menjadi Ketua Ekskul {$ekskul->nama_ekskul}.");
@@ -472,8 +500,11 @@ class PembinaController extends Controller
 
     public function copotKetua(Ekskul $ekskul, Siswa $siswa)
     {
-        $pembina = auth()->user()?->pembina;
-        abort_unless($pembina && $ekskul->pembina_id === $pembina->id, 403);
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+        $pembina = $user?->pembina;
+
+        abort_unless($isKesiswaan || ($pembina && $ekskul->pembina_id === $pembina->id), 403);
 
         if ($siswa->jabatan === 'ketua') {
             DB::transaction(function () use ($ekskul, $siswa) {
@@ -494,6 +525,11 @@ class PembinaController extends Controller
     }
 
     public function pendaftaran(Request $request)
+    {
+        return redirect()->route('pembina.anggota');
+    }
+
+    public function pendaftaranLegacy(Request $request)
     {
         $ekskuls = $this->getEkskuls();
         $ekskulIds = $ekskuls->pluck('id');
@@ -552,9 +588,10 @@ class PembinaController extends Controller
         $ekskulIds = $ekskuls->pluck('id');
         abort_unless($ekskulIds->contains($pendaftaran->ekskul_id), 403);
 
-        // Pembina hanya boleh ACC/tolak jika ekskul belum punya ketua
+        // Pembina hanya boleh ACC/tolak jika ekskul belum punya ketua, namun Kesiswaan berwenang kapan saja
+        $isKesiswaan = in_array(auth()->user()->role, ['kesiswaan', 'admin'], true);
         $ekskul = $ekskuls->firstWhere('id', $pendaftaran->ekskul_id);
-        if ($ekskul && $ekskul->ketua() !== null) {
+        if (! $isKesiswaan && $ekskul && $ekskul->ketua() !== null) {
             return back()->with('error', 'Ekskul ini sudah memiliki ketua. Pendaftaran hanya bisa diproses oleh ketua ekskul.');
         }
 
@@ -599,20 +636,54 @@ class PembinaController extends Controller
         $ekskuls = $this->getEkskuls();
         $ekskulIds = $ekskuls->pluck('id');
 
+        $selectedEkskulId = $request->input('ekskul');
+        if (! $selectedEkskulId && $ekskuls->count() === 1) {
+            $selectedEkskulId = $ekskuls->first()?->id;
+        }
+
+        // TAMPILKAN KATALOG KARTU EKSKUL JIKA BELUM MEMILIH EKSKUL
+        if (! $selectedEkskulId || ! $ekskulIds->contains((int) $selectedEkskulId)) {
+            $ekskulCards = $ekskuls->map(function (Ekskul $e) {
+                $totalLaporan = LaporanBulanan::where('ekskul_id', $e->id)->where('status', '!=', 'draft')->count();
+                $menungguCount = LaporanBulanan::where('ekskul_id', $e->id)->where('status', LaporanBulanan::STATUS_MENUNGGU)->count();
+                $disetujuiCount = LaporanBulanan::where('ekskul_id', $e->id)->where('status', LaporanBulanan::STATUS_DISETUJUI)->count();
+                $laporanTerbaru = LaporanBulanan::where('ekskul_id', $e->id)->where('status', '!=', 'draft')->latest('bulan')->first();
+
+                return (object) [
+                    'ekskul' => $e,
+                    'totalLaporan' => $totalLaporan,
+                    'menungguCount' => $menungguCount,
+                    'disetujuiCount' => $disetujuiCount,
+                    'laporanTerbaru' => $laporanTerbaru,
+                ];
+            });
+
+            return view('pembina.laporan', [
+                'ekskuls' => $ekskuls,
+                'activeEkskul' => null,
+                'ekskulCards' => $ekskulCards,
+            ]);
+        }
+
+        $activeEkskul = $ekskuls->firstWhere('id', (int) $selectedEkskulId);
+
         $allowedSorts = ['bulan', 'status'];
         $sort = in_array($request->input('sort'), $allowedSorts, true) ? $request->input('sort') : 'bulan';
         $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
 
-        $query = LaporanBulanan::whereIn('ekskul_id', $ekskulIds)
-            ->where('status', '!=', 'draft')
-            ->with('ekskul');
+        $query = LaporanBulanan::where('status', '!=', 'draft')->with('ekskul');
 
-        // Search: bulan atau ekskul
+        if ($activeEkskul) {
+            $query->where('ekskul_id', $activeEkskul->id);
+        } else {
+            $query->whereIn('ekskul_id', $ekskulIds);
+        }
+
+        // Search: bulan atau materi
         if ($request->filled('cari')) {
             $cari = $request->input('cari');
             $query->where(function ($q) use ($cari) {
-                $q->where('bulan', 'like', "%{$cari}%")
-                    ->orWhereHas('ekskul', fn ($e) => $e->where('nama_ekskul', 'like', "%{$cari}%"));
+                $q->where('bulan', 'like', "%{$cari}%");
             });
         }
 
@@ -622,14 +693,16 @@ class PembinaController extends Controller
             $query->where('status', $statusFilter);
         }
 
-        // Filter ekskul
-        if ($request->filled('ekskul') && $ekskulIds->contains($request->input('ekskul'))) {
-            $query->where('ekskul_id', $request->input('ekskul'));
-        }
-
         $laporans = $query->orderBy($sort, $direction)->paginate(10)->withQueryString();
 
-        $kegiatans = Kegiatan::whereIn('ekskul_id', $ekskulIds)
+        $kegiatanQuery = Kegiatan::query();
+        if ($activeEkskul) {
+            $kegiatanQuery->where('ekskul_id', $activeEkskul->id);
+        } else {
+            $kegiatanQuery->whereIn('ekskul_id', $ekskulIds);
+        }
+
+        $kegiatans = $kegiatanQuery
             ->withCount(['presensis as hadir_count' => fn ($q) => $q->where('status', 'hadir')])
             ->withCount(['presensis as izin_count' => fn ($q) => $q->where('status', 'izin')])
             ->withCount(['presensis as sakit_count' => fn ($q) => $q->where('status', 'sakit')])
@@ -638,7 +711,7 @@ class PembinaController extends Controller
             ->paginate(10, ['*'], 'presensi_page')
             ->withQueryString();
 
-        return view('pembina.laporan', compact('laporans', 'kegiatans', 'ekskuls', 'sort', 'direction'));
+        return view('pembina.laporan', compact('laporans', 'kegiatans', 'ekskuls', 'activeEkskul', 'selectedEkskulId', 'sort', 'direction'));
     }
 
     public function laporanShow(LaporanBulanan $laporanBulanan)
@@ -724,11 +797,43 @@ class PembinaController extends Controller
         $ekskuls = $this->getEkskuls();
         $ekskulIds = $ekskuls->pluck('id');
 
+        $selectedEkskul = $request->input('ekskul');
+        if (! $selectedEkskul && $ekskuls->count() === 1) {
+            $selectedEkskul = $ekskuls->first()?->id;
+        }
+
+        // TAMPILKAN KATALOG KARTU EKSKUL JIKA BELUM MEMILIH EKSKUL
+        if (! $selectedEkskul || ! $ekskulIds->contains((int) $selectedEkskul)) {
+            $ekskulCards = $ekskuls->map(function (Ekskul $e) {
+                $totalKegiatan = Kegiatan::where('ekskul_id', $e->id)->count();
+                $kegiatanTerakhir = Kegiatan::where('ekskul_id', $e->id)->latest('tanggal_kegiatan')->first();
+                $totalAnggota = Pendaftaran::where('ekskul_id', $e->id)
+                    ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
+                    ->count();
+
+                return (object) [
+                    'ekskul' => $e,
+                    'totalKegiatan' => $totalKegiatan,
+                    'kegiatanTerakhir' => $kegiatanTerakhir,
+                    'totalAnggota' => $totalAnggota,
+                ];
+            });
+
+            return view('pembina.presensi', [
+                'ekskuls' => $ekskuls,
+                'selectedEkskul' => null,
+                'ekskulCards' => $ekskulCards,
+            ]);
+        }
+
+        $selectedEkskul = (int) $selectedEkskul;
+        $activeEkskul = $ekskuls->firstWhere('id', $selectedEkskul);
+
         $allowedSorts = ['tanggal_kegiatan', 'materi'];
         $sort = in_array($request->input('sort'), $allowedSorts, true) ? $request->input('sort') : 'tanggal_kegiatan';
         $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
 
-        $query = Kegiatan::whereIn('ekskul_id', $ekskulIds)
+        $query = Kegiatan::where('ekskul_id', $selectedEkskul)
             ->with(['presensis.pendaftaran.siswa', 'ekskul']);
 
         if ($request->filled('cari')) {
@@ -739,13 +844,9 @@ class PembinaController extends Controller
             });
         }
 
-        if ($request->filled('ekskul') && $request->input('ekskul') !== 'semua' && $ekskulIds->contains($request->input('ekskul'))) {
-            $query->where('ekskul_id', $request->input('ekskul'));
-        }
-
         $kegiatans = $query->orderBy($sort, $direction)->paginate(10)->withQueryString();
 
-        return view('pembina.presensi', compact('kegiatans', 'ekskuls', 'sort', 'direction'));
+        return view('pembina.presensi', compact('kegiatans', 'ekskuls', 'selectedEkskul', 'activeEkskul', 'sort', 'direction'));
     }
 
     /**
@@ -792,12 +893,55 @@ class PembinaController extends Controller
 
     public function rekap(Request $request)
     {
+        $ekskuls = $this->getEkskuls();
+        $ekskulIds = $ekskuls->pluck('id');
+
+        $selectedEkskul = $request->input('ekskul');
+        if (! $selectedEkskul && $ekskuls->count() === 1) {
+            $selectedEkskul = $ekskuls->first()?->id;
+        }
+
+        // JIKA BELUM MEMILIH EKSKUL: TAMPILKAN KATALOG KARTU EKSKUL UNTUK REKAP
+        if (! $selectedEkskul || ! $ekskulIds->contains((int) $selectedEkskul)) {
+            $ekskulCards = $ekskuls->map(function (Ekskul $e) {
+                $totalAnggota = Pendaftaran::where('ekskul_id', $e->id)
+                    ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
+                    ->count();
+                $totalKegiatan = Kegiatan::where('ekskul_id', $e->id)->count();
+
+                return (object) [
+                    'ekskul' => $e,
+                    'totalAnggota' => $totalAnggota,
+                    'totalKegiatan' => $totalKegiatan,
+                ];
+            });
+
+            return view('pembina.rekap', [
+                'ekskuls' => $ekskuls,
+                'ekskulId' => null,
+                'ekskul' => null,
+                'ekskulCards' => $ekskulCards,
+                'bulan' => now()->format('Y-m'),
+                'rows' => collect(),
+                'kegiatans' => collect(),
+                'eventKegiatans' => collect(),
+                'availableMonths' => collect([now()->format('Y-m')]),
+                'totalHadir' => 0,
+                'totalIzin' => 0,
+                'totalSakit' => 0,
+                'totalAlpha' => 0,
+                'pelatih' => null,
+                'presensiPelatih' => [],
+            ]);
+        }
+
         [$ekskuls, $ekskulId, $rekap] = $this->rekapData($request);
 
         return view('pembina.rekap', array_merge($rekap, [
             'ekskuls' => $ekskuls,
             'ekskulId' => $ekskulId,
             'bulan' => $rekap['bulan'],
+            'ekskulCards' => null,
         ]));
     }
 

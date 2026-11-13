@@ -15,6 +15,42 @@ class KegiatanController extends Controller
 
     public function index(Request $request)
     {
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+
+        if ($isKesiswaan && ! $request->filled('ekskul')) {
+            $ekskuls = \App\Models\Ekskul::orderBy('nama_ekskul')->get();
+            $cards = $ekskuls->map(function (\App\Models\Ekskul $e) {
+                $totalKegiatan = Kegiatan::where('ekskul_id', $e->id)->count();
+                $eventCount = Kegiatan::where('ekskul_id', $e->id)->whereNotNull('jenis_kegiatan')->count();
+                $kegiatanTerakhir = Kegiatan::where('ekskul_id', $e->id)->latest('tanggal_kegiatan')->first();
+                $totalAnggota = $e->pendaftarans()->where('status', 'diterima')->count();
+
+                $stats = [
+                    ['label' => 'Total Kegiatan', 'value' => $totalKegiatan.' Kegiatan', 'class' => 'font-bold text-slate-800 dark:text-slate-200'],
+                    ['label' => 'Event Khusus', 'value' => $eventCount.' Event', 'class' => 'font-bold text-amber-600 dark:text-amber-400'],
+                    ['label' => 'Anggota Aktif', 'value' => $totalAnggota.' Siswa', 'class' => 'font-semibold text-slate-600 dark:text-slate-300'],
+                ];
+                if ($kegiatanTerakhir) {
+                    $stats[] = ['label' => 'Terakhir', 'value' => $kegiatanTerakhir->tanggal_kegiatan->translatedFormat('d M Y'), 'class' => 'font-medium text-slate-500 text-[11px]'];
+                }
+
+                return (object) [
+                    'ekskul' => $e,
+                    'stats' => $stats,
+                    'badge' => null,
+                    'actionText' => 'Buka Kegiatan',
+                    'actionUrl' => route('ketua.kegiatan.index', ['ekskul' => $e->id]),
+                ];
+            });
+
+            return view('ketua.kegiatan.index', [
+                'isCatalog' => true,
+                'cards' => $cards,
+                'isKesiswaan' => true,
+            ]);
+        }
+
         $ekskul = $this->ekskul();
         $base = Kegiatan::where('ekskul_id', $ekskul->id);
         $total = (clone $base)->count();
@@ -41,7 +77,7 @@ class KegiatanController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('ketua.kegiatan.index', compact('kegiatans', 'ekskul', 'total', 'sort', 'direction'));
+        return view('ketua.kegiatan.index', compact('kegiatans', 'ekskul', 'total', 'sort', 'direction', 'isKesiswaan'));
     }
 
     public function create()

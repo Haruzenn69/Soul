@@ -60,6 +60,7 @@ class PenilaianExportService
                 'pendaftaran' => $p,
                 'siswa' => $p->siswa,
                 'kelas' => $p->siswa?->kelas?->nama ?? '-',
+                'kelas_id' => $p->siswa?->kelas_id,
                 'penilaian' => $penilaian,
                 'pembina_penilai' => $penilaian?->penilai ?? $ekskul->pembina,
                 'total_pertemuan' => $kehadiran['total_pertemuan'],

@@ -24,7 +24,13 @@ class PengurusController extends Controller
 
     private function getPembinaEkskuls(): Collection
     {
-        $pembina = auth()->user()?->pembina;
+        $user = auth()->user();
+
+        if ($user && in_array($user->role, ['kesiswaan', 'admin'], true)) {
+            return Ekskul::orderBy('nama_ekskul')->get();
+        }
+
+        $pembina = $user?->pembina;
 
         return $pembina ? $pembina->ekskuls()->get() : collect();
     }
@@ -143,8 +149,10 @@ class PengurusController extends Controller
      */
     public function tetapkanPembina(Request $request, Ekskul $ekskul)
     {
-        $pembina = auth()->user()?->pembina;
-        abort_unless($pembina && $ekskul->pembina_id === $pembina->id, 403, 'Akses tidak diizinkan.');
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+        $pembina = $user?->pembina;
+        abort_unless($isKesiswaan || ($pembina && $ekskul->pembina_id === $pembina->id), 403, 'Akses tidak diizinkan.');
 
         $validated = $request->validate([
             'siswa_id' => ['required', 'exists:siswas,id'],
@@ -291,9 +299,11 @@ class PengurusController extends Controller
      */
     public function approve(Request $request, Pengurus $pengurus)
     {
-        $pembina = auth()->user()?->pembina;
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+        $pembina = $user?->pembina;
         $ekskul = $pengurus->ekskul;
-        abort_unless($pembina && $ekskul && $ekskul->pembina_id === $pembina->id, 403, 'Akses tidak diizinkan.');
+        abort_unless($isKesiswaan || ($pembina && $ekskul && $ekskul->pembina_id === $pembina->id), 403, 'Akses tidak diizinkan.');
 
         if (! $pengurus->isMenunggu()) {
             return back()->with('error', 'Usulan ini sudah tidak dalam status menunggu.');
@@ -363,9 +373,11 @@ class PengurusController extends Controller
      */
     public function reject(Request $request, Pengurus $pengurus)
     {
-        $pembina = auth()->user()?->pembina;
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+        $pembina = $user?->pembina;
         $ekskul = $pengurus->ekskul;
-        abort_unless($pembina && $ekskul && $ekskul->pembina_id === $pembina->id, 403, 'Akses tidak diizinkan.');
+        abort_unless($isKesiswaan || ($pembina && $ekskul && $ekskul->pembina_id === $pembina->id), 403, 'Akses tidak diizinkan.');
 
         if (! $pengurus->isMenunggu()) {
             return back()->with('error', 'Usulan ini sudah tidak dalam status menunggu.');
@@ -397,9 +409,11 @@ class PengurusController extends Controller
      */
     public function copot(Request $request, Pengurus $pengurus)
     {
-        $pembina = auth()->user()?->pembina;
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+        $pembina = $user?->pembina;
         $ekskul = $pengurus->ekskul;
-        abort_unless($pembina && $ekskul && $ekskul->pembina_id === $pembina->id, 403, 'Akses tidak diizinkan.');
+        abort_unless($isKesiswaan || ($pembina && $ekskul && $ekskul->pembina_id === $pembina->id), 403, 'Akses tidak diizinkan.');
 
         if (! $pengurus->isAktif()) {
             return back()->with('error', 'Pengurus ini tidak dalam status aktif.');

@@ -1,16 +1,40 @@
 @extends('ketua.layout')
-@section('title', 'Rekap Absensi - ' . $ekskul->nama_ekskul)
+@section('title', 'Rekap Absensi' . (isset($ekskul) && $ekskul ? ' - ' . $ekskul->nama_ekskul : ''))
 
 @section('content')
+@if(isset($isCatalog) && $isCatalog)
+    @include('partials.ketua-card-catalog', [
+        'title' => 'Rekapitulasi Absensi Ekskul',
+        'subtitle' => 'Pilih salah satu ekstrakurikuler di bawah ini untuk melihat rekap kehadiran bulanan, matriks absensi, dan cetak PDF.',
+        'featureBadge' => 'Operasional Ketua • Rekap Absensi',
+        'icon' => 'fa-solid fa-chart-pie',
+        'cards' => $cards,
+    ])
+@else
     <div class="space-y-6">
+        @if(isset($isKesiswaan) && $isKesiswaan)
+            <div class="flex items-center justify-between gap-4">
+                <a href="{{ route('ketua.presensi.rekap') }}"
+                   class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition shrink-0"
+                   title="Kembali ke Pilihan Ekskul">
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
+                    <span>Pilih Ekskul Lain</span>
+                </a>
+                <span class="px-2.5 py-1 rounded-xl text-xs font-extrabold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/50">
+                    Ekskul: {{ $ekskul->nama_ekskul }}
+                </span>
+            </div>
+        @endif
+
         {{-- PAGE HEADER --}}
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 animate-fade-up">
             <div>
-                <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Rekap Absensi</h1>
+                <h1 class="text-xl md:text-2xl font-extrabold text-slate-900">Rekap Absensi: {{ $ekskul->nama_ekskul }}</h1>
                 <p class="text-xs text-slate-400 mt-1">Rekapitulasi kehadiran anggota {{ $ekskul->nama_ekskul }} untuk {{ \Illuminate\Support\Carbon::createFromFormat('Y-m', $bulan)->translatedFormat('F Y') }}</p>
             </div>
             <div class="flex items-center gap-2 flex-wrap">
                 <form method="GET" action="{{ route('ketua.presensi.rekap') }}" class="flex items-center gap-2">
+                    <input type="hidden" name="ekskul" value="{{ $ekskul->id }}">
                     <label for="bulan" class="text-xs font-semibold text-slate-500">Bulan</label>
                     <select id="bulan" name="bulan" required onchange="this.form.submit()"
                         class="rounded-xl border-slate-200 text-xs focus:border-sky-400 focus:ring-sky-400">
@@ -21,12 +45,10 @@
                         @endforeach
                     </select>
                 </form>
-                <a href="{{ route('ketua.presensi.rekap-pdf', ['bulan' => $bulan]) }}" target="_blank"
+                <a href="{{ route('ketua.presensi.rekap-pdf', ['bulan' => $bulan, 'ekskul' => $ekskul->id]) }}" target="_blank"
                     class="px-4 py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs rounded-xl shadow-md shadow-sky-200 transition">
                     Print PDF
                 </a>
-                <a href="{{ route('ketua.kegiatan.index') }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition">Kegiatan</a>
-                <a href="{{ route('ketua.dashboard') }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition">Dashboard</a>
             </div>
         </div>
 
@@ -35,4 +57,5 @@
         @include('partials.rekap-event')
         @include('partials.rekap-pelatih')
     </div>
+@endif
 @endsection

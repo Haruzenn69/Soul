@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Pembina;
 
 use App\Http\Controllers\Controller;
+use App\Models\Ekskul;
 use App\Models\Faq;
 use App\Services\NotifikasiService;
 use App\Support\TableKit;
@@ -13,7 +14,13 @@ class FaqController extends Controller
 {
     private function getEkskuls(): Collection
     {
-        $pembina = auth()->user()?->pembina;
+        $user = auth()->user();
+
+        if ($user && in_array($user->role, ['kesiswaan', 'admin'], true)) {
+            return Ekskul::orderBy('nama_ekskul')->get();
+        }
+
+        $pembina = $user?->pembina;
 
         if (! $pembina) {
             return collect();

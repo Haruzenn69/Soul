@@ -146,6 +146,51 @@ class LaporanBulananController extends Controller
 
     public function index(Request $request)
     {
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+
+        if ($isKesiswaan && ! $request->filled('ekskul')) {
+            $ekskuls = \App\Models\Ekskul::orderBy('nama_ekskul')->get();
+            $cards = $ekskuls->map(function (\App\Models\Ekskul $e) {
+                $base = LaporanBulanan::where('ekskul_id', $e->id);
+                $total = (clone $base)->count();
+                $draftCount = (clone $base)->where('status', 'draft')->count();
+                $menungguCount = (clone $base)->where('status', 'menunggu')->count();
+                $disetujuiCount = (clone $base)->where('status', 'disetujui')->count();
+                $terbaru = (clone $base)->latest('bulan')->first();
+
+                $badge = null;
+                if ($menungguCount > 0) {
+                    $badge = ['text' => $menungguCount.' Menunggu Pembina', 'class' => 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300'];
+                } elseif ($draftCount > 0) {
+                    $badge = ['text' => $draftCount.' Draft Tersedia', 'class' => 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/60 dark:text-sky-300'];
+                }
+
+                $stats = [
+                    ['label' => 'Total Laporan', 'value' => $total.' Laporan', 'class' => 'font-bold text-slate-800 dark:text-slate-200'],
+                    ['label' => 'Draft / Belum Kirim', 'value' => $draftCount.' Laporan', 'class' => 'font-semibold text-slate-600 dark:text-slate-300'],
+                    ['label' => 'Telah Disetujui', 'value' => $disetujuiCount.' Laporan', 'class' => 'font-bold text-emerald-600 dark:text-emerald-400'],
+                ];
+                if ($terbaru) {
+                    $stats[] = ['label' => 'Periode Terbaru', 'value' => \Carbon\Carbon::createFromFormat('Y-m', $terbaru->bulan)->translatedFormat('M Y'), 'class' => 'font-medium text-slate-500 text-[11px]'];
+                }
+
+                return (object) [
+                    'ekskul' => $e,
+                    'stats' => $stats,
+                    'badge' => $badge,
+                    'actionText' => 'Kelola Laporan',
+                    'actionUrl' => route('ketua.laporan-bulanan.index', ['ekskul' => $e->id]),
+                ];
+            });
+
+            return view('ketua.laporan-bulanan.index', [
+                'isCatalog' => true,
+                'cards' => $cards,
+                'isKesiswaan' => true,
+            ]);
+        }
+
         $ekskul = $this->ekskul();
         $base = LaporanBulanan::where('ekskul_id', $ekskul->id);
         $total = (clone $base)->count();
@@ -165,7 +210,7 @@ class LaporanBulananController extends Controller
             ->paginate(8)
             ->withQueryString();
 
-        return view('ketua.laporan-bulanan.index', compact('laporans', 'total', 'sort', 'direction'));
+        return view('ketua.laporan-bulanan.index', compact('laporans', 'total', 'sort', 'direction', 'ekskul', 'isKesiswaan'));
     }
 
     public function create()

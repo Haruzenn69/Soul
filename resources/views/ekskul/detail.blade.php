@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -45,11 +45,15 @@
     {{-- TOP NAVBAR --}}
     <header class="sticky top-0 z-40 border-b border-sky-100 dark:border-neutral-800 bg-white/85 dark:bg-[#181818]/90 backdrop-blur-md transition-colors">
         <div class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-8">
-            <a href="{{ route('siswa.landing') }}" class="flex items-center gap-2.5 group">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 text-white flex items-center justify-center font-extrabold text-sm shadow-md shadow-sky-200 dark:shadow-none group-hover:scale-105 transition-transform">
-                    S
-                </div>
-                <span class="text-base font-extrabold tracking-tight text-slate-900 dark:text-white">SOUL</span>
+            <a href="{{ route('siswa.landing') }}" class="flex items-center gap-2 group">
+                {{-- Logo light (tampil di light mode) --}}
+                <img src="{{ asset('images/logo-light-nobg.png') }}"
+                     alt="SOUL"
+                     class="h-8 w-auto block dark:hidden group-hover:opacity-80 transition-opacity">
+                {{-- Logo dark (tampil di dark mode) --}}
+                <img src="{{ asset('images/logo-dark-nobg.png') }}"
+                     alt="SOUL"
+                     class="h-8 w-auto hidden dark:block group-hover:opacity-80 transition-opacity">
             </a>
 
             <div class="flex items-center gap-2">

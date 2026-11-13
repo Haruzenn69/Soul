@@ -4,25 +4,75 @@
 @section('content')
 <div class="space-y-6 animate-fade-up max-w-7xl mx-auto">
 
-    {{-- TOP BAR & EKSKUL SWITCHER --}}
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Kelola Pengurus Inti</h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Struktur kepengurusan: Ketua, Wakil Ketua, Sekretaris, dan Bendahara (1 orang per jabatan).</p>
+    {{-- TOP BAR & EKSKUL SELECTOR (SANGAT JELAS & PROMINENT) --}}
+    <div class="bg-white dark:bg-[#1a1a1a] rounded-3xl p-5 md:p-6 border border-slate-200/80 dark:border-neutral-800 shadow-sm">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 text-[11px] font-bold border border-sky-200/60 dark:border-sky-800/50 mb-2">
+                    <i class="fa-solid fa-users-gear text-xs"></i> Manajemen Kepengurusan
+                </span>
+                <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Pilih Ketua & Pengurus Ekskul</h1>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Tentukan Ketua Ekskul dan struktur pengurus inti (Wakil Ketua, Sekretaris, Bendahara) untuk memimpin kegiatan ekskul.
+                </p>
+            </div>
+
+            {{-- SELECTOR EKSKUL UTAMA (JELAS & MENONJOL) --}}
+            @if($ekskuls->count() > 1)
+                <div class="bg-slate-50 dark:bg-neutral-900/80 p-3 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shrink-0">
+                    <form method="GET" action="{{ route('pembina.pengurus.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <label for="ekskul-select" class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 shrink-0">
+                            <i class="fa-solid fa-shapes text-sky-600 dark:text-sky-400 text-xs"></i>
+                            <span>Pilih Ekskul:</span>
+                        </label>
+                        <div class="relative">
+                            <select id="ekskul-select" name="ekskul" onchange="this.form.submit()"
+                                class="w-full sm:w-64 pl-3.5 pr-8 py-2 bg-white dark:bg-[#1a1a1a] border border-slate-300 dark:border-neutral-700 rounded-xl text-xs font-extrabold text-slate-800 dark:text-white shadow-xs focus:outline-none focus:ring-2 focus:ring-sky-500 appearance-none">
+                                @foreach($ekskuls as $item)
+                                    <option value="{{ $item->id }}" {{ ($ekskul && $ekskul->id === $item->id) ? 'selected' : '' }}>
+                                        {{ $item->nama_ekskul }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            @endif
         </div>
 
-        @if($ekskuls->count() > 1)
-            <div class="flex items-center gap-2">
-                <label for="ekskul-select" class="text-xs font-bold text-slate-600 dark:text-slate-300">Pilih Ekskul:</label>
-                <form method="GET" action="{{ route('pembina.pengurus.index') }}">
-                    <select id="ekskul-select" name="ekskul" onchange="this.form.submit()" class="px-3 py-1.5 bg-white dark:bg-neutral-900 border border-sky-100 dark:border-neutral-800 rounded-xl text-xs font-bold text-sky-700 dark:text-sky-300 shadow-xs focus:outline-none focus:ring-2 focus:ring-sky-400">
-                        @foreach($ekskuls as $item)
-                            <option value="{{ $item->id }}" {{ ($ekskul && $ekskul->id === $item->id) ? 'selected' : '' }}>
-                                {{ $item->nama_ekskul }}
-                            </option>
-                        @endforeach
-                    </select>
-                </form>
+        @if($ekskul)
+            {{-- SUMMARY BADGE BAR --}}
+            <div class="mt-4 pt-4 border-t border-slate-100 dark:border-neutral-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-bold text-slate-700 dark:text-slate-300">Ekskul Aktif:</span>
+                    <span class="px-3 py-1 rounded-xl bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 font-extrabold border border-sky-200/60 dark:border-sky-800/50">
+                        {{ $ekskul->nama_ekskul }}
+                    </span>
+                    <span class="text-slate-400">·</span>
+                    <span class="text-slate-600 dark:text-slate-400 font-medium">
+                        {{ $anggotaEligible->count() }} Anggota Diterima
+                    </span>
+                    <span class="text-slate-400">·</span>
+                    <span class="text-slate-600 dark:text-slate-400 font-medium">
+                        {{ $pengurusAktif->count() }}/4 Jabatan Terisi
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('pembina.ekskul.pilih-ketua-page', $ekskul) }}"
+                       class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition shadow-xs">
+                        <i class="fa-solid fa-crown text-amber-500 text-xs"></i>
+                        <span>Pilih Ketua dari Data Siswa</span>
+                    </a>
+                    <button type="button" onclick="openModalTetapkan()"
+                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs font-bold transition shadow-xs">
+                        <i class="fa-solid fa-user-plus text-xs"></i>
+                        <span>Tetapkan Pengurus</span>
+                    </button>
+                </div>
             </div>
         @endif
     </div>
@@ -220,17 +270,27 @@
                         </div>
 
                         {{-- ACTION BUTTONS (KHUSUS PEMBINA) --}}
-                        <div class="mt-4 pt-4 border-t border-sky-100/80 dark:border-neutral-800 flex items-center gap-2">
-                            <button type="button" onclick="openModalTetapkanJabatan('{{ $jabatanKey }}')" class="flex-1 py-2 px-3 rounded-xl bg-sky-50 dark:bg-neutral-800 hover:bg-sky-100 dark:hover:bg-neutral-700 text-sky-700 dark:text-sky-300 text-xs font-bold transition text-center border border-sky-200/60 dark:border-neutral-700 shadow-xs">
-                                {{ $pengurus ? 'Ganti Pengurus' : 'Pilih ' . $jabatanNama }}
-                            </button>
-
-                            @if($pengurus)
-                                <button type="button" onclick="openModalCopot('{{ route('pembina.pengurus.copot', $pengurus->id) }}', '{{ $pengurus->siswa?->nama }}', '{{ $jabatanNama }}')" class="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 text-rose-600 dark:text-rose-400 transition border border-rose-100 dark:border-rose-900/50" title="Copot Pengurus">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                    </svg>
+                        <div class="mt-4 pt-4 border-t border-sky-100/80 dark:border-neutral-800 flex flex-col gap-2">
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="openModalTetapkanJabatan('{{ $jabatanKey }}')" class="flex-1 py-2 px-3 rounded-xl bg-sky-50 dark:bg-neutral-800 hover:bg-sky-100 dark:hover:bg-neutral-700 text-sky-700 dark:text-sky-300 text-xs font-bold transition text-center border border-sky-200/60 dark:border-neutral-700 shadow-xs">
+                                    {{ $pengurus ? 'Ganti ' . $jabatanNama : '+ Pilih ' . $jabatanNama }}
                                 </button>
+
+                                @if($pengurus)
+                                    <button type="button" onclick="openModalCopot('{{ route('pembina.pengurus.copot', $pengurus->id) }}', '{{ $pengurus->siswa?->nama }}', '{{ $jabatanNama }}')" class="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 text-rose-600 dark:text-rose-400 transition border border-rose-100 dark:border-rose-900/50" title="Copot Pengurus">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                @endif
+                            </div>
+
+                            @if($jabatanKey === 'ketua' && ! $pengurus)
+                                <a href="{{ route('pembina.ekskul.pilih-ketua-page', $ekskul) }}"
+                                   class="w-full py-1.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 text-[11px] font-bold transition text-center shadow-xs flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-crown text-[10px] text-amber-400"></i>
+                                    <span>Pilih dari Master Siswa</span>
+                                </a>
                             @endif
                         </div>
                     </div>
@@ -314,11 +374,15 @@
 
             <div>
                 <label for="input-jabatan" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Pilih Jabatan</label>
-                <select id="input-jabatan" name="jabatan" required class="w-full px-3 py-2.5 bg-sky-50/60 dark:bg-neutral-950 border border-sky-100 dark:border-neutral-800 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:bg-white dark:focus:bg-neutral-900 transition">
+                <select id="input-jabatan" name="jabatan" required onchange="toggleKetuaHint(this.value)" class="w-full px-3 py-2.5 bg-sky-50/60 dark:bg-neutral-950 border border-sky-100 dark:border-neutral-800 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:bg-white dark:focus:bg-neutral-900 transition">
                     @foreach($daftarJabatan as $key => $label)
                         <option value="{{ $key }}">{{ $label }}</option>
                     @endforeach
                 </select>
+                <div id="ketua-global-hint" class="mt-2 p-2.5 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200/60 dark:border-amber-800/50 flex items-center justify-between gap-2 text-[11px] text-amber-800 dark:text-amber-300">
+                    <span>Khusus Ketua, bisa dipilih dari seluruh siswa sekolah.</span>
+                    <a href="{{ route('pembina.ekskul.pilih-ketua-page', $ekskul) }}" class="font-extrabold underline hover:text-amber-900 shrink-0">Pilih dari Seluruh Siswa &rarr;</a>
+                </div>
             </div>
 
             <div>
@@ -418,11 +482,21 @@
 </div>
 
 <script>
+    function toggleKetuaHint(val) {
+        var hint = document.getElementById('ketua-global-hint');
+        if (hint) {
+            hint.style.display = (val === 'ketua') ? 'flex' : 'none';
+        }
+    }
+
     function openModalTetapkan() {
+        var sel = document.getElementById('input-jabatan');
+        if (sel) toggleKetuaHint(sel.value);
         document.getElementById('modal-tetapkan').classList.remove('hidden');
     }
     function openModalTetapkanJabatan(jabatan) {
         document.getElementById('input-jabatan').value = jabatan;
+        toggleKetuaHint(jabatan);
         openModalTetapkan();
     }
     function closeModalTetapkan() {
