@@ -201,8 +201,8 @@
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     {{-- Identity & Info --}}
                     <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 text-white font-black text-base flex items-center justify-center shadow-md shadow-sky-200 shrink-0">
-                            {{ strtoupper(substr($pelatih->nama, 0, 2)) }}
+                        <div class="w-12 h-12 rounded-2xl overflow-hidden bg-sky-100 shadow-md shadow-sky-200 shrink-0">
+                            <img src="{{ asset('images/pelatih.webp') }}" alt="Foto Profil {{ $pelatih->nama }}" class="w-full h-full object-cover">
                         </div>
                         <div>
                             <div class="flex items-center gap-2 flex-wrap">

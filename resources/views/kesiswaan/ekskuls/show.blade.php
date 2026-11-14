@@ -98,12 +98,8 @@
                 </div>
                 @if ($ekskul->pembina)
                     <div class="flex min-w-0 flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3">
-                        <div class="w-7 h-7 sm:w-11 sm:h-11 rounded-lg sm:rounded-2xl overflow-hidden shrink-0 bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-extrabold flex items-center justify-center text-[10px] sm:text-xs uppercase shadow-xs">
-                            @if ($ekskul->pembina->foto_url)
-                                <img src="{{ $ekskul->pembina->foto_url }}" alt="{{ $ekskul->pembina->nama }}" class="w-full h-full object-cover">
-                            @else
-                                {{ strtoupper(substr($ekskul->pembina->nama, 0, 2)) }}
-                            @endif
+                        <div class="w-7 h-7 sm:w-11 sm:h-11 rounded-lg sm:rounded-2xl overflow-hidden shrink-0 bg-indigo-100 dark:bg-indigo-950/50 shadow-xs">
+                            <img src="{{ $ekskul->pembina->foto_url }}" alt="{{ $ekskul->pembina->nama }}" class="w-full h-full object-cover">
                         </div>
                         <div class="min-w-0">
                             <div class="font-bold text-[10px] sm:text-sm text-slate-900 dark:text-white truncate">{{ $ekskul->pembina->nama }}</div>
@@ -165,8 +161,8 @@
                 </div>
                 @if ($ekskul->pelatih)
                     <div class="flex min-w-0 flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-3">
-                        <div class="w-7 h-7 sm:w-11 sm:h-11 rounded-lg sm:rounded-2xl bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-extrabold flex items-center justify-center text-[10px] sm:text-xs uppercase shrink-0 shadow-xs">
-                            {{ strtoupper(substr($ekskul->pelatih->nama, 0, 2)) }}
+                        <div class="w-7 h-7 sm:w-11 sm:h-11 rounded-lg sm:rounded-2xl overflow-hidden bg-emerald-100 dark:bg-emerald-950/50 shrink-0 shadow-xs">
+                            <img src="{{ asset('images/pelatih.webp') }}" alt="Foto Profil {{ $ekskul->pelatih->nama }}" class="w-full h-full object-cover">
                         </div>
                         <div class="min-w-0">
                             <div class="flex items-center gap-1.5 flex-wrap">
