@@ -229,12 +229,8 @@
                             <td class="py-3.5 px-5">
                                 @if ($ekskul->pembina)
                                     <div class="flex items-center gap-2">
-                                        <div class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500 overflow-hidden">
-                                            @if ($ekskul->pembina->foto)
-                                                <img src="{{ $ekskul->pembina->foto_url }}" alt="{{ $ekskul->pembina->nama }}" class="w-full h-full object-cover">
-                                            @else
-                                                {{ strtoupper(substr($ekskul->pembina->nama, 0, 2)) }}
-                                            @endif
+                                        <div class="w-7 h-7 rounded-full bg-slate-100 overflow-hidden">
+                                            <img src="{{ $ekskul->pembina->foto_url }}" alt="{{ $ekskul->pembina->nama }}" class="w-full h-full object-cover">
                                         </div>
                                         <span class="text-slate-700">{{ $ekskul->pembina->nama }}</span>
                                     </div>

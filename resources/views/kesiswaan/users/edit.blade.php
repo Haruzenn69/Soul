@@ -242,7 +242,7 @@
                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                 </div>
                 <div class="md:col-span-3 flex items-center gap-4 p-3 bg-slate-50/80 rounded-2xl border border-slate-200/80">
-                    <img src="{{ $user->pembina?->foto_url ?? asset('images/default.png') }}"
+                    <img src="{{ $user->pembina?->foto_url ?? asset('images/guru.webp') }}"
                          alt="Foto Profil Pembina"
                          class="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-sm flex-shrink-0"
                          onerror="this.onerror=null;this.src='{{ asset('images/default.png') }}';">

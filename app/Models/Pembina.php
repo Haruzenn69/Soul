@@ -37,7 +37,7 @@ class Pembina extends Model
             return asset('storage/'.$this->foto);
         }
 
-        return asset('images/default.png');
+        return asset('images/guru.webp');
     }
 
     protected function nama(): Attribute
