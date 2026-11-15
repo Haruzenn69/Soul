@@ -4,20 +4,20 @@
 
 @section('content')
     {{-- HERO --}}
-    <div data-tilt-card class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-4 md:p-6 md:pb-12 lg:pb-14 text-white shadow-xl shadow-sky-200 soul-timbul tilt-card animate-fade-up">
+    <div data-tilt-card class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-4 md:p-6 text-white shadow-xl shadow-sky-200 soul-timbul tilt-card animate-fade-up">
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
         </div>
         <div class="relative grid grid-cols-5 gap-2 md:gap-4 lg:gap-6 items-center">
             <!-- TEXT + CTA -->
             <div class="min-w-0 col-span-3">
-                <h1 class="text-base sm:text-xl md:text-2xl font-extrabold tracking-tight leading-tight break-words">
+                <h1 class="text-base sm:text-xl md:text-2xl lg:text-[26px] font-extrabold tracking-tight leading-tight break-words">
                     Selamat datang {{ auth()->user()->username }}
                 </h1>
-                <p class="text-[11px] sm:text-sm text-white/85 mt-1 font-medium leading-snug">
+                <p class="text-[11px] sm:text-sm md:text-[13px] lg:text-sm text-white/85 mt-1 font-medium leading-snug">
                     {{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }}
                 </p>
-                <p class="text-[10px] sm:text-xs text-white/70 mt-2 max-w-[15rem] sm:max-w-[22rem] leading-relaxed text-justify">
+                <p class="text-[10px] sm:text-xs md:text-xs lg:text-[13px] text-white/70 mt-2 max-w-[15rem] sm:max-w-[22rem] md:max-w-md leading-relaxed text-justify md:text-left">
                     Kelola akun pengguna, data ekstrakurikuler, dan daftar kelas sekolah melalui panel kesiswaan.
                 </p>
 
@@ -33,36 +33,38 @@
                 </div>
             </div>
 
-            <!-- ILLUSTRATIVE PANEL + FLOATING STATS -->
-            <div class="col-span-2 relative min-w-0">
-                <div class="relative h-32 sm:h-36 md:h-40 lg:h-44 rounded-2xl md:rounded-3xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center">
-                    <div class="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
-                        <div class="absolute -bottom-10 -left-6 w-32 h-32 rounded-full bg-white/20 blur-2xl"></div>
-                    </div>
-                    <img src="{{ asset('images/dashboardbiru.png') }}" alt="Ilustrasi Kesiswaan"
-                         class="h-24 sm:h-28 md:h-40 lg:h-44 w-auto max-w-full md:max-w-[130px] lg:max-w-[150px] object-contain drop-shadow-xl animate-floaty select-none relative z-0 mb-8 md:mb-2 pointer-events-none">
-                </div>
+            <!-- FOTO + STAT CARD (maskot menempel pas di atas kartu putih pada semua ukuran layar) -->
+            <div class="col-span-2 relative min-w-0 flex flex-col justify-end">
+                <div class="relative rounded-2xl md:rounded-3xl bg-white/10 backdrop-blur border border-white/20 p-2 sm:p-2.5 md:p-3 flex flex-col items-center justify-end overflow-hidden shadow-inner">
+                    <div class="absolute -bottom-10 -left-6 w-32 h-32 rounded-full bg-white/20 blur-2xl pointer-events-none"></div>
 
-                <!-- floating stat card overlapping bottom edge -->
-                <div class="absolute bottom-2 md:-bottom-7 left-1 right-1 sm:left-2 sm:right-2 z-10 grid grid-cols-3 gap-0.5 sm:gap-1 bg-white rounded-lg sm:rounded-xl shadow-xl shadow-sky-900/10 p-1 sm:p-2">
-                    <div class="text-center border-r border-slate-100 pr-1">
-                        <p class="text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalUsers }}</p>
-                        <p class="text-[9px] md:text-xs text-slate-400 font-semibold mt-1">Akun</p>
+                    <!-- FOTO MASKOT: menempel pas di atas card putih tanpa celah -->
+                    <div class="relative z-0 -mb-2 sm:-mb-2.5 md:-mb-3.5 flex items-end justify-center">
+                        <img src="{{ asset('images/dashboardbiru.png') }}" alt="Ilustrasi Kesiswaan"
+                             class="h-24 sm:h-28 md:h-36 lg:h-40 w-auto object-contain drop-shadow-xl select-none pointer-events-none">
                     </div>
-                    <div class="text-center border-r border-slate-100 px-1">
-                        <p class="text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalSiswa }}</p>
-                        <p class="text-[9px] md:text-xs text-slate-400 font-semibold mt-1">Siswa</p>
-                    </div>
-                    <div class="text-center pl-1">
-                        <p class="text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalEkskul }}</p>
-                        <p class="text-[9px] md:text-xs text-slate-400 font-semibold mt-1">Ekskul</p>
+
+                    <!-- STAT CARD: berada tepat di bawah maskot, menutup potongan bawah gambar secara presisi -->
+                    <div class="relative z-10 w-full grid grid-cols-3 gap-0.5 sm:gap-1 bg-white rounded-xl shadow-lg shadow-sky-900/10 p-1 sm:p-1.5 md:p-2">
+                        <div class="text-center border-r border-slate-100 pr-0.5 sm:pr-1">
+                            <p class="text-xs sm:text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalUsers }}</p>
+                            <p class="text-[8px] sm:text-[9px] md:text-xs text-slate-400 font-semibold mt-0.5 sm:mt-1">Akun</p>
+                        </div>
+                        <div class="text-center border-r border-slate-100 px-0.5 sm:px-1">
+                            <p class="text-xs sm:text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalSiswa }}</p>
+                            <p class="text-[8px] sm:text-[9px] md:text-xs text-slate-400 font-semibold mt-0.5 sm:mt-1">Siswa</p>
+                        </div>
+                        <div class="text-center pl-0.5 sm:pl-1">
+                            <p class="text-xs sm:text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalEkskul }}</p>
+                            <p class="text-[8px] sm:text-[9px] md:text-xs text-slate-400 font-semibold mt-0.5 sm:mt-1">Ekskul</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="relative mt-4 pt-3 md:mt-11 lg:mt-12 border-t border-white/15 grid grid-cols-3 gap-1.5 sm:gap-2">
+        <div class="relative mt-3 sm:mt-4 pt-3 border-t border-white/15 grid grid-cols-3 gap-1.5 sm:gap-2">
             <a href="{{ route('kesiswaan.users.index') }}" class="group flex min-w-0 items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-users text-sm text-white"></i>
@@ -90,25 +92,6 @@
                     <p class="text-[10px] sm:text-xs text-white/70 mt-1 leading-tight">Data Kelas</p>
                 </div>
             </a>
-        </div>
-    </div>
-
-    {{-- STATS CARDS - MOBILE/TABLET --}}
-    <div class="hidden grid-cols-3 gap-3 md:hidden">
-        <div class="relative overflow-hidden rounded-2xl bg-white border border-sky-100 p-3 md:p-5 shadow-sm animate-fade-up" style="animation-delay: .1s">
-            <p class="text-xs font-bold text-slate-400 tracking-wider uppercase">Akun Pengguna</p>
-            <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $totalUsers }}</h3>
-            <p class="text-xs font-semibold text-sky-600 mt-0.5 md:mt-1">Semua role</p>
-        </div>
-        <div class="relative overflow-hidden rounded-2xl bg-white border border-sky-100 p-3 md:p-5 shadow-sm animate-fade-up" style="animation-delay: .2s">
-            <p class="text-xs font-bold text-slate-400 tracking-wider uppercase">Siswa</p>
-            <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $totalSiswa }}</h3>
-            <p class="text-xs font-semibold text-sky-600 mt-0.5 md:mt-1">Terdaftar</p>
-        </div>
-        <div class="relative overflow-hidden rounded-2xl bg-white border border-sky-100 p-3 md:p-5 shadow-sm animate-fade-up" style="animation-delay: .3s">
-            <p class="text-xs font-bold text-slate-400 tracking-wider uppercase">Ekskul</p>
-            <h3 class="text-xl md:text-3xl font-extrabold mt-0.5 md:mt-1.5 text-sky-700">{{ $totalEkskul }}</h3>
-            <p class="text-xs font-semibold text-sky-600 mt-0.5 md:mt-1">{{ $ekskulBuka }} aktif</p>
         </div>
     </div>
 
@@ -162,6 +145,64 @@
                         <canvas id="ekskulChart"></canvas>
                     </div>
                 </div>
+        </div>
+
+        <!-- DAFTAR AKUN SISWA DAN GURU TERDAFTAR (Header biru seperti card paling atas, tanpa pil, tanpa svg dan emoji) -->
+        <div class="bg-white rounded-2xl md:rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <!-- Header Section: Gradasi biru seperti card paling atas dengan teks putih -->
+            <div class="bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-4 sm:p-5 text-white flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm sm:text-base font-extrabold text-white tracking-tight">Akun Siswa &amp; Guru Terdaftar</h3>
+                    <p class="text-xs text-white/85 font-medium mt-0.5">Daftar akun terbaru yang telah berhasil didaftarkan ke sistem</p>
+                </div>
+                <a href="{{ route('kesiswaan.users.index') }}" class="inline-flex items-center text-xs font-bold text-sky-700 bg-white hover:bg-sky-50 px-3 py-1.5 rounded-xl shadow-sm transition-all">
+                    Lihat Semua
+                </a>
+            </div>
+
+            <!-- Table Section: Bersih, tanpa pil, tanpa svg/emoji -->
+            <div class="p-3 sm:p-5 pt-2 sm:pt-3">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-100 text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
+                                <th class="py-2.5 px-3 whitespace-nowrap">Nama Lengkap</th>
+                                <th class="py-2.5 px-3 whitespace-nowrap">Peran</th>
+                                <th class="py-2.5 px-3 whitespace-nowrap">NIS / NIP</th>
+                                <th class="py-2.5 px-3 whitespace-nowrap">Email</th>
+                                <th class="py-2.5 px-3 whitespace-nowrap text-right">Waktu Daftar</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-slate-600">
+                            @forelse($recentUsers as $user)
+                                <tr class="hover:bg-slate-50/60 transition-colors">
+                                    <td class="py-3 px-3 font-semibold text-slate-800 whitespace-nowrap">
+                                        {{ $user->role === 'siswa' ? ($user->siswa?->nama ?? $user->username) : ($user->pembina?->nama ?? $user->username) }}
+                                    </td>
+                                    <td class="py-3 px-3 text-slate-600 whitespace-nowrap">
+                                        {{ $user->role === 'siswa' ? ($user->siswa?->kelas ? 'Siswa - ' . $user->siswa->kelas->nama : 'Siswa') : 'Guru / Pembina' }}
+                                    </td>
+                                    <td class="py-3 px-3 font-mono text-[11px] text-slate-500 whitespace-nowrap">
+                                        {{ $user->role === 'siswa' ? ($user->siswa?->nis ?? '-') : ($user->pembina?->nip ?? '-') }}
+                                    </td>
+                                    <td class="py-3 px-3 text-slate-500 whitespace-nowrap">
+                                        {{ $user->email }}
+                                    </td>
+                                    <td class="py-3 px-3 text-right text-slate-400 text-[11px] whitespace-nowrap">
+                                        {{ $user->created_at ? $user->created_at->format('d/m/Y H:i') : '-' }}
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="py-8 text-center text-slate-400 text-xs">
+                                        Belum ada akun siswa atau guru yang terdaftar.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 @endsection

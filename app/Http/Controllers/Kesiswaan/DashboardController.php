@@ -58,6 +58,13 @@ class DashboardController extends Controller
         // Active tahun ajaran
         $tahunAjaranAktif = TahunAjaran::getActive();
 
+        // Daftar akun siswa dan guru yang berhasil didaftarkan
+        $recentUsers = User::with(['siswa.kelas', 'pembina'])
+            ->whereIn('role', ['siswa', 'pembina'])
+            ->latest()
+            ->take(8)
+            ->get();
+
         return view('kesiswaan.dashboard', [
             'totalUsers' => User::count(),
             'totalSiswa' => Siswa::whereIn('status', ['aktif', 'menunggu_penempatan'])->count(),
@@ -71,6 +78,7 @@ class DashboardController extends Controller
             'unreadCount' => $unreadCount,
             'pendingPendaftaran' => $pendingPendaftaran,
             'tahunAjaranAktif' => $tahunAjaranAktif,
+            'recentUsers' => $recentUsers,
         ]);
     }
 }
