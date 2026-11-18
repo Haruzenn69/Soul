@@ -84,7 +84,7 @@
                 return $direction === 'asc' ? 'M8 15l4 4 4-4' : 'M8 9l4-4 4 4';
             };
 
-            $hasFilter = request()->filled(['q', 'predikat']) || request()->filled('sort');
+            $hasFilter = request()->filled(['q', 'predikat', 'kelas_id']) || request()->filled('sort');
             $dinilai = $rows->filter(fn ($r) => $r->penilaian !== null);
         @endphp
 
@@ -109,6 +109,15 @@
                         <option value="{{ $pr }}" {{ request('predikat') === $pr ? 'selected' : '' }}>Predikat {{ $pr }}</option>
                     @endforeach
                 </select>
+
+                @if(isset($daftarKelas) && $daftarKelas->isNotEmpty())
+                    <select name="kelas_id" class="px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                        <option value="">Semua Kelas</option>
+                        @foreach($daftarKelas as $kelasOpt)
+                            <option value="{{ $kelasOpt->id }}" {{ request('kelas_id') == $kelasOpt->id ? 'selected' : '' }}>{{ $kelasOpt->nama }}</option>
+                        @endforeach
+                    </select>
+                @endif
 
                 <button type="submit" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-xl shadow-sm transition">
                     Filter

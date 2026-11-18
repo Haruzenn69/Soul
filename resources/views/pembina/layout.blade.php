@@ -92,21 +92,9 @@
 
             <!-- KANAN: Info User + Notifikasi + Logout -->
             <div class="flex items-center gap-2 md:gap-3 shrink-0">
-                @if($__isKesiswaan)
-                    <a href="{{ route('kesiswaan.dashboard') }}"
-                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition shadow-sm">
-                        <i class="fa-solid fa-arrow-left text-[10px]"></i>
-                        <span>Panel Kesiswaan</span>
-                    </a>
-                    <div class="bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 hidden sm:flex">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                        Akses Kesiswaan (Semua Ekskul)
-                    </div>
-                @else
-                    <div class="bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-900/50 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 hidden sm:block">
-                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Pembina
-                    </div>
-                @endif
+                <div class="bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-900/50 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 hidden sm:block">
+                    <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Pembina
+                </div>
                 <a href="{{ $__isKesiswaan ? route('kesiswaan.notifikasi') : route('pembina.notifikasi') }}" class="w-9 h-9 rounded-xl bg-white dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 flex items-center justify-center text-xs relative text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-neutral-700 hover:border-sky-200 dark:hover:border-neutral-600 transition-all shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -115,12 +103,6 @@
                         <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 absolute top-1.5 right-1.5 border-2 border-white dark:border-neutral-800 shadow-sm"></span>
                     @endif
                 </a>
-                <form method="POST" action="{{ route('logout') }}" class="hidden sm:block">
-                    @csrf
-                    <button type="submit" class="bg-red-50 dark:bg-rose-950/30 hover:bg-red-100 dark:hover:bg-rose-900/40 text-red-400 dark:text-rose-400 px-4 py-2 rounded-lg text-xs font-semibold border border-red-100 dark:border-rose-900/50 transition shadow-sm">
-                        Logout
-                    </button>
-                </form>
             </div>
         </header>
 

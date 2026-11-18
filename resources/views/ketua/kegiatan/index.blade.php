@@ -6,7 +6,7 @@
     @include('partials.ketua-card-catalog', [
         'title' => 'Jadwal & Presensi Kegiatan',
         'subtitle' => 'Pilih salah satu ekstrakurikuler di bawah ini untuk melihat jadwal, mengelola kegiatan, dan input presensi.',
-        'featureBadge' => 'Operasional Ketua • Kegiatan',
+        'hideFeatureBadge' => true,
         'icon' => 'fa-solid fa-calendar-check',
         'cards' => $cards,
     ])

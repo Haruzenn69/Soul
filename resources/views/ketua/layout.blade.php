@@ -119,17 +119,7 @@
 
             <!-- KANAN: Info User + Notifikasi + Logout -->
             <div class="flex items-center gap-2 md:gap-3 shrink-0">
-                @if($__isKesiswaan)
-                    <a href="{{ route('kesiswaan.dashboard') }}"
-                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition shadow-sm">
-                        <i class="fa-solid fa-arrow-left text-[10px]"></i>
-                        <span class="hidden sm:inline">Panel Kesiswaan</span>
-                    </a>
-                    <div class="bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 px-2.5 py-1 rounded-lg text-[11px] font-bold hidden lg:flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                        Mode Kesiswaan
-                    </div>
-                @else
+                @if(!$__isKesiswaan)
                     <div class="bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-800/50 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-2 hidden sm:block">
                         <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Ketua
                     </div>

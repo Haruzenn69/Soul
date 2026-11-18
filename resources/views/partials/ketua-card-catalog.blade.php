@@ -21,9 +21,11 @@
     <div class="bg-white dark:bg-[#1a1a1a] rounded-3xl p-6 md:p-8 border border-slate-200/80 dark:border-neutral-800 shadow-sm">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100 dark:border-neutral-800">
             <div>
+                @if(!(isset($hideFeatureBadge) && $hideFeatureBadge))
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 text-xs font-bold border border-sky-200/60 dark:border-sky-800/50 mb-2">
                     <i class="{{ $icon ?? 'fa-solid fa-shapes' }} text-xs"></i> {{ $featureBadge ?? 'Operasional Ketua' }}
                 </span>
+                @endif
                 <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                     {{ $title ?? 'Pilih Ekstrakurikuler' }}
                 </h1>
@@ -32,7 +34,7 @@
                 </p>
             </div>
             <div class="flex items-center gap-2">
-                <span class="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-slate-300 text-xs font-bold border border-slate-200/80 dark:border-neutral-700">
+                <span class="px-3.5 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 text-xs font-bold border border-sky-200/60 dark:border-sky-800/50">
                     Total {{ $cards->count() }} Ekskul
                 </span>
             </div>
@@ -119,7 +121,7 @@
 
                     {{-- Action Button --}}
                     <a href="{{ $card->actionUrl }}"
-                       class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs">
+                       class="w-full py-2.5 px-4 rounded-xl bg-sky-500 hover:bg-sky-600 dark:bg-sky-500 dark:hover:bg-sky-600 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs">
                         <span>{{ $card->actionText ?? 'Kelola' }}</span>
                         <i class="fa-solid fa-arrow-right text-[11px]"></i>
                     </a>

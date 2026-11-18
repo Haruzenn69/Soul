@@ -99,6 +99,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/search/suggestions', [SearchSuggestionController::class, 'index'])->name('search.suggestions');
     Route::post('/onboarding/setup', [OnboardingController::class, 'setup'])->name('onboarding.setup');
     Route::post('/onboarding/login', [OnboardingController::class, 'returnToLogin'])->name('onboarding.login');
+    Route::post('/onboarding/dismiss', [OnboardingController::class, 'dismiss'])->name('onboarding.dismiss');
 
 });
 

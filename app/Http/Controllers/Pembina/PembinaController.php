@@ -981,6 +981,10 @@ class PembinaController extends Controller
             'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore(auth()->id())],
             'foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'no_telp' => ['nullable', 'string', 'max:25'],
+            'jenis_kelamin' => ['nullable', Rule::in(['laki-laki', 'perempuan'])],
+            'tempat_lahir' => ['nullable', 'string', 'max:100'],
+            'tanggal_lahir' => ['nullable', 'date'],
+            'agama' => ['nullable', 'string', 'max:50'],
         ], [
             'username.alpha_dash' => 'Username hanya boleh berisi huruf, angka, tanda hubung (-), dan garis bawah (_).',
             'username.unique' => 'Username sudah digunakan akun lain.',
@@ -996,16 +1000,24 @@ class PembinaController extends Controller
         $oldEmail = $user->email;
         $oldFoto = $pembina->foto;
         $oldNoTelp = $pembina->no_telp;
+        $oldJenisKelamin = $pembina->jenis_kelamin;
+        $oldTempatLahir = $pembina->tempat_lahir;
+        $oldTanggalLahir = $pembina->tanggal_lahir?->format('Y-m-d');
+        $oldAgama = $pembina->agama;
         $newUsername = !empty($validated['username']) ? $validated['username'] : $oldUsername;
         $newEmail = $validated['email'] ?? null;
         $newNoTelp = $validated['no_telp'] ?? null;
+        $newJenisKelamin = $validated['jenis_kelamin'] ?? null;
+        $newTempatLahir = $validated['tempat_lahir'] ?? null;
+        $newTanggalLahir = $validated['tanggal_lahir'] ?? null;
+        $newAgama = $validated['agama'] ?? null;
         $fotoPath = $request->hasFile('foto')
             ? $request->file('foto')->store('profile-photos', 'public')
             : $oldFoto;
 
         $changedFields = [];
 
-        DB::transaction(function () use ($pembina, $user, $validated, $oldUsername, $oldEmail, $oldFoto, $oldNoTelp, $newUsername, $newEmail, $newNoTelp, $fotoPath, &$changedFields) {
+        DB::transaction(function () use ($pembina, $user, $validated, $oldUsername, $oldEmail, $oldFoto, $oldNoTelp, $oldJenisKelamin, $oldTempatLahir, $oldTanggalLahir, $oldAgama, $newUsername, $newEmail, $newNoTelp, $newJenisKelamin, $newTempatLahir, $newTanggalLahir, $newAgama, $fotoPath, &$changedFields) {
             $userUpdates = [];
             if (! empty($validated['username']) && $validated['username'] !== $user->username) {
                 $userUpdates['username'] = $validated['username'];
@@ -1023,12 +1035,20 @@ class PembinaController extends Controller
                 'email' => [$oldEmail, $newEmail],
                 'no_telp' => [$oldNoTelp, $newNoTelp],
                 'foto' => [$oldFoto, $fotoPath],
+                'jenis_kelamin' => [$oldJenisKelamin, $newJenisKelamin],
+                'tempat_lahir' => [$oldTempatLahir, $newTempatLahir],
+                'tanggal_lahir' => [$oldTanggalLahir, $newTanggalLahir],
+                'agama' => [$oldAgama, $newAgama],
             ];
 
             $pembina->update([
                 'email' => $newEmail,
                 'no_telp' => $newNoTelp,
                 'foto' => $fotoPath,
+                'jenis_kelamin' => $newJenisKelamin,
+                'tempat_lahir' => $newTempatLahir,
+                'tanggal_lahir' => $newTanggalLahir,
+                'agama' => $newAgama,
             ]);
 
             foreach ($changes as $field => [$oldValue, $newValue]) {

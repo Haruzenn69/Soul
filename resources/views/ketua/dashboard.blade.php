@@ -40,7 +40,7 @@
                     <div class="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
                         <div class="absolute -bottom-10 -left-6 w-32 h-32 rounded-full bg-white/20 blur-2xl"></div>
                     </div>
-                    <img src="{{ asset('images/default.png') }}" alt="Ilustrasi Ketua"
+                    <img src="{{ asset('images/defaultransparan.png') }}" alt="Ilustrasi Ketua"
                          class="h-24 sm:h-28 md:h-40 lg:h-44 w-auto max-w-full md:max-w-[130px] lg:max-w-[150px] object-contain drop-shadow-xl animate-floaty select-none relative z-0 mb-8 md:mb-2 pointer-events-none">
                 </div>
 
