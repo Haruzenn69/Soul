@@ -28,9 +28,6 @@ class UserController extends Controller
     public function index(Request $request): View
     {
         $roleFilter = $request->input('role');
-        if ($roleFilter === 'guru') {
-            $roleFilter = 'pembina';
-        }
 
         $sort = in_array($request->input('sort'), ['username', 'email', 'role', 'created_at'], true) ? $request->input('sort') : 'created_at';
         $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
@@ -46,7 +43,9 @@ class UserController extends Controller
                 });
             })
             ->when($roleFilter, function ($query) use ($roleFilter) {
-                if ($roleFilter === 'staff') {
+                if ($roleFilter === 'guru') {
+                    $query->whereIn('role', ['pembina', 'kesiswaan']);
+                } elseif ($roleFilter === 'staff') {
                     $query->whereIn('role', ['kesiswaan', 'admin']);
                 } else {
                     $query->where('role', $roleFilter);
@@ -60,8 +59,10 @@ class UserController extends Controller
         $counts = [
             'all' => User::count(),
             'siswa' => User::where('role', 'siswa')->count(),
-            'guru' => User::where('role', 'pembina')->count(),
-            'staff' => User::whereIn('role', ['kesiswaan', 'admin'])->count(),
+            'guru' => User::whereIn('role', ['pembina', 'kesiswaan'])->count(),
+            'pembina' => User::where('role', 'pembina')->count(),
+            'kesiswaan' => User::where('role', 'kesiswaan')->count(),
+            'staff' => User::where('role', 'admin')->count(),
         ];
 
         return view('kesiswaan.users.index', compact('users', 'counts', 'roleFilter', 'sort', 'direction'));
@@ -89,18 +90,21 @@ class UserController extends Controller
         $validated = $request->validate([
             'jenis' => ['required', 'in:siswa,pembina'],
             'kelas_id' => ['required_if:jenis,siswa', 'nullable', 'integer', Rule::exists('kelas', 'id')->where('tahun_ajaran_id', TahunAjaran::where('status', 'aktif')->value('id'))],
+            'role_guru' => ['nullable', 'in:pembina,kesiswaan'],
             'file' => ['required', 'file', 'mimes:xlsx,xls,csv'],
         ], [
             'jenis.required' => 'Pilih jenis akun (siswa/pembina) terlebih dahulu.',
             'kelas_id.required' => 'Pilih kelas untuk akun siswa.',
             'kelas_id.exists' => 'Kelas yang dipilih tidak valid.',
+            'role_guru.in' => 'Hak akses guru yang dipilih tidak valid.',
             'file.required' => 'File excel wajib diunggah.',
             'file.mimes' => 'File harus berupa .xlsx, .xls, atau .csv.',
         ]);
 
+        $defaultRole = $validated['role_guru'] ?? 'pembina';
         $import = $validated['jenis'] === 'siswa'
             ? new SiswaImport((int) $validated['kelas_id'])
-            : new PembinaImport;
+            : new PembinaImport($defaultRole);
 
         Excel::import($import, $request->file('file'));
 
@@ -138,18 +142,25 @@ class UserController extends Controller
             ->with('import_jenis', $jenis);
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
+        $role = $request->query('role');
+        if (! $role) {
+            $referer = (string) $request->headers->get('referer', '');
+            $role = str_contains($referer, 'pembina') ? 'guru' : 'siswa';
+        }
+
         return view('kesiswaan.users.create', [
             'kelas' => Kelas::with('tahunAjaran')->whereHas('tahunAjaran', fn ($query) => $query->where('status', 'aktif'))->orderBy('nama')->get(),
+            'role' => $role,
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $isStaff = in_array($request->input('role'), ['admin', 'kesiswaan']);
+        $isStaff = $request->input('role') === 'admin';
 
-        $isPembina = $request->input('role') === 'pembina';
+        $isGuru = in_array($request->input('role'), ['pembina', 'kesiswaan'], true);
 
         $rules = [
             'username' => [$isStaff ? 'required' : 'nullable', 'string', 'max:255', 'unique:users,username'],
@@ -173,7 +184,7 @@ class UserController extends Controller
                 'alamat' => ['nullable', 'string'],
                 'medsos' => ['nullable', 'string', 'max:255'],
             ];
-        } elseif ($request->input('role') === 'pembina') {
+        } elseif ($isGuru) {
             $rules += [
                 'pembina_nama' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s.,\'-]+$/'],
                 'pembina_foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
@@ -247,7 +258,7 @@ class UserController extends Controller
                 'password' => Hash::make('password'),
                 'role' => $data['role'],
                 'email_verified_at' => now(),
-                'onboarding_completed_at' => in_array($data['role'], ['siswa', 'pembina'], true) ? null : now(),
+                'onboarding_completed_at' => now(),
             ]);
 
             if ($data['role'] === 'siswa') {
@@ -271,7 +282,7 @@ class UserController extends Controller
                     'medsos' => $data['medsos'] ?? null,
                     'jabatan' => 'siswa',
                 ]);
-            } elseif ($data['role'] === 'pembina') {
+            } elseif (in_array($data['role'], ['pembina', 'kesiswaan'], true)) {
                 $pembinaFotoPath = $request->hasFile('pembina_foto')
                     ? $request->file('pembina_foto')->store('profile-photos', 'public')
                     : null;
@@ -294,8 +305,13 @@ class UserController extends Controller
             return $user;
         });
 
-        return redirect()
-            ->route('kesiswaan.users.index')
+        $targetRoute = match ($data['role']) {
+            'siswa' => route('kesiswaan.siswa.index'),
+            'pembina', 'kesiswaan' => route('kesiswaan.pembina.index'),
+            default => route('kesiswaan.siswa.index'),
+        };
+
+        return redirect($targetRoute)
             ->with('success', $user->username
                 ? "Akun {$user->username} berhasil dibuat dengan password default: password"
                 : 'Akun berhasil dibuat. Password default: password (akun dapat diubah sendiri lewat menu Profil).');
@@ -477,7 +493,7 @@ class UserController extends Controller
                     $existingPembina->delete();
                 }
 
-            } elseif ($data['role'] === 'pembina') {
+            } elseif (in_array($data['role'], ['pembina', 'kesiswaan'], true)) {
                 $pembinaData = [
                     'nip' => $data['nip'],
                     'nama' => mb_strtoupper(trim($data['pembina_nama'])),

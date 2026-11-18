@@ -162,8 +162,8 @@
                     </div>
                 </div>
                 <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
-                    <a href="{{ route('kesiswaan.users.create') }}" class="text-xs font-bold text-sky-600 hover:text-sky-700 inline-flex items-center gap-1">
-                        Buka Form Import <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    <a href="{{ route('kesiswaan.users.import-form', 'siswa') }}" class="text-xs font-bold text-sky-600 hover:text-sky-700 inline-flex items-center gap-1">
+                        Buka Form Import Siswa <i class="fa-solid fa-arrow-right text-[10px]"></i>
                     </a>
                 </div>
             </div>

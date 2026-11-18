@@ -13,8 +13,16 @@
         $initialStep = 4;
     }
 
-    $currentRole = old('role', old('jenis') === 'pembina' ? 'pembina' : 'siswa');
+    $requestedRole = request('role', request('jenis', $role ?? 'siswa'));
+    if ($requestedRole === 'guru') {
+        $requestedRole = 'pembina';
+    }
+    $isGuruMode = in_array($requestedRole, ['pembina', 'kesiswaan'], true);
+    $isSiswaMode = ! $isGuruMode;
+    $currentRole = $isGuruMode ? old('role', in_array($requestedRole, ['kesiswaan']) ? 'kesiswaan' : 'pembina') : 'siswa';
     $currentJenisKelamin = old('jenis_kelamin', '');
+    $backUrl = $isGuruMode ? route('kesiswaan.pembina.index') : route('kesiswaan.siswa.index');
+    $backText = $isGuruMode ? 'Kembali ke Data Guru' : 'Kembali ke Data Siswa';
 @endphp
 
 <script>
@@ -364,7 +372,7 @@ function userCreateForm() {
                     document.getElementById('input-siswa-nis')?.focus();
                     return false;
                 }
-            } else if (this.role === 'pembina') {
+            } else if (this.role === 'pembina' || this.role === 'kesiswaan') {
                 if (!this.pembinaNip || this.pembinaNip.length !== 18) {
                     e.preventDefault();
                     this.showWarning({
@@ -394,19 +402,23 @@ function userCreateForm() {
 
         <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-extrabold bg-white/20 text-white border border-white/30 backdrop-blur-sm mb-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                    <span>Role Akun: {{ $isGuruMode ? 'Guru & Pembina' : 'Siswa' }}</span>
+                </div>
                 <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">
-                    Buat Akun Baru
+                    {{ $isGuruMode ? 'Tambah Data Guru' : 'Tambah Data Siswa' }}
                 </h1>
-                <p class="text-xs text-white/80 mt-1.5 max-w-xl leading-relaxed">
-                    Buat akun pengguna baru untuk siswa, guru/pembina, atau staf. Password default: <span class="font-bold text-white">password</span>
+                <p class="text-xs text-white/80 mt-1 max-w-xl leading-relaxed">
+                    {{ $isGuruMode ? 'Formulir pembuatan akun guru secara satuan. Password default: password' : 'Formulir pembuatan akun siswa secara satuan. Password default: password' }}
                 </p>
             </div>
 
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
-                <a href="{{ route('kesiswaan.users.index') }}"
+                <a href="{{ $backUrl }}"
                    class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/20 transition-all">
                     <i class="fa-solid fa-arrow-left text-xs"></i>
-                    Kembali ke Daftar Akun
+                    {{ $backText }}
                 </a>
             </div>
         </div>
@@ -436,43 +448,10 @@ function userCreateForm() {
     <form action="{{ route('kesiswaan.users.store') }}" method="POST" enctype="multipart/form-data" id="form-create-user" novalidate x-on:submit="handleSubmit($event)">
         @csrf
 
-        {{-- PILIH ROLE --}}
-        <div class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-4 mb-5">
-            <div>
-                <h2 class="text-sm font-extrabold text-slate-900">Pilih Role</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Tentukan jenis akun yang akan dibuat.</p>
-            </div>
-
-            @php
-                $roles = [
-                    'siswa' => ['label' => 'Siswa', 'desc' => 'Akun siswa dengan biodata & kelas'],
-                    'pembina' => ['label' => 'Guru / Pembina', 'desc' => 'Akun pembina ekskul dengan NIP'],
-                    'kesiswaan' => ['label' => 'Kesiswaan', 'desc' => 'Staf admin kesiswaan'],
-                ];
-                if (auth()->user()->role === 'admin') {
-                    $roles['admin'] = ['label' => 'Administrator', 'desc' => 'Akses penuh manajemen sistem'];
-                }
-            @endphp
-
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                @foreach ($roles as $rVal => $rData)
-                    <label class="relative flex flex-col p-3 rounded-2xl border-2 cursor-pointer transition-all"
-                           :class="role === '{{ $rVal }}' ? 'border-sky-500 bg-sky-50/60' : 'border-slate-100 hover:border-slate-200 bg-slate-50/40'">
-                        <input type="radio" name="role" value="{{ $rVal }}" x-model="role" @change="checkSiswaClassAvailability()" class="sr-only">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold" :class="role === '{{ $rVal }}' ? 'text-sky-900' : 'text-slate-800'">
-                                {{ $rData['label'] }}
-                            </span>
-                            <span class="w-4 h-4 rounded-full border flex items-center justify-center transition-colors"
-                                  :class="role === '{{ $rVal }}' ? 'border-sky-500 bg-sky-500' : 'border-slate-300'">
-                                <span class="w-1.5 h-1.5 rounded-full bg-white" x-show="role === '{{ $rVal }}'"></span>
-                            </span>
-                        </div>
-                        <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">{{ $rData['desc'] }}</p>
-                    </label>
-                @endforeach
-            </div>
-        </div>
+        {{-- ROLE OTOMATIS: SISWA --}}
+        @if ($isSiswaMode)
+            <input type="hidden" name="role" value="siswa">
+        @endif
 
         {{-- =============================================================== --}}
         {{-- ROLE: SISWA (TWO-COLUMN: FORM + PREVIEW)                        --}}
@@ -483,9 +462,23 @@ function userCreateForm() {
                 {{-- LEFT: FORM COLUMN --}}
                 <div class="flex-1 min-w-0 space-y-5">
 
-                    <a href="{{ route('kesiswaan.users.import-form', 'siswa') }}" class="inline-flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-xs font-bold text-emerald-800 hover:bg-emerald-100">
-                        <i class="fa-solid fa-file-excel text-sm text-emerald-600"></i> Import Akun Siswa dengan Excel
-                    </a>
+                    {{-- OPSI IMPORT SISWA DENGAN EXCEL --}}
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-3xl bg-emerald-50/70 border border-emerald-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-file-excel text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-emerald-950">Ingin menambahkan banyak siswa sekaligus?</h4>
+                                <p class="text-[11px] text-emerald-700/80 mt-0.5">Gunakan format file Excel untuk import akun siswa secara massal.</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('kesiswaan.users.import-form', 'siswa') }}"
+                           class="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 transition shrink-0 shadow-sm shadow-emerald-200">
+                            <i class="fa-solid fa-file-excel text-xs"></i>
+                            Import Siswa Excel
+                        </a>
+                    </div>
 
                     {{-- STEPPER NAV --}}
                     <div class="bg-white rounded-3xl p-4 md:p-5 border border-sky-100 shadow-sm">
@@ -745,7 +738,7 @@ function userCreateForm() {
                                 Kembali
                             </button>
                             <div class="flex items-center gap-2">
-                                <a href="{{ route('kesiswaan.users.index') }}"
+                                <a href="{{ route('kesiswaan.siswa.index') }}"
                                    class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-2xl transition">Batal</a>
                                 <button type="submit"
                                         class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm shadow-sky-200 transition">
@@ -860,26 +853,71 @@ function userCreateForm() {
         </div>
 
         {{-- =============================================================== --}}
-        {{-- ROLE: PEMBINA (GURU) - SIMPLIFIED                               --}}
+        {{-- ROLE: PEMBINA & KESISWAAN (GURU) - SIMPLIFIED                   --}}
         {{-- =============================================================== --}}
-        <div x-show="role === 'pembina'" x-cloak>
+        <div x-show="role === 'pembina' || role === 'kesiswaan'" x-cloak>
             <div class="flex flex-col lg:flex-row gap-5 items-stretch">
 
                 {{-- LEFT: FORM --}}
                 <div class="flex-1 min-w-0">
-                    <a href="{{ route('kesiswaan.users.import-form', 'pembina') }}" class="mb-5 inline-flex items-center gap-2 rounded-2xl border border-blue-200 bg-blue-50 px-5 py-3 text-xs font-bold text-blue-800 hover:bg-blue-100">
-                        <i class="fa-solid fa-file-excel text-sm text-blue-600"></i> Import Akun Guru dengan Excel
-                    </a>
+                    {{-- OPSI IMPORT GURU DENGAN EXCEL --}}
+                    <div class="mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-3xl bg-blue-50/70 border border-blue-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-file-excel text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-blue-950">Ingin menambahkan banyak guru sekaligus?</h4>
+                                <p class="text-[11px] text-blue-700/80 mt-0.5">Gunakan format file Excel untuk import akun guru beserta hak aksesnya.</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('kesiswaan.users.import-form', 'pembina') }}"
+                           class="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-blue-700 transition shrink-0 shadow-sm shadow-blue-200">
+                            <i class="fa-solid fa-file-excel text-xs"></i>
+                            Import Guru Excel
+                        </a>
+                    </div>
+
                     <div class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-5">
                         <div class="border-b border-slate-100 pb-3">
-                            <h3 class="text-sm font-extrabold text-slate-900">Data Guru / Pembina Ekskul</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">Lengkapi seluruh biodata pembina. Username akan dibuat sendiri oleh pembina saat login pertama.</p>
+                            <h3 class="text-sm font-extrabold text-slate-900" x-text="role === 'kesiswaan' ? 'Data Guru (Kesiswaan)' : 'Data Guru (Pembina Ekskul)'">Data Guru / Pembina Ekskul</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Lengkapi seluruh biodata guru. Username dan password dapat diatur secara mandiri di menu Profil.</p>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {{-- PERAN / JABATAN GURU --}}
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Jabatan / Hak Akses Guru <span class="text-rose-500">*</span></label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <label class="flex items-center gap-3 p-3.5 rounded-2xl border-2 cursor-pointer transition"
+                                           :class="role === 'pembina' ? 'border-sky-500 bg-sky-50/60 ring-2 ring-sky-100' : 'border-slate-100 bg-slate-50/50 hover:border-slate-200'">
+                                        <input type="radio" name="role" value="pembina" x-model="role" class="sr-only">
+                                        <span class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0"
+                                              :class="role === 'pembina' ? 'border-sky-500 bg-sky-500' : 'border-slate-300'">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-white" x-show="role === 'pembina'"></span>
+                                        </span>
+                                        <div>
+                                            <span class="text-xs font-bold text-slate-900 block">Guru Pembina Ekskul</span>
+                                            <span class="text-[11px] text-slate-400 block mt-0.5">Membimbing dan mengelola kegiatan ekstrakurikuler</span>
+                                        </div>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-3.5 rounded-2xl border-2 cursor-pointer transition"
+                                           :class="role === 'kesiswaan' ? 'border-sky-500 bg-sky-50/60 ring-2 ring-sky-100' : 'border-slate-100 bg-slate-50/50 hover:border-slate-200'">
+                                        <input type="radio" name="role" value="kesiswaan" x-model="role" class="sr-only">
+                                        <span class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0"
+                                              :class="role === 'kesiswaan' ? 'border-sky-500 bg-sky-500' : 'border-slate-300'">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-white" x-show="role === 'kesiswaan'"></span>
+                                        </span>
+                                        <div>
+                                            <span class="text-xs font-bold text-slate-900 block">Guru Kesiswaan</span>
+                                            <span class="text-[11px] text-slate-400 block mt-0.5">Memiliki akses manajemen kesiswaan sekolah</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Nama Lengkap Beserta Gelar *</label>
-                                <input type="text" name="pembina_nama" id="input-pembina-nama" x-model="pembinaNama" :disabled="role !== 'pembina'" placeholder="Contoh: Dra. Siti Fatimah, M.Pd" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input type="text" name="pembina_nama" id="input-pembina-nama" x-model="pembinaNama" :disabled="role !== 'pembina' && role !== 'kesiswaan'" placeholder="Contoh: Dra. Siti Fatimah, M.Pd" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                                 <p class="text-[10px] text-slate-400 mt-1">Hanya huruf alfabet, spasi, dan tanda baca gelar (tidak boleh angka).</p>
                             </div>
                             <div>
@@ -891,7 +929,7 @@ function userCreateForm() {
                                 </label>
                                 <input type="text" inputmode="numeric" maxlength="18" name="nip" id="input-pembina-nip"
                                        x-model="pembinaNip"
-                                       :disabled="role !== 'pembina'"
+                                       :disabled="role !== 'pembina' && role !== 'kesiswaan'"
                                        @input="pembinaNip = $event.target.value.replace(/\D/g, '').slice(0, 18)"
                                        placeholder="18 digit angka"
                                        class="w-full px-4 py-2.5 bg-slate-50 border rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:ring-2 transition"
@@ -900,11 +938,11 @@ function userCreateForm() {
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Email *</label>
-                                <input type="email" name="email" id="input-pembina-email" :disabled="role !== 'pembina'" value="{{ old('email') }}" placeholder="guru@sekolah.sch.id" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input type="email" name="email" id="input-pembina-email" :disabled="role !== 'pembina' && role !== 'kesiswaan'" value="{{ old('email') }}" placeholder="guru@sekolah.sch.id" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Jenis Kelamin *</label>
-                                <select name="pembina_jenis_kelamin" id="input-pembina-jenis-kelamin" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <select name="pembina_jenis_kelamin" id="input-pembina-jenis-kelamin" :disabled="role !== 'pembina' && role !== 'kesiswaan'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                                     <option value="">Pilih jenis kelamin</option>
                                     <option value="laki-laki" {{ old('pembina_jenis_kelamin') === 'laki-laki' ? 'selected' : '' }}>Laki-laki</option>
                                     <option value="perempuan" {{ old('pembina_jenis_kelamin') === 'perempuan' ? 'selected' : '' }}>Perempuan</option>
@@ -912,15 +950,15 @@ function userCreateForm() {
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tempat Lahir *</label>
-                                <input type="text" name="pembina_tempat_lahir" id="input-pembina-tempat-lahir" x-model="pembinaTempatLahir" :disabled="role !== 'pembina'" value="{{ old('pembina_tempat_lahir') }}" placeholder="Contoh: Bandung" maxlength="100" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs disabled:opacity-60 disabled:cursor-not-allowed">
+                                <input type="text" name="pembina_tempat_lahir" id="input-pembina-tempat-lahir" x-model="pembinaTempatLahir" :disabled="role !== 'pembina' && role !== 'kesiswaan'" value="{{ old('pembina_tempat_lahir') }}" placeholder="Contoh: Bandung" maxlength="100" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs disabled:opacity-60 disabled:cursor-not-allowed">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tanggal Lahir *</label>
-                                <input type="date" name="pembina_tanggal_lahir" id="input-pembina-tanggal-lahir" :disabled="role !== 'pembina'" value="{{ old('pembina_tanggal_lahir') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input type="date" name="pembina_tanggal_lahir" id="input-pembina-tanggal-lahir" :disabled="role !== 'pembina' && role !== 'kesiswaan'" value="{{ old('pembina_tanggal_lahir') }}" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Agama *</label>
-                                <select name="pembina_agama" id="input-pembina-agama" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <select name="pembina_agama" id="input-pembina-agama" :disabled="role !== 'pembina' && role !== 'kesiswaan'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                                     <option value="">Pilih agama</option>
                                     @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agama)
                                         <option value="{{ $agama }}" {{ old('pembina_agama') === $agama ? 'selected' : '' }}>{{ $agama }}</option>
@@ -929,29 +967,29 @@ function userCreateForm() {
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">No. Telp / WA <span class="font-normal text-slate-400 normal-case">(Opsional)</span></label>
-                                <input type="text" name="pembina_no_telp" id="input-pembina-no-telp" :disabled="role !== 'pembina'" value="{{ old('pembina_no_telp') }}" placeholder="08xxxxxxxxxx" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input type="text" name="pembina_no_telp" id="input-pembina-no-telp" :disabled="role !== 'pembina' && role !== 'kesiswaan'" value="{{ old('pembina_no_telp') }}" placeholder="08xxxxxxxxxx" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Media Sosial (opsional)</label>
-                                <input type="text" name="pembina_medsos" :disabled="role !== 'pembina'" value="{{ old('pembina_medsos') }}" placeholder="@username / tautan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input type="text" name="pembina_medsos" :disabled="role !== 'pembina' && role !== 'kesiswaan'" value="{{ old('pembina_medsos') }}" placeholder="@username / tautan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Alamat <span class="font-normal text-slate-400 normal-case">(Opsional)</span></label>
-                                <textarea name="pembina_alamat" id="input-pembina-alamat" rows="2" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">{{ old('pembina_alamat') }}</textarea>
+                                <textarea name="pembina_alamat" id="input-pembina-alamat" rows="2" :disabled="role !== 'pembina' && role !== 'kesiswaan'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">{{ old('pembina_alamat') }}</textarea>
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Foto Profil (opsional)</label>
-                                <input type="file" name="pembina_foto" id="input-foto-pembina" @change="handlePembinaPhoto($event)" accept="image/jpeg,image/png,image/jpg,image/webp" :disabled="role !== 'pembina'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
+                                <input type="file" name="pembina_foto" id="input-foto-pembina" @change="handlePembinaPhoto($event)" accept="image/jpeg,image/png,image/jpg,image/webp" :disabled="role !== 'pembina' && role !== 'kesiswaan'" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs">
                                 <p class="text-[10px] text-slate-400 mt-1">Format JPG, PNG, WEBP. Maksimal 2MB.</p>
                             </div>
                         </div>
 
                         <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-                            <a href="{{ route('kesiswaan.users.index') }}"
+                            <a href="{{ route('kesiswaan.pembina.index') }}"
                                class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-2xl transition">Batal</a>
                             <button type="submit"
                                     class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm shadow-sky-200 transition">
-                                Simpan Akun Pembina
+                                <span x-text="role === 'kesiswaan' ? 'Simpan Akun Guru (Kesiswaan)' : 'Simpan Akun Guru (Pembina)'">Simpan Akun Pembina</span>
                             </button>
                         </div>
                     </div>
@@ -965,7 +1003,7 @@ function userCreateForm() {
                                 <h4 class="text-xs font-extrabold text-slate-700">Pratinjau Akun</h4>
                                 <p class="text-[10px] text-slate-400">Data terisi otomatis</p>
                             </div>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">Pembina</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100" x-text="role === 'kesiswaan' ? 'Kesiswaan' : 'Pembina'">Pembina</span>
                         </div>
 
                         <div class="px-5 pt-5 pb-4 flex items-center gap-3 border-b border-slate-100">
@@ -975,7 +1013,7 @@ function userCreateForm() {
                             <div class="min-w-0 flex-1">
                                 <p class="text-sm font-extrabold text-slate-900 truncate" x-text="pembinaNama || 'Nama Guru / Pembina'"></p>
                                 <p class="text-[11px] text-slate-400 mt-0.5">Biodata diisi kesiswaan</p>
-                                <span class="inline-block mt-1 text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-lg">Role: Pembina Ekskul</span>
+                                <span class="inline-block mt-1 text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-lg" x-text="role === 'kesiswaan' ? 'Role: Guru (Kesiswaan)' : 'Role: Guru (Pembina Ekskul)'">Role: Pembina Ekskul</span>
                             </div>
                         </div>
 
@@ -993,27 +1031,27 @@ function userCreateForm() {
 
 
         {{-- =============================================================== --}}
-        {{-- ROLE: STAF (KESISWAAN / ADMIN)                                  --}}
+        {{-- ROLE: ADMINISTRATOR                                             --}}
         {{-- =============================================================== --}}
-        <div x-show="role === 'kesiswaan' || role === 'admin'" x-cloak class="space-y-5">
+        <div x-show="role === 'admin'" x-cloak class="space-y-5">
             <div class="bg-white rounded-3xl p-6 border border-sky-100 shadow-sm space-y-5">
                 <div class="border-b border-slate-100 pb-3">
-                    <h3 class="text-sm font-extrabold text-slate-900">Data Login Staf / Administrator</h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Akun staf menggunakan kombinasi username dan email.</p>
+                    <h3 class="text-sm font-extrabold text-slate-900">Data Login Administrator</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Akun administrator menggunakan kombinasi username dan email.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Username <span class="text-rose-500">*</span></label>
                         <input type="text" name="username" id="input-staf-username" value="{{ old('username') }}" placeholder="Username untuk login"
-                               :required="role === 'kesiswaan' || role === 'admin'"
-                               :disabled="role !== 'kesiswaan' && role !== 'admin'"
+                               :required="role === 'admin'"
+                               :disabled="role !== 'admin'"
                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                     </div>
                     <div>
                         <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Email <span class="text-rose-500">*</span></label>
-                        <input type="email" name="email" id="input-staf-email" value="{{ old('email') }}" placeholder="staf@sekolah.sch.id"
-                               :disabled="role !== 'kesiswaan' && role !== 'admin'"
+                        <input type="email" name="email" id="input-staf-email" value="{{ old('email') }}" placeholder="admin@sekolah.sch.id"
+                               :disabled="role !== 'admin'"
                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                     </div>
                 </div>

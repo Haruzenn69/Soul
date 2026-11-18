@@ -122,7 +122,7 @@ class KegiatanController extends Controller
     {
         $this->ensureEkskul($kegiatan);
 
-        $kegiatan->load(['presensis.pendaftaran.siswa', 'presensiPelatihs', 'ekskul.pelatih']);
+        $kegiatan->load(['presensis.pendaftaran.siswa.kelas', 'presensiPelatihs', 'ekskul.pelatih']);
 
         $presensiPelatih = $kegiatan->presensiPelatihs->first();
 

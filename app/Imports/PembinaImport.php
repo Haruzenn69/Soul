@@ -20,6 +20,10 @@ class PembinaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHead
 
     protected array $seenEmails = [];
 
+    public function __construct(
+        public string $defaultRole = 'pembina'
+    ) {}
+
     public function rules(): array
     {
         return [
@@ -80,7 +84,7 @@ class PembinaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHead
     public function prepareForValidation(array $row): array
     {
         $clean = [];
-        foreach (['nip', 'nama_lengkap', 'email', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'agama', 'no_telp', 'alamat', 'media_sosial'] as $key) {
+        foreach (['nip', 'nama_lengkap', 'email', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'agama', 'no_telp', 'alamat', 'media_sosial', 'hak_akses'] as $key) {
             $value = trim((string) ($row[$key] ?? ''));
             $clean[$key] = $value === '' ? null : $value;
         }
@@ -128,13 +132,22 @@ class PembinaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHead
             $email = "pembina.{$nip}@soul.internal";
         }
 
+        $role = $this->defaultRole;
+        if (! empty($row['hak_akses']) || ! empty($row['role'])) {
+            $inputRole = strtolower(trim((string) ($row['hak_akses'] ?? $row['role'])));
+            if (in_array($inputRole, ['kesiswaan', 'pembina', 'guru'], true)) {
+                // "guru" (guru biasa) disimpan sebagai role "pembina" tanpa penugasan ekskul
+                $role = $inputRole === 'guru' ? 'pembina' : $inputRole;
+            }
+        }
+
         $user = User::create([
             'username' => null,
             'email' => $email,
             'password' => Hash::make('password'),
-            'role' => 'pembina',
+            'role' => $role,
             'email_verified_at' => now(),
-            'onboarding_completed_at' => null,
+            'onboarding_completed_at' => now(),
         ]);
 
         $user->pembina()->create([

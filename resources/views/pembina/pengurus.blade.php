@@ -4,46 +4,116 @@
 @section('content')
 <div class="space-y-6 animate-fade-up max-w-7xl mx-auto">
 
-    {{-- TOP BAR & EKSKUL SELECTOR (SANGAT JELAS & PROMINENT) --}}
-    <div class="bg-white dark:bg-[#1a1a1a] rounded-3xl p-5 md:p-6 border border-slate-200/80 dark:border-neutral-800 shadow-sm">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 text-[11px] font-bold border border-sky-200/60 dark:border-sky-800/50 mb-2">
-                    <i class="fa-solid fa-users-gear text-xs"></i> Manajemen Kepengurusan
-                </span>
-                <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Pilih Ketua & Pengurus Ekskul</h1>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    Tentukan Ketua Ekskul dan struktur pengurus inti (Wakil Ketua, Sekretaris, Bendahara) untuk memimpin kegiatan ekskul.
-                </p>
+@if (! $ekskul)
+        {{-- STEP 1: PILIH EKSKUL TERLEBIH DAHULU (KATALOG KARTU EKSKUL) --}}
+        <div class="space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100 dark:border-neutral-800">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 text-xs font-bold border border-sky-200/60 dark:border-sky-800/50 mb-2">
+                        <i class="fa-solid fa-users-gear text-xs"></i> Manajemen Kepengurusan
+                    </span>
+                    <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Pilih Ekstrakurikuler</h1>
+                    <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        Pilih salah satu ekstrakurikuler di bawah ini untuk melihat dan mengelola susunan pengurus inti (Ketua, Wakil Ketua, Sekretaris, Bendahara).
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-slate-300 text-xs font-bold border border-slate-200/80 dark:border-neutral-700">
+                        Total {{ $ekskuls->count() }} Ekskul
+                    </span>
+                </div>
             </div>
 
-            {{-- SELECTOR EKSKUL UTAMA (JELAS & MENONJOL) --}}
-            @if($ekskuls->count() > 1)
-                <div class="bg-slate-50 dark:bg-neutral-900/80 p-3 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shrink-0">
-                    <form method="GET" action="{{ route('pembina.pengurus.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                        <label for="ekskul-select" class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 shrink-0">
-                            <i class="fa-solid fa-shapes text-sky-600 dark:text-sky-400 text-xs"></i>
-                            <span>Pilih Ekskul:</span>
-                        </label>
-                        <div class="relative">
-                            <select id="ekskul-select" name="ekskul" onchange="this.form.submit()"
-                                class="w-full sm:w-64 pl-3.5 pr-8 py-2 bg-white dark:bg-[#1a1a1a] border border-slate-300 dark:border-neutral-700 rounded-xl text-xs font-extrabold text-slate-800 dark:text-white shadow-xs focus:outline-none focus:ring-2 focus:ring-sky-500 appearance-none">
-                                @foreach($ekskuls as $item)
-                                    <option value="{{ $item->id }}" {{ ($ekskul && $ekskul->id === $item->id) ? 'selected' : '' }}>
-                                        {{ $item->nama_ekskul }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                                <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                            </span>
+            @if($ekskuls->isEmpty())
+                <div class="bg-white dark:bg-neutral-900 rounded-3xl border border-slate-200/80 dark:border-neutral-800 shadow-sm p-12 text-center">
+                    <div class="w-14 h-14 mx-auto rounded-2xl bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 flex items-center justify-center text-slate-400 mb-4">
+                        <i class="fa-solid fa-folder-open text-xl"></i>
+                    </div>
+                    <h2 class="text-sm font-bold text-slate-900 dark:text-white">Belum Ada Ekskul</h2>
+                    <p class="text-xs text-slate-400 mt-1">Anda belum ditugaskan membina ekstrakurikuler mana pun.</p>
+                </div>
+            @else
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    @foreach($ekskulCards as $card)
+                        <div class="bg-white dark:bg-[#1a1a1a] rounded-2xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-sm flex flex-col justify-between hover:border-sky-300 dark:hover:border-sky-700 hover:shadow-md transition group">
+                            <div>
+                                <div class="flex items-start justify-between gap-2 mb-3">
+                                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-800 dark:bg-sky-950/70 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60">
+                                        {{ $card->ekskul->kategori ?? 'Umum' }}
+                                    </span>
+                                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                                        {{ $card->pengurusCount }}/4 Jabatan
+                                    </span>
+                                </div>
+
+                                <h3 class="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition mb-2">
+                                    {{ $card->ekskul->nama_ekskul }}
+                                </h3>
+
+                                <div class="p-3 bg-slate-50 dark:bg-neutral-900 rounded-xl border border-slate-200/60 dark:border-neutral-800 mb-3 flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-white dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 flex items-center justify-center shrink-0 overflow-hidden">
+                                        @if($card->ketua && $card->ketua->foto_url)
+                                            <img src="{{ $card->ketua->foto_url }}" alt="{{ $card->ketua->nama }}" class="w-full h-full object-cover">
+                                        @elseif($card->ketua)
+                                            <span class="text-[11px] font-extrabold text-slate-700 dark:text-slate-200 uppercase">
+                                                {{ strtoupper(substr($card->ketua->nama, 0, 2)) }}
+                                            </span>
+                                        @else
+                                            <i class="fa-solid fa-crown text-slate-400 text-xs"></i>
+                                        @endif
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 block">Ketua Ekskul:</span>
+                                        <p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                                            {{ $card->ketua?->nama ?? 'Belum Ada Ketua' }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                @if($card->usulanCount > 0)
+                                    <div class="mb-3 px-2.5 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/50 flex items-center gap-1.5 text-amber-700 dark:text-amber-300 text-[11px] font-semibold">
+                                        <i class="fa-solid fa-clock text-amber-500 text-[10px]"></i>
+                                        <span>{{ $card->usulanCount }} usulan menunggu</span>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <a href="{{ route('pembina.pengurus.index', ['ekskul' => $card->ekskul->id]) }}"
+                               class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs mt-3">
+                                <span>Kelola Pengurus</span>
+                                <i class="fa-solid fa-arrow-right text-[11px]"></i>
+                            </a>
                         </div>
-                    </form>
+                    @endforeach
                 </div>
             @endif
         </div>
+    @else
+        {{-- STEP 2: DETAIL PENGURUS EKSKUL TERPILIH --}}
+        {{-- TOP BAR & TOMBOL KEMBALI (DROPDOWN FILTER REDUNDAN DIHAPUS) --}}
+        <div class="bg-white dark:bg-[#1a1a1a] rounded-3xl p-5 md:p-6 border border-slate-200/80 dark:border-neutral-800 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    @if($ekskuls->count() > 1)
+                        <a href="{{ route('pembina.pengurus.index') }}"
+                           class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition shrink-0"
+                           title="Kembali ke Pilihan Ekskul">
+                            <i class="fa-solid fa-arrow-left text-xs"></i>
+                            <span>Pilih Ekskul Lain</span>
+                        </a>
+                    @endif
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 text-[11px] font-bold border border-sky-200/60 dark:border-sky-800/50 mb-1">
+                            <i class="fa-solid fa-users-gear text-xs"></i> Manajemen Kepengurusan
+                        </span>
+                        <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Kelola Pengurus Inti: {{ $ekskul->nama_ekskul }}</h1>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            Tentukan Ketua Ekskul dan struktur pengurus inti (Wakil Ketua, Sekretaris, Bendahara) untuk memimpin kegiatan ekskul.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-        @if($ekskul)
             {{-- SUMMARY BADGE BAR --}}
             <div class="mt-4 pt-4 border-t border-slate-100 dark:border-neutral-800 flex flex-wrap items-center justify-between gap-3 text-xs">
                 <div class="flex items-center gap-2 flex-wrap">
@@ -74,14 +144,7 @@
                     </button>
                 </div>
             </div>
-        @endif
-    </div>
-
-    @if(!$ekskul)
-        <div class="p-8 bg-white dark:bg-neutral-900 rounded-3xl border border-sky-100 dark:border-neutral-800 text-center">
-            <p class="text-sm font-bold text-slate-600 dark:text-slate-300">Anda belum ditugaskan membina ekstrakurikuler mana pun.</p>
         </div>
-    @else
 
         {{-- HERO BANNER (Biru Muda di Light Mode, Hitam di Dark Mode) --}}
         <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-sky-500 to-blue-500 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-950 p-6 md:p-8 text-white border border-sky-200/50 dark:border-neutral-800 shadow-xl shadow-sky-200/50 dark:shadow-none">

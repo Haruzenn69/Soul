@@ -250,6 +250,17 @@
         $namaPelatih = ($pelatihModel && filled($pelatihModel->nama)) ? $pelatihModel->nama : '-';
         $namaKetua = $ekskul->ketua()?->nama ?? 'Ketua Ekskul';
 
+        // Tanda tangan digital pelatih (khusus ditampilkan pada lembar absensi pelatih)
+        $pelatihTtdSrc = '';
+        if ($pelatihModel && !empty($pelatihModel->tanda_tangan)) {
+            $ttdPath = storage_path('app/public/' . $pelatihModel->tanda_tangan);
+            if (file_exists($ttdPath)) {
+                $ttdData = base64_encode(file_get_contents($ttdPath));
+                $ttdMime = mime_content_type($ttdPath);
+                $pelatihTtdSrc = 'data:' . $ttdMime . ';base64,' . $ttdData;
+            }
+        }
+
         $tanggalSurat = $laporan->tanggal_surat 
             ?? \Carbon\Carbon::parse($laporan->bulan)->endOfMonth()->translatedFormat('d F Y');
 
@@ -503,26 +514,6 @@
                 @endforelse
             </tbody>
         </table>
-
-        <!-- TANDA TANGAN PERTEMUAN -->
-        <div class="ttd-dual-container">
-            <table>
-                <tr>
-                    <td style="width: 50%; text-align: left;">
-                        <p>Mengetahui,</p>
-                        <p>Ketua Ekskul {{ $ekskul->nama_ekskul }}</p>
-                        <div class="space"></div>
-                        <p class="nama-ttd">{{ $namaKetua }}</p>
-                    </td>
-                    <td style="width: 50%; text-align: right;">
-                        <p>Bandung, {{ $kegiatan->tanggal_kegiatan ? $kegiatan->tanggal_kegiatan->translatedFormat('d F Y') : $tanggalSurat }}</p>
-                        <p>Pelatih / Pembina Ekskul</p>
-                        <div class="space"></div>
-                        <p class="nama-ttd">{{ $namaPelatih !== '-' ? $namaPelatih : ($ekskul->pembina->nama ?? '..................................................') }}</p>
-                    </td>
-                </tr>
-            </table>
-        </div>
     @endforeach
 
     {{-- =================================================================== --}}
@@ -630,8 +621,15 @@
                             <span style="color: #6b7280;">&ndash;</span>
                         @endif
                     </td>
-                    <td style="text-align: {{ $loop->iteration % 2 === 1 ? 'left' : 'right' }}; padding-left: 6px; padding-right: 6px; font-size: 8.5pt;">
-                        @if($statusPelatih === 'hadir' || ($namaPelatih !== '-' && empty($statusPelatih)))
+                    <td style="text-align: {{ $loop->iteration % 2 === 1 ? 'left' : 'right' }}; padding: 2px 6px; font-size: 8.5pt; vertical-align: middle;">
+                        @if($statusPelatih === 'hadir')
+                            @if(!empty($pelatihTtdSrc))
+                                <span style="font-size: 8pt; vertical-align: middle;">{{ $loop->iteration }}.</span>
+                                <img src="{{ $pelatihTtdSrc }}" alt="TTD" style="max-height: 22px; max-width: 60px; vertical-align: middle; margin-left: 2px;">
+                            @else
+                                {{ $loop->iteration }}. ....................
+                            @endif
+                        @elseif($namaPelatih !== '-' && empty($statusPelatih))
                             {{ $loop->iteration }}. ....................
                         @else
                             <span style="color: #999; font-style: italic;">&ndash;</span>
@@ -645,25 +643,5 @@
             @endforelse
         </tbody>
     </table>
-
-    <!-- TANDA TANGAN LEMBAR PELATIH -->
-    <div class="ttd-dual-container">
-        <table>
-            <tr>
-                <td style="width: 50%; text-align: left;">
-                    <p>Mengetahui,</p>
-                    <p>Ketua Ekskul {{ $ekskul->nama_ekskul }}</p>
-                    <div class="space"></div>
-                    <p class="nama-ttd">{{ $namaKetua }}</p>
-                </td>
-                <td style="width: 50%; text-align: right;">
-                    <p>Bandung, {{ $tanggalSurat }}</p>
-                    <p>Pelatih Ekstrakurikuler</p>
-                    <div class="space"></div>
-                    <p class="nama-ttd">{{ $namaPelatih !== '-' ? $namaPelatih : '..................................................' }}</p>
-                </td>
-            </tr>
-        </table>
-    </div>
 </body>
 </html>

@@ -1,6 +1,6 @@
 @extends('layouts.kesiswaan')
 
-@section('title', 'Data Pembina')
+@section('title', 'Data Guru')
 
 @section('content')
 @php
@@ -31,18 +31,23 @@
         <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
                 <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">
-                    Data Pembina
+                    Data Guru & Pembina
                 </h1>
                 <p class="text-xs text-white/80 mt-1.5 max-w-xl leading-relaxed">
-                    Daftar seluruh pembina ekskul. Kelola penugasan ekskul yang dibina oleh masing-masing pembina di sini.
+                    Daftar seluruh guru dan pembina ekskul. Kelola penugasan ekskul serta akun guru di sini.
                 </p>
             </div>
 
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
-                <a href="{{ route('kesiswaan.users.create') }}"
+                <a href="{{ route('kesiswaan.users.import-form', 'pembina') }}"
+                   class="inline-flex items-center justify-center gap-2 px-4 py-3 bg-white/20 border border-white/30 text-white font-bold text-xs rounded-2xl hover:bg-white/30 transition-all">
+                    <i class="fa-solid fa-file-excel text-xs"></i>
+                    Import Guru
+                </a>
+                <a href="{{ route('kesiswaan.users.create', ['role' => 'guru']) }}"
                    class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
-                    
-                    Tambah Pembina
+                    <i class="fa-solid fa-user-plus text-xs"></i>
+                    Tambah Guru
                 </a>
             </div>
         </div>

@@ -22,13 +22,13 @@
                 </p>
 
                 <div class="flex flex-row flex-wrap items-center gap-1.5 sm:gap-2 mt-3 sm:mt-4">
-                    <a href="{{ route('kesiswaan.users.create') }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2 py-2 sm:gap-1.5 sm:px-4 bg-white text-sky-700 font-bold text-[10px] sm:text-xs rounded-xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
-                        <i class="fa-solid fa-user-plus text-[10px] sm:text-xs shrink-0"></i>
-                        <span>Buat Akun Baru</span>
+                    <a href="{{ route('kesiswaan.siswa.index') }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2 py-2 sm:gap-1.5 sm:px-4 bg-white text-sky-700 font-bold text-[10px] sm:text-xs rounded-xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
+                        <i class="fa-solid fa-graduation-cap text-[10px] sm:text-xs shrink-0"></i>
+                        <span>Data Siswa</span>
                     </a>
-                    <a href="{{ route('kesiswaan.users.index') }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2 py-2 sm:gap-1.5 sm:px-4 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-[10px] sm:text-xs rounded-xl hover:bg-white/20 transition-all">
-                        <i class="fa-solid fa-users text-[10px] sm:text-xs shrink-0"></i>
-                        <span>Daftar Akun</span>
+                    <a href="{{ route('kesiswaan.pembina.index') }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2 py-2 sm:gap-1.5 sm:px-4 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-[10px] sm:text-xs rounded-xl hover:bg-white/20 transition-all">
+                        <i class="fa-solid fa-chalkboard-user text-[10px] sm:text-xs shrink-0"></i>
+                        <span>Data Guru</span>
                     </a>
                 </div>
             </div>
@@ -65,13 +65,13 @@
 
         <!-- Quick Actions -->
         <div class="relative mt-3 sm:mt-4 pt-3 border-t border-white/15 grid grid-cols-3 gap-1.5 sm:gap-2">
-            <a href="{{ route('kesiswaan.users.index') }}" class="group flex min-w-0 items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+            <a href="{{ route('kesiswaan.siswa.index') }}" class="group flex min-w-0 items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
                 <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-users text-sm text-white"></i>
                 </div>
                 <div class="min-w-0 text-left">
-                    <p class="text-xs font-bold leading-none">Akun</p>
-                    <p class="text-[10px] sm:text-xs text-white/70 mt-1 leading-tight">Kelola Pengguna</p>
+                    <p class="text-xs font-bold leading-none">Siswa</p>
+                    <p class="text-[10px] sm:text-xs text-white/70 mt-1 leading-tight">Data Siswa</p>
                 </div>
             </a>
             <a href="{{ route('kesiswaan.ekskuls.index') }}" class="group flex min-w-0 items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">

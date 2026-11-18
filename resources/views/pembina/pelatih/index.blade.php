@@ -299,6 +299,28 @@
                         @else
                             <span class="text-[10px] text-slate-400 italic">Sertifikat belum ada</span>
                         @endif
+
+                        {{-- Tanda Tangan Pelatih (PNG/JPG) --}}
+                        @if($pelatih->tanda_tangan)
+                            <a href="{{ route('storage.public', ['path' => $pelatih->tanda_tangan]) }}" target="_blank"
+                               class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs border border-emerald-200 transition"
+                               title="Lihat Tanda Tangan Resmi">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                </svg>
+                                TTD
+                            </a>
+                        @endif
+
+                        {{-- Tombol Edit Pelatih --}}
+                        <a href="{{ route('pembina.pelatih.edit', $pelatih) }}"
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-sm shadow-sky-500/20 transition"
+                           title="Edit Data Pelatih">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            Edit
+                        </a>
                     </div>
                 </div>
             </div>
