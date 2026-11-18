@@ -379,7 +379,8 @@ class UserController extends Controller
     {
         $this->authorizeManage($user);
 
-        $isStaff = in_array($request->input('role'), ['admin', 'kesiswaan']);
+        $isStaff = $request->input('role') === 'admin';
+        $isGuru = in_array($request->input('role'), ['pembina', 'kesiswaan'], true);
 
         $rules = [
             'username' => [$isStaff ? 'required' : 'nullable', 'string', 'max:255', 'unique:users,username,'.$user->id],
@@ -405,18 +406,18 @@ class UserController extends Controller
                 'alamat' => ['nullable', 'string'],
                 'medsos' => ['nullable', 'string', 'max:255'],
             ];
-        } elseif ($request->input('role') === 'pembina') {
+        } elseif ($isGuru) {
             $nipIgnore = $user->pembina ? ','.$user->pembina->id : '';
             $rules += [
                 'nip' => ['required', 'string', 'digits:18', 'unique:pembinas,nip'.$nipIgnore],
                 'pembina_nama' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s.,\'-]+$/'],
                 'pembina_foto' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-                'pembina_tempat_lahir' => ['required', 'string', 'max:100'],
-                'pembina_tanggal_lahir' => ['required', 'date'],
-                'pembina_agama' => ['required', 'string', 'max:50'],
+                'pembina_tempat_lahir' => ['nullable', 'string', 'max:100'],
+                'pembina_tanggal_lahir' => ['nullable', 'date'],
+                'pembina_agama' => ['nullable', 'string', 'max:50'],
                 'pembina_jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
-                'pembina_no_telp' => ['required', 'string', 'max:25'],
-                'pembina_alamat' => ['required', 'string'],
+                'pembina_no_telp' => ['nullable', 'string', 'max:25'],
+                'pembina_alamat' => ['nullable', 'string'],
                 'pembina_medsos' => ['nullable', 'string', 'max:255'],
             ];
         }
@@ -443,7 +444,7 @@ class UserController extends Controller
             'pembina_foto.max' => 'Ukuran foto pembina maksimal 2MB.',
         ]);
 
-        DB::transaction(function () use ($user, $data, $request) {
+        DB::transaction(function () use ($user, $data, $request, $isGuru) {
             $existingSiswa = $user->siswa;
             $existingPembina = $user->pembina;
             $isActive = (bool) $data['is_active'];
@@ -493,18 +494,19 @@ class UserController extends Controller
                     $existingPembina->delete();
                 }
 
-            } elseif (in_array($data['role'], ['pembina', 'kesiswaan'], true)) {
+            } elseif ($isGuru) {
+                // Baik role pembina maupun kesiswaan, data pembina/guru tetap tersimpan dan tidak dihilangkan!
                 $pembinaData = [
-                    'nip' => $data['nip'],
-                    'nama' => mb_strtoupper(trim($data['pembina_nama'])),
-                    'tempat_lahir' => $data['pembina_tempat_lahir'] ?? null,
-                    'tanggal_lahir' => $data['pembina_tanggal_lahir'] ?? null,
-                    'agama' => $data['pembina_agama'] ?? null,
-                    'jenis_kelamin' => $data['pembina_jenis_kelamin'],
+                    'nip' => $data['nip'] ?? $existingPembina?->nip,
+                    'nama' => filled($data['pembina_nama'] ?? null) ? mb_strtoupper(trim($data['pembina_nama'])) : ($existingPembina?->nama ?? $user->name ?? $user->username),
+                    'tempat_lahir' => $data['pembina_tempat_lahir'] ?? $existingPembina?->tempat_lahir,
+                    'tanggal_lahir' => $data['pembina_tanggal_lahir'] ?? $existingPembina?->tanggal_lahir,
+                    'agama' => $data['pembina_agama'] ?? $existingPembina?->agama,
+                    'jenis_kelamin' => $data['pembina_jenis_kelamin'] ?? $existingPembina?->jenis_kelamin ?? 'laki-laki',
                     'email' => $data['email'],
-                    'no_telp' => $data['pembina_no_telp'] ?? null,
-                    'alamat' => $data['pembina_alamat'] ?? null,
-                    'medsos' => $data['pembina_medsos'] ?? null,
+                    'no_telp' => $data['pembina_no_telp'] ?? $existingPembina?->no_telp,
+                    'alamat' => $data['pembina_alamat'] ?? $existingPembina?->alamat,
+                    'medsos' => $data['pembina_medsos'] ?? $existingPembina?->medsos,
                 ];
 
                 if ($request->hasFile('pembina_foto')) {
@@ -520,7 +522,7 @@ class UserController extends Controller
                 );
 
                 if ($existingSiswa) {
-                    if ($existingSiswa->foto && Storage::disk('public')->exists($existingSiswa->foto)) {
+                    if ($existingSiswa?->foto && Storage::disk('public')->exists($existingSiswa->foto)) {
                         Storage::disk('public')->delete($existingSiswa->foto);
                     }
                     $existingSiswa->delete();
@@ -541,9 +543,12 @@ class UserController extends Controller
             }
         });
 
+        $user->refresh()->load(['siswa', 'pembina']);
+        $displayName = $user->pembina?->nama ?? $user->siswa?->nama ?? $user->username ?? $user->email;
+
         return redirect()
             ->route('kesiswaan.users.index')
-            ->with('success', "Akun {$user->username} berhasil diperbarui.");
+            ->with('success', "Akun {$displayName} berhasil diperbarui.");
     }
 
     public function destroy(User $user): RedirectResponse
