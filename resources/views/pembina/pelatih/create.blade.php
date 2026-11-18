@@ -168,42 +168,74 @@
             </div>
         </div>
 
-        {{-- Section 3: Berkas CV & Sertifikat Wajib (PDF) --}}
-        <div>
+        {{-- Section 3: Berkas CV, Sertifikat & Tanda Tangan Wajib --}}
+        <div x-data="{ ttdPreview: null }">
             <h2 class="text-sm font-extrabold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
                 <span class="w-6 h-6 rounded-lg bg-sky-100 text-sky-700 font-black text-xs flex items-center justify-center">3</span>
-                Dokumen Berkas (Keduanya Wajib Format PDF)
+                Dokumen Berkas & Tanda Tangan Resmi
             </h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {{-- Curriculum Vitae (CV) - WAJIB PDF --}}
-                <div class="p-4 rounded-2xl bg-sky-50/60 border-2 border-dashed border-sky-300">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="px-2 py-0.5 rounded-md bg-sky-600 text-white font-black text-[10px] uppercase">Wajib</span>
-                        <label class="text-xs font-extrabold text-slate-800">
-                            Curriculum Vitae / CV (PDF) <span class="text-rose-500">*</span>
-                        </label>
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {{-- Curriculum Vitae (CV) - WAJIB PDF --}}
+                    <div class="p-4 rounded-2xl bg-sky-50/60 border-2 border-dashed border-sky-300">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="px-2 py-0.5 rounded-md bg-sky-600 text-white font-black text-[10px] uppercase">Wajib</span>
+                            <label class="text-xs font-extrabold text-slate-800">
+                                Curriculum Vitae / CV (PDF) <span class="text-rose-500">*</span>
+                            </label>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mb-3 leading-relaxed">
+                            Unggah riwayat hidup & rekam jejak kepelatihan dalam format <strong class="text-sky-800">PDF</strong> (Maksimal 5MB).
+                        </p>
+                        <input type="file" name="cv" accept="application/pdf" required
+                               class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-sky-600 file:text-white hover:file:bg-sky-700 file:cursor-pointer transition">
                     </div>
-                    <p class="text-[11px] text-slate-500 mb-3 leading-relaxed">
-                        Unggah riwayat hidup & rekam jejak kepelatihan dalam format <strong class="text-sky-800">PDF</strong> (Maksimal 5MB).
-                    </p>
-                    <input type="file" name="cv" accept="application/pdf" required
-                           class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-sky-600 file:text-white hover:file:bg-sky-700 file:cursor-pointer transition">
+
+                    {{-- Sertifikat Pelatih (WAJIB PDF) --}}
+                    <div class="p-4 rounded-2xl bg-amber-50/60 border-2 border-dashed border-amber-300">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="px-2 py-0.5 rounded-md bg-amber-500 text-white font-black text-[10px] uppercase">Wajib</span>
+                            <label class="text-xs font-extrabold text-slate-800">
+                                Sertifikat Pelatih (PDF) <span class="text-rose-500">*</span>
+                            </label>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mb-3 leading-relaxed">
+                            Unggah sertifikat lisensi kepelatihan resmi dalam format <strong class="text-amber-800">PDF</strong> (Maksimal 5MB).
+                        </p>
+                        <input type="file" name="sertifikat" accept="application/pdf" required
+                               class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-white hover:file:bg-amber-600 file:cursor-pointer transition">
+                    </div>
                 </div>
 
-                {{-- Sertifikat Pelatih (WAJIB PDF) --}}
-                <div class="p-4 rounded-2xl bg-amber-50/60 border-2 border-dashed border-amber-300">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="px-2 py-0.5 rounded-md bg-amber-500 text-white font-black text-[10px] uppercase">Wajib</span>
-                        <label class="text-xs font-extrabold text-slate-800">
-                            Sertifikat Pelatih (PDF) <span class="text-rose-500">*</span>
-                        </label>
+                {{-- Tanda Tangan Pelatih (WAJIB JPG/PNG) --}}
+                <div class="p-4 rounded-2xl bg-emerald-50/60 border-2 border-dashed border-emerald-300">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-md bg-emerald-600 text-white font-black text-[10px] uppercase">Wajib</span>
+                            <label class="text-xs font-extrabold text-slate-800">
+                                Tanda Tangan Pelatih (PNG / JPG) <span class="text-rose-500">*</span>
+                            </label>
+                        </div>
+                        <span class="text-[10px] text-emerald-700 font-semibold">Digunakan khusus untuk absensi pelatih di laporan bulanan</span>
                     </div>
                     <p class="text-[11px] text-slate-500 mb-3 leading-relaxed">
-                        Unggah sertifikat lisensi kepelatihan resmi dalam format <strong class="text-amber-800">PDF</strong> (Maksimal 5MB).
+                        Unggah scan/foto tanda tangan pelatih format <strong class="text-emerald-800">PNG atau JPG</strong> (latar transparan atau putih bersih, maksimal 2MB). Tanda tangan ini akan dicantumkan secara otomatis pada lembar absensi pelatih di akhir laporan bulanan.
                     </p>
-                    <input type="file" name="sertifikat" accept="application/pdf" required
-                           class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-500 file:text-white hover:file:bg-amber-600 file:cursor-pointer transition">
+
+                    <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                        <div class="flex-1 w-full">
+                            <input type="file" name="tanda_tangan" accept="image/png,image/jpeg,image/jpg" required
+                                   @change="const file = $event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { ttdPreview = e.target.result; }; reader.readAsDataURL(file); }"
+                                   class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 file:cursor-pointer transition">
+                        </div>
+
+                        {{-- Preview Box --}}
+                        <div x-show="ttdPreview" x-cloak class="shrink-0 flex items-center gap-2 p-2 bg-white rounded-xl border border-emerald-200 shadow-sm">
+                            <span class="text-[10px] text-slate-400 font-bold px-1">Pratinjau:</span>
+                            <img :src="ttdPreview" alt="Pratinjau TTD" class="h-10 max-w-[120px] object-contain">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

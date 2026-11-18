@@ -23,6 +23,7 @@ class Pelatih extends Model
         'domisili',
         'cv',
         'sertifikat',
+        'tanda_tangan',
         'status',
         'status_verifikasi',
         'catatan_verifikasi',

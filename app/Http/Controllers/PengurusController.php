@@ -90,7 +90,46 @@ class PengurusController extends Controller
     public function indexPembina(Request $request)
     {
         $ekskuls = $this->getPembinaEkskuls();
-        $ekskul = $this->resolvePembinaEkskul($request);
+        $ekskulIds = $ekskuls->pluck('id');
+        $selectedEkskulId = $request->input('ekskul');
+
+        // Jika hanya membina 1 ekskul, otomatis pilih ekskul tersebut
+        if (! $selectedEkskulId && $ekskuls->count() === 1) {
+            $selectedEkskulId = $ekskuls->first()?->id;
+        }
+
+        // TAMPILKAN KATALOG KARTU EKSKUL JIKA BELUM MEMILIH EKSKUL (PEMBINA MULTI-EKSKUL)
+        if (! $selectedEkskulId || ! $ekskulIds->contains((int) $selectedEkskulId)) {
+            $ekskulCards = $ekskuls->map(function (Ekskul $e) {
+                $anggotaCount = Pendaftaran::where('ekskul_id', $e->id)
+                    ->where('status', Pendaftaran::STATUS_DITERIMA)
+                    ->count();
+                $ketua = $e->ketua();
+                $pengurusAktifCount = Pengurus::where('ekskul_id', $e->id)
+                    ->where('status', Pengurus::STATUS_AKTIF)
+                    ->count();
+                $usulanMenungguCount = Pengurus::where('ekskul_id', $e->id)
+                    ->where('status', Pengurus::STATUS_MENUNGGU)
+                    ->count();
+
+                return (object) [
+                    'ekskul' => $e,
+                    'totalAnggota' => $anggotaCount,
+                    'ketua' => $ketua,
+                    'pengurusCount' => $pengurusAktifCount,
+                    'usulanCount' => $usulanMenungguCount,
+                ];
+            });
+
+            return view('pembina.pengurus', [
+                'ekskuls' => $ekskuls,
+                'ekskul' => null,
+                'ekskulCards' => $ekskulCards,
+                'isCatalog' => true,
+            ]);
+        }
+
+        $ekskul = $ekskuls->firstWhere('id', (int) $selectedEkskulId);
 
         if ($ekskul) {
             $this->syncExistingKetua($ekskul);

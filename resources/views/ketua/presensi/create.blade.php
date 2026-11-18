@@ -43,11 +43,20 @@
                 <p class="text-xs font-bold text-slate-700 dark:text-neutral-200">Tandai kehadiran anggota</p>
                 <p class="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">Periksa status setiap anggota, lalu simpan setelah semua data sesuai.</p>
             </div>
+            @php
+                $kelasOptions = [];
+                foreach(($kelasList ?? []) as $k) {
+                    $kelasOptions[$k->nama] = $k->nama;
+                }
+            @endphp
             @include('partials.table-client-tools', [
                 'tableId' => 'presensi-table',
-                'searchCols' => [1],
-                'filterCols' => [2],
+                'searchCols' => [1, 2],
+                'filterCols' => [3],
                 'filterOptions' => ['hadir' => 'Hadir', 'sakit' => 'Sakit', 'izin' => 'Izin', 'alpha' => 'Alpha'],
+                'secondaryFilterCol' => 2,
+                'secondaryFilterOptions' => $kelasOptions,
+                'secondaryFilterPlaceholder' => 'Semua Kelas',
                 'defaultSize' => 10,
             ])
             <div class="overflow-x-auto">
@@ -56,6 +65,7 @@
                     <tr>
                         <th class="px-4 md:px-6 py-3 font-semibold text-slate-600 dark:text-neutral-400 whitespace-nowrap">No</th>
                         <th data-sort-index="1" class="px-4 md:px-6 py-3 font-semibold text-slate-600 dark:text-neutral-400 whitespace-nowrap cursor-pointer select-none hover:text-slate-800 dark:hover:text-neutral-200 transition" title="Klik untuk urutkan">Nama</th>
+                        <th data-sort-index="2" class="px-4 md:px-6 py-3 font-semibold text-slate-600 dark:text-neutral-400 whitespace-nowrap cursor-pointer select-none hover:text-slate-800 dark:hover:text-neutral-200 transition" title="Klik untuk urutkan">Kelas</th>
                         <th class="px-4 md:px-6 py-3 font-semibold text-slate-600 dark:text-neutral-400 whitespace-nowrap">Status</th>
                     </tr>
                 </thead>
@@ -64,6 +74,7 @@
                         <tr class="hover:bg-sky-50/50 dark:hover:bg-neutral-800/50 transition">
                             <td class="px-4 md:px-6 py-3.5 whitespace-nowrap text-slate-700 dark:text-neutral-300">{{ $loop->iteration }}</td>
                             <td class="px-4 md:px-6 py-3.5 whitespace-nowrap font-medium text-slate-800 dark:text-neutral-200">{{ $anggota->siswa->nama }}</td>
+                            <td class="px-4 md:px-6 py-3.5 whitespace-nowrap text-slate-600 dark:text-neutral-300">{{ $anggota->siswa->kelas?->nama ?? '-' }}</td>
                             <td class="px-4 md:px-6 py-3.5 whitespace-nowrap">
                                 <select name="presensi[{{ $loop->index }}][status]"
                                     class="px-3 py-1.5 rounded-full bg-sky-50/50 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 text-slate-800 dark:text-neutral-200 text-xs focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition w-full sm:w-auto">
@@ -83,7 +94,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="px-4 py-10 text-center text-slate-400">Belum ada anggota aktif untuk diabsen.</td>
+                            <td colspan="4" class="px-4 py-10 text-center text-slate-400">Belum ada anggota aktif untuk diabsen.</td>
                         </tr>
                     @endforelse
                 </tbody>

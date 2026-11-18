@@ -6,7 +6,7 @@
     $sort = $sort ?? 'tanggal_kegiatan';
     $direction = $direction ?? 'desc';
     $currentSortCombo = $sort . '_' . $direction;
-    $hasActiveFilter = request()->filled('cari') || request()->filled('sort');
+    $hasActiveFilter = request()->filled('cari') || request()->filled('sort') || request()->filled('kelas_id');
 @endphp
 
 @if(!isset($selectedEkskul) || !$selectedEkskul)
@@ -137,6 +137,15 @@
             {{-- PANEL FILTER 1-KLIK (EXPANDABLE) --}}
             <div x-show="showFilter" x-cloak x-transition
                  class="mt-3 pt-3 border-t border-slate-100 dark:border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Filter Kelas Siswa</label>
+                    <select name="kelas_id" onchange="document.getElementById('filter-presensi-pembina-form').submit()" class="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition-all">
+                        <option value="">Semua Kelas</option>
+                        @foreach(($kelasList ?? []) as $k)
+                            <option value="{{ $k->id }}" {{ request('kelas_id') == $k->id ? 'selected' : '' }}>{{ $k->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Urutan Kegiatan</label>
                     <select id="sort-select" class="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition-all">

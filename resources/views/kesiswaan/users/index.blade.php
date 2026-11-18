@@ -38,7 +38,7 @@
                     Akun Pengguna
                 </h1>
                 <p class="text-[10px] sm:text-xs text-white/80 mt-1.5 max-w-[12rem] sm:max-w-xl leading-relaxed">
-                    Informasi data pengguna, akun siswa, guru/pembina, dan staf sekolah melalui panel kesiswaan.
+                    Informasi data pengguna, akun siswa dan guru (pembina ekskul & kesiswaan) melalui panel kesiswaan.
                 </p>
             </div>
 
@@ -54,7 +54,7 @@
         {{-- FILTER TABS DI DALAM CARD BIRU --}}
         <div class="relative mt-6 pt-5 border-t border-white/15">
             <div class="text-[11px] font-bold text-white/75 uppercase tracking-wider mb-2.5">
-                Filter Tampilan Akun:
+                Kategori Pengguna:
             </div>
             <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
                 @php
@@ -63,43 +63,33 @@
                     
                     $tabAllUrl = route('kesiswaan.users.index', array_filter(['q' => $currentQ]));
                     $tabSiswaUrl = route('kesiswaan.users.index', array_filter(['role' => 'siswa', 'q' => $currentQ]));
-                    $tabGuruUrl = route('kesiswaan.users.index', array_filter(['role' => 'pembina', 'q' => $currentQ]));
-                    $tabStaffUrl = route('kesiswaan.users.index', array_filter(['role' => 'staff', 'q' => $currentQ]));
+                    $tabGuruUrl = route('kesiswaan.users.index', array_filter(['role' => 'guru', 'q' => $currentQ]));
                 @endphp
 
-                {{-- Tab: Semua --}}
+                {{-- Tab: Semua Pengguna --}}
                 <a href="{{ $tabAllUrl }}"
-                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap {{ empty($activeRole) ? 'bg-white text-sky-700 shadow-md shadow-sky-900/15' : 'bg-white/10 backdrop-blur border border-white/20 text-white hover:bg-white/20' }}">
-                    <span>Semua Akun</span>
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap {{ empty($activeRole) ? 'bg-white text-sky-700 shadow-md shadow-sky-900/15' : 'bg-white/10 border border-white/20 text-white hover:bg-white/20' }}">
+                    <span>Semua Pengguna</span>
                     <span class="px-2 py-0.5 rounded-full text-[11px] {{ empty($activeRole) ? 'bg-sky-100 text-sky-700 font-bold' : 'bg-white/15 text-white' }}">
                         {{ $counts['all'] }}
                     </span>
                 </a>
 
-                {{-- Tab: Siswa (Hanya Siswa) --}}
+                {{-- Tab: Siswa --}}
                 <a href="{{ $tabSiswaUrl }}"
-                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap {{ $activeRole === 'siswa' ? 'bg-white text-sky-700 shadow-md shadow-sky-900/15' : 'bg-white/10 backdrop-blur border border-white/20 text-white hover:bg-white/20' }}">
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap {{ $activeRole === 'siswa' ? 'bg-white text-sky-700 shadow-md shadow-sky-900/15' : 'bg-white/10 border border-white/20 text-white hover:bg-white/20' }}">
                     <span>Siswa</span>
                     <span class="px-2 py-0.5 rounded-full text-[11px] {{ $activeRole === 'siswa' ? 'bg-sky-100 text-sky-700 font-bold' : 'bg-white/15 text-white' }}">
                         {{ $counts['siswa'] }}
                     </span>
                 </a>
 
-                {{-- Tab: Guru / Pembina (Hanya Guru) --}}
+                {{-- Tab: Guru (Pembina & Kesiswaan) --}}
                 <a href="{{ $tabGuruUrl }}"
-                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap {{ in_array($activeRole, ['pembina', 'guru']) ? 'bg-white text-sky-700 shadow-md shadow-sky-900/15' : 'bg-white/10 backdrop-blur border border-white/20 text-white hover:bg-white/20' }}">
-                    <span>Guru / Pembina</span>
-                    <span class="px-2 py-0.5 rounded-full text-[11px] {{ in_array($activeRole, ['pembina', 'guru']) ? 'bg-sky-100 text-sky-700 font-bold' : 'bg-white/15 text-white' }}">
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap {{ in_array($activeRole, ['pembina', 'guru', 'kesiswaan']) ? 'bg-white text-sky-700 shadow-md shadow-sky-900/15' : 'bg-white/10 border border-white/20 text-white hover:bg-white/20' }}">
+                    <span>Guru (Pembina & Kesiswaan)</span>
+                    <span class="px-2 py-0.5 rounded-full text-[11px] {{ in_array($activeRole, ['pembina', 'guru', 'kesiswaan']) ? 'bg-sky-100 text-sky-700 font-bold' : 'bg-white/15 text-white' }}">
                         {{ $counts['guru'] }}
-                    </span>
-                </a>
-
-                {{-- Tab: Staf & Admin --}}
-                <a href="{{ $tabStaffUrl }}"
-                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap {{ in_array($activeRole, ['staff', 'kesiswaan', 'admin']) ? 'bg-white text-sky-700 shadow-md shadow-sky-900/15' : 'bg-white/10 backdrop-blur border border-white/20 text-white hover:bg-white/20' }}">
-                    <span>Staf & Admin</span>
-                    <span class="px-2 py-0.5 rounded-full text-[11px] {{ in_array($activeRole, ['staff', 'kesiswaan', 'admin']) ? 'bg-sky-100 text-sky-700 font-bold' : 'bg-white/15 text-white' }}">
-                        {{ $counts['staff'] }}
                     </span>
                 </a>
             </div>
@@ -185,8 +175,9 @@
                             <select name="role" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                                 <option value="">Semua Role</option>
                                 <option value="siswa" {{ request('role') === 'siswa' ? 'selected' : '' }}>Siswa</option>
-                                <option value="pembina" {{ in_array(request('role'), ['pembina', 'guru']) ? 'selected' : '' }}>Guru / Pembina</option>
-                                <option value="kesiswaan" {{ request('role') === 'kesiswaan' ? 'selected' : '' }}>Kesiswaan</option>
+                                <option value="guru" {{ request('role') === 'guru' ? 'selected' : '' }}>Semua Guru</option>
+                                <option value="pembina" {{ request('role') === 'pembina' ? 'selected' : '' }}>Guru - Pembina Ekskul</option>
+                                <option value="kesiswaan" {{ request('role') === 'kesiswaan' ? 'selected' : '' }}>Guru - Kesiswaan</option>
                                 <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                             </select>
                         </div>
@@ -301,12 +292,12 @@
                                             <span class="{{ $isNonaktif ? 'text-slate-500' : 'text-amber-600' }} font-bold ml-1">(Ketua)</span>
                                         @endif
                                     @elseif ($user->role === 'pembina')
-                                        <span>Guru / Pembina</span>
+                                        <span>Guru (Pembina Ekskul)</span>
                                         @if ($isNonaktif)
                                             <span class="ml-1 inline-flex rounded-lg border border-slate-300 bg-slate-200 px-1.5 py-0.5 text-[10px] font-bold text-slate-600">Akun Nonaktif</span>
                                         @endif
                                     @elseif ($user->role === 'kesiswaan')
-                                        <span>Kesiswaan</span>
+                                        <span>Guru (Kesiswaan)</span>
                                         @if ($isNonaktif)
                                             <span class="ml-1 inline-flex rounded-lg border border-slate-300 bg-slate-200 px-1.5 py-0.5 text-[10px] font-bold text-slate-600">Akun Nonaktif</span>
                                         @endif

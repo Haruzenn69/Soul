@@ -113,11 +113,23 @@
         </div>
 
         <h3 class="text-sm font-bold text-slate-800 dark:text-neutral-100 mb-3">Daftar presensi</h3>
+        @php
+            $showKelasOptions = [];
+            foreach ($kegiatan->presensis as $pItem) {
+                if ($kNama = $pItem->pendaftaran?->siswa?->kelas?->nama) {
+                    $showKelasOptions[$kNama] = $kNama;
+                }
+            }
+            ksort($showKelasOptions);
+        @endphp
         @include('partials.table-client-tools', [
             'tableId' => 'presensi-show-table',
-            'searchCols' => [1],
-            'filterCols' => [2],
+            'searchCols' => [1, 2],
+            'filterCols' => [3],
             'filterOptions' => ['hadir' => 'Hadir', 'sakit' => 'Sakit', 'izin' => 'Izin', 'alpha' => 'Alpha'],
+            'secondaryFilterCol' => 2,
+            'secondaryFilterOptions' => $showKelasOptions,
+            'secondaryFilterPlaceholder' => 'Semua Kelas',
             'defaultSize' => 10,
         ])
         <div class="overflow-x-auto rounded-xl border border-sky-100 dark:border-neutral-800">
@@ -126,6 +138,7 @@
                 <tr>
                     <th class="px-4 py-3 font-semibold text-slate-600 dark:text-neutral-400 whitespace-nowrap">No</th>
                     <th data-sort-index="1" class="px-4 py-3 font-semibold text-slate-600 dark:text-neutral-400 whitespace-nowrap cursor-pointer select-none hover:text-slate-800 dark:hover:text-neutral-200 transition" title="Klik untuk urutkan">Nama</th>
+                    <th data-sort-index="2" class="px-4 py-3 font-semibold text-slate-600 dark:text-neutral-400 whitespace-nowrap cursor-pointer select-none hover:text-slate-800 dark:hover:text-neutral-200 transition" title="Klik untuk urutkan">Kelas</th>
                     <th class="px-4 py-3 font-semibold text-slate-600 dark:text-neutral-400 whitespace-nowrap">Status</th>
                 </tr>
             </thead>
@@ -134,6 +147,7 @@
                     <tr class="hover:bg-sky-50/50 dark:hover:bg-neutral-800/50 transition">
                         <td class="px-4 py-3 whitespace-nowrap text-slate-700 dark:text-neutral-300">{{ $loop->iteration }}</td>
                         <td class="px-4 py-3 whitespace-nowrap font-medium text-slate-800 dark:text-neutral-200">{{ $presensi->pendaftaran->siswa->nama ?? '-' }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-neutral-300">{{ $presensi->pendaftaran?->siswa?->kelas?->nama ?? '-' }}</td>
                         <td class="px-4 py-3 whitespace-nowrap">
                             @if($presensi->status === 'hadir')
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">Hadir</span>
@@ -148,7 +162,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" class="px-4 py-6 text-center text-slate-400 dark:text-neutral-500">Belum ada presensi.</td>
+                        <td colspan="4" class="px-4 py-6 text-center text-slate-400 dark:text-neutral-500">Belum ada presensi.</td>
                     </tr>
                 @endforelse
             </tbody>

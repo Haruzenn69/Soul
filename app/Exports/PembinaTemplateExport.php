@@ -17,7 +17,7 @@ class PembinaTemplateExport implements FromArray, WithColumnFormatting, WithColu
 {
     public function headings(): array
     {
-        return ['NIP', 'Nama Lengkap', 'Email', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir', 'Agama', 'No. Telp', 'Alamat', 'Media Sosial'];
+        return ['NIP', 'Nama Lengkap', 'Email', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir', 'Agama', 'No. Telp', 'Alamat', 'Media Sosial', 'Hak Akses'];
     }
 
     public function array(): array
@@ -38,6 +38,7 @@ class PembinaTemplateExport implements FromArray, WithColumnFormatting, WithColu
             'H' => NumberFormat::FORMAT_TEXT,
             'I' => NumberFormat::FORMAT_TEXT,
             'J' => NumberFormat::FORMAT_TEXT,
+            'K' => NumberFormat::FORMAT_TEXT,
         ];
     }
 
@@ -54,6 +55,7 @@ class PembinaTemplateExport implements FromArray, WithColumnFormatting, WithColu
             'H' => 18,
             'I' => 32,
             'J' => 28,
+            'K' => 22,
         ];
     }
 
@@ -119,6 +121,21 @@ class PembinaTemplateExport implements FromArray, WithColumnFormatting, WithColu
                 $agamaValidation->setPrompt('Pilih salah satu: Islam, Kristen, Katolik, Hindu, Buddha, Khonghucu');
                 $agamaValidation->setFormula1('"Islam,Kristen,Katolik,Hindu,Buddha,Khonghucu"');
                 $sheet->setDataValidation('G2:G500', $agamaValidation);
+
+                // Dropdown Hak Akses (Kolom K)
+                $roleValidation = new DataValidation();
+                $roleValidation->setType(DataValidation::TYPE_LIST);
+                $roleValidation->setErrorStyle(DataValidation::STYLE_INFORMATION);
+                $roleValidation->setAllowBlank(true);
+                $roleValidation->setShowInputMessage(true);
+                $roleValidation->setShowErrorMessage(true);
+                $roleValidation->setShowDropDown(true);
+                $roleValidation->setErrorTitle('Pilihan Tidak Valid');
+                $roleValidation->setError('Pilih hak akses dari daftar yang tersedia.');
+                $roleValidation->setPromptTitle('Pilih Hak Akses');
+                $roleValidation->setPrompt('Pilih: Pembina (guru pembina ekskul), Kesiswaan (guru staf kesiswaan), atau Guru (guru biasa). Jika dikosongkan, default: Pembina.');
+                $roleValidation->setFormula1('"Pembina,Kesiswaan,Guru"');
+                $sheet->setDataValidation('K2:K500', $roleValidation);
             },
         ];
     }

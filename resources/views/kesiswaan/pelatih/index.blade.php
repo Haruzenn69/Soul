@@ -1,6 +1,6 @@
 @extends('layouts.kesiswaan')
 
-@section('title', 'Verifikasi & Data Pelatih')
+@section('title', 'Data Pelatih')
 
 @section('content')
 <div class="space-y-6 animate-fade-up">
@@ -16,10 +16,10 @@
             <div>
                 
                 <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight leading-tight text-white">
-                    Verifikasi Pelatih Ekskul
+                    Data Pelatih Ekskul
                 </h1>
                 <p class="text-xs text-white/80 mt-1 max-w-xl leading-relaxed">
-                    Tinjau data biodata, CV, dan sertifikat PDF pelatih yang diajukan oleh Pembina. Pelatih yang telah diverifikasi akan otomatis tampil di katalog ekskul.
+                    Daftar pelatih ekskul beserta verifikasi berkas, CV, dan sertifikat resmi. Pelatih yang telah diverifikasi akan otomatis tampil di katalog ekskul.
                 </p>
             </div>
 
@@ -365,6 +365,24 @@
                                     Tanpa Sertifikat
                                 </span>
                             @endif
+
+                            {{-- Tanda Tangan Pelatih --}}
+                            @if($pelatih->tanda_tangan)
+                                <a href="{{ route('storage.public', ['path' => $pelatih->tanda_tangan]) }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-xs transition"
+                                   title="Lihat Tanda Tangan Pelatih">
+                                    <i class="fa-solid fa-signature text-xs"></i>
+                                    TTD Pelatih
+                                </a>
+                            @endif
+
+                            {{-- Edit Pelatih --}}
+                            <a href="{{ route('pembina.pelatih.edit', $pelatih) }}"
+                               class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition"
+                               title="Edit Data Pelatih">
+                                <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                Edit
+                            </a>
                         </div>
 
                         {{-- Action Buttons untuk Pending --}}

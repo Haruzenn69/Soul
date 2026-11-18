@@ -40,7 +40,7 @@ class User extends Authenticatable
             return ! ($this->siswa?->isProfileComplete() ?? false);
         }
 
-        if ($this->role === 'pembina') {
+        if (in_array($this->role, ['pembina', 'kesiswaan'], true)) {
             return ! ($this->pembina?->isProfileComplete() ?? false);
         }
 
@@ -49,10 +49,8 @@ class User extends Authenticatable
 
     public function needsOnboarding(): bool
     {
-        // Siswa dan pembina baru harus mengatur username serta password
-        // mereka sebelum menggunakan akun.
-        return in_array($this->role, ['siswa', 'pembina'], true)
-            && is_null($this->onboarding_completed_at);
+        // Onboarding dinonaktifkan — username dan password diubah via halaman Profil masing-masing.
+        return false;
     }
 
 

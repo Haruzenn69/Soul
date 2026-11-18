@@ -115,6 +115,7 @@ class PelatihController extends Controller
             'alamat' => ['required', 'string', 'max:1000'],
             'cv' => ['required', 'file', 'mimes:pdf', 'max:5120'], // CV Wajib PDF
             'sertifikat' => ['required', 'file', 'mimes:pdf', 'max:5120'], // Sertifikat Wajib PDF
+            'tanda_tangan' => ['required', 'image', 'mimes:png,jpg,jpeg', 'max:2048'], // Tanda tangan Wajib JPG/PNG
         ], [
             'ekskul_id.required' => 'Pilih salah satu ekskul binaanmu.',
             'email.required' => 'Alamat email pelatih wajib diisi.',
@@ -127,10 +128,15 @@ class PelatihController extends Controller
             'sertifikat.required' => 'Sertifikat pelatih dalam format PDF wajib diunggah.',
             'sertifikat.mimes' => 'Sertifikat pelatih harus berupa file dengan format PDF.',
             'sertifikat.max' => 'Ukuran file sertifikat maksimal 5MB.',
+            'tanda_tangan.required' => 'Tanda tangan pelatih (format PNG atau JPG) wajib diunggah.',
+            'tanda_tangan.image' => 'File tanda tangan pelatih harus berupa file gambar.',
+            'tanda_tangan.mimes' => 'Format file tanda tangan pelatih harus berupa PNG atau JPG.',
+            'tanda_tangan.max' => 'Ukuran file tanda tangan pelatih maksimal 2MB.',
         ]);
 
         $cvPath = $request->file('cv')->store('pelatih/cv', 'public');
         $sertifikatPath = $request->file('sertifikat')->store('pelatih/sertifikat', 'public');
+        $ttdPath = $request->file('tanda_tangan')->store('pelatih/ttd', 'public');
 
         $pembinaId = $pembina?->id ?? Ekskul::find($validated['ekskul_id'])?->pembina_id;
 
@@ -146,6 +152,7 @@ class PelatihController extends Controller
             'alamat' => $validated['alamat'],
             'cv' => $cvPath,
             'sertifikat' => $sertifikatPath,
+            'tanda_tangan' => $ttdPath,
             'status' => 'aktif',
             'status_verifikasi' => $isKesiswaan ? Pelatih::VERIFIKASI_TERVERIFIKASI : Pelatih::VERIFIKASI_PENDING,
         ]);
@@ -156,5 +163,96 @@ class PelatihController extends Controller
         }
 
         return redirect()->route('pembina.pelatih.index')->with('success', $isKesiswaan ? "Pelatih {$pelatih->nama} berhasil didaftarkan langsung ke ekskul." : "Pendaftaran pelatih {$pelatih->nama} berhasil diajukan dan sedang menunggu verifikasi kesiswaan.");
+    }
+
+    public function edit(Pelatih $pelatih)
+    {
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+        if (! $isKesiswaan) {
+            $pembina = $this->getPembina();
+            $ekskulIds = $this->getEkskuls()->pluck('id')->toArray();
+            abort_unless($pelatih->pembina_id === $pembina?->id || in_array($pelatih->ekskul_id, $ekskulIds), 403, 'Akses khusus pembina terkait.');
+        }
+
+        $ekskuls = $this->getEkskuls();
+
+        return view('pembina.pelatih.edit', compact('pelatih', 'ekskuls'));
+    }
+
+    public function update(Request $request, Pelatih $pelatih)
+    {
+        $user = auth()->user();
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+        if (! $isKesiswaan) {
+            $pembina = $this->getPembina();
+            $ekskulIds = $this->getEkskuls()->pluck('id')->toArray();
+            abort_unless($pelatih->pembina_id === $pembina?->id || in_array($pelatih->ekskul_id, $ekskulIds), 403, 'Akses khusus pembina terkait.');
+        } else {
+            $ekskulIds = Ekskul::pluck('id')->toArray();
+        }
+
+        $validated = $request->validate([
+            'ekskul_id' => ['required', 'in:'.implode(',', $ekskulIds)],
+            'nama' => ['required', 'string', 'max:255'],
+            'jenis_kelamin' => ['required', 'in:laki-laki,perempuan'],
+            'no_hp' => ['required', 'string', 'max:25'],
+            'email' => ['required', 'email', 'max:255'],
+            'sosmed' => ['nullable', 'string', 'max:255'],
+            'domisili' => ['required', 'string', 'max:255'],
+            'alamat' => ['required', 'string', 'max:1000'],
+            'cv' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+            'sertifikat' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+            'tanda_tangan' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:2048'],
+        ], [
+            'ekskul_id.required' => 'Pilih salah satu ekskul binaanmu.',
+            'email.required' => 'Alamat email pelatih wajib diisi.',
+            'email.email' => 'Format alamat email tidak valid.',
+            'domisili.required' => 'Domisili / kota tempat tinggal pelatih wajib diisi.',
+            'alamat.required' => 'Alamat lengkap tempat tinggal pelatih wajib diisi.',
+            'cv.mimes' => 'File CV harus berupa dokumen dengan format PDF.',
+            'cv.max' => 'Ukuran file CV maksimal 5MB.',
+            'sertifikat.mimes' => 'Sertifikat pelatih harus berupa file dengan format PDF.',
+            'sertifikat.max' => 'Ukuran file sertifikat maksimal 5MB.',
+            'tanda_tangan.image' => 'File tanda tangan pelatih harus berupa file gambar.',
+            'tanda_tangan.mimes' => 'Format file tanda tangan pelatih harus berupa PNG atau JPG.',
+            'tanda_tangan.max' => 'Ukuran file tanda tangan pelatih maksimal 2MB.',
+        ]);
+
+        $data = [
+            'ekskul_id' => $validated['ekskul_id'],
+            'nama' => $validated['nama'],
+            'jenis_kelamin' => $validated['jenis_kelamin'],
+            'no_hp' => $validated['no_hp'],
+            'email' => $validated['email'],
+            'sosmed' => $validated['sosmed'] ?? null,
+            'domisili' => $validated['domisili'],
+            'alamat' => $validated['alamat'],
+        ];
+
+        if ($request->hasFile('cv')) {
+            if ($pelatih->cv && Storage::disk('public')->exists($pelatih->cv)) {
+                Storage::disk('public')->delete($pelatih->cv);
+            }
+            $data['cv'] = $request->file('cv')->store('pelatih/cv', 'public');
+        }
+
+        if ($request->hasFile('sertifikat')) {
+            if ($pelatih->sertifikat && Storage::disk('public')->exists($pelatih->sertifikat)) {
+                Storage::disk('public')->delete($pelatih->sertifikat);
+            }
+            $data['sertifikat'] = $request->file('sertifikat')->store('pelatih/sertifikat', 'public');
+        }
+
+        if ($request->hasFile('tanda_tangan')) {
+            if ($pelatih->tanda_tangan && Storage::disk('public')->exists($pelatih->tanda_tangan)) {
+                Storage::disk('public')->delete($pelatih->tanda_tangan);
+            }
+            $data['tanda_tangan'] = $request->file('tanda_tangan')->store('pelatih/ttd', 'public');
+        }
+
+        $pelatih->update($data);
+
+        return redirect()->route('pembina.pelatih.index')->with('success', "Data pelatih {$pelatih->nama} berhasil diperbarui.");
     }
 }

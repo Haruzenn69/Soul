@@ -2,6 +2,9 @@
     $searchCols = $searchCols ?? [1];
     $filterCols = $filterCols ?? [];
     $filterOptions = $filterOptions ?? [];
+    $secondaryFilterCol = $secondaryFilterCol ?? null;
+    $secondaryFilterOptions = $secondaryFilterOptions ?? [];
+    $secondaryFilterPlaceholder = $secondaryFilterPlaceholder ?? 'Semua Kelas';
     $defaultSize = $defaultSize ?? 10;
 @endphp
 <div class="px-4 md:px-6 py-3 bg-sky-50/40 dark:bg-neutral-800/40 border-b border-sky-100 dark:border-neutral-800 flex flex-wrap items-center gap-2.5" id="{{ $tableId }}-tools">
@@ -12,6 +15,14 @@
         <input type="search" id="{{ $tableId }}-search" placeholder="Cari..." autocomplete="off"
             class="w-full pl-9 pr-4 py-2 bg-white/70 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-800 dark:text-neutral-100 placeholder-slate-400 dark:placeholder-neutral-500 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 dark:focus:border-neutral-600 focus:ring-4 focus:ring-sky-100 dark:focus:ring-neutral-700 transition-all">
     </div>
+    @if($secondaryFilterCol !== null && count($secondaryFilterOptions) > 0)
+        <select id="{{ $tableId }}-secondary-filter" class="px-3 py-2 bg-white/70 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-neutral-200 focus:outline-none focus:border-sky-400 dark:focus:border-neutral-600 focus:ring-4 focus:ring-sky-100 dark:focus:ring-neutral-700 transition-all">
+            <option value="">{{ $secondaryFilterPlaceholder }}</option>
+            @foreach ($secondaryFilterOptions as $value => $label)
+                <option value="{{ strtolower($value) }}">{{ $label }}</option>
+            @endforeach
+        </select>
+    @endif
     @if($filterCols)
         <select id="{{ $tableId }}-filter" class="px-3 py-2 bg-white/70 dark:bg-neutral-800 border border-sky-100 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-neutral-200 focus:outline-none focus:border-sky-400 dark:focus:border-neutral-600 focus:ring-4 focus:ring-sky-100 dark:focus:ring-neutral-700 transition-all">
             <option value="">Semua Status</option>
@@ -45,15 +56,18 @@
     });
     var searchCols = {{ json_encode($searchCols) }};
     var filterCols = {{ json_encode($filterCols) }};
+    var secondaryFilterCol = {{ json_encode($secondaryFilterCol) }};
     var size = {{ $defaultSize }};
     var page = 1;
     var search = '';
     var filter = '';
+    var secondaryFilter = '';
     var sortIndex = -1;
     var sortAsc = true;
 
     var searchInput = document.getElementById('{{ $tableId }}-search');
     var filterSel = filterCols.length ? document.getElementById('{{ $tableId }}-filter') : null;
+    var secondaryFilterSel = secondaryFilterCol !== null ? document.getElementById('{{ $tableId }}-secondary-filter') : null;
     var sizeSel = document.getElementById('{{ $tableId }}-size');
     var infoEl = document.getElementById('{{ $tableId }}-info');
     var pageEl = document.getElementById('{{ $tableId }}-page');
@@ -73,7 +87,8 @@
         var list = rows.filter(function (row) {
             var okSearch = !keyword || searchCols.some(function (i) { return cellValue(row, i).indexOf(keyword) !== -1; });
             var okFilter = !filter || filterCols.some(function (i) { return cellValue(row, i) === filter; });
-            return okSearch && okFilter;
+            var okSecondary = !secondaryFilter || (secondaryFilterCol !== null && cellValue(row, secondaryFilterCol).indexOf(secondaryFilter) !== -1);
+            return okSearch && okFilter && okSecondary;
         });
 
         if (sortIndex > -1) {
@@ -107,6 +122,7 @@
 
     searchInput.addEventListener('input', function () { page = 1; search = searchInput.value; render(); });
     if (filterSel) filterSel.addEventListener('change', function () { page = 1; filter = filterSel.value; render(); });
+    if (secondaryFilterSel) secondaryFilterSel.addEventListener('change', function () { page = 1; secondaryFilter = secondaryFilterSel.value; render(); });
     sizeSel.addEventListener('change', function () { page = 1; size = parseInt(sizeSel.value, 10) || 10; render(); });
     prevBtn.addEventListener('click', function () { if (page > 1) { page--; render(); } });
     nextBtn.addEventListener('click', function () { page++; render(); });

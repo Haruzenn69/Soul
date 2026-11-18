@@ -23,8 +23,10 @@ class PresensiController extends Controller
         $ekskul = $this->ekskul();
         $anggotas = Pendaftaran::where('ekskul_id', $ekskul->id)
             ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
-            ->with('siswa')
+            ->with('siswa.kelas')
             ->get();
+
+        $kelasList = $anggotas->pluck('siswa.kelas')->filter()->unique('id')->sortBy('nama')->values();
 
         $presensiExisting = Presensi::where('kegiatan_id', $kegiatan->id)
             ->pluck('status', 'pendaftaran_id')
@@ -35,7 +37,7 @@ class PresensiController extends Controller
             ? PresensiPelatih::where('kegiatan_id', $kegiatan->id)->where('pelatih_id', $pelatih->id)->value('status')
             : null;
 
-        return view('ketua.presensi.create', compact('kegiatan', 'anggotas', 'presensiExisting', 'pelatih', 'pelatihStatus'));
+        return view('ketua.presensi.create', compact('kegiatan', 'anggotas', 'presensiExisting', 'pelatih', 'pelatihStatus', 'kelasList'));
     }
 
     public function store(Request $request, Kegiatan $kegiatan)

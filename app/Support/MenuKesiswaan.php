@@ -19,9 +19,8 @@ class MenuKesiswaan
                 'label' => 'Akun Pengguna',
                 'is' => ['kesiswaan.users.*', 'kesiswaan.siswa.*', 'kesiswaan.pembina.*', 'kesiswaan.pelatih.*'],
                 'children' => [
-                    ['icon' => 'users', 'label' => 'Akun Pengguna', 'url' => route('kesiswaan.users.index'), 'is' => ['kesiswaan.users.*']],
                     ['icon' => 'users', 'label' => 'Data Siswa', 'url' => route('kesiswaan.siswa.index'), 'is' => ['kesiswaan.siswa.*']],
-                    ['icon' => 'user', 'label' => 'Data Pembina', 'url' => route('kesiswaan.pembina.index'), 'is' => ['kesiswaan.pembina.*']],
+                    ['icon' => 'user', 'label' => 'Data Guru', 'url' => route('kesiswaan.pembina.index'), 'is' => ['kesiswaan.pembina.*']],
                     ['icon' => 'user-check', 'label' => 'Data Pelatih', 'url' => route('kesiswaan.pelatih.index'), 'is' => ['kesiswaan.pelatih.*']],
                 ],
             ],

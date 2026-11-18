@@ -224,6 +224,8 @@ Route::middleware(['auth', 'role:pembina,kesiswaan,admin'])->prefix('pembina')->
     Route::get('/pelatih', [PembinaPelatihController::class, 'index'])->name('pelatih.index');
     Route::get('/pelatih/create', [PembinaPelatihController::class, 'create'])->name('pelatih.create');
     Route::post('/pelatih', [PembinaPelatihController::class, 'store'])->name('pelatih.store');
+    Route::get('/pelatih/{pelatih}/edit', [PembinaPelatihController::class, 'edit'])->name('pelatih.edit');
+    Route::put('/pelatih/{pelatih}', [PembinaPelatihController::class, 'update'])->name('pelatih.update');
     Route::get('/anggota', [PembinaController::class, 'anggota'])->name('anggota');
     Route::get('/anggota/ekskul/{ekskul}', [PembinaController::class, 'anggotaByEkskul'])->name('anggota.ekskul');
     Route::get('/anggota/{pendaftaran}', [PembinaController::class, 'anggotaShow'])->name('anggota.show');

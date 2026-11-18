@@ -28,6 +28,7 @@
             ['No. Telp', 'Opsional, boleh dikosongkan.'],
             ['Alamat', 'Opsional, boleh dikosongkan.'],
             ['Media Sosial', 'Opsional, boleh dikosongkan.'],
+            ['Hak Akses', 'Opsional: Pembina, Kesiswaan, atau Guru (tersedia dropdown pilihan di file Excel). Default jika kosong: Pembina.'],
         ];
     @endphp
 
@@ -37,7 +38,9 @@
                 <h1 class="text-xl font-extrabold text-theme-dark">Import Akun {{ $isSiswa ? 'Siswa' : 'Guru / Pembina' }}</h1>
                 <p class="mt-1 text-xs text-gray-500">Unduh template, lengkapi kolom sesuai keterangannya, lalu unggah file Excel atau CSV.</p>
             </div>
-            <a href="{{ route('kesiswaan.users.create') }}" class="rounded-full bg-gray-100 px-5 py-2.5 text-xs font-bold text-gray-600 hover:bg-gray-200">Kembali ke Form Pembuatan Akun</a>
+            <a href="{{ $isSiswa ? route('kesiswaan.siswa.index') : route('kesiswaan.pembina.index') }}" class="rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-200 transition">
+                Kembali ke Data {{ $isSiswa ? 'Siswa' : 'Pembina / Guru' }}
+            </a>
         </div>
 
         @if(session('error'))
@@ -74,7 +77,7 @@
                 </table>
             </div>
             <div class="mt-4 rounded-2xl bg-amber-50 p-4 text-xs leading-relaxed text-amber-800">
-                <strong>Catatan Penting:</strong> Kolom <code>Username</code> tidak ada di Excel karena username dibuat mandiri oleh siswa atau pembina saat pertama kali login. Kolom <strong>Agama</strong> dan <strong>Jenis Kelamin</strong> telah dilengkapi dropdown pilihan di Excel. Email, No. Telp, dan Media Sosial boleh dikosongkan. Foto profil tidak ada di kolom Excel dan dapat ditambahkan setelah login. Tanggal dapat berupa sel tanggal Excel atau teks dengan format <strong>26-06-2008</strong> atau <strong>2008-06-26</strong>.
+                <strong>Catatan Penting:</strong> Kolom <code>Username</code> tidak ada di Excel karena username dan password dapat diatur secara mandiri oleh pengguna melalui menu Profil masing-masing setelah login. @if(!$isSiswa) Hak akses masing-masing guru (Pembina, Kesiswaan, atau Guru Biasa) ditentukan langsung melalui kolom <strong>Hak Akses</strong> di Excel. @endif Kolom <strong>Agama</strong>, <strong>Jenis Kelamin</strong>@if(!$isSiswa), dan <strong>Hak Akses</strong>@endif telah dilengkapi dropdown pilihan di Excel. Email, No. Telp, dan Media Sosial boleh dikosongkan. Foto profil dapat ditambahkan setelah login. Tanggal dapat berupa sel tanggal Excel atau teks dengan format <strong>26-06-2008</strong> atau <strong>2008-06-26</strong>.
             </div>
         </section>
 

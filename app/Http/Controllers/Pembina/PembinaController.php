@@ -834,7 +834,7 @@ class PembinaController extends Controller
         $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
 
         $query = Kegiatan::where('ekskul_id', $selectedEkskul)
-            ->with(['presensis.pendaftaran.siswa', 'ekskul']);
+            ->with(['presensis.pendaftaran.siswa.kelas', 'ekskul']);
 
         if ($request->filled('cari')) {
             $cari = $request->input('cari');
@@ -844,9 +844,16 @@ class PembinaController extends Controller
             });
         }
 
+        if ($request->filled('kelas_id')) {
+            $kelasId = $request->input('kelas_id');
+            $query->whereHas('presensis.pendaftaran.siswa', fn ($s) => $s->where('kelas_id', $kelasId));
+        }
+
         $kegiatans = $query->orderBy($sort, $direction)->paginate(10)->withQueryString();
 
-        return view('pembina.presensi', compact('kegiatans', 'ekskuls', 'selectedEkskul', 'activeEkskul', 'sort', 'direction'));
+        $kelasList = \App\Models\Kelas::orderBy('nama')->get();
+
+        return view('pembina.presensi', compact('kegiatans', 'ekskuls', 'selectedEkskul', 'activeEkskul', 'sort', 'direction', 'kelasList'));
     }
 
     /**

@@ -60,9 +60,9 @@
                     
                     Daftar Kelas
                 </a>
-                <a href="{{ route('kesiswaan.users.create') }}"
+                <a href="{{ route('kesiswaan.users.create', ['role' => 'siswa']) }}"
                    class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-sky-700 font-bold text-xs rounded-2xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
-                    
+                    <i class="fa-solid fa-user-plus text-xs"></i>
                     Tambah Siswa
                 </a>
             </div>

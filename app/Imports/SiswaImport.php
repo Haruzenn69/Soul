@@ -137,7 +137,7 @@ class SiswaImport implements SkipsEmptyRows, SkipsOnFailure, ToModel, WithHeadin
             'password' => Hash::make('password'),
             'role' => 'siswa',
             'email_verified_at' => now(),
-            'onboarding_completed_at' => null,
+            'onboarding_completed_at' => now(),
         ]);
 
         $user->siswa()->create([
