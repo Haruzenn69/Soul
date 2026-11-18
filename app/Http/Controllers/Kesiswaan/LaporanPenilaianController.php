@@ -126,11 +126,19 @@ class LaporanPenilaianController extends Controller
 
         $q = strtolower(trim((string) $request->input('q')));
         $predikat = $request->input('predikat');
+        $kelasId = $request->input('kelas_id');
         $sort = in_array($request->input('sort'), ['nama', 'nilai_akhir', 'kehadiran', 'predikat'], true) ? $request->input('sort') : 'nilai_akhir';
         $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
 
-        if ($q || $predikat) {
-            $rows = $rows->filter(function ($row) use ($q, $predikat) {
+        $daftarKelas = $rows
+            ->filter(fn ($row) => !empty($row->kelas_id))
+            ->map(fn ($row) => (object) ['id' => $row->kelas_id, 'nama' => $row->kelas])
+            ->unique('id')
+            ->sortBy(fn ($k) => [$k->nama, (int) $k->id])
+            ->values();
+
+        if ($q || $predikat || $kelasId) {
+            $rows = $rows->filter(function ($row) use ($q, $predikat, $kelasId) {
                 if ($q) {
                     $nama = strtolower($row->siswa?->nama ?? '');
                     $nis = strtolower($row->siswa?->nis ?? '');
@@ -139,6 +147,9 @@ class LaporanPenilaianController extends Controller
                     }
                 }
                 if ($predikat && $row->predikat !== $predikat) {
+                    return false;
+                }
+                if ($kelasId && (string) ($row->kelas_id ?? '') !== (string) $kelasId) {
                     return false;
                 }
                 return true;
@@ -165,7 +176,7 @@ class LaporanPenilaianController extends Controller
             })->values();
         }
 
-        return view('kesiswaan.laporan-penilaian.show', compact('ekskul', 'rows', 'summary', 'periode', 'daftarPeriode', 'tahunAjaranAktif', 'pembinaPenilai', 'sort', 'direction'));
+        return view('kesiswaan.laporan-penilaian.show', compact('ekskul', 'rows', 'summary', 'periode', 'daftarPeriode', 'tahunAjaranAktif', 'pembinaPenilai', 'daftarKelas', 'sort', 'direction'));
     }
 
     public function downloadPdf(Request $request, Ekskul $ekskul)

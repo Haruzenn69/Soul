@@ -81,7 +81,15 @@ class AnggotaController extends Controller
                 $cari = $request->input('cari');
                 $query->whereHas('siswa', fn ($s) => $s->where('nama', 'like', "%{$cari}%")->orWhere('nis', 'like', "%{$cari}%"));
             })
-            ->when($request->filled('status') && $statusDipilih !== 'semua', fn ($query) => $query->where('status', $statusDipilih));
+            ->when($request->filled('status') && $statusDipilih !== 'semua', fn ($query) => $query->where('status', $statusDipilih))
+            ->when($request->filled('kelas_id'), fn ($query) => $query->whereHas('siswa', fn ($s) => $s->where('kelas_id', $request->input('kelas_id'))));
+
+        $daftarKelas = \App\Models\Kelas::query()
+            ->whereHas('siswas.pendaftarans', fn ($p) => $p
+                ->where('ekskul_id', $ekskul->id)
+                ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_NONAKTIF, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_KELUAR]))
+            ->orderBy('nama')
+            ->get();
 
         [$sort, $direction] = TableKit::sort(['nama', 'nis', 'status', 'tanggal_daftar'], 'tanggal_daftar', 'desc');
 
@@ -101,7 +109,7 @@ class AnggotaController extends Controller
             ? $arsipService->arsip($ekskul)
             : ['ketuaSelesai' => collect(), 'anggotaLulus' => collect(), 'total' => $arsipTotal];
 
-        return view('ketua.anggota.index', compact('anggotas', 'ekskul', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal', 'isKesiswaan'));
+        return view('ketua.anggota.index', compact('anggotas', 'ekskul', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'daftarKelas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal', 'isKesiswaan'));
     }
 
     public function calonSiswa(Request $request): JsonResponse

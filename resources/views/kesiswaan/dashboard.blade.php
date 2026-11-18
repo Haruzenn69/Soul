@@ -4,7 +4,7 @@
 
 @section('content')
     {{-- HERO --}}
-    <div data-tilt-card class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-4 md:p-6 text-white shadow-xl shadow-sky-200 soul-timbul tilt-card animate-fade-up">
+    <div data-tilt-card class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sky-400 via-blue-400 to-blue-600 p-3.5 sm:p-5 md:p-6 text-white shadow-xl shadow-sky-200 soul-timbul tilt-card animate-fade-up">
         <div class="absolute inset-0 pointer-events-none">
             <div class="absolute -bottom-24 -left-10 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
         </div>
@@ -17,17 +17,17 @@
                 <p class="text-[11px] sm:text-sm md:text-[13px] lg:text-sm text-white/85 mt-1 font-medium leading-snug">
                     {{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM Y') }}
                 </p>
-                <p class="text-[10px] sm:text-xs md:text-xs lg:text-[13px] text-white/70 mt-2 max-w-[15rem] sm:max-w-[22rem] md:max-w-md leading-relaxed text-justify md:text-left">
+                <p class="text-[10px] sm:text-xs md:text-xs lg:text-[13px] text-white/80 mt-1.5 sm:mt-2 leading-relaxed text-left">
                     Kelola akun pengguna, data ekstrakurikuler, dan daftar kelas sekolah melalui panel kesiswaan.
                 </p>
 
-                <div class="flex flex-row flex-wrap items-center gap-1.5 sm:gap-2 mt-3 sm:mt-4">
-                    <a href="{{ route('kesiswaan.users.create') }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2 py-2 sm:gap-1.5 sm:px-4 bg-white text-sky-700 font-bold text-[10px] sm:text-xs rounded-xl shadow-lg shadow-sky-900/10 hover:bg-sky-50 hover:-translate-y-0.5 transition-all">
-                        <i class="fa-solid fa-user-plus text-[10px] sm:text-xs shrink-0"></i>
-                        <span>Buat Akun Baru</span>
+                <div class="flex flex-row items-center gap-1.5 sm:gap-2 mt-2.5 sm:mt-4">
+                    <a href="{{ route('kesiswaan.users.create') }}" class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 sm:px-4 sm:py-2 bg-white text-sky-700 font-bold text-[10px] sm:text-xs rounded-xl shadow-md hover:bg-sky-50 transition-all shrink-0">
+                        <i class="fa-solid fa-user-plus text-[9px] sm:text-xs shrink-0"></i>
+                        <span>Buat Akun<span class="hidden sm:inline">&nbsp;Baru</span></span>
                     </a>
-                    <a href="{{ route('kesiswaan.users.index') }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2 py-2 sm:gap-1.5 sm:px-4 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-[10px] sm:text-xs rounded-xl hover:bg-white/20 transition-all">
-                        <i class="fa-solid fa-users text-[10px] sm:text-xs shrink-0"></i>
+                    <a href="{{ route('kesiswaan.users.index') }}" class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 sm:px-4 sm:py-2 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-[10px] sm:text-xs rounded-xl hover:bg-white/20 transition-all shrink-0">
+                        <i class="fa-solid fa-users text-[9px] sm:text-xs shrink-0"></i>
                         <span>Daftar Akun</span>
                     </a>
                 </div>
@@ -35,27 +35,27 @@
 
             <!-- FOTO + STAT CARD (maskot menempel pas di atas kartu putih pada semua ukuran layar) -->
             <div class="col-span-2 relative min-w-0 flex flex-col justify-end">
-                <div class="relative rounded-2xl md:rounded-3xl bg-white/10 backdrop-blur border border-white/20 p-2 sm:p-2.5 md:p-3 flex flex-col items-center justify-end overflow-hidden shadow-inner">
+                <div class="relative rounded-2xl md:rounded-3xl bg-white/10 backdrop-blur border border-white/20 p-1.5 sm:p-2.5 md:p-3 flex flex-col items-center justify-end overflow-hidden shadow-inner">
                     <div class="absolute -bottom-10 -left-6 w-32 h-32 rounded-full bg-white/20 blur-2xl pointer-events-none"></div>
 
                     <!-- FOTO MASKOT: menempel pas di atas card putih tanpa celah -->
-                    <div class="relative z-0 -mb-2 sm:-mb-2.5 md:-mb-3.5 flex items-end justify-center">
+                    <div class="relative z-0 -mb-2 sm:-mb-2.5 md:-mb-3.5 flex items-end justify-center pt-1">
                         <img src="{{ asset('images/dashboardbiru.png') }}" alt="Ilustrasi Kesiswaan"
-                             class="h-24 sm:h-28 md:h-36 lg:h-40 w-auto object-contain drop-shadow-xl select-none pointer-events-none">
+                             class="h-20 sm:h-24 md:h-36 lg:h-40 w-auto object-contain drop-shadow-xl select-none pointer-events-none">
                     </div>
 
                     <!-- STAT CARD: berada tepat di bawah maskot, menutup potongan bawah gambar secara presisi -->
                     <div class="relative z-10 w-full grid grid-cols-3 gap-0.5 sm:gap-1 bg-white rounded-xl shadow-lg shadow-sky-900/10 p-1 sm:p-1.5 md:p-2">
                         <div class="text-center border-r border-slate-100 pr-0.5 sm:pr-1">
-                            <p class="text-xs sm:text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalUsers }}</p>
+                            <p class="text-[11px] sm:text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalUsers }}</p>
                             <p class="text-[8px] sm:text-[9px] md:text-xs text-slate-400 font-semibold mt-0.5 sm:mt-1">Akun</p>
                         </div>
                         <div class="text-center border-r border-slate-100 px-0.5 sm:px-1">
-                            <p class="text-xs sm:text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalSiswa }}</p>
+                            <p class="text-[11px] sm:text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalSiswa }}</p>
                             <p class="text-[8px] sm:text-[9px] md:text-xs text-slate-400 font-semibold mt-0.5 sm:mt-1">Siswa</p>
                         </div>
                         <div class="text-center pl-0.5 sm:pl-1">
-                            <p class="text-xs sm:text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalEkskul }}</p>
+                            <p class="text-[11px] sm:text-sm md:text-base font-extrabold text-sky-700 leading-none">{{ $totalEkskul }}</p>
                             <p class="text-[8px] sm:text-[9px] md:text-xs text-slate-400 font-semibold mt-0.5 sm:mt-1">Ekskul</p>
                         </div>
                     </div>
@@ -64,32 +64,32 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="relative mt-3 sm:mt-4 pt-3 border-t border-white/15 grid grid-cols-3 gap-1.5 sm:gap-2">
-            <a href="{{ route('kesiswaan.users.index') }}" class="group flex min-w-0 items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
-                <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-users text-sm text-white"></i>
+        <div class="relative mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-white/15 grid grid-cols-3 gap-1 sm:gap-2">
+            <a href="{{ route('kesiswaan.users.index') }}" class="group flex min-w-0 items-center gap-1 sm:gap-2 px-1.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+                <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-users text-[10px] sm:text-sm text-white"></i>
                 </div>
                 <div class="min-w-0 text-left">
-                    <p class="text-xs font-bold leading-none">Akun</p>
-                    <p class="text-[10px] sm:text-xs text-white/70 mt-1 leading-tight">Kelola Pengguna</p>
+                    <p class="text-[10px] sm:text-xs font-bold leading-none truncate">Akun</p>
+                    <p class="text-[8px] sm:text-[10px] md:text-xs text-white/70 mt-0.5 sm:mt-1 leading-tight truncate">Kelola Pengguna</p>
                 </div>
             </a>
-            <a href="{{ route('kesiswaan.ekskuls.index') }}" class="group flex min-w-0 items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
-                <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-shapes text-sm text-white"></i>
+            <a href="{{ route('kesiswaan.ekskuls.index') }}" class="group flex min-w-0 items-center gap-1 sm:gap-2 px-1.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+                <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-shapes text-[10px] sm:text-sm text-white"></i>
                 </div>
                 <div class="min-w-0 text-left">
-                    <p class="text-xs font-bold leading-none">Ekskul</p>
-                    <p class="text-[10px] sm:text-xs text-white/70 mt-1 leading-tight">Data Ekskul</p>
+                    <p class="text-[10px] sm:text-xs font-bold leading-none truncate">Ekskul</p>
+                    <p class="text-[8px] sm:text-[10px] md:text-xs text-white/70 mt-0.5 sm:mt-1 leading-tight truncate">Data Ekskul</p>
                 </div>
             </a>
-            <a href="{{ route('kesiswaan.kelas.index') }}" class="group flex min-w-0 items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
-                <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-chalkboard-user text-sm text-white"></i>
+            <a href="{{ route('kesiswaan.kelas.index') }}" class="group flex min-w-0 items-center gap-1 sm:gap-2 px-1.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-white/10 backdrop-blur border border-white/10 hover:bg-white/20 transition-all">
+                <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-chalkboard-user text-[10px] sm:text-sm text-white"></i>
                 </div>
                 <div class="min-w-0 text-left">
-                    <p class="text-xs font-bold leading-none">Kelas</p>
-                    <p class="text-[10px] sm:text-xs text-white/70 mt-1 leading-tight">Data Kelas</p>
+                    <p class="text-[10px] sm:text-xs font-bold leading-none truncate">Kelas</p>
+                    <p class="text-[8px] sm:text-[10px] md:text-xs text-white/70 mt-0.5 sm:mt-1 leading-tight truncate">Data Kelas</p>
                 </div>
             </a>
         </div>

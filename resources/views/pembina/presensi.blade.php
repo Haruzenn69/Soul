@@ -62,7 +62,7 @@
                     </div>
 
                     <a href="{{ route('pembina.presensi', ['ekskul' => $card->ekskul->id]) }}"
-                       class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs">
+                       class="w-full py-2.5 px-4 rounded-xl bg-sky-500 hover:bg-sky-600 dark:bg-sky-500 dark:hover:bg-sky-600 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs">
                         <span>Lihat Presensi</span>
                         <i class="fa-solid fa-arrow-right text-[11px]"></i>
                     </a>
@@ -123,7 +123,7 @@
                     <i class="fa-solid text-[10px] text-slate-400 transition-transform duration-200" :class="showFilter ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                 </button>
 
-                <button type="submit" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs font-bold rounded-xl transition shadow-xs">
+                <button type="submit" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 dark:bg-sky-500 dark:hover:bg-sky-600 text-white text-xs font-bold rounded-xl transition shadow-xs">
                     Cari
                 </button>
 

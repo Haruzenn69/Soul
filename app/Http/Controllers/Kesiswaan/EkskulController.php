@@ -46,6 +46,7 @@ class EkskulController extends Controller
             ->when($request->input('status') === 'aktif', fn ($q) => $q->where('status', true))
             ->when($request->input('status') === 'nonaktif', fn ($q) => $q->where('status', false))
             ->orderByDesc('status')
+            ->orderByRaw('CASE WHEN pembina_id IS NULL THEN 0 ELSE 1 END')
             ->orderBy($sort, $direction)
             ->paginate(50)
             ->withQueryString();

@@ -62,11 +62,6 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <a href="{{ route('pembina.ekskul.pilih-ketua-page', $ekskul) }}"
-                       class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition shadow-xs">
-                        <i class="fa-solid fa-crown text-amber-500 text-xs"></i>
-                        <span>Pilih Ketua dari Data Siswa</span>
-                    </a>
                     <button type="button" onclick="openModalTetapkan()"
                             class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs font-bold transition shadow-xs">
                         <i class="fa-solid fa-user-plus text-xs"></i>
@@ -92,12 +87,6 @@
 
             <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="max-w-2xl">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 dark:bg-neutral-800 backdrop-blur-md border border-white/30 dark:border-neutral-700 text-[11px] font-extrabold uppercase tracking-wider text-white dark:text-sky-300 mb-3 shadow-xs">
-                        <svg class="w-3.5 h-3.5 text-amber-300" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                        </svg>
-                        Kepengurusan {{ $ekskul->nama_ekskul }}
-                    </div>
                     <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
                         Struktur Pengurus Inti Ekskul
                     </h2>
@@ -188,8 +177,8 @@
             @php
                 $posisiStyles = [
                     'ketua' => [
-                        'badge' => 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800',
-                        'accent' => 'from-amber-400 to-yellow-500',
+                        'badge' => 'bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200 dark:border-sky-800',
+                        'accent' => 'from-sky-400 to-blue-500',
                         'icon' => 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
                     ],
                     'wakil_ketua' => [
@@ -198,13 +187,13 @@
                         'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
                     ],
                     'sekretaris' => [
-                        'badge' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
-                        'accent' => 'from-emerald-400 to-teal-500',
+                        'badge' => 'bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200 dark:border-sky-800',
+                        'accent' => 'from-sky-400 to-blue-500',
                         'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
                     ],
                     'bendahara' => [
-                        'badge' => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
-                        'accent' => 'from-indigo-400 to-purple-500',
+                        'badge' => 'bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200 dark:border-sky-800',
+                        'accent' => 'from-sky-400 to-blue-500',
                         'icon' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
                     ],
                 ];

@@ -417,6 +417,10 @@ class NotifikasiService
             'email' => 'email',
             'no_telp' => 'nomor telepon',
             'username' => 'username login',
+            'jenis_kelamin' => 'jenis kelamin',
+            'tempat_lahir' => 'tempat lahir',
+            'tanggal_lahir' => 'tanggal lahir',
+            'agama' => 'agama',
         ];
 
         $labels = array_map(fn ($f) => $fieldLabels[$f] ?? $f, $changedFields);
@@ -439,6 +443,10 @@ class NotifikasiService
             'email' => 'email',
             'no_telp' => 'nomor telepon',
             'username' => 'username login',
+            'jenis_kelamin' => 'jenis kelamin',
+            'tempat_lahir' => 'tempat lahir',
+            'tanggal_lahir' => 'tanggal lahir',
+            'agama' => 'agama',
         ];
 
         $labels = array_map(fn ($f) => $fieldLabels[$f] ?? $f, $changedFields);
