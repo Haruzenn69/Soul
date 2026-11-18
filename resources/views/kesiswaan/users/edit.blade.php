@@ -72,9 +72,13 @@
                     <select name="role" id="role" required onchange="toggleRoleFields()"
                             class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                         @php
-                            $roles = ['siswa' => 'Siswa', 'pembina' => 'Guru / Pembina', 'kesiswaan' => 'Kesiswaan'];
+                            $roles = [
+                                'siswa' => 'Siswa',
+                                'pembina' => 'Guru (Pembina Ekskul)',
+                                'kesiswaan' => 'Guru (Kesiswaan)',
+                            ];
                             if (auth()->user()->role === 'admin') {
-                                $roles = ['admin' => 'Admin'] + $roles;
+                                $roles = ['admin' => 'Administrator'] + $roles;
                             }
                         @endphp
                         @foreach ($roles as $value => $label)
@@ -186,9 +190,9 @@
             </div>
         </div>
 
-        <!-- Data Pembina -->
+        <!-- Data Guru / Pembina -->
         <div id="fields-pembina" class="hidden space-y-4">
-            <h2 class="text-sm font-extrabold text-slate-900">Data Pembina</h2>
+            <h2 class="text-sm font-extrabold text-slate-900" id="title-guru">Data Guru / Pembina</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1.5">NIP *</label>
@@ -411,12 +415,20 @@
     }
     function toggleRoleFields() {
         const role = document.getElementById('role').value;
+        const isSiswa = role === 'siswa';
+        const isGuru = role === 'pembina' || role === 'kesiswaan';
         const siswaFields = document.getElementById('fields-siswa');
         const pembinaFields = document.getElementById('fields-pembina');
-        siswaFields.classList.toggle('hidden', role !== 'siswa');
-        pembinaFields.classList.toggle('hidden', role !== 'pembina');
-        siswaFields.querySelectorAll('input, select, textarea').forEach(field => field.disabled = role !== 'siswa');
-        pembinaFields.querySelectorAll('input, select, textarea').forEach(field => field.disabled = role !== 'pembina');
+        const titleGuru = document.getElementById('title-guru');
+
+        if (titleGuru) {
+            titleGuru.textContent = role === 'kesiswaan' ? 'Data Guru (Kesiswaan)' : 'Data Guru (Pembina Ekskul)';
+        }
+
+        siswaFields.classList.toggle('hidden', !isSiswa);
+        pembinaFields.classList.toggle('hidden', !isGuru);
+        siswaFields.querySelectorAll('input, select, textarea').forEach(field => field.disabled = !isSiswa);
+        pembinaFields.querySelectorAll('input, select, textarea').forEach(field => field.disabled = !isGuru);
     }
     let isDeactivationConfirmed = false;
 
@@ -500,18 +512,18 @@
                         return false;
                     }
                 }
-            } else if (role === 'pembina') {
+            } else if (role === 'pembina' || role === 'kesiswaan') {
                 const nipEl = this.querySelector('input[name="nip"]');
                 if (nipEl) {
                     const nipVal = nipEl.value.trim();
                     if (!nipVal) {
                         e.preventDefault();
-                        showEditWarning('NIP Wajib Diisi', 'NIP pembina wajib diisi tepat 18 angka.', [], nipEl, 'Isi NIP');
+                        showEditWarning('NIP Wajib Diisi', 'NIP guru wajib diisi tepat 18 angka.', [], nipEl, 'Isi NIP');
                         return false;
                     }
                     if (nipVal.length !== 18 || !/^\d{18}$/.test(nipVal)) {
                         e.preventDefault();
-                        showEditWarning('Format NIP Tidak Sesuai', 'NIP pembina harus terdiri dari tepat 18 digit angka (saat ini terisi ' + nipVal.length + ' angka).', [], nipEl, 'Perbaiki NIP');
+                        showEditWarning('Format NIP Tidak Sesuai', 'NIP guru harus terdiri dari tepat 18 digit angka (saat ini terisi ' + nipVal.length + ' angka).', [], nipEl, 'Perbaiki NIP');
                         return false;
                     }
                 }

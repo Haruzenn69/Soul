@@ -242,7 +242,18 @@
                                         @endif
                                     </div>
                                     <div class="min-w-0">
-                                        <div class="font-bold text-slate-900 leading-snug truncate">{{ $p->nama ?? '-' }}</div>
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <span class="font-bold text-slate-900 leading-snug truncate">{{ $p->nama ?? '-' }}</span>
+                                            @if ($p->user?->role === 'kesiswaan')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                    Kesiswaan
+                                                </span>
+                                            @elseif ($p->user?->role === 'pembina')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                                                    Pembina
+                                                </span>
+                                            @endif
+                                        </div>
                                         <div class="text-[11px] text-slate-400 truncate flex items-center gap-1.5 mt-0.5">
                                             <span>{{ $p->nip ? 'NIP. ' . $p->nip : ($p->email ?? '-') }}</span>
                                             @if ($p->jenis_kelamin)

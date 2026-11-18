@@ -21,7 +21,7 @@ class PembinaController extends Controller
             : 'nama';
         $direction = $request->input('direction') === 'desc' ? 'desc' : 'asc';
 
-        $pembinas = Pembina::with(['ekskuls'])
+        $pembinas = Pembina::with(['ekskuls', 'user'])
             ->withCount('ekskuls')
             ->when($request->filled('q'), function ($query) use ($request) {
                 $q = '%'.$request->input('q').'%';
