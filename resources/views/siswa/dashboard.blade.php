@@ -93,7 +93,7 @@
                     <div class="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
                         <div class="absolute -bottom-10 -left-6 w-32 h-32 rounded-full bg-white/20 blur-2xl"></div>
                     </div>
-                    <img src="{{ asset('images/default.png') }}" alt="Ilustrasi Siswa"
+                    <img src="{{ asset('images/defaultransparan.png') }}" alt="Ilustrasi Siswa"
                          class="h-24 sm:h-28 md:h-40 lg:h-44 w-auto max-w-full md:max-w-[130px] lg:max-w-[150px] object-contain drop-shadow-xl animate-floaty select-none relative z-0 mb-8 md:mb-2 pointer-events-none">
                 </div>
 
@@ -384,7 +384,7 @@
 
                             @if($pItem && $pItem->siswa)
                                 <div class="flex min-w-0 flex-col sm:flex-row items-center sm:items-center gap-1 sm:gap-3">
-                                    <img src="{{ $pItem->siswa->foto_url ?? asset('images/default.png') }}" alt="{{ $pItem->siswa->nama }}" class="w-6 h-6 sm:w-10 sm:h-10 rounded-md sm:rounded-xl object-cover border border-slate-200 dark:border-neutral-700 shrink-0">
+                                    <img src="{{ $pItem->siswa->foto_url ?? asset('images/defaultransparan.png') }}" alt="{{ $pItem->siswa->nama }}" class="w-6 h-6 sm:w-10 sm:h-10 rounded-md sm:rounded-xl object-cover border border-slate-200 dark:border-neutral-700 shrink-0">
                                     <div class="min-w-0 w-full sm:flex-1 text-center sm:text-left">
                                         <h4 class="text-[9px] sm:text-xs font-bold text-slate-900 dark:text-white truncate" title="{{ $pItem->siswa->nama }}">
                                             {{ $pItem->siswa->nama }}
