@@ -70,4 +70,13 @@ class OnboardingController extends Controller
 
         return redirect()->route('login');
     }
+
+    public function dismiss(Request $request): RedirectResponse
+    {
+        abort_unless(auth()->user()?->needsOnboarding(), 403);
+
+        $request->session()->put('onboarding_dismissed', true);
+
+        return back();
+    }
 }

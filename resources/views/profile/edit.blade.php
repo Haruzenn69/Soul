@@ -65,7 +65,7 @@
             ['icon' => 'user', 'label' => 'Profil Saya', 'url' => route('profile.edit', array_merge($ekskul ? ['ekskul' => $ekskul->id] : [], ['from' => 'siswa'])), 'is' => 'profile.edit'],
         ],
         'more' => [
-            {{-- (Menu daftar ekskul dihapus sesuai kebijakan baru) --}}
+            // Menu daftar ekskul dihapus sesuai kebijakan baru.
             ['label' => 'Ajukan Keluar', 'url' => route('siswa.pengajuan-keluar', $ekskul ? ['ekskul' => $ekskul->id] : []), 'is' => ['siswa.pengajuan-keluar', 'siswa.pengajuan-keluar.store']],
         ],
     ];
@@ -574,6 +574,53 @@
                                 <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Digunakan untuk menerima notifikasi akun.</p>
                             </div>
 
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                                <!-- Jenis Kelamin -->
+                                <div>
+                                    <label class="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider block mb-1.5">
+                                        Jenis Kelamin
+                                    </label>
+                                    <select name="jenis_kelamin"
+                                            class="w-full px-4 py-2.5 bg-slate-50 dark:bg-neutral-800/60 border @error('jenis_kelamin') border-rose-300 @else border-slate-200 dark:border-neutral-700 @enderror rounded-2xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition">
+                                        <option value="">Pilih...</option>
+                                        <option value="laki-laki" {{ old('jenis_kelamin', $siswa?->jenis_kelamin) === 'laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                        <option value="perempuan" {{ old('jenis_kelamin', $siswa?->jenis_kelamin) === 'perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                    </select>
+                                </div>
+
+                                <!-- Agama -->
+                                <div>
+                                    <label class="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider block mb-1.5">
+                                        Agama
+                                    </label>
+                                    <select name="agama"
+                                            class="w-full px-4 py-2.5 bg-slate-50 dark:bg-neutral-800/60 border @error('agama') border-rose-300 @else border-slate-200 dark:border-neutral-700 @enderror rounded-2xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition">
+                                        <option value="">Pilih Agama...</option>
+                                        @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agm)
+                                            <option value="{{ $agm }}" {{ old('agama', $siswa?->agama) === $agm ? 'selected' : '' }}>{{ $agm }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Tempat Lahir -->
+                                <div>
+                                    <label class="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider block mb-1.5">
+                                        Tempat Lahir
+                                    </label>
+                                    <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $siswa?->tempat_lahir) }}" placeholder="Kota kelahiran"
+                                           class="w-full px-4 py-2.5 bg-slate-50 dark:bg-neutral-800/60 border @error('tempat_lahir') border-rose-300 @else border-slate-200 dark:border-neutral-700 @enderror rounded-2xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition">
+                                </div>
+
+                                <!-- Tanggal Lahir -->
+                                <div>
+                                    <label class="text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider block mb-1.5">
+                                        Tanggal Lahir
+                                    </label>
+                                    <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $siswa?->tanggal_lahir?->format('Y-m-d')) }}"
+                                           class="w-full px-4 py-2.5 bg-slate-50 dark:bg-neutral-800/60 border @error('tanggal_lahir') border-rose-300 @else border-slate-200 dark:border-neutral-700 @enderror rounded-2xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition">
+                                </div>
+                            </div>
+
                             <div class="pt-2">
                                 <button type="submit"
                                         class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
@@ -640,7 +687,7 @@
 
                             <div class="mt-4 p-3 bg-slate-50 dark:bg-neutral-800/40 rounded-2xl border border-slate-200/70 dark:border-neutral-700 text-xs text-slate-500 dark:text-slate-400 flex items-start gap-2.5">
                                 <i class="fa-solid fa-circle-info text-sky-500 text-sm mt-0.5 shrink-0"></i>
-                                <span class="text-[11px] leading-relaxed">Apabila terdapat kesalahan pada data identitas di atas (nama, kelas, NIS, atau data kelahiran), silakan hubungi staf Kesiswaan atau wali kelas Anda untuk pembaruan data resmi.</span>
+                                <span class="text-[11px] leading-relaxed">Jenis kelamin, agama, tempat/tanggal lahir, email, dan nomor telepon dapat kamu ubah sendiri melalui form "Data Akun" di atas. Apabila terdapat kesalahan pada nama, kelas, atau NIS, silakan hubungi staf Kesiswaan atau wali kelas Anda untuk pembaruan data resmi.</span>
                             </div>
                         </div>
                     </div>

@@ -69,7 +69,7 @@
 
                                 <div class="mt-5 pt-3 border-t border-slate-100 dark:border-neutral-800">
                                     <a href="{{ route('pembina.penilaian', ['ekskul' => $card->ekskul->id]) }}"
-                                       class="w-full inline-flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 text-xs font-bold transition shadow-sm">
+                                       class="w-full inline-flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-sky-500 hover:bg-sky-600 dark:bg-sky-500 dark:hover:bg-sky-600 text-white text-xs font-bold transition shadow-sm">
                                         <span>Input Penilaian</span>
                                         <i class="fa-solid fa-arrow-right text-[10px]"></i>
                                     </a>

@@ -41,9 +41,9 @@
 
     @php
         $statusOptions = ['diterima' => 'Aktif', 'peringatan' => 'Peringatan', 'nonaktif' => 'Nonaktif', 'keluar' => 'Keluar'];
-        $hasFilter = request()->filled('cari') || request()->filled('status') || $tampilArsip;
+        $hasFilter = request()->filled('cari') || request()->filled('status') || request()->filled('kelas_id') || $tampilArsip;
     @endphp
-    <div x-data="{ openFilter: {{ (request()->filled('status') || $tampilArsip) ? 'true' : 'false' }} }"
+    <div x-data="{ openFilter: {{ (request()->filled('status') || request()->filled('kelas_id') || $tampilArsip) ? 'true' : 'false' }} }"
          class="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-sky-100 dark:border-neutral-800 shadow-sm">
         <form method="GET" action="{{ route('ketua.anggota.index') }}" class="space-y-3">
             <input type="hidden" name="ekskul" value="{{ $ekskul->id }}">
@@ -77,7 +77,17 @@
             </div>
 
             <div x-show="openFilter" x-cloak x-transition
-                 class="pt-3 border-t border-slate-100 dark:border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                 class="pt-3 border-t border-slate-100 dark:border-neutral-800 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Kelas</label>
+                    <select name="kelas_id" onchange="this.form.submit()" class="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition-all appearance-none font-medium">
+                        <option value="">Semua Kelas</option>
+                        @foreach (($daftarKelas ?? collect()) as $kelasOpt)
+                            <option value="{{ $kelasOpt->id }}" {{ request('kelas_id') == $kelasOpt->id ? 'selected' : '' }}>{{ $kelasOpt->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div>
                     <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">Status Keanggotaan</label>
                     <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-xl text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:border-sky-500 transition-all appearance-none font-medium">

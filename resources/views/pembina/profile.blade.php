@@ -16,7 +16,7 @@
             </div>
             <div>
                 <h2 class="text-sm font-extrabold text-amber-900">Lengkapi Data Diri</h2>
-                <p class="text-xs text-amber-700 mt-1">Data biodata yang belum lengkap perlu diperbarui oleh kesiswaan. Anda tetap dapat mengganti foto profil, nomor telepon, dan email di bawah.</p>
+                <p class="text-xs text-amber-700 mt-1">Data biodata yang belum lengkap perlu diperbarui. Anda tetap dapat mengganti foto profil, nomor telepon, email, jenis kelamin, agama, tempat lahir, dan tanggal lahir di bawah.</p>
             </div>
         </div>
     @endif
@@ -54,7 +54,7 @@
             <!-- UBAH / LENGKAPI DATA Diri -->
             <div class="bg-white p-6 rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 animate-fade-up" style="animation-delay: .12s">
                 <h2 class="text-sm font-extrabold text-slate-900 mb-1">Data yang Dapat Diubah</h2>
-                <p class="text-[11px] text-slate-400 mb-4">Anda dapat mengubah foto profil, nomor telepon, dan email. Data biodata lainnya dikelola kesiswaan.</p>
+                <p class="text-[11px] text-slate-400 mb-4">Anda dapat mengubah foto profil, nomor telepon, email, jenis kelamin, agama, tempat lahir, dan tanggal lahir. Data lainnya dikelola kesiswaan.</p>
                 <form method="POST" action="{{ route('pembina.profile.update') }}" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @csrf
                     <div>
@@ -84,19 +84,19 @@
                     </div>
 
                     <div>
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Jenis Kelamin (dikelola kesiswaan)</label>
-                        <select disabled
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Jenis Kelamin</label>
+                        <select name="jenis_kelamin"
                                 class="w-full px-4 py-2.5 bg-sky-50/60 border @error('jenis_kelamin') border-red-300 @else border-sky-100 @enderror rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
-                            <option value="" {{ !$pembina?->jenis_kelamin ? 'selected' : '' }} disabled>Pilih...</option>
+                            <option value="" {{ !$pembina?->jenis_kelamin ? 'selected' : '' }}>Pilih...</option>
                             <option value="laki-laki" {{ old('jenis_kelamin', $pembina?->jenis_kelamin) === 'laki-laki' ? 'selected' : '' }}>Laki-laki</option>
                             <option value="perempuan" {{ old('jenis_kelamin', $pembina?->jenis_kelamin) === 'perempuan' ? 'selected' : '' }}>Perempuan</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Agama (dikelola kesiswaan)</label>
-                        <select disabled
-                                class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Agama</label>
+                        <select name="agama"
+                                class="w-full px-4 py-2.5 bg-sky-50/60 border @error('agama') border-red-300 @else border-sky-100 @enderror rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                             <option value="">Pilih Agama...</option>
                             @foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'] as $agm)
                                 <option value="{{ $agm }}" {{ old('agama', $pembina->agama) === $agm ? 'selected' : '' }}>{{ $agm }}</option>
@@ -105,15 +105,15 @@
                     </div>
 
                     <div>
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tempat Lahir (dikelola kesiswaan)</label>
-                        <input disabled type="text" value="{{ $pembina->tempat_lahir }}" placeholder="Kota kelahiran"
-                               class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tempat Lahir</label>
+                        <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $pembina->tempat_lahir) }}" placeholder="Kota kelahiran"
+                               class="w-full px-4 py-2.5 bg-sky-50/60 border @error('tempat_lahir') border-red-300 @else border-sky-100 @enderror rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                     </div>
 
                     <div>
-                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tanggal Lahir (dikelola kesiswaan)</label>
-                        <input disabled type="date" value="{{ $pembina->tanggal_lahir?->format('Y-m-d') }}"
-                               class="w-full px-4 py-2.5 bg-sky-50/60 border border-sky-100 rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tanggal Lahir</label>
+                        <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $pembina->tanggal_lahir?->format('Y-m-d')) }}"
+                               class="w-full px-4 py-2.5 bg-sky-50/60 border @error('tanggal_lahir') border-red-300 @else border-sky-100 @enderror rounded-xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
                     </div>
 
                     <div>
