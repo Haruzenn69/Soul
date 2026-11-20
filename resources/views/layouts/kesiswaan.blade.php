@@ -50,7 +50,7 @@
                 </div>
 
                 <!-- Search (Desktop) -->
-                <form method="GET" action="{{ route('kesiswaan.users.index') }}" class="soul-search-wrap relative w-full max-w-sm hidden sm:block">
+                <form method="GET" action="{{ route('kesiswaan.siswa.index') }}" class="soul-search-wrap relative w-full max-w-sm hidden sm:block">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
                     <input type="search" name="q" data-soul-search value="{{ request('q') }}" placeholder="Cari akun, siswa, kelas, ekskul..." class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-neutral-800 border border-slate-200/70 dark:border-neutral-700 rounded-full text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:bg-white dark:focus:bg-neutral-800 focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:focus:ring-sky-900/30 transition-all">
                 </form>

@@ -24,7 +24,7 @@
             </div>
 
             <div class="flex gap-2.5 shrink-0 items-center flex-wrap">
-                <a href="{{ route('kesiswaan.users.index') }}"
+                <a href="{{ $user->role === 'siswa' ? route('kesiswaan.siswa.index') : route('kesiswaan.pembina.index') }}"
                    class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-xs rounded-2xl hover:bg-white/20 transition-all">
                     <i class="fa-solid fa-arrow-left text-xs"></i>
                     Kembali ke Daftar Akun
@@ -272,7 +272,7 @@
                     <i class="fa-solid fa-floppy-disk text-xs"></i>
                     Simpan Perubahan
                 </button>
-                <a href="{{ route('kesiswaan.users.index') }}"
+                <a href="{{ $user->role === 'siswa' ? route('kesiswaan.siswa.index') : route('kesiswaan.pembina.index') }}"
                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-2xl transition">
                     Batal
                 </a>

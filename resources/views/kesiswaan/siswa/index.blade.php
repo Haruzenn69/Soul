@@ -16,7 +16,7 @@
         return $direction === 'asc' ? 'M8 15l4 4 4-4' : 'M8 9l4-4 4 4';
     };
 
-    $hasFilter = request()->filled(['q', 'kelas_id', 'angkatan', 'jenis_kelamin', 'jabatan', 'status']);
+    $hasFilter = request()->filled(['q', 'kelas_id', 'angkatan', 'jenis_kelamin', 'jabatan', 'status', 'ekskul_id']);
 @endphp
 
 <div class="space-y-5 animate-fade-up">
@@ -34,7 +34,7 @@
                     Data Siswa
                 </h1>
                 <p class="text-xs text-white/80 mt-1.5 max-w-xl leading-relaxed">
-                    Daftar siswa aktif dan arsip alumni. Gunakan filter status, kelas, dan angkatan untuk menemukan data.
+                    Daftar siswa aktif dan arsip alumni. Gunakan filter status, kelas, ekskul, dan angkatan untuk menemukan data.
                 </p>
             </div>
 
@@ -60,6 +60,7 @@
         if (request()->filled('angkatan')) $activeFilterCount++;
         if (request()->filled('jenis_kelamin')) $activeFilterCount++;
         if (request()->filled('jabatan')) $activeFilterCount++;
+        if (request()->filled('ekskul_id')) $activeFilterCount++;
         $hasActiveSearch = request()->filled('q');
         $hasAnyFilterOrSearch = $activeFilterCount > 0 || $hasActiveSearch;
     @endphp
@@ -159,6 +160,17 @@
                             </select>
                         </div>
 
+                        {{-- Kategori: Ekskul --}}
+                        <div class="sm:col-span-2">
+                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Ekskul</label>
+                            <select name="ekskul_id" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                                <option value="">Semua Ekskul</option>
+                                @foreach ($ekskulList as $e)
+                                    <option value="{{ $e->id }}" {{ request('ekskul_id') == $e->id ? 'selected' : '' }}>{{ $e->nama_ekskul }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         {{-- Kategori 3: Angkatan --}}
                         <div>
                             <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Tahun Angkatan</label>
@@ -241,6 +253,15 @@
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-100">
                         Gender: {{ ucfirst(request('jenis_kelamin')) }}
                         <a href="{{ route('kesiswaan.siswa.index', request()->except('jenis_kelamin', 'page')) }}" class="text-sky-400 hover:text-rose-600 font-extrabold">&times;</a>
+                    </span>
+                @endif
+
+                {{-- Ekskul --}}
+                @if (request()->filled('ekskul_id'))
+                    @php $ekskulName = $ekskulList->firstWhere('id', request('ekskul_id'))?->nama_ekskul ?? request('ekskul_id'); @endphp
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-100">
+                        Ekskul: {{ $ekskulName }}
+                        <a href="{{ route('kesiswaan.siswa.index', request()->except('ekskul_id', 'page')) }}" class="text-sky-400 hover:text-rose-600 font-extrabold">&times;</a>
                     </span>
                 @endif
 

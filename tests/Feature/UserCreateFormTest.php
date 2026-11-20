@@ -73,7 +73,7 @@ class UserCreateFormTest extends TestCase
         $response = $this->actingAs($this->makeUser('kesiswaan'))
             ->post(route('kesiswaan.users.store'), $this->payloadSiswa());
 
-        $response->assertRedirect(route('kesiswaan.users.index'));
+        $response->assertRedirect(route('kesiswaan.siswa.index'));
         $response->assertSessionHasNoErrors();
         $this->assertDatabaseHas('siswas', [
             'nis' => '3000000001',
@@ -120,7 +120,7 @@ class UserCreateFormTest extends TestCase
                 'nip' => '198001012010011001',
             ]);
 
-        $response->assertRedirect(route('kesiswaan.users.index'));
+        $response->assertRedirect(route('kesiswaan.pembina.index'));
         $response->assertSessionHasNoErrors();
         $this->assertDatabaseHas('users', [
             'role' => 'pembina',

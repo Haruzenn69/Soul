@@ -112,7 +112,7 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
     Route::get('users/template-pembina', [UserController::class, 'templatePembina'])->name('users.template-pembina');
     Route::post('users/import', [UserController::class, 'import'])->name('users.import');
 
-    Route::resource('users', UserController::class);
+    Route::resource('users', UserController::class)->except(['index']);
     Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])
         ->name('users.reset-password');
 

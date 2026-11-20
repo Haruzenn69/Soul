@@ -1057,7 +1057,7 @@ function userCreateForm() {
                 </div>
 
                 <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-                    <a href="{{ route('kesiswaan.users.index') }}"
+                    <a href="{{ route('kesiswaan.siswa.index') }}"
                        class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-2xl transition">Batal</a>
                     <button type="submit"
                             class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-2xl shadow-sm shadow-sky-200 transition">
