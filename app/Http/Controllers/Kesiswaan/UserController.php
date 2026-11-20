@@ -25,49 +25,6 @@ use Maatwebsite\Excel\Validators\Failure;
 
 class UserController extends Controller
 {
-    public function index(Request $request): View
-    {
-        $roleFilter = $request->input('role');
-
-        $sort = in_array($request->input('sort'), ['username', 'email', 'role', 'created_at'], true) ? $request->input('sort') : 'created_at';
-        $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
-
-        $users = User::with(['siswa.kelas', 'pembina.ekskuls'])
-            ->when($request->filled('q'), function ($query) use ($request) {
-                $q = $request->input('q');
-                $query->where(function ($sub) use ($q) {
-                    $sub->where('username', 'like', "%{$q}%")
-                        ->orWhere('email', 'like', "%{$q}%")
-                        ->orWhereHas('siswa', fn ($s) => $s->where('nama', 'like', "%{$q}%")->orWhere('nis', 'like', "%{$q}%"))
-                        ->orWhereHas('pembina', fn ($p) => $p->where('nama', 'like', "%{$q}%")->orWhere('nip', 'like', "%{$q}%"));
-                });
-            })
-            ->when($roleFilter, function ($query) use ($roleFilter) {
-                if ($roleFilter === 'guru') {
-                    $query->whereIn('role', ['pembina', 'kesiswaan']);
-                } elseif ($roleFilter === 'staff') {
-                    $query->whereIn('role', ['kesiswaan', 'admin']);
-                } else {
-                    $query->where('role', $roleFilter);
-                }
-            })
-            ->orderByRaw("CASE WHEN users.is_active = 0 OR (users.role = 'siswa' AND EXISTS (SELECT 1 FROM siswas WHERE siswas.user_id = users.id AND siswas.status = 'nonaktif')) THEN 2 WHEN users.role = 'pembina' AND EXISTS (SELECT 1 FROM pembinas INNER JOIN ekskuls ON ekskuls.pembina_id = pembinas.id WHERE pembinas.user_id = users.id) THEN 0 ELSE 1 END ASC")
-            ->orderBy($sort, $direction)
-            ->paginate(10)
-            ->withQueryString();
-
-        $counts = [
-            'all' => User::count(),
-            'siswa' => User::where('role', 'siswa')->count(),
-            'guru' => User::whereIn('role', ['pembina', 'kesiswaan'])->count(),
-            'pembina' => User::where('role', 'pembina')->count(),
-            'kesiswaan' => User::where('role', 'kesiswaan')->count(),
-            'staff' => User::where('role', 'admin')->count(),
-        ];
-
-        return view('kesiswaan.users.index', compact('users', 'counts', 'roleFilter', 'sort', 'direction'));
-    }
-
     public function templateSiswa()
     {
         return Excel::download(new SiswaTemplateExport, 'template-akun-siswa.xlsx');
@@ -546,8 +503,11 @@ class UserController extends Controller
         $user->refresh()->load(['siswa', 'pembina']);
         $displayName = $user->pembina?->nama ?? $user->siswa?->nama ?? $user->username ?? $user->email;
 
-        return redirect()
-            ->route('kesiswaan.users.index')
+        $targetRoute = $user->role === 'siswa'
+            ? route('kesiswaan.siswa.index')
+            : route('kesiswaan.pembina.index');
+
+        return redirect($targetRoute)
             ->with('success', "Akun {$displayName} berhasil diperbarui.");
     }
 

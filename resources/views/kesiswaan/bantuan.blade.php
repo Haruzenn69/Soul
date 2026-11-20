@@ -137,7 +137,7 @@
                     </div>
                 </div>
                 <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
-                    <a href="{{ route('kesiswaan.users.index') }}" class="text-xs font-bold text-sky-600 hover:text-sky-700 inline-flex items-center gap-1">
+                    <a href="{{ route('kesiswaan.siswa.index') }}" class="text-xs font-bold text-sky-600 hover:text-sky-700 inline-flex items-center gap-1">
                         Buka Akun Pengguna <i class="fa-solid fa-arrow-right text-[10px]"></i>
                     </a>
                 </div>

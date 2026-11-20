@@ -30,10 +30,6 @@
                         <i class="fa-solid fa-chalkboard-user text-[10px] sm:text-xs shrink-0"></i>
                         <span>Data Guru</span>
                     </a>
-                    <a href="{{ route('kesiswaan.users.index') }}" class="inline-flex max-w-full items-center justify-center gap-1 px-2.5 py-1.5 sm:px-4 sm:py-2 bg-white/10 backdrop-blur border border-white/20 text-white font-bold text-[10px] sm:text-xs rounded-xl hover:bg-white/20 transition-all">
-                        <i class="fa-solid fa-users text-[10px] sm:text-xs shrink-0"></i>
-                        <span>Semua Akun</span>
-                    </a>
                 </div>
             </div>
 
@@ -168,9 +164,6 @@
                     <h3 class="text-sm sm:text-base font-extrabold text-white tracking-tight">Akun Siswa &amp; Guru Terdaftar</h3>
                     <p class="text-xs text-white/85 font-medium mt-0.5">Daftar akun terbaru yang telah berhasil didaftarkan ke sistem</p>
                 </div>
-                <a href="{{ route('kesiswaan.users.index') }}" class="inline-flex items-center text-xs font-bold text-sky-700 bg-white hover:bg-sky-50 px-3 py-1.5 rounded-xl shadow-sm transition-all">
-                    Lihat Semua
-                </a>
             </div>
 
             <!-- Table Section: Bersih, tanpa pil, tanpa svg/emoji -->

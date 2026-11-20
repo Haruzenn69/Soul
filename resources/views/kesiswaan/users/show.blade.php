@@ -5,7 +5,7 @@
 @php
     $backUrl = request()->headers->get('referer');
     if (! $backUrl || parse_url($backUrl, PHP_URL_HOST) !== request()->getHost()) {
-        $backUrl = route('kesiswaan.users.index');
+        $backUrl = $user->role === 'siswa' ? route('kesiswaan.siswa.index') : route('kesiswaan.pembina.index');
     }
 
     $histories = $user->siswa?->profileHistories ?? $user->pembina?->profileHistories ?? collect();

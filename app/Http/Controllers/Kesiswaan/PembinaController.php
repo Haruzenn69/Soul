@@ -33,6 +33,16 @@ class PembinaController extends Controller
                 });
             })
             ->when($request->filled('jenis_kelamin'), fn ($query) => $query->where('jenis_kelamin', $request->input('jenis_kelamin')))
+            ->when($request->filled('status'), function ($query) use ($request) {
+                match ($request->input('status')) {
+                    'membina' => $query->whereHas('ekskuls'),
+                    'tidak_membina' => $query
+                        ->doesntHave('ekskuls')
+                        ->whereDoesntHave('user', fn ($u) => $u->where('role', 'kesiswaan')),
+                    'kesiswaan' => $query->whereHas('user', fn ($u) => $u->where('role', 'kesiswaan')),
+                    default => null,
+                };
+            })
             ->when($request->filled('kategori'), function ($query) use ($request) {
                 $kat = $request->input('kategori');
                 $query->where(function ($sub) use ($kat) {

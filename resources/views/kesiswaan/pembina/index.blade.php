@@ -16,7 +16,7 @@
         return $direction === 'asc' ? 'M8 15l4 4 4-4' : 'M8 9l4-4 4 4';
     };
 
-    $hasFilter = request()->filled(['q', 'jenis_kelamin']);
+    $hasFilter = request()->filled(['q', 'jenis_kelamin', 'status']);
 @endphp
 
 <div class="space-y-5 animate-fade-up">
@@ -68,6 +68,12 @@
         $activeFilterCount = 0;
         if (request()->filled('jenis_kelamin')) $activeFilterCount++;
         if (request()->filled('kategori')) $activeFilterCount++;
+        if (request()->filled('status')) $activeFilterCount++;
+        $statusLabels = [
+            'membina' => 'Guru yang Membina',
+            'tidak_membina' => 'Guru yang Tidak Membina',
+            'kesiswaan' => 'Guru Kesiswaan',
+        ];
         $hasActiveSearch = request()->filled('q');
         $hasAnyFilterOrSearch = $activeFilterCount > 0 || $hasActiveSearch;
     @endphp
@@ -136,7 +142,7 @@
                             </div>
                             <div>
                                 <h3 class="text-xs font-extrabold text-slate-900">Filter Guru / Pembina</h3>
-                                <p class="text-[11px] text-slate-400">Pilih kategori atau gender pembina</p>
+                                <p class="text-[11px] text-slate-400">Pilih status binaan, kategori, atau gender pembina</p>
                             </div>
                         </div>
                         <button type="button" @click="openFilter = false" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-50 transition">
@@ -146,6 +152,17 @@
 
                     {{-- Grid Kategori Filter --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        {{-- Status Binaan / Peran --}}
+                        <div class="sm:col-span-2">
+                            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Status Binaan / Peran</label>
+                            <select name="status" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                                <option value="">Semua Guru</option>
+                                <option value="membina" {{ request('status') === 'membina' ? 'selected' : '' }}>Guru yang Membina</option>
+                                <option value="tidak_membina" {{ request('status') === 'tidak_membina' ? 'selected' : '' }}>Guru yang Tidak Membina</option>
+                                <option value="kesiswaan" {{ request('status') === 'kesiswaan' ? 'selected' : '' }}>Guru Kesiswaan</option>
+                            </select>
+                        </div>
+
                         {{-- Jenis Kelamin --}}
                         <div>
                             <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Jenis Kelamin</label>
@@ -187,6 +204,14 @@
         @if ($activeFilterCount > 0)
             <div class="flex flex-wrap items-center gap-1.5 pt-2 border-t border-slate-100">
                 <span class="text-[11px] font-bold text-slate-400 mr-1">Filter Aktif:</span>
+
+                {{-- Status Binaan / Peran --}}
+                @if (request()->filled('status'))
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-100">
+                        Status: {{ $statusLabels[request('status')] ?? request('status') }}
+                        <a href="{{ route('kesiswaan.pembina.index', request()->except('status', 'page')) }}" class="text-sky-400 hover:text-rose-600 font-extrabold">&times;</a>
+                    </span>
+                @endif
 
                 {{-- Jenis Kelamin --}}
                 @if (request()->filled('jenis_kelamin'))
