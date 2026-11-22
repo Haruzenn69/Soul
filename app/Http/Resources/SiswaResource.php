@@ -2,11 +2,12 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Siswa;
 use App\Support\MediaUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\Siswa */
+/** @mixin Siswa */
 class SiswaResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -16,7 +17,8 @@ class SiswaResource extends JsonResource
             'nama' => $this->nama,
             'nis' => $this->nis,
             'jenis_kelamin' => $this->jenis_kelamin,
-            'foto' => MediaUrl::for($this->foto),
+            'foto' => MediaUrl::for($this->foto)
+                ?? rtrim(config('app.url'), '/').'/images/default.png',
             'jabatan' => $this->jabatan,
             'is_ketua' => $this->isKetua(),
             'is_profile_complete' => $this->isProfileComplete(),

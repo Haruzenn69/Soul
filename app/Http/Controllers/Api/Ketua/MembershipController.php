@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api\Ketua;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Http\Resources\PendaftaranResource;
+use App\Models\Notifikasi;
 use App\Models\Pendaftaran;
 use App\Models\PengajuanKeluar;
+use App\Models\Pengurus;
 use App\Models\RiwayatJabatan;
 use App\Models\RiwayatPendaftaran;
 use App\Models\Siswa;
@@ -17,11 +19,112 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class MembershipController extends ApiController
 {
     use KetuaEkskul;
+
+    public function usulkanPengurus(Request $request): JsonResponse
+    {
+        $ekskul = $this->ekskul();
+        $validated = $request->validate([
+            'ekskul_id' => ['required', 'integer', Rule::in([$ekskul->id])],
+            'siswa_id' => ['required', 'integer', 'exists:siswas,id'],
+            'jabatan' => ['required', Rule::in(array_keys(Pengurus::daftarJabatanUsulanKetua()))],
+            'alasan' => ['required', 'string', 'min:10', 'max:500'],
+        ], [
+            'ekskul_id.in' => 'Ekskul tidak sesuai dengan ekskul yang Anda pimpin.',
+            'jabatan.in' => 'Ketua hanya dapat mengusulkan Wakil Ketua, Sekretaris, atau Bendahara.',
+            'alasan.min' => 'Alasan pengajuan minimal 10 karakter.',
+            'alasan.max' => 'Alasan pengajuan maksimal 500 karakter.',
+        ]);
+
+        return DB::transaction(function () use ($ekskul, $validated): JsonResponse {
+            $siswa = Siswa::query()
+                ->whereKey($validated['siswa_id'])
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $pendaftaran = Pendaftaran::query()
+                ->where('ekskul_id', $ekskul->id)
+                ->where('siswa_id', $siswa->id)
+                ->where('status', Pendaftaran::STATUS_DITERIMA)
+                ->exists();
+
+            if (! $pendaftaran) {
+                $message = "{$siswa->nama} bukan anggota aktif berstatus diterima di ekskul ini.";
+
+                return $this->error($message, 422, ['siswa_id' => [$message]]);
+            }
+
+            $jabatanAktif = Pengurus::query()
+                ->where('ekskul_id', $ekskul->id)
+                ->where('siswa_id', $siswa->id)
+                ->where('status', Pengurus::STATUS_AKTIF)
+                ->first();
+
+            if ($jabatanAktif) {
+                $message = "{$siswa->nama} sudah memegang jabatan "
+                    .Pengurus::labelJabatan($jabatanAktif->jabatan).' di ekskul ini.';
+
+                return $this->error($message, 422, ['siswa_id' => [$message]]);
+            }
+
+            $pendingJabatan = Pengurus::query()
+                ->where('ekskul_id', $ekskul->id)
+                ->where('jabatan', $validated['jabatan'])
+                ->where('status', Pengurus::STATUS_MENUNGGU)
+                ->with('siswa')
+                ->first();
+
+            if ($pendingJabatan) {
+                $message = 'Sudah ada usulan '.Pengurus::labelJabatan($validated['jabatan'])
+                    ." atas nama {$pendingJabatan->siswa?->nama} yang sedang menunggu persetujuan Pembina.";
+
+                return $this->error($message, 422, ['jabatan' => [$message]]);
+            }
+
+            $pendingSiswa = Pengurus::query()
+                ->where('ekskul_id', $ekskul->id)
+                ->where('siswa_id', $siswa->id)
+                ->where('status', Pengurus::STATUS_MENUNGGU)
+                ->first();
+
+            if ($pendingSiswa) {
+                $message = "{$siswa->nama} sudah diusulkan untuk jabatan "
+                    .Pengurus::labelJabatan($pendingSiswa->jabatan)
+                    .' dan sedang menunggu persetujuan Pembina.';
+
+                return $this->error($message, 422, ['siswa_id' => [$message]]);
+            }
+
+            $pengurus = Pengurus::create([
+                'ekskul_id' => $ekskul->id,
+                'siswa_id' => $siswa->id,
+                'jabatan' => $validated['jabatan'],
+                'status' => Pengurus::STATUS_MENUNGGU,
+                'diusulkan_oleh' => 'ketua',
+                'catatan' => $validated['alasan'],
+            ]);
+
+            if ($ekskul->pembina) {
+                Notifikasi::create([
+                    'pembina_id' => $ekskul->pembina->id,
+                    'judul' => 'Usulan Pengurus Ekskul Baru',
+                    'pesan' => "Ketua ekskul {$ekskul->nama_ekskul} mengusulkan {$siswa->nama} sebagai "
+                        .Pengurus::labelJabatan($validated['jabatan']).'. Menunggu persetujuan Anda.',
+                    'tipe' => 'info',
+                ]);
+            }
+
+            return $this->created(
+                ['pengurus' => $pengurus],
+                'Pengajuan kepengurusan berhasil dikirim ke pembina/admin.',
+            );
+        });
+    }
 
     public function anggota(Request $request): JsonResponse
     {

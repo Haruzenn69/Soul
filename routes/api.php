@@ -55,6 +55,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/password', [SiswaController::class, 'updatePassword'])->name('password.update');
         Route::get('/kelas', [SiswaController::class, 'kelas'])->name('kelas');
         Route::post('/onboarding/complete', [SiswaController::class, 'onboardingComplete'])->name('onboarding.complete');
+        Route::post('/pengajuan-kepengurusan', [KetuaMembershipController::class, 'usulkanPengurus'])
+            ->middleware('ketua_ekskul')
+            ->name('pengurus.proposal');
     });
 
     // ============================================================

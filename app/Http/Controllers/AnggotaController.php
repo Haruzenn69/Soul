@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Models\Pendaftaran;
+use App\Models\Presensi;
 use App\Models\RiwayatPendaftaran;
 use App\Models\Siswa;
 use App\Services\ArsipEkskulService;
@@ -108,8 +109,9 @@ class AnggotaController extends Controller
         $arsip = $tampilArsip
             ? $arsipService->arsip($ekskul)
             : ['ketuaSelesai' => collect(), 'anggotaLulus' => collect(), 'total' => $arsipTotal];
+        $ketuaId = $ekskul->ketua()?->id;
 
-        return view('ketua.anggota.index', compact('anggotas', 'ekskul', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'daftarKelas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal', 'isKesiswaan'));
+        return view('ketua.anggota.index', compact('anggotas', 'ekskul', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'daftarKelas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal', 'isKesiswaan', 'ketuaId'));
     }
 
     public function calonSiswa(Request $request): JsonResponse
@@ -173,6 +175,45 @@ class AnggotaController extends Controller
             'total' => $siswas->total(),
             'current_page' => $siswas->currentPage(),
             'last_page' => $siswas->lastPage(),
+        ]);
+    }
+
+    public function show(Request $request, Pendaftaran $pendaftaran)
+    {
+        $this->ensureEkskul($pendaftaran);
+
+        $pendaftaran->load([
+            'siswa.kelas',
+            'ekskul.pembina.user',
+            'ekskul.pelatih',
+            'siswa.pendaftarans.ekskul',
+            'siswa.pengajuanKeluars.ekskul',
+            'siswa.riwayatJabatans.ekskul',
+        ]);
+
+        $presensiStats = Presensi::where('pendaftaran_id', $pendaftaran->id)
+            ->selectRaw('
+                count(*) as total,
+                sum(case when status = ? then 1 else 0 end) as hadir
+            ', [Presensi::STATUS_HADIR])
+            ->first();
+
+        $totalPresensi = (int) ($presensiStats->total ?? 0);
+        $hadir = (int) ($presensiStats->hadir ?? 0);
+        $persentase = $totalPresensi > 0 ? round(($hadir / $totalPresensi) * 100, 1) : 0;
+        $backUrl = route('ketua.anggota.index', array_merge(
+            $request->query(),
+            ['ekskul' => $pendaftaran->ekskul_id],
+        ));
+
+        return view('pembina.anggota.show', [
+            'pendaftaran' => $pendaftaran,
+            'ekskuls' => collect([$pendaftaran->ekskul]),
+            'totalPresensi' => $totalPresensi,
+            'hadir' => $hadir,
+            'persentase' => $persentase,
+            'isKetuaView' => true,
+            'backUrl' => $backUrl,
         ]);
     }
 

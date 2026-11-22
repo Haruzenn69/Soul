@@ -2,15 +2,30 @@
 
 namespace Tests\Feature;
 
+use App\Models\PengajuanKeluar;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use App\Models\PengajuanKeluar;
 use Tests\Support\CreatesFixtures;
 use Tests\TestCase;
 
 class SiswaMobileProfileApiTest extends TestCase
 {
     use CreatesFixtures, RefreshDatabase;
+
+    public function test_mobile_resources_return_the_default_profile_photo_when_student_has_none(): void
+    {
+        config(['app.url' => 'http://soul.test']);
+        $user = $this->makeUser('siswa');
+        $this->makeSiswa($user, $this->makeKelas('x'));
+
+        $this->actingAs($user)
+            ->getJson('/api/siswa/profile')
+            ->assertOk()
+            ->assertJsonPath(
+                'data.siswa.foto',
+                'http://soul.test/images/default.png',
+            );
+    }
 
     public function test_profile_photo_url_is_included_in_mobile_user_resources(): void
     {
@@ -38,55 +53,55 @@ class SiswaMobileProfileApiTest extends TestCase
 
     public function test_ketua_membership_endpoints_include_student_photo_urls(): void
     {
-            config(['app.url' => 'http://soul.test']);
-            $ekskul = $this->makeEkskul();
-            $ketua = $this->makeKetua($ekskul);
-            $memberUser = $this->makeUser('siswa');
-            $member = $this->makeSiswa($memberUser, $this->makeKelas('x'));
-            $member->update([
-                'nama' => 'Foto Anggota',
-                'foto' => 'profile-photos/member.jpg',
-            ]);
-            $this->daftarkan($member, $ekskul);
+        config(['app.url' => 'http://soul.test']);
+        $ekskul = $this->makeEkskul();
+        $ketua = $this->makeKetua($ekskul);
+        $memberUser = $this->makeUser('siswa');
+        $member = $this->makeSiswa($memberUser, $this->makeKelas('x'));
+        $member->update([
+            'nama' => 'Foto Anggota',
+            'foto' => 'profile-photos/member.jpg',
+        ]);
+        $this->daftarkan($member, $ekskul);
 
-            $pendingUser = $this->makeUser('siswa');
-            $pending = $this->makeSiswa($pendingUser, $this->makeKelas('x'));
-            $pending->update([
-                'nama' => 'Foto Pendaftar',
-                'foto' => 'profile-photos/pending.jpg',
-            ]);
-            $this->daftarkan($pending, $ekskul, 'pending');
-            PengajuanKeluar::create([
-                'siswa_id' => $member->id,
-                'ekskul_id' => $ekskul->id,
-                'alasan' => 'Saya ingin fokus ke pelajaran utama.',
-                'status' => 'pending',
-                'tanggal_pengajuan' => now()->toDateString(),
-            ]);
+        $pendingUser = $this->makeUser('siswa');
+        $pending = $this->makeSiswa($pendingUser, $this->makeKelas('x'));
+        $pending->update([
+            'nama' => 'Foto Pendaftar',
+            'foto' => 'profile-photos/pending.jpg',
+        ]);
+        $this->daftarkan($pending, $ekskul, 'pending');
+        PengajuanKeluar::create([
+            'siswa_id' => $member->id,
+            'ekskul_id' => $ekskul->id,
+            'alasan' => 'Saya ingin fokus ke pelajaran utama.',
+            'status' => 'pending',
+            'tanggal_pengajuan' => now()->toDateString(),
+        ]);
 
-            $this->actingAs($ketua['user'])
-                ->getJson('/api/ketua/anggota?cari=Foto%20Anggota')
-                ->assertOk()
-                ->assertJsonPath(
-                    'data.anggotas.0.siswa.foto',
-                    'http://soul.test/storage/profile-photos/member.jpg',
-                );
+        $this->actingAs($ketua['user'])
+            ->getJson('/api/ketua/anggota?cari=Foto%20Anggota')
+            ->assertOk()
+            ->assertJsonPath(
+                'data.anggotas.0.siswa.foto',
+                'http://soul.test/storage/profile-photos/member.jpg',
+            );
 
-            $this->actingAs($ketua['user'])
-                ->getJson('/api/ketua/pendaftaran?cari=Foto%20Pendaftar')
-                ->assertOk()
-                ->assertJsonPath(
-                    'data.pendaftarans.0.siswa.foto',
-                    'http://soul.test/storage/profile-photos/pending.jpg',
-                );
+        $this->actingAs($ketua['user'])
+            ->getJson('/api/ketua/pendaftaran?cari=Foto%20Pendaftar')
+            ->assertOk()
+            ->assertJsonPath(
+                'data.pendaftarans.0.siswa.foto',
+                'http://soul.test/storage/profile-photos/pending.jpg',
+            );
 
-            $this->actingAs($ketua['user'])
-                ->getJson('/api/ketua/pengajuan-keluar?cari=Foto%20Anggota')
-                ->assertOk()
-                ->assertJsonPath(
-                    'data.pengajuans.0.foto',
-                    'http://soul.test/storage/profile-photos/member.jpg',
-                );
+        $this->actingAs($ketua['user'])
+            ->getJson('/api/ketua/pengajuan-keluar?cari=Foto%20Anggota')
+            ->assertOk()
+            ->assertJsonPath(
+                'data.pengajuans.0.foto',
+                'http://soul.test/storage/profile-photos/member.jpg',
+            );
     }
 
     public function test_siswa_can_update_all_profile_fields_and_password_from_mobile(): void

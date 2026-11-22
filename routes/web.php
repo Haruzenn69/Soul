@@ -291,6 +291,7 @@ Route::middleware(['auth', 'role:siswa,kesiswaan,admin', 'ketua_ekskul'])->prefi
     Route::get('anggota', [AnggotaController::class, 'index'])->name('anggota.index');
     Route::get('anggota/calon-siswa', [AnggotaController::class, 'calonSiswa'])->name('anggota.calon-siswa');
     Route::post('anggota', [AnggotaController::class, 'store'])->name('anggota.store');
+    Route::get('anggota/{pendaftaran}', [AnggotaController::class, 'show'])->name('anggota.show');
     Route::patch('anggota/{pendaftaran}/status', [AnggotaController::class, 'updateStatus'])->name('anggota.update-status');
     Route::get('pengurus', [PengurusController::class, 'indexKetua'])->name('pengurus.index');
     Route::post('pengurus/usulkan', [PengurusController::class, 'usulkanKetua'])->name('pengurus.usulkan');

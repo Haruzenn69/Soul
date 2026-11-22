@@ -139,108 +139,160 @@
         </div>
     </div>
 
-    <div class="ketua-card-list bg-white rounded-2xl border border-sky-100 shadow-lg shadow-sky-100/60 overflow-hidden">
-        <div class="overflow-x-auto">
-        <table class="card-table ketua-card-anggota w-full text-left text-xs md:text-sm">
-            <thead class="bg-gradient-to-r from-sky-50 to-blue-50">
+    <div class="ketua-card-list bg-white dark:bg-[#1a1a1a] p-5 md:p-6 rounded-2xl border border-slate-200/80 dark:border-neutral-800 shadow-sm">
+        <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+            <div>
+                <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Daftar Anggota</h3>
+                <p class="text-xs text-slate-400 dark:text-neutral-500 mt-0.5">Pilih nama siswa untuk melihat profil dan riwayat keanggotaan.</p>
+            </div>
+            <span class="text-xs font-semibold px-3 py-1 bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 rounded-xl">
+                Total {{ $anggotas->total() }} Anggota
+            </span>
+        </div>
+        <div class="overflow-x-auto md:overflow-visible">
+        <table class="card-table ketua-card-anggota w-full text-xs">
+            <thead>
                 <tr>
-                    <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">No</th>
-                    @include('partials.th-sort', ['label' => 'NIS', 'key' => 'nis', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
-                    @include('partials.th-sort', ['label' => 'Nama', 'key' => 'nama', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
-                    <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Kelas</th>
-                    @include('partials.th-sort', ['label' => 'Status', 'key' => 'status', 'sort' => $sort, 'direction' => $direction, 'class' => 'px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap'])
-                    <th class="px-3 md:px-6 py-3 font-semibold text-slate-500 whitespace-nowrap">Aksi</th>
+                    <th class="p-3 font-semibold rounded-l-xl text-left bg-slate-50 dark:bg-neutral-800/80 text-slate-500 dark:text-neutral-400 border-b border-slate-100 dark:border-neutral-800">No</th>
+                    @include('partials.th-sort', ['label' => 'Identitas Siswa', 'key' => 'nama', 'sort' => $sort, 'direction' => $direction, 'class' => 'p-3 font-semibold text-left bg-slate-50 dark:bg-neutral-800/80 text-slate-500 dark:text-neutral-400 border-b border-slate-100 dark:border-neutral-800'])
+                    <th class="p-3 font-semibold text-left bg-slate-50 dark:bg-neutral-800/80 text-slate-500 dark:text-neutral-400 border-b border-slate-100 dark:border-neutral-800">Kelas</th>
+                    <th class="p-3 font-semibold text-left bg-slate-50 dark:bg-neutral-800/80 text-slate-500 dark:text-neutral-400 border-b border-slate-100 dark:border-neutral-800">Jabatan</th>
+                    @include('partials.th-sort', ['label' => 'Status', 'key' => 'status', 'sort' => $sort, 'direction' => $direction, 'class' => 'p-3 font-semibold text-left bg-slate-50 dark:bg-neutral-800/80 text-slate-500 dark:text-neutral-400 border-b border-slate-100 dark:border-neutral-800'])
+                    <th class="p-3 font-semibold text-center rounded-r-xl bg-slate-50 dark:bg-neutral-800/80 text-slate-500 dark:text-neutral-400 border-b border-slate-100 dark:border-neutral-800">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-sky-50">
+            <tbody class="divide-y divide-slate-100 dark:divide-neutral-800">
                 @forelse($anggotas as $anggota)
                     @php
                         $isSelf = $anggota->siswa_id === (auth()->user()->siswa->id ?? null);
+                        $profileUrl = route('ketua.anggota.show', ['pendaftaran' => $anggota->id] + request()->query());
+                        $isKetuaEkskul = $anggota->siswa?->jabatan === 'ketua'
+                            && $ketuaId === $anggota->siswa_id;
                     @endphp
-                    <tr class="hover:bg-sky-50/50 transition {{ in_array($anggota->status, ['nonaktif', 'keluar']) ? 'opacity-60' : '' }}">
-                        <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap text-slate-500">{{ $loop->iteration }}</td>
-                        <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap text-slate-600">{{ $anggota->siswa->nis }}</td>
-                        <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap text-slate-800">
-                            {{ $anggota->siswa->nama }}
-                            @if($isSelf)
-                                <span class="ml-1 px-1.5 py-0.5 bg-sky-100 text-sky-700 border border-sky-200 rounded-md text-[9px] font-bold">Kamu</span>
-                            @endif
-                        </td>
-                        <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap text-slate-600">{{ $anggota->siswa->kelas->nama ?? '-' }}</td>
-                        <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap">
-                            @if($anggota->status === 'diterima')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-full">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                    Aktif
-                                </span>
-                            @elseif($anggota->status === 'peringatan')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 border border-amber-200 text-xs font-semibold rounded-full">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86l-8.24 14a2 2 0 001.73 3h16.44a2 2 0 001.73-3l-8.24-14a2 2 0 00-3.42 0z"/>
-                                    </svg>
-                                    Peringatan
-                                </span>
-                            @elseif($anggota->status === 'keluar')
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-600 border border-slate-200 text-xs font-semibold rounded-full">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                                    Keluar
-                                </span>
-                            @else
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-600 border border-rose-200 text-xs font-semibold rounded-full">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                    Nonaktif
-                                </span>
-                            @endif
-                        </td>
-                        <td class="px-3 md:px-6 py-3 md:py-3.5 whitespace-nowrap">
-                            @if($isSelf)
-                                <span class="text-slate-300 text-[11px]">—</span>
-                            @else
-                                <div class="flex flex-wrap items-center gap-2">
-                                    @if($anggota->status === 'diterima')
-                                        <form action="{{ route('ketua.anggota.update-status', $anggota) }}" method="POST"
-                                            onsubmit="return confirm('Beri peringatan kepada {{ addslashes($anggota->siswa->nama) }}? Siswa akan menerima alert peringatan di akunnya. Status tetap aktif.');">
-                                            @csrf @method('PATCH')
-                                            <input type="hidden" name="status" value="peringatan">
-                                            <button type="submit" class="inline-flex items-center gap-1 px-2.5 md:px-3 py-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 border border-amber-200 font-semibold rounded-full hover:from-amber-200 hover:to-yellow-200 transition text-xs">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86l-8.24 14a2 2 0 001.73 3h16.44a2 2 0 001.73-3l-8.24-14a2 2 0 00-3.42 0z"/>
-                                                </svg>
-                                                Peringatan
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('ketua.anggota.update-status', $anggota) }}" method="POST"
-                                            onsubmit="return confirm('Nonaktifkan {{ addslashes($anggota->siswa->nama) }}? Siswa tidak akan terhitung anggota aktif ekskul.');">
-                                            @csrf @method('PATCH')
-                                            <input type="hidden" name="status" value="nonaktif">
-                                            <button type="submit" class="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 text-xs font-semibold rounded-full transition">Nonaktifkan</button>
-                                        </form>
-                                    @elseif($anggota->status === 'peringatan')
-                                        <form action="{{ route('ketua.anggota.update-status', $anggota) }}" method="POST">
-                                            @csrf @method('PATCH')
-                                            <input type="hidden" name="status" value="diterima">
-                                            <button type="submit" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-full transition">Aktifkan</button>
-                                        </form>
-                                        <form action="{{ route('ketua.anggota.update-status', $anggota) }}" method="POST"
-                                            onsubmit="return confirm('Nonaktifkan {{ addslashes($anggota->siswa->nama) }}? Siswa tidak akan terhitung anggota aktif ekskul.');">
-                                            @csrf @method('PATCH')
-                                            <input type="hidden" name="status" value="nonaktif">
-                                            <button type="submit" class="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 text-xs font-semibold rounded-full transition">Nonaktifkan</button>
-                                        </form>
+                    <tr class="hover:bg-slate-50/60 dark:hover:bg-neutral-800/40 transition {{ in_array($anggota->status, ['nonaktif', 'keluar']) ? 'opacity-60' : '' }}">
+                        <td class="p-3 text-slate-400 dark:text-neutral-500 font-medium">{{ $anggotas->firstItem() + $loop->index }}</td>
+                        <td class="p-3">
+                            <a href="{{ route('ketua.anggota.show', ['pendaftaran' => $anggota->id] + request()->query()) }}" class="flex items-center gap-2.5 group rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">
+                                <div class="w-8 h-8 rounded-xl overflow-hidden shrink-0 flex items-center justify-center font-bold text-xs bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 border border-slate-200/80 dark:border-neutral-700">
+                                    @if($anggota->siswa?->foto_url)
+                                        <img src="{{ $anggota->siswa->foto_url }}" alt="" class="w-full h-full object-cover">
                                     @else
-                                        <form action="{{ route('ketua.anggota.update-status', $anggota) }}" method="POST">
-                                            @csrf @method('PATCH')
-                                            <input type="hidden" name="status" value="diterima">
-                                            <button type="submit" class="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-full transition">Aktifkan</button>
-                                        </form>
+                                        <span>{{ strtoupper(substr($anggota->siswa->nama ?? 'S', 0, 2)) }}</span>
                                     @endif
                                 </div>
+                                <div>
+                                    <span class="font-extrabold text-slate-900 dark:text-neutral-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 block transition">{{ $anggota->siswa->nama ?? '-' }}</span>
+                                    <span class="text-[10px] text-slate-400 dark:text-neutral-500">NIS: {{ $anggota->siswa->nis ?? '-' }}</span>
+                                </div>
+                            </a>
+                        </td>
+                        <td class="p-3 font-medium text-slate-700 dark:text-neutral-300">{{ $anggota->siswa->kelas->nama ?? '-' }}</td>
+                        <td class="p-3">
+                            @if($isKetuaEkskul)
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900">
+                                    <i class="fa-solid fa-crown text-[9px]"></i> Ketua
+                                </span>
+                            @elseif($anggota->siswa?->jabatan === 'ketua')
+                                <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 text-[10px] font-medium">Ketua Lain</span>
+                            @else
+                                <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-neutral-800 text-slate-500 dark:text-neutral-400 text-[10px] font-medium">Anggota</span>
                             @endif
+                        </td>
+                        <td class="p-3 whitespace-nowrap">
+                            @if($anggota->status === 'diterima')
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/50">Aktif</span>
+                            @elseif($anggota->status === 'peringatan')
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/50">Peringatan</span>
+                            @elseif($anggota->status === 'nonaktif')
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-neutral-800 text-slate-500 dark:text-neutral-400 border border-slate-200 dark:border-neutral-700">Nonaktif</span>
+                            @else
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-200/80 dark:border-rose-800/50">Keluar</span>
+                            @endif
+                        </td>
+                        <td class="p-3 text-center">
+                            <div class="flex flex-wrap items-center justify-center gap-2">
+                                <a href="{{ $profileUrl }}"
+                                   class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-sky-200 dark:border-sky-800/60 bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 text-[11px] font-bold hover:bg-sky-100 dark:hover:bg-sky-900/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 transition"
+                                   aria-label="Lihat profil {{ $anggota->siswa->nama ?? 'siswa' }}">
+                                    <i class="fa-regular fa-id-card text-[10px]" aria-hidden="true"></i>
+                                    Profil
+                                </a>
+                                <div class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
+                                    <button type="button"
+                                            @unless($isSelf) @click="open = !open" @endunless
+                                            @disabled($isSelf)
+                                            aria-haspopup="menu"
+                                            aria-label="Aksi keanggotaan untuk {{ $anggota->siswa->nama ?? 'siswa' }}"
+                                            :aria-expanded="open.toString()"
+                                            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 {{ $isSelf ? 'border-slate-200 dark:border-neutral-700 bg-slate-100 dark:bg-neutral-800 text-slate-400 dark:text-neutral-500 cursor-not-allowed' : 'border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-neutral-800' }}">
+                                        Aksi
+                                        <i class="fa-solid fa-chevron-down text-[9px]" aria-hidden="true"></i>
+                                    </button>
+                                    @unless($isSelf)
+                                        <div x-show="open" x-cloak x-transition
+                                             role="menu"
+                                             class="absolute right-0 z-30 mt-2 w-40 rounded-xl border border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-1.5 shadow-lg text-left">
+                                            @if($anggota->status === 'diterima')
+                                                <form action="{{ route('ketua.anggota.update-status', $anggota) }}" method="POST"
+                                                      onsubmit="return confirm('Beri peringatan kepada {{ addslashes($anggota->siswa->nama) }}? Siswa akan menerima alert peringatan di akunnya. Status tetap aktif.');">
+                                                    @csrf @method('PATCH')
+                                                    <input type="hidden" name="status" value="peringatan">
+                                                    <button type="submit" role="menuitem" class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-xs font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition">
+                                                        <i class="fa-solid fa-triangle-exclamation w-3 text-center" aria-hidden="true"></i>
+                                                        Peringatan
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('ketua.anggota.update-status', $anggota) }}" method="POST"
+                                                      onsubmit="return confirm('Nonaktifkan {{ addslashes($anggota->siswa->nama) }}? Siswa tidak akan terhitung anggota aktif ekskul.');">
+                                                    @csrf @method('PATCH')
+                                                    <input type="hidden" name="status" value="nonaktif">
+                                                    <button type="submit" role="menuitem" class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition">
+                                                        <i class="fa-solid fa-user-slash w-3 text-center" aria-hidden="true"></i>
+                                                        Nonaktifkan
+                                                    </button>
+                                                </form>
+                                            @elseif($anggota->status === 'peringatan')
+                                                <form action="{{ route('ketua.anggota.update-status', $anggota) }}" method="POST">
+                                                    @csrf @method('PATCH')
+                                                    <input type="hidden" name="status" value="diterima">
+                                                    <button type="submit" role="menuitem" class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition">
+                                                        <i class="fa-solid fa-user-check w-3 text-center" aria-hidden="true"></i>
+                                                        Aktifkan
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('ketua.anggota.update-status', $anggota) }}" method="POST"
+                                                      onsubmit="return confirm('Nonaktifkan {{ addslashes($anggota->siswa->nama) }}? Siswa tidak akan terhitung anggota aktif ekskul.');">
+                                                    @csrf @method('PATCH')
+                                                    <input type="hidden" name="status" value="nonaktif">
+                                                    <button type="submit" role="menuitem" class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition">
+                                                        <i class="fa-solid fa-user-slash w-3 text-center" aria-hidden="true"></i>
+                                                        Nonaktifkan
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <form action="{{ route('ketua.anggota.update-status', $anggota) }}" method="POST">
+                                                    @csrf @method('PATCH')
+                                                    <input type="hidden" name="status" value="diterima">
+                                                    <button type="submit" role="menuitem" class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition">
+                                                        <i class="fa-solid fa-user-check w-3 text-center" aria-hidden="true"></i>
+                                                        Aktifkan
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    @endunless
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-10 text-center text-slate-400">Tidak ada anggota yang sesuai dengan filter yang dipilih.</td>
+                        <td colspan="6" class="px-6 py-10 text-center text-slate-400">
+                            <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-neutral-800 flex items-center justify-center mx-auto mb-3 text-slate-400">
+                                <i class="fa-solid fa-users text-lg"></i>
+                            </div>
+                            <p class="text-xs font-semibold">Tidak ada anggota yang sesuai dengan filter yang dipilih.</p>
+                        </td>
                     </tr>
                 @endforelse
             </tbody>

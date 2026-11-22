@@ -1,4 +1,4 @@
-@extends('pembina.layout')
+@extends(($isKetuaView ?? false) ? 'ketua.layout' : 'pembina.layout')
 @section('title', 'Detail Anggota')
 
 @section('content')
@@ -34,7 +34,7 @@
             <p class="text-xs text-slate-400 mt-0.5">Profil lengkap dan riwayat keanggotaan.</p>
         </div>
         <div class="flex items-center gap-2 self-start sm:self-auto flex-wrap">
-            @if($isKetuaInThisEkskul)
+            @if(!($isKetuaView ?? false) && $isKetuaInThisEkskul)
                 <form action="{{ route('pembina.ekskul.copot-ketua', ['ekskul' => $pendaftaran->ekskul_id, 'siswa' => $pendaftaran->siswa_id]) }}" method="POST"
                       onsubmit="return confirm('Copot jabatan Ketua Ekskul {{ $pendaftaran->ekskul->nama_ekskul }} dari {{ $pendaftaran->siswa->nama }}?')">
                     @csrf
@@ -44,7 +44,7 @@
                         <span>Copot Jabatan Ketua</span>
                     </button>
                 </form>
-            @elseif(!$isKetua && $pendaftaran->status === 'diterima')
+            @elseif(!($isKetuaView ?? false) && !$isKetua && $pendaftaran->status === 'diterima')
                 <form action="{{ route('pembina.ekskul.pilih-ketua', ['ekskul' => $pendaftaran->ekskul_id, 'siswa' => $pendaftaran->siswa_id]) }}" method="POST"
                       onsubmit="return confirm('Jadikan {{ $pendaftaran->siswa->nama }} sebagai Ketua di ekskul {{ $pendaftaran->ekskul->nama_ekskul }}?{{ $currentKetuaEkskul ? ' (Ketua lama: ' . $currentKetuaEkskul->nama . ' akan diturunkan)' : '' }}')">
                     @csrf
@@ -55,7 +55,7 @@
                     </button>
                 </form>
             @endif
-            <a href="{{ route('pembina.anggota') }}" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-xl transition">Kembali</a>
+            <a href="{{ $backUrl ?? route('pembina.anggota') }}" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-xl transition">Kembali</a>
         </div>
     </div>
 

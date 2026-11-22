@@ -72,6 +72,86 @@ class PengurusTest extends TestCase
         ]);
     }
 
+    public function test_ketua_can_submit_a_leadership_proposal_through_the_mobile_api(): void
+    {
+        $ekskul = $this->makeEkskul();
+        $ketua = $this->makeKetua($ekskul);
+        $calon = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('xi'));
+        $this->daftarkan($calon, $ekskul, Pendaftaran::STATUS_DITERIMA);
+
+        $this->actingAs($ketua['user'])
+            ->postJson('/api/siswa/pengajuan-kepengurusan', [
+                'ekskul_id' => $ekskul->id,
+                'siswa_id' => $calon->id,
+                'nama_siswa' => 'Nama dari client yang tidak dipercaya',
+                'nis' => '0000000000',
+                'jabatan' => 'sekretaris',
+                'alasan' => 'Memiliki tanggung jawab dan pengalaman organisasi.',
+            ])
+            ->assertCreated()
+            ->assertJsonPath('data.pengurus.ekskul_id', $ekskul->id)
+            ->assertJsonPath('data.pengurus.siswa_id', $calon->id)
+            ->assertJsonPath('data.pengurus.jabatan', 'sekretaris')
+            ->assertJsonPath('data.pengurus.status', 'menunggu');
+
+        $this->assertDatabaseHas('pengurus', [
+            'ekskul_id' => $ekskul->id,
+            'siswa_id' => $calon->id,
+            'jabatan' => 'sekretaris',
+            'status' => 'menunggu',
+            'diusulkan_oleh' => 'ketua',
+            'catatan' => 'Memiliki tanggung jawab dan pengalaman organisasi.',
+        ]);
+        $this->assertDatabaseHas('notifikasis', [
+            'pembina_id' => $ekskul->pembina_id,
+            'judul' => 'Usulan Pengurus Ekskul Baru',
+        ]);
+    }
+
+    public function test_non_ketua_cannot_submit_a_leadership_proposal_through_the_mobile_api(): void
+    {
+        $ekskul = $this->makeEkskul();
+        $siswa = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
+
+        $this->actingAs($siswa->user)
+            ->postJson('/api/siswa/pengajuan-kepengurusan', [
+                'ekskul_id' => $ekskul->id,
+                'siswa_id' => $siswa->id,
+                'jabatan' => 'sekretaris',
+                'alasan' => 'Alasan pengajuan lebih dari sepuluh karakter.',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('pengurus', [
+            'siswa_id' => $siswa->id,
+            'jabatan' => 'sekretaris',
+        ]);
+    }
+
+    public function test_ketua_cannot_submit_a_proposal_for_another_extracurricular(): void
+    {
+        $ekskul = $this->makeEkskul();
+        $ketua = $this->makeKetua($ekskul);
+        $ekskulLain = $this->makeEkskul();
+        $calon = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('xi'));
+        $this->daftarkan($calon, $ekskul, Pendaftaran::STATUS_DITERIMA);
+
+        $this->actingAs($ketua['user'])
+            ->postJson('/api/siswa/pengajuan-kepengurusan', [
+                'ekskul_id' => $ekskulLain->id,
+                'siswa_id' => $calon->id,
+                'jabatan' => 'sekretaris',
+                'alasan' => 'Alasan pengajuan lebih dari sepuluh karakter.',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Ekskul tidak sesuai dengan ekskul yang Anda pimpin.');
+
+        $this->assertDatabaseMissing('pengurus', [
+            'ekskul_id' => $ekskulLain->id,
+            'siswa_id' => $calon->id,
+        ]);
+    }
+
     public function test_ketua_tidak_bisa_mengusulkan_posisi_ketua(): void
     {
         $ekskul = $this->makeEkskul();
