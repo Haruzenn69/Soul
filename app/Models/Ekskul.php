@@ -10,9 +10,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Ekskul extends Model
 {
+    public const TIPE_EKSKUL = 'ekskul';
+    public const TIPE_KOMUNITAS = 'komunitas';
+
     protected $fillable = [
         'pembina_id',
         'pelatih_id',
+        'parent_id',
+        'tipe',
         'nama_ekskul',
         'kategori',
         'deskripsi',
@@ -27,6 +32,70 @@ class Ekskul extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function subdivisis(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
+
+    public function isKomunitas(): bool
+    {
+        return ($this->tipe ?? self::TIPE_EKSKUL) === self::TIPE_KOMUNITAS;
+    }
+
+    public function isEkskul(): bool
+    {
+        return ! $this->isKomunitas();
+    }
+
+    public function isSubdivisi(): bool
+    {
+        return ! is_null($this->parent_id);
+    }
+
+    public function hasSubdivisi(): bool
+    {
+        return $this->subdivisis()->exists();
+    }
+
+    public function ketuaSubdivisi(): ?Siswa
+    {
+        if ($this->isSubdivisi() && $this->parent_id) {
+            $pengurus = Pengurus::where('ekskul_id', $this->parent_id)
+                ->where('subdivisi_id', $this->id)
+                ->where('jabatan', Pengurus::JABATAN_WAKIL_KETUA)
+                ->where('status', Pengurus::STATUS_AKTIF)
+                ->first();
+
+            if ($pengurus?->siswa) {
+                return $pengurus->siswa;
+            }
+        }
+
+        return $this->ketua();
+    }
+
+    public function wakilKetuaSubdivisi(int|self $subdivisi): ?Siswa
+    {
+        $subId = is_numeric($subdivisi) ? $subdivisi : $subdivisi->id;
+        $pengurus = $this->penguruses()
+            ->where('subdivisi_id', $subId)
+            ->where('jabatan', Pengurus::JABATAN_WAKIL_KETUA)
+            ->where('status', Pengurus::STATUS_AKTIF)
+            ->first();
+
+        return $pengurus?->siswa;
+    }
+
+    public function labelTipe(): string
+    {
+        return $this->isKomunitas() ? 'Komunitas' : 'Ekstrakurikuler';
+    }
 
     public function pembina(): BelongsTo
     {

@@ -118,6 +118,8 @@ Route::middleware(['auth', 'role:kesiswaan,admin'])->prefix('kesiswaan')->name('
 
     Route::get('ekskuls/kategori/{kategori}', [EkskulController::class, 'byKategori'])->name('ekskuls.by-kategori');
     Route::resource('ekskuls', EkskulController::class)->except([]);
+    Route::post('ekskuls/{ekskul}/subdivisi', [EkskulController::class, 'storeSubdivisi'])->name('ekskuls.subdivisi.store');
+    Route::delete('ekskuls/{ekskul}/subdivisi/{subdivisi}', [EkskulController::class, 'destroySubdivisi'])->name('ekskuls.subdivisi.destroy');
     Route::post('kategori-ekskul', [KategoriEkskulController::class, 'store'])->name('kategori.store');
     Route::delete('kategori-ekskul/{kategoriEkskul}', [KategoriEkskulController::class, 'destroy'])->name('kategori.destroy');
     Route::post('pembina/{pembina}/assign-ekskul', [KesiswaanPembinaController::class, 'assignEkskul'])->name('pembina.assign-ekskul');

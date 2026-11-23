@@ -386,16 +386,7 @@
         @endforelse
     </table>
 
-    <!-- TANDA TANGAN (PALING BAWAH SEBELAH KANAN) -->
-    <div class="ttd-single-container">
-        <div class="ttd-single">
-            <p>Bandung, {{ $tanggalSurat }}</p>
-            <p>Pelatih Ekstrakurikuler {{ $ekskul->nama_ekskul ?? '' }}</p>
-            <div class="space"></div>
-            <p class="nama-pelatih">{{ $namaPelatih !== '-' ? $namaPelatih : '..................................................' }}</p>
-        </div>
-        <div style="clear: both;"></div>
-    </div>
+
 
     {{-- =================================================================== --}}
     {{-- LEMBAR 2+: HISTORY PRESENSI SISWA PER 1 PERTEMUAN                   --}}

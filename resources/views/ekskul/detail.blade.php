@@ -216,36 +216,38 @@
                                 </div>
                             </div>
 
-                            {{-- Pelatih Card --}}
-                            @php
-                                $pelatihAktif = ($ekskul->pelatih && $ekskul->pelatih->isTerverifikasi()) ? $ekskul->pelatih : null;
-                            @endphp
-                            <div class="p-3.5 sm:p-4 rounded-2xl bg-amber-50/60 dark:bg-neutral-900 border border-amber-100 dark:border-neutral-800 flex items-start gap-3 transition hover:border-amber-200 dark:hover:border-neutral-700">
-                                <div class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                                    </svg>
-                                </div>
-                                <div class="min-w-0">
-                                    <div class="flex items-center gap-1.5">
-                                        <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-neutral-400">Pelatih</p>
-                                        @if($pelatihAktif)
-                                            <span class="inline-flex items-center gap-0.5 text-[9px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 px-1.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800" title="Terverifikasi Kesiswaan">
-                                                <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                                                Terverifikasi
-                                            </span>
+                            {{-- Pelatih Card (Hanya jika Ekskul, Komunitas tidak ada pelatih) --}}
+                            @if ($ekskul->isEkskul())
+                                @php
+                                    $pelatihAktif = ($ekskul->pelatih && $ekskul->pelatih->isTerverifikasi()) ? $ekskul->pelatih : null;
+                                @endphp
+                                <div class="p-3.5 sm:p-4 rounded-2xl bg-amber-50/60 dark:bg-neutral-900 border border-amber-100 dark:border-neutral-800 flex items-start gap-3 transition hover:border-amber-200 dark:hover:border-neutral-700">
+                                    <div class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-1.5">
+                                            <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-neutral-400">Pelatih</p>
+                                            @if($pelatihAktif)
+                                                <span class="inline-flex items-center gap-0.5 text-[9px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 px-1.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800" title="Terverifikasi Kesiswaan">
+                                                    <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                                    Terverifikasi
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <p class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 truncate mt-0.5">
+                                            {{ $pelatihAktif ? $pelatihAktif->nama : 'Belum ada' }}
+                                        </p>
+                                        @if($pelatihAktif && $pelatihAktif->sosmed)
+                                            <p class="text-[10px] text-slate-400 dark:text-neutral-500 truncate mt-0.5">
+                                                {{ $pelatihAktif->sosmed }}
+                                            </p>
                                         @endif
                                     </div>
-                                    <p class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 truncate mt-0.5">
-                                        {{ $pelatihAktif ? $pelatihAktif->nama : 'Belum ada' }}
-                                    </p>
-                                    @if($pelatihAktif && $pelatihAktif->sosmed)
-                                        <p class="text-[10px] text-slate-400 dark:text-neutral-500 truncate mt-0.5">
-                                            {{ $pelatihAktif->sosmed }}
-                                        </p>
-                                    @endif
                                 </div>
-                            </div>
+                            @endif
 
                             {{-- Anggota Card --}}
                             <div class="p-3.5 sm:p-4 rounded-2xl bg-emerald-50/60 dark:bg-neutral-900 border border-emerald-100 dark:border-neutral-800 flex items-start gap-3 transition hover:border-emerald-200 dark:hover:border-neutral-700">
@@ -389,6 +391,83 @@
                     </div>
                 </div>
             </section>
+
+            {{-- SUB DIVISI SECTION --}}
+            @if ($ekskul->subdivisis->isNotEmpty())
+                <section id="subdivisi" class="scroll-mt-20">
+                    <div class="flex items-center justify-between gap-4 flex-wrap mb-6">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1.5">
+                                <span class="px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950/70 text-sky-800 dark:text-sky-300 font-extrabold text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                    Sub Divisi Peminatan
+                                </span>
+                            </div>
+                            <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                                Sub Divisi {{ $ekskul->nama_ekskul }}
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
+                                Setiap sub divisi dipimpin oleh seorang Wakil Ketua {{ $ekskul->nama_ekskul }} yang bertindak sebagai Ketua di masing-masing sub divisi.
+                            </p>
+                        </div>
+                        <span class="px-3 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 text-xs font-bold border border-sky-200/60 dark:border-sky-800/50">
+                            {{ $ekskul->subdivisis->count() }} Sub Divisi
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        @foreach ($ekskul->subdivisis as $sub)
+                            @php
+                                $ketuaSub = $ekskul->wakilKetuaSubdivisi($sub) ?? $sub->ketua();
+                            @endphp
+                            <div class="bg-white dark:bg-[#1a1a1a] rounded-2xl p-5 border border-slate-200/80 dark:border-neutral-800 shadow-sm hover:border-sky-300 transition flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between gap-2 mb-3">
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300">
+                                            Sub Divisi
+                                        </span>
+                                        <span class="text-[11px] text-slate-400 font-medium">
+                                            {{ $sub->pendaftarans_count ?? $sub->pendaftarans()->count() }} Anggota
+                                        </span>
+                                    </div>
+                                    <h4 class="text-base font-extrabold text-slate-900 dark:text-white mb-1.5">
+                                        {{ $sub->nama_ekskul }}
+                                    </h4>
+                                    @if ($sub->deskripsi)
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-3">
+                                            {{ $sub->deskripsi }}
+                                        </p>
+                                    @endif
+
+                                    <div class="p-3 bg-slate-50 dark:bg-neutral-900 rounded-xl border border-slate-100 dark:border-neutral-800 flex items-center gap-2.5 mb-2">
+                                        <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center text-xs font-extrabold shrink-0">
+                                            @if($ketuaSub?->foto_url)
+                                                <img src="{{ $ketuaSub->foto_url }}" class="w-full h-full object-cover rounded-lg">
+                                            @else
+                                                {{ strtoupper(substr($ketuaSub?->nama ?? 'W', 0, 2)) }}
+                                            @endif
+                                        </div>
+                                        <div class="min-w-0">
+                                            <span class="text-[9px] font-bold text-slate-400 block uppercase tracking-wider">Ketua Sub Divisi (Wakil Ketua):</span>
+                                            <p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                                                {{ $ketuaSub?->nama ?? 'Belum Ditentukan' }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="pt-3 border-t border-slate-100 dark:border-neutral-800 flex items-center justify-between text-[11px]">
+                                    <span class="text-slate-400">{{ $sub->jadwal ?: 'Jadwal mengikuti induk' }}</span>
+                                    <a href="{{ route('ekskul.detail', $sub) }}" class="font-bold text-sky-600 hover:text-sky-700 inline-flex items-center gap-1">
+                                        <span>Lihat</span>
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
 
             {{-- 2. INFORMASI PRESTASI --}}
             <section id="prestasi" class="scroll-mt-20">

@@ -19,7 +19,10 @@
     @php
         $filters = [
             'semua' => ['label' => 'Semua', 'count' => $jumlah['semua'] ?? 0],
+            'ekskul' => ['label' => 'Ekstrakurikuler', 'count' => $jumlah['ekskul'] ?? 0],
+            'komunitas' => ['label' => 'Komunitas', 'count' => $jumlah['komunitas'] ?? 0],
         ];
+        $currentTipe = request('tipe', 'semua');
         $ekskulAktifIds = ($ekskulAktifs ?? collect())->pluck('id')->all();
     @endphp
 
@@ -54,9 +57,9 @@
         <div class="flex items-center gap-1.5 bg-white border border-slate-200/80 rounded-2xl p-1.5 shadow-sm overflow-x-auto scrollbar-none">
             @foreach ($filters as $key => $item)
                 @php
-                    $isActive = ($status === $key) || ($status === null && $key === 'semua');
+                    $isActive = ($tipe === $key) || ($tipe === null && $key === 'semua');
                     $href = route('siswa.katalog', array_filter(
-                        array_merge(request()->except('status'), ['status' => $key === 'semua' ? null : $key]),
+                        array_merge(request()->except('tipe'), ['tipe' => $key === 'semua' ? null : $key]),
                         fn($v) => $v !== null && $v !== ''
                     ));
                 @endphp
@@ -77,8 +80,8 @@
         {{-- Search + Reset --}}
         <div class="flex items-center gap-2 flex-1">
             <form method="GET" action="{{ route('siswa.katalog') }}" class="relative flex-1">
-                @if ($status)
-                    <input type="hidden" name="status" value="{{ $status }}">
+                @if ($tipe)
+                    <input type="hidden" name="tipe" value="{{ $tipe }}">
                 @endif
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
                     <i class="fa-solid fa-magnifying-glass text-xs"></i>
@@ -86,7 +89,7 @@
                 <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari nama ekskul atau pembina..."
                        class="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200/80 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all shadow-sm">
             </form>
-            @if (request('cari') || $status)
+            @if (request('cari') || $tipe)
                 <a href="{{ route('siswa.katalog') }}"
                    class="flex items-center gap-1.5 px-3.5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 rounded-2xl text-xs font-semibold transition-all shadow-sm shrink-0"
                    title="Reset filter & pencarian">
@@ -135,7 +138,7 @@
                 $logo = \App\Support\EkskulInfo::logo($ekskul->logo);
                 $alasanEkskul = ($alasanPerEkskul ?? collect())[$ekskul->id] ?? null;
             @endphp
-            <div class="catalog-card group flex flex-col bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden hover:shadow-md hover:border-slate-300 hover:-translate-y-0.5 transition-all duration-200">
+            <div x-data="{ showSub: false }" class="catalog-card group flex flex-col bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden hover:shadow-md hover:border-slate-300 hover:-translate-y-0.5 transition-all duration-200">
                 {{-- Card Header Strip --}}
                 <div class="h-1.5 w-full bg-gradient-to-r from-sky-400 to-blue-500"></div>
 
@@ -166,17 +169,37 @@
 
                     {{-- Name & Desc --}}
                     <div class="flex items-center gap-1.5 mb-1 flex-wrap">
-                        <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
-                            {{ $ekskul->nama_ekskul }}
-                        </h3>
-                        @if ($ekskul->isWajib())
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                Wajib
-                            </span>
-                        @elseif ($ekskul->kategori)
-                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-semibold bg-slate-100 text-slate-600 border border-slate-200/60">
-                                {{ $ekskul->kategori }}
-                            </span>
+                        @if ($ekskul->hasSubdivisi())
+                            <button type="button" @click="showSub = !showSub" class="text-left cursor-pointer group-hover:text-blue-600 transition-colors">
+                                <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1 inline">
+                                    {{ $ekskul->nama_ekskul }}
+                                </h3>
+                            </button>
+                            <button type="button" @click.stop="showSub = !showSub"
+                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 cursor-pointer transition shadow-2xs">
+                                <i class="fa-solid fa-sitemap text-[8px]"></i>
+                                <span>{{ $ekskul->subdivisis->count() }} Sub Divisi</span>
+                                <svg class="w-2.5 h-2.5 transition-transform duration-200" :class="showSub ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                        @else
+                            <h3 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+                                {{ $ekskul->nama_ekskul }}
+                            </h3>
+                            @if ($ekskul->isSubdivisi())
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                                    Sub Divisi {{ $ekskul->parent?->nama_ekskul }}
+                                </span>
+                            @elseif ($ekskul->isKomunitas())
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-semibold bg-violet-50 text-violet-700 border border-violet-200">
+                                    Komunitas
+                                </span>
+                            @elseif ($ekskul->kategori)
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-semibold bg-slate-100 text-slate-600 border border-slate-200/60">
+                                    {{ $ekskul->kategori }}
+                                </span>
+                            @endif
                         @endif
                     </div>
                     <p class="text-[11px] text-slate-500 leading-relaxed line-clamp-2 flex-1">
@@ -194,6 +217,35 @@
                             <span class="text-[11px] text-slate-500 truncate">{{ $ekskul->jadwal ?: 'Jadwal belum diatur' }}</span>
                         </div>
                     </div>
+
+                    {{-- Accordion Sub Divisi yang muncul saat ekskul diklik --}}
+                    @if ($ekskul->hasSubdivisi())
+                        <div class="mt-3 pt-2.5 border-t border-slate-100">
+                            <button type="button" @click.stop="showSub = !showSub"
+                                    class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100/80 border border-amber-200/80 text-amber-800 transition text-[11px] font-bold cursor-pointer">
+                                <span class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-sitemap text-[10px] text-amber-600"></i>
+                                    <span x-text="showSub ? 'Sembunyikan Sub Divisi' : 'Lihat {{ $ekskul->subdivisis->count() }} Sub Divisi'"></span>
+                                </span>
+                                <svg class="w-3 h-3 text-amber-700 transition-transform duration-200" :class="showSub ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+
+                            <div x-show="showSub" x-cloak class="mt-2 p-2.5 bg-slate-50 rounded-xl border border-amber-100 space-y-1.5">
+                                <p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">Cabang Peminatan:</p>
+                                <div class="grid grid-cols-2 gap-1.5">
+                                    @foreach ($ekskul->subdivisis as $sub)
+                                        <a href="{{ route('ekskul.detail', $sub) }}"
+                                           class="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200/80 hover:border-sky-400 hover:text-sky-600 text-slate-700 transition shadow-2xs group/sub">
+                                            <span class="text-[10px] font-bold truncate">{{ $sub->nama_ekskul }}</span>
+                                            <i class="fa-solid fa-chevron-right text-[8px] text-slate-400 group-hover/sub:text-sky-600 group-hover/sub:translate-x-0.5 transition-transform"></i>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @endif
 
                     {{-- Ekskul hanya dapat dilihat siswa; keanggotaan dikelola Ketua. --}}
                     <div class="mt-4 pt-3.5 border-t border-slate-100 flex flex-col gap-2">

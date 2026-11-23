@@ -29,16 +29,12 @@ final class AturanEkskul
      * Kategori fallback (default) untuk ekskul yang kategorinya dihapus.
      * Kategori ini dilindungi dan tidak bisa dihapus oleh kesiswaan.
      */
-    public const KATEGORI_FALLBACK = 'Lainnya';
+    public const KATEGORI_FALLBACK = 'Komunitas';
 
-    /** Default daftar seluruh kategori ekskul di sistem. */
+    /** Default daftar seluruh kategori ekskul di sistem (hanya Ekskul dan Komunitas). */
     public const DEFAULT_KATEGORI = [
-        'Wajib',
-        'Olahraga',
-        'Seni',
-        'Bahasa',
-        'Bela Diri',
-        'Lainnya',
+        'Ekskul',
+        'Komunitas',
     ];
 
     /** Fallback konstanta kategori ekskul. */
