@@ -13,6 +13,7 @@ class UserResource extends JsonResource
         $siswa = $this->relationLoaded('siswa') ? $this->siswa : $this->siswa()->with('kelas')->first();
         $pembina = $this->relationLoaded('pembina') ? $this->pembina : $this->pembina()->first();
         $aktiv = $siswa ? $siswa->activePendaftaran()?->loadMissing('ekskul') : null;
+        $ketuaEkskulId = $siswa?->ekskulDipimpin()?->id;
 
         return [
             'id' => $this->id,
@@ -30,6 +31,7 @@ class UserResource extends JsonResource
                 'jenis_kelamin' => $pembina->jenis_kelamin,
             ] : null,
             'aktiv_ekskul' => $aktiv?->ekskul ? (new EkskulResource($aktiv->ekskul))->resolve() : null,
+            'ketua_ekskul_id' => $ketuaEkskulId,
             'active_ekskuls' => $siswa
                 ? EkskulResource::collection($siswa->activeEkskuls())->resolve()
                 : [],
