@@ -12,6 +12,7 @@ use App\Http\Resources\SiswaResource;
 use App\Models\Kelas;
 use App\Models\Notifikasi;
 use App\Models\PengajuanKeluar;
+use App\Models\Pengurus;
 use App\Models\Penilaian;
 use App\Models\Presensi;
 use App\Models\Ekskul;
@@ -111,6 +112,26 @@ class SiswaController extends ApiController
         $unreadNotifCount = $siswa->notifikasis()->where('is_read', false)->count();
 
         $hasSubmittedTestimoni = $selectedSummary['has_submitted_testimoni'] ?? false;
+        $pengurusAktif = collect();
+        $pengurusPending = collect();
+        if ($ekskul) {
+            $pengurusAktif = $ekskul->pengurusAktif()
+                ->with('siswa.kelas')
+                ->get();
+            $pengurusPending = $ekskul->penguruses()
+                ->where('status', Pengurus::STATUS_MENUNGGU)
+                ->with('siswa.kelas')
+                ->get();
+
+            if (! $pengurusAktif->contains('jabatan', Pengurus::JABATAN_KETUA) && $ekskul->ketua()) {
+                $pengurusAktif->push((object) [
+                    'jabatan' => Pengurus::JABATAN_KETUA,
+                    'siswa' => $ekskul->ketua()->loadMissing('kelas'),
+                    'status' => Pengurus::STATUS_AKTIF,
+                    'created_at' => null,
+                ]);
+            }
+        }
 
         return [
             'siswa' => (new SiswaResource($siswa->loadMissing('kelas')))->resolve(),
@@ -120,6 +141,8 @@ class SiswaController extends ApiController
             'status_terakhir' => $statusTerakhir ? (new PendaftaranResource($statusTerakhir))->resolve() : null,
             'nonaktif_status' => $nonaktifStatus,
             'ekskul' => $ekskul ? (new EkskulResource($ekskul))->resolve() : null,
+            'pengurus_aktif' => $pengurusAktif->values(),
+            'pengurus_pending' => $pengurusPending->values(),
             'active_ekskuls' => EkskulResource::collection($activePendaftarans->pluck('ekskul')->filter()->values())->resolve(),
             'active_summaries' => $activeSummaries,
             'kegiatan_mendatang' => $kegiatanMendatang,
