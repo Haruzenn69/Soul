@@ -302,11 +302,11 @@
                             <div class="team-avatar">
                                 <div class="team-avatar-halo" aria-hidden="true"></div>
                                 <div class="team-avatar-frame">
-                                    <img class="team-avatar-img" src="{{ asset('images/rizki.jpg') }}" alt="Adit Pratama">
+                                    <img class="team-avatar-img" src="{{ asset('images/rizki.jpeg') }}" alt="Adit Pratama">
                                 </div>
                             </div>
                             <div class="team-info">
-                                <h3 class="team-name">M.Rizki Bintang</h3>
+                                <h3 class="team-name">M. Rizqi Bintang</h3>
                                 <div class="team-location">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                                     <span>Bandung</span>
