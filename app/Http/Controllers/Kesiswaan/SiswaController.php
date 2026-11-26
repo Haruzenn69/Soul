@@ -39,8 +39,13 @@ class SiswaController extends Controller
             ->when($request->filled('jenis_kelamin'), fn ($query) => $query->where('jenis_kelamin', $request->input('jenis_kelamin')))
             ->when($request->filled('jabatan'), fn ($query) => $query->where('jabatan', $request->input('jabatan')))
             ->when($request->filled('ekskul_id'), function ($query) use ($request) {
+                $ekskulId = $request->input('ekskul_id');
+                $targetIds = Ekskul::where('id', $ekskulId)
+                    ->orWhere('parent_id', $ekskulId)
+                    ->pluck('id');
+
                 $query->whereHas('pendaftarans', fn ($p) => $p
-                    ->where('ekskul_id', $request->input('ekskul_id'))
+                    ->whereIn('ekskul_id', $targetIds)
                     ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN]));
             })
             ->orderByRaw("CASE WHEN siswas.status = 'nonaktif' OR EXISTS (SELECT 1 FROM users WHERE users.id = siswas.user_id AND users.is_active = 0) THEN 1 ELSE 0 END ASC")
@@ -52,7 +57,7 @@ class SiswaController extends Controller
         return view('kesiswaan.siswa.index', [
             'siswas' => $siswas,
             'kelasList' => Kelas::orderBy('nama')->get(),
-            'ekskulList' => Ekskul::orderBy('nama_ekskul')->get(),
+            'ekskulList' => Ekskul::doesntHave('subdivisis')->orderBy('nama_ekskul')->get(),
             'angkatanList' => Siswa::whereNotNull('angkatan')->where('angkatan', '!=', '')
                 ->distinct()->orderBy('angkatan', 'desc')->pluck('angkatan'),
             'sort' => $sort,

@@ -250,15 +250,10 @@
         $namaPelatih = ($pelatihModel && filled($pelatihModel->nama)) ? $pelatihModel->nama : '-';
         $namaKetua = $ekskul->ketua()?->nama ?? 'Ketua Ekskul';
 
-        // Tanda tangan digital pelatih (khusus ditampilkan pada lembar absensi pelatih)
+        // Tanda tangan digital pelatih (dioptimalkan agar memotong margin kosong dan pas di tabel)
         $pelatihTtdSrc = '';
         if ($pelatihModel && !empty($pelatihModel->tanda_tangan)) {
-            $ttdPath = storage_path('app/public/' . $pelatihModel->tanda_tangan);
-            if (file_exists($ttdPath)) {
-                $ttdData = base64_encode(file_get_contents($ttdPath));
-                $ttdMime = mime_content_type($ttdPath);
-                $pelatihTtdSrc = 'data:' . $ttdMime . ';base64,' . $ttdData;
-            }
+            $pelatihTtdSrc = \App\Support\SignatureHelper::getOptimizedBase64($pelatihModel->tanda_tangan) ?: '';
         }
 
         $tanggalSurat = $laporan->tanggal_surat 
@@ -557,12 +552,12 @@
     <table class="matrix">
         <thead>
             <tr>
-                <th style="width: 6%;">No</th>
-                <th style="width: 18%;">Pertemuan</th>
-                <th style="width: 18%;">Hari, Tanggal</th>
-                <th style="width: 14%;">Waktu</th>
-                <th style="width: 25%; text-align: center;">Materi Kegiatan</th>
-                <th style="width: 10%;">Keterangan</th>
+                <th style="width: 5%;">No</th>
+                <th style="width: 17%;">Pertemuan</th>
+                <th style="width: 17%;">Hari, Tanggal</th>
+                <th style="width: 13%;">Waktu</th>
+                <th style="width: 24%; text-align: center;">Materi Kegiatan</th>
+                <th style="width: 9%;">Keterangan</th>
                 <th style="width: 15%;">TTD</th>
             </tr>
         </thead>
@@ -612,11 +607,13 @@
                             <span style="color: #6b7280;">&ndash;</span>
                         @endif
                     </td>
-                    <td style="text-align: {{ $loop->iteration % 2 === 1 ? 'left' : 'right' }}; padding: 2px 6px; font-size: 8.5pt; vertical-align: middle;">
+                    <td style="text-align: {{ $loop->iteration % 2 === 1 ? 'left' : 'right' }}; padding: 3px 5px; font-size: 8.5pt; vertical-align: middle; height: 50px;">
                         @if($statusPelatih === 'hadir')
                             @if(!empty($pelatihTtdSrc))
-                                <span style="font-size: 8pt; vertical-align: middle;">{{ $loop->iteration }}.</span>
-                                <img src="{{ $pelatihTtdSrc }}" alt="TTD" style="max-height: 22px; max-width: 60px; vertical-align: middle; margin-left: 2px;">
+                                <div style="display: inline-block; vertical-align: middle; text-align: left; max-width: 100%;">
+                                    <span style="font-size: 8pt; vertical-align: middle; margin-right: 2px;">{{ $loop->iteration }}.</span>
+                                    <img src="{{ $pelatihTtdSrc }}" alt="TTD" style="max-height: 46px; max-width: 85px; width: auto; height: auto; vertical-align: middle; display: inline-block;">
+                                </div>
                             @else
                                 {{ $loop->iteration }}. ....................
                             @endif

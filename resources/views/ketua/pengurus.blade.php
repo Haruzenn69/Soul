@@ -267,14 +267,41 @@
         <form method="POST" action="{{ route('ketua.pengurus.usulkan') }}" class="space-y-4">
             @csrf
 
+            @php
+                $hasSekretaris = $pengurusAktif->has('sekretaris') || $usulanMenunggu->where('jabatan', 'sekretaris')->isNotEmpty();
+                $hasBendahara = $pengurusAktif->has('bendahara') || $usulanMenunggu->where('jabatan', 'bendahara')->isNotEmpty();
+
+                $assignedSubdivisiIds = $wakilKetuas->pluck('subdivisi_id')->filter()
+                    ->merge($usulanMenunggu->where('jabatan', 'wakil_ketua')->pluck('subdivisi_id')->filter())
+                    ->all();
+
+                $hasWakilKetuaAvailable = ($subdivisis->isNotEmpty())
+                    ? ($subdivisis->pluck('id')->diff($assignedSubdivisiIds)->isNotEmpty())
+                    : (! $pengurusAktif->has('wakil_ketua') && $usulanMenunggu->where('jabatan', 'wakil_ketua')->isEmpty());
+
+                $adaJabatanTersedia = $hasWakilKetuaAvailable || ! $hasSekretaris || ! $hasBendahara;
+            @endphp
+
+            @if(! $adaJabatanTersedia)
+                <div class="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200/60 dark:border-amber-800/50 text-xs text-amber-800 dark:text-amber-300">
+                    <i class="fa-solid fa-circle-info mr-1"></i> Seluruh jabatan pengurus pada ekskul ini sudah terisi atau sedang dalam proses usulan.
+                </div>
+            @endif
+
             <div>
                 <label for="usul-jabatan" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Pilih Jabatan yang Diusulkan</label>
                 <select id="usul-jabatan" name="jabatan" required onchange="toggleUsulSubdivisi(this.value)" class="w-full px-3 py-2.5 bg-sky-50/60 dark:bg-neutral-950 border border-sky-100 dark:border-neutral-800 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:bg-white dark:focus:bg-neutral-900 transition">
-                    @foreach($daftarJabatanUsulan as $key => $label)
-                        <option value="{{ $key }}">{{ $label }}</option>
-                    @endforeach
+                    @if($hasWakilKetuaAvailable)
+                        <option value="wakil_ketua">Wakil Ketua</option>
+                    @endif
+                    @if(! $hasSekretaris)
+                        <option value="sekretaris">Sekretaris</option>
+                    @endif
+                    @if(! $hasBendahara)
+                        <option value="bendahara">Bendahara</option>
+                    @endif
                 </select>
-                <p class="text-[10px] text-slate-400 mt-1">Ketua hanya dapat mengusulkan posisi Wakil Ketua, Sekretaris, dan Bendahara.</p>
+                <p class="text-[10px] text-slate-400 mt-1">Jabatan yang sudah aktif atau sedang menunggu persetujuan tidak dimunculkan kembali.</p>
 
                 @if(isset($subdivisis) && $subdivisis->isNotEmpty())
                     <div id="subdivisi-usul-box" class="mt-2.5 p-3 bg-sky-50 dark:bg-sky-950/40 rounded-xl border border-sky-200/60 dark:border-sky-800/50" style="display: none;">
@@ -284,10 +311,12 @@
                         <select id="usul-subdivisi" name="subdivisi_id" class="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-sky-200 dark:border-neutral-800 rounded-lg text-xs text-slate-800 dark:text-slate-200">
                             <option value="">-- Calon Ketua Sub Divisi apa? --</option>
                             @foreach($subdivisis as $sub)
-                                <option value="{{ $sub->id }}">Ketua Sub Divisi {{ $sub->nama_ekskul }}</option>
+                                @if(! in_array($sub->id, $assignedSubdivisiIds))
+                                    <option value="{{ $sub->id }}">Ketua Sub Divisi {{ $sub->nama_ekskul }}</option>
+                                @endif
                             @endforeach
                         </select>
-                        <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Wakil Ketua pada ekskul ini memimpin masing-masing Sub Divisi.</p>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Hanya menampilkan sub divisi yang belum memiliki Ketua Sub Divisi.</p>
                     </div>
                 @endif
             </div>
@@ -317,7 +346,7 @@
                 <button type="button" onclick="closeModalUsulkan()" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-200 dark:hover:bg-neutral-700 transition">
                     Batal
                 </button>
-                <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white text-xs font-extrabold shadow-md transition">
+                <button type="submit" @if(! $adaJabatanTersedia || $anggotaEligible->isEmpty()) disabled @endif class="px-5 py-2 rounded-xl {{ ! $adaJabatanTersedia || $anggotaEligible->isEmpty() ? 'bg-slate-300 dark:bg-neutral-800 cursor-not-allowed text-slate-500' : 'bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white shadow-md' }} text-xs font-extrabold transition">
                     Kirim Usulan ke Pembina
                 </button>
             </div>

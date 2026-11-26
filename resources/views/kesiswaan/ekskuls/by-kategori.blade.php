@@ -216,9 +216,12 @@
                             :class="activeSub === {{ $ekskul->id }} ? 'bg-sky-50/40' : ''">
                             <td class="py-3.5 px-5">
                                 <div class="flex items-center gap-3">
-                                    <div @if ($ekskul->hasSubdivisi()) @click="activeSub = (activeSub === {{ $ekskul->id }} ? null : {{ $ekskul->id }})" class="cursor-pointer" title="Klik untuk lihat sub divisi" @endif
-                                         class="w-9 h-9 rounded-xl overflow-hidden shrink-0 {{ $ekskul->status ? 'bg-sky-100' : 'bg-slate-100' }}">
-                                        <img src="{{ $ekskul->logo_url }}" alt="Logo {{ $ekskul->nama_ekskul }}" class="w-full h-full object-cover {{ $ekskul->status ? '' : 'grayscale opacity-70' }}">
+                                    <div @if ($ekskul->hasSubdivisi()) @click="activeSub = (activeSub === {{ $ekskul->id }} ? null : {{ $ekskul->id }})" title="Klik untuk lihat sub divisi" @endif
+                                         class="w-9 h-9 rounded-xl overflow-hidden shrink-0 {{ $ekskul->status ? 'bg-sky-100' : 'bg-slate-100' }} {{ $ekskul->hasSubdivisi() ? 'cursor-pointer' : '' }}"
+                                         style="width: 36px; height: 36px; max-width: 36px; max-height: 36px; min-width: 36px; min-height: 36px;">
+                                        <img src="{{ $ekskul->logo_url }}" alt="Logo {{ $ekskul->nama_ekskul }}"
+                                             class="w-full h-full object-cover {{ $ekskul->status ? '' : 'grayscale opacity-70' }}"
+                                             style="width: 100%; height: 100%; max-width: 36px; max-height: 36px; object-fit: cover; display: block;">
                                     </div>
                                     <div>
                                         <div class="flex items-center gap-2 flex-wrap">

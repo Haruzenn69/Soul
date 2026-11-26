@@ -59,7 +59,7 @@
                     <h2 class="truncate text-sm font-bold text-slate-800 dark:text-slate-100">{{ $siswa->nama }}</h2>
                     <p class="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">NIS {{ $siswa->nis }} · {{ $siswa->kelas?->nama ?? 'Kelas belum tersedia' }}</p>
                     @if($siswa->ekskul_dipimpin_lain)
-                        <p class="mt-1 text-[10px] text-slate-500 dark:text-slate-400">Ketua {{ $siswa->ekskul_dipimpin_lain->nama_ekskul }}</p>
+                        <p class="mt-1 text-[10px] text-amber-600 dark:text-amber-400 font-medium">Ketua {{ $siswa->ekskul_dipimpin_lain->nama_ekskul }}</p>
                     @endif
                     @if(!$siswa->punya_akun)
                         <p class="mt-1 text-[10px] text-amber-600 dark:text-amber-400 font-medium">⚠ Belum punya akun aktif</p>
@@ -68,7 +68,7 @@
                 @if($siswa->is_current_ketua)
                     <span class="shrink-0 text-[11px] font-semibold text-sky-600 dark:text-sky-400">Ketua aktif</span>
                 @elseif($siswa->ekskul_dipimpin_lain)
-                    <span class="shrink-0 text-[11px] text-slate-400">Tidak tersedia</span>
+                    <span class="shrink-0 text-[11px] text-slate-400 bg-slate-100 dark:bg-neutral-800 px-2.5 py-1 rounded-lg font-medium">Ketua Ekskul Lain</span>
                 @else
                     <form method="POST" action="{{ route('pembina.ekskul.pilih-ketua', ['ekskul' => $ekskul->id, 'siswa' => $siswa->id]) }}" onsubmit="return confirm('Tetapkan {{ addslashes($siswa->nama) }} sebagai Ketua {{ addslashes($ekskul->nama_ekskul) }}?')">
                         @csrf

@@ -474,10 +474,18 @@
                         <label for="input-subdivisi" class="block text-xs font-bold text-sky-900 dark:text-sky-300 mb-1">
                             Pilih Sub Divisi yang Dipimpin (Khusus Wakil Ketua) <span class="text-rose-500">*</span>
                         </label>
+                        @php
+                            $assignedSubdivisiIds = $wakilKetuas->pluck('subdivisi_id')->filter()->all();
+                        @endphp
                         <select id="input-subdivisi" name="subdivisi_id" class="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-sky-200 dark:border-neutral-800 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-400">
                             <option value="">-- Tetapkan sebagai Ketua Sub Divisi apa? --</option>
                             @foreach($subdivisis as $sub)
-                                <option value="{{ $sub->id }}">Ketua Sub Divisi {{ $sub->nama_ekskul }}</option>
+                                @php
+                                    $sudahAda = $wakilKetuas->firstWhere('subdivisi_id', $sub->id);
+                                @endphp
+                                <option value="{{ $sub->id }}">
+                                    Ketua Sub Divisi {{ $sub->nama_ekskul }} {{ $sudahAda ? '(Saat ini: ' . ($sudahAda->siswa?->nama ?? 'Terisi') . ')' : '' }}
+                                </option>
                             @endforeach
                         </select>
                         <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Wakil Ketua pada ekskul ini memimpin masing-masing Sub Divisi.</p>
