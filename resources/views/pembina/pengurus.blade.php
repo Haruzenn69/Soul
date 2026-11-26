@@ -291,7 +291,40 @@
                             </div>
 
                             {{-- KONTEN PENGURUS --}}
-                            @if($pengurus && $pengurus->siswa)
+                            @if($jabatanKey === 'wakil_ketua' && isset($subdivisis) && $subdivisis->isNotEmpty())
+                                <div class="py-2 space-y-2">
+                                    <div class="p-2 bg-sky-50 dark:bg-sky-950/40 rounded-xl border border-sky-100 dark:border-sky-800 text-center mb-2">
+                                        <span class="text-[10px] font-bold text-sky-800 dark:text-sky-300">
+                                            {{ $wakilKetuas->count() }} / {{ $subdivisis->count() }} Sub Divisi Terisi
+                                        </span>
+                                    </div>
+                                    @foreach($subdivisis as $sub)
+                                        @php
+                                            $wk = $wakilKetuas->firstWhere('subdivisi_id', $sub->id);
+                                        @endphp
+                                        <div class="p-2 rounded-xl border {{ $wk ? 'border-sky-200 dark:border-sky-800 bg-sky-50/40 dark:bg-sky-950/30' : 'border-dashed border-slate-200 dark:border-neutral-800 bg-slate-50/30' }} flex items-center justify-between gap-2">
+                                            <div class="min-w-0">
+                                                <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200">
+                                                    {{ $sub->nama_ekskul }}
+                                                </span>
+                                                <p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate mt-0.5">
+                                                    {{ $wk?->siswa?->nama ?? 'Belum ada ketua' }}
+                                                </p>
+                                                @if($wk?->siswa)
+                                                    <p class="text-[9px] text-slate-400 truncate">
+                                                        {{ $wk->siswa->kelas?->nama ?? '-' }}
+                                                    </p>
+                                                @endif
+                                            </div>
+                                            @if($wk)
+                                                <button type="button" onclick="openModalCopot('{{ route('pembina.pengurus.copot', $wk->id) }}', '{{ $wk->siswa?->nama }}', 'Wakil Ketua ({{ $sub->nama_ekskul }})')" class="p-1 text-rose-500 hover:bg-rose-50 rounded-lg shrink-0" title="Copot">
+                                                    <i class="fa-solid fa-xmark text-xs"></i>
+                                                </button>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @elseif($pengurus && $pengurus->siswa)
                                 <div class="text-center py-2">
                                     <div class="w-20 h-20 mx-auto rounded-2xl p-1 bg-gradient-to-br {{ $style['accent'] }} shadow-md mb-3">
                                         <div class="w-full h-full rounded-xl overflow-hidden bg-white dark:bg-neutral-800 flex items-center justify-center">
@@ -435,6 +468,29 @@
                     <span>Khusus Ketua, bisa dipilih dari seluruh siswa sekolah.</span>
                     <a href="{{ route('pembina.ekskul.pilih-ketua-page', $ekskul) }}" class="font-extrabold underline hover:text-amber-900 shrink-0">Pilih dari Seluruh Siswa &rarr;</a>
                 </div>
+
+                @if(isset($subdivisis) && $subdivisis->isNotEmpty())
+                    <div id="subdivisi-selector-box" class="mt-2.5 p-3 bg-sky-50 dark:bg-sky-950/40 rounded-xl border border-sky-200/60 dark:border-sky-800/50" style="display: none;">
+                        <label for="input-subdivisi" class="block text-xs font-bold text-sky-900 dark:text-sky-300 mb-1">
+                            Pilih Sub Divisi yang Dipimpin (Khusus Wakil Ketua) <span class="text-rose-500">*</span>
+                        </label>
+                        @php
+                            $assignedSubdivisiIds = $wakilKetuas->pluck('subdivisi_id')->filter()->all();
+                        @endphp
+                        <select id="input-subdivisi" name="subdivisi_id" class="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-sky-200 dark:border-neutral-800 rounded-lg text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-400">
+                            <option value="">-- Tetapkan sebagai Ketua Sub Divisi apa? --</option>
+                            @foreach($subdivisis as $sub)
+                                @php
+                                    $sudahAda = $wakilKetuas->firstWhere('subdivisi_id', $sub->id);
+                                @endphp
+                                <option value="{{ $sub->id }}">
+                                    Ketua Sub Divisi {{ $sub->nama_ekskul }} {{ $sudahAda ? '(Saat ini: ' . ($sudahAda->siswa?->nama ?? 'Terisi') . ')' : '' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Wakil Ketua pada ekskul ini memimpin masing-masing Sub Divisi.</p>
+                    </div>
+                @endif
             </div>
 
             <div>
@@ -539,6 +595,10 @@
         if (hint) {
             hint.style.display = (val === 'ketua') ? 'flex' : 'none';
         }
+        var subBox = document.getElementById('subdivisi-selector-box');
+        if (subBox) {
+            subBox.style.display = (val === 'wakil_ketua') ? 'block' : 'none';
+        }
     }
 
     function openModalTetapkan() {
@@ -546,9 +606,13 @@
         if (sel) toggleKetuaHint(sel.value);
         document.getElementById('modal-tetapkan').classList.remove('hidden');
     }
-    function openModalTetapkanJabatan(jabatan) {
+    function openModalTetapkanJabatan(jabatan, subdivisiId = null) {
         document.getElementById('input-jabatan').value = jabatan;
         toggleKetuaHint(jabatan);
+        var subSelect = document.getElementById('input-subdivisi');
+        if (subSelect && subdivisiId) {
+            subSelect.value = subdivisiId;
+        }
         openModalTetapkan();
     }
     function closeModalTetapkan() {

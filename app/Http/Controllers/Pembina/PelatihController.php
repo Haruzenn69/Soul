@@ -28,10 +28,14 @@ class PelatihController extends Controller
     {
         $user = auth()->user();
         if ($user && in_array($user->role, ['kesiswaan', 'admin'], true)) {
-            return Ekskul::orderBy('nama_ekskul')->get();
+            return Ekskul::where(function ($q) {
+                $q->where('tipe', '!=', Ekskul::TIPE_KOMUNITAS)->orWhereNull('tipe');
+            })->orderBy('nama_ekskul')->get();
         }
 
-        return $this->getPembina()->ekskuls;
+        return $this->getPembina()->ekskuls()->where(function ($q) {
+            $q->where('tipe', '!=', Ekskul::TIPE_KOMUNITAS)->orWhereNull('tipe');
+        })->orderBy('nama_ekskul')->get();
     }
 
     public function index(Request $request)

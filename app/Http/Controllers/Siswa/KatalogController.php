@@ -18,8 +18,9 @@ class KatalogController extends Controller
         $ekskulAktif = $ekskulAktifs->first();
 
         $cari = Ekskul::query()
-            ->with('pembina')
+            ->with(['pembina', 'parent', 'subdivisis.penguruses.siswa'])
             ->where('status', true)
+            ->whereNull('parent_id')
             ->when($request->filled('cari'), function ($query) use ($request) {
                 $cari = $request->input('cari');
 
@@ -27,16 +28,33 @@ class KatalogController extends Controller
                     $sub->where('nama_ekskul', 'like', "%{$cari}%")
                         ->orWhere('deskripsi', 'like', "%{$cari}%")
                         ->orWhere('tagline', 'like', "%{$cari}%")
-                        ->orWhereHas('pembina', fn ($p) => $p->where('nama', 'like', "%{$cari}%"));
+                        ->orWhereHas('pembina', fn ($p) => $p->where('nama', 'like', "%{$cari}%"))
+                        ->orWhereHas('subdivisis', fn ($s) => $s->where('nama_ekskul', 'like', "%{$cari}%"));
                 });
             });
 
-        // Jumlah mengikuti pencarian dan filter, untuk memberi ringkasan katalog.
+        $tipe = $request->input('tipe');
+        if ($tipe === 'komunitas') {
+            $filtered = (clone $cari)->where('tipe', Ekskul::TIPE_KOMUNITAS);
+        } elseif ($tipe === 'ekskul') {
+            $filtered = (clone $cari)->where(function ($q) {
+                $q->where('tipe', '!=', Ekskul::TIPE_KOMUNITAS)->orWhereNull('tipe');
+            });
+        } else {
+            $filtered = $cari;
+            $tipe = null;
+        }
+
+        // Jumlah mengikuti pencarian dan filter
         $jumlah = [
             'semua' => (clone $cari)->count(),
+            'ekskul' => (clone $cari)->where(function ($q) {
+                $q->where('tipe', '!=', Ekskul::TIPE_KOMUNITAS)->orWhereNull('tipe');
+            })->count(),
+            'komunitas' => (clone $cari)->where('tipe', Ekskul::TIPE_KOMUNITAS)->count(),
         ];
 
-        $ekskuls = $cari->get();
+        $ekskuls = $filtered->get();
 
         $alasanPerEkskul = $siswa
             ? $ekskuls->mapWithKeys(fn (Ekskul $e) => [$e->id => $siswa->alasanTidakBisaDaftar($e)])
@@ -46,6 +64,7 @@ class KatalogController extends Controller
             'ekskuls' => $ekskuls,
             'jumlah' => $jumlah,
             'status' => null,
+            'tipe' => $tipe,
             'ekskulAktif' => $ekskulAktif,
             'ekskulAktifs' => $ekskulAktifs,
             'alasanPerEkskul' => $alasanPerEkskul,

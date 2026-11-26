@@ -102,6 +102,21 @@
         </div>
     </div>
 
+    {{-- INFO SUB DIVISI EKSKUL BINAAN --}}
+    @foreach($ekskuls as $ekskulBinaan)
+        @if($ekskulBinaan->isSubdivisi())
+            <div class="rounded-2xl border border-sky-200 dark:border-sky-900/50 bg-sky-50 dark:bg-sky-950/30 p-4 flex items-start gap-3 animate-fade-up">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shrink-0 shadow-sm">
+                    <i class="fa-solid fa-sitemap text-white text-sm"></i>
+                </div>
+                <div class="text-xs leading-relaxed text-sky-800 dark:text-sky-300">
+                    <p class="font-bold">{{ $ekskulBinaan->nama_ekskul }} — Sub Divisi</p>
+                    <p class="mt-0.5">Merupakan sub divisi dari ekskul induk <strong class="text-sky-900 dark:text-sky-200">{{ $ekskulBinaan->parent?->nama_ekskul ?? '-' }}</strong>. Pengurus dan kegiatan dikelola secara mandiri.</p>
+                </div>
+            </div>
+        @endif
+    @endforeach
+
     {{-- STATS CARDS - MOBILE ONLY --}}
     <div class="grid grid-cols-3 gap-2.5 md:hidden">
         <div class="relative overflow-hidden rounded-2xl bg-white dark:bg-[#1a1a1a] border border-sky-100 dark:border-neutral-800 p-3 shadow-sm">

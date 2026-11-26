@@ -134,37 +134,52 @@ class PengurusController extends Controller
         if ($ekskul) {
             $this->syncExistingKetua($ekskul);
 
-            // 4 Jabatan Pokok
-            $pengurusAktif = Pengurus::where('ekskul_id', $ekskul->id)
+            // Pengurus aktif
+            $semuaPengurusAktif = Pengurus::where('ekskul_id', $ekskul->id)
                 ->where('status', Pengurus::STATUS_AKTIF)
-                ->with(['siswa.kelas', 'siswa.pendaftarans'])
-                ->get()
-                ->keyBy('jabatan');
+                ->with(['siswa.kelas', 'siswa.pendaftarans', 'subdivisi'])
+                ->get();
+
+            $pengurusAktif = $semuaPengurusAktif->keyBy('jabatan');
+            $wakilKetuas = $semuaPengurusAktif->where('jabatan', Pengurus::JABATAN_WAKIL_KETUA);
+
+            // Sub divisi ekskul
+            $subdivisis = $ekskul->subdivisis()->orderBy('nama_ekskul')->get();
 
             // Usulan dari ketua yang masih menunggu
             $usulanMenunggu = Pengurus::where('ekskul_id', $ekskul->id)
                 ->where('status', Pengurus::STATUS_MENUNGGU)
-                ->with(['siswa.kelas'])
+                ->with(['siswa.kelas', 'subdivisi'])
                 ->latest()
                 ->get();
 
             // Riwayat pengurus (selesai atau ditolak)
             $riwayatPengurus = Pengurus::where('ekskul_id', $ekskul->id)
                 ->whereIn('status', [Pengurus::STATUS_SELESAI, Pengurus::STATUS_DITOLAK])
-                ->with(['siswa.kelas'])
+                ->with(['siswa.kelas', 'subdivisi'])
                 ->latest()
                 ->limit(20)
                 ->get();
 
-            // Anggota ekskul berstatus 'diterima' yang berhak dipilih menjadi pengurus
+            // Anggota ekskul berstatus 'diterima' yang belum memegang jabatan aktif di ekskul ini
+            $currentKetuaId = $ekskul->ketua()?->id;
+            $occupiedInThisEkskul = Pengurus::where('ekskul_id', $ekskul->id)
+                ->whereIn('status', [Pengurus::STATUS_AKTIF, Pengurus::STATUS_MENUNGGU])
+                ->pluck('siswa_id')
+                ->when($currentKetuaId, fn ($col) => $col->push($currentKetuaId))
+                ->unique();
+
             $anggotaEligible = Pendaftaran::where('ekskul_id', $ekskul->id)
                 ->where('status', Pendaftaran::STATUS_DITERIMA)
+                ->whereNotIn('siswa_id', $occupiedInThisEkskul)
                 ->with('siswa.kelas')
                 ->get()
                 ->sortBy(fn ($item) => strtolower($item->siswa?->nama ?? ''))
                 ->values();
         } else {
             $pengurusAktif = collect();
+            $wakilKetuas = collect();
+            $subdivisis = collect();
             $usulanMenunggu = collect();
             $riwayatPengurus = collect();
             $anggotaEligible = collect();
@@ -176,6 +191,8 @@ class PengurusController extends Controller
             'ekskuls',
             'ekskul',
             'pengurusAktif',
+            'wakilKetuas',
+            'subdivisis',
             'usulanMenunggu',
             'riwayatPengurus',
             'anggotaEligible',
@@ -196,6 +213,7 @@ class PengurusController extends Controller
         $validated = $request->validate([
             'siswa_id' => ['required', 'exists:siswas,id'],
             'jabatan' => ['required', 'in:ketua,wakil_ketua,sekretaris,bendahara'],
+            'subdivisi_id' => ['nullable', 'exists:ekskuls,id'],
             'catatan' => ['nullable', 'string', 'max:500'],
         ], [
             'siswa_id.required' => 'Pilih salah satu anggota ekskul.',
@@ -206,6 +224,11 @@ class PengurusController extends Controller
 
         $siswa = Siswa::findOrFail($validated['siswa_id']);
         $jabatan = $validated['jabatan'];
+        $subdivisiId = ($jabatan === Pengurus::JABATAN_WAKIL_KETUA) ? ($validated['subdivisi_id'] ?? null) : null;
+        if ($subdivisiId) {
+            $subdivisi = Ekskul::findOrFail($subdivisiId);
+            abort_unless($subdivisi->parent_id === $ekskul->id, 422, 'Sub divisi tidak sesuai dengan ekskul ini.');
+        }
 
         // Ketua dapat dipilih dari master siswa oleh Pembina. Keanggotaannya
         // dibuat bersamaan dengan penetapan agar tidak tersimpan setengah.
@@ -234,25 +257,31 @@ class PengurusController extends Controller
 
         }
 
-        // 2. Pastikan siswa belum memegang jabatan aktif lain di ekskul ini (1 orang per jabatan)
-        $jabatanAktifLain = Pengurus::where('ekskul_id', $ekskul->id)
-            ->where('siswa_id', $siswa->id)
-            ->where('status', Pengurus::STATUS_AKTIF)
-            ->first();
-
-        if ($jabatanAktifLain) {
-            if ($jabatanAktifLain->jabatan === $jabatan) {
-                return back()->with('info', "{$siswa->nama} saat ini sudah aktif menjabat sebagai " . Pengurus::labelJabatan($jabatan) . ".");
-            }
-            return back()->with('error', "{$siswa->nama} saat ini sudah menjabat sebagai " . Pengurus::labelJabatan($jabatanAktifLain->jabatan) . " di ekskul ini. Satu siswa hanya dapat memegang satu jabatan.");
-        }
-
-        // 3. Jika jabatan yang dipilih adalah ketua, validasi aturan ketua ekskul sistem
+        // 2. Jika jabatan yang dipilih adalah ketua, pastikan siswa belum menjadi ketua di ekskul lain
         if ($jabatan === Pengurus::JABATAN_KETUA) {
             $ekskulDipimpin = $siswa->ekskulDipimpin();
             if ($ekskulDipimpin && $ekskulDipimpin->id !== $ekskul->id) {
                 return back()->with('error', "{$siswa->nama} saat ini sudah menjabat sebagai Ketua di ekskul {$ekskulDipimpin->nama_ekskul}. Satu siswa hanya dapat menjadi ketua pada 1 ekskul.");
             }
+        }
+
+        // 3. Pastikan siswa belum memegang jabatan aktif lain di ekskul ini (1 siswa 1 jabatan per ekskul)
+        $jabatanAktifDiEkskulIni = Pengurus::where('ekskul_id', $ekskul->id)
+            ->where('siswa_id', $siswa->id)
+            ->where('status', Pengurus::STATUS_AKTIF)
+            ->first();
+
+        if ($jabatanAktifDiEkskulIni) {
+            $isSamePosition = ($jabatanAktifDiEkskulIni->jabatan === $jabatan && (int) $jabatanAktifDiEkskulIni->subdivisi_id === (int) $subdivisiId);
+            if ($isSamePosition) {
+                return back()->with('info', "{$siswa->nama} saat ini sudah aktif menjabat sebagai " . Pengurus::labelJabatan($jabatan) . " di ekskul ini.");
+            }
+
+            return back()->with('error', "{$siswa->nama} saat ini sudah menjabat sebagai " . Pengurus::labelJabatan($jabatanAktifDiEkskulIni->jabatan) . " di ekskul ini. Satu siswa hanya dapat memegang satu jabatan pada ekskul yang sama.");
+        }
+
+        if ($ekskul->ketua()?->id === $siswa->id && $jabatan !== Pengurus::JABATAN_KETUA) {
+            return back()->with('error', "{$siswa->nama} adalah Ketua di ekskul ini dan tidak dapat merangkap jabatan lain.");
         }
 
         DB::transaction(function () use ($ekskul, $siswa, $jabatan, $validated, $perluTambahAnggota, &$pendaftaran) {
@@ -278,10 +307,15 @@ class PengurusController extends Controller
             }
 
             // Jika jabatan ini sebelumnya sudah memiliki pengurus aktif, copot/ganti pengurus lama
-            $pengurusLama = Pengurus::where('ekskul_id', $ekskul->id)
+            $queryLama = Pengurus::where('ekskul_id', $ekskul->id)
                 ->where('jabatan', $jabatan)
-                ->where('status', Pengurus::STATUS_AKTIF)
-                ->first();
+                ->where('status', Pengurus::STATUS_AKTIF);
+
+            if ($jabatan === Pengurus::JABATAN_WAKIL_KETUA && $subdivisiId) {
+                $queryLama->where('subdivisi_id', $subdivisiId);
+            }
+
+            $pengurusLama = $queryLama->first();
 
             if ($pengurusLama) {
                 $pengurusLama->update([
@@ -297,17 +331,23 @@ class PengurusController extends Controller
             }
 
             // Batalkan/selesaikan usulan pending untuk jabatan ini bila ada
-            Pengurus::where('ekskul_id', $ekskul->id)
+            $queryPending = Pengurus::where('ekskul_id', $ekskul->id)
                 ->where('jabatan', $jabatan)
-                ->where('status', Pengurus::STATUS_MENUNGGU)
-                ->update([
-                    'status' => Pengurus::STATUS_DITOLAK,
-                    'catatan' => 'Dibatalkan karena pembina langsung menetapkan pengurus baru.',
-                ]);
+                ->where('status', Pengurus::STATUS_MENUNGGU);
+
+            if ($jabatan === Pengurus::JABATAN_WAKIL_KETUA && $subdivisiId) {
+                $queryPending->where('subdivisi_id', $subdivisiId);
+            }
+
+            $queryPending->update([
+                'status' => Pengurus::STATUS_DITOLAK,
+                'catatan' => 'Dibatalkan karena pembina langsung menetapkan pengurus baru.',
+            ]);
 
             // Tetapkan pengurus baru dengan status aktif
             Pengurus::create([
                 'ekskul_id' => $ekskul->id,
+                'subdivisi_id' => $subdivisiId,
                 'siswa_id' => $siswa->id,
                 'jabatan' => $jabatan,
                 'status' => Pengurus::STATUS_AKTIF,
@@ -360,6 +400,24 @@ class PengurusController extends Controller
                 'catatan' => 'Ditolak otomatis karena siswa bukan lagi anggota aktif.',
             ]);
             return back()->with('error', 'Siswa bukan anggota aktif berstatus diterima pada ekskul ini.');
+        }
+
+        // Pastikan siswa belum memegang jabatan aktif lain di ekskul ini
+        $jabatanAktifDiEkskulIni = Pengurus::where('ekskul_id', $ekskul->id)
+            ->where('siswa_id', $pengurus->siswa_id)
+            ->where('id', '!=', $pengurus->id)
+            ->where('status', Pengurus::STATUS_AKTIF)
+            ->first();
+
+        if ($jabatanAktifDiEkskulIni) {
+            return back()->with('error', "Tidak dapat menyetujui usulan: " . ($pengurus->siswa?->nama ?? 'Siswa') . " sudah menjabat sebagai " . Pengurus::labelJabatan($jabatanAktifDiEkskulIni->jabatan) . " di ekskul ini.");
+        }
+
+        if ($pengurus->jabatan === Pengurus::JABATAN_KETUA) {
+            $ekskulDipimpin = $pengurus->siswa?->ekskulDipimpin();
+            if ($ekskulDipimpin && $ekskulDipimpin->id !== $ekskul->id) {
+                return back()->with('error', "Tidak dapat menyetujui usulan: " . ($pengurus->siswa?->nama ?? 'Siswa') . " sudah menjabat sebagai Ketua di ekskul {$ekskulDipimpin->nama_ekskul}.");
+            }
         }
 
         DB::transaction(function () use ($ekskul, $pengurus, $request) {
@@ -498,17 +556,20 @@ class PengurusController extends Controller
         $ekskul = $this->ekskul();
         $this->syncExistingKetua($ekskul);
 
-        // 4 Jabatan Pokok
-        $pengurusAktif = Pengurus::where('ekskul_id', $ekskul->id)
+        // Pengurus aktif
+        $semuaPengurusAktif = Pengurus::where('ekskul_id', $ekskul->id)
             ->where('status', Pengurus::STATUS_AKTIF)
-            ->with(['siswa.kelas'])
-            ->get()
-            ->keyBy('jabatan');
+            ->with(['siswa.kelas', 'subdivisi'])
+            ->get();
+
+        $pengurusAktif = $semuaPengurusAktif->keyBy('jabatan');
+        $wakilKetuas = $semuaPengurusAktif->where('jabatan', Pengurus::JABATAN_WAKIL_KETUA);
+        $subdivisis = $ekskul->subdivisis()->orderBy('nama_ekskul')->get();
 
         // Usulan yang masih menunggu persetujuan pembina
         $usulanMenunggu = Pengurus::where('ekskul_id', $ekskul->id)
             ->where('status', Pengurus::STATUS_MENUNGGU)
-            ->with(['siswa.kelas'])
+            ->with(['siswa.kelas', 'subdivisi'])
             ->latest()
             ->get();
 
@@ -516,14 +577,22 @@ class PengurusController extends Controller
         $riwayatUsulan = Pengurus::where('ekskul_id', $ekskul->id)
             ->where('diusulkan_oleh', 'ketua')
             ->whereIn('status', [Pengurus::STATUS_AKTIF, Pengurus::STATUS_DITOLAK, Pengurus::STATUS_SELESAI])
-            ->with(['siswa.kelas'])
+            ->with(['siswa.kelas', 'subdivisi'])
             ->latest()
             ->limit(15)
             ->get();
 
-        // Anggota berstatus diterima yang dapat diusulkan
+        // Anggota berstatus diterima yang belum memegang jabatan aktif di ekskul ini
+        $currentKetuaId = $ekskul->ketua()?->id;
+        $occupiedInThisEkskul = Pengurus::where('ekskul_id', $ekskul->id)
+            ->whereIn('status', [Pengurus::STATUS_AKTIF, Pengurus::STATUS_MENUNGGU])
+            ->pluck('siswa_id')
+            ->when($currentKetuaId, fn ($col) => $col->push($currentKetuaId))
+            ->unique();
+
         $anggotaEligible = Pendaftaran::where('ekskul_id', $ekskul->id)
             ->where('status', Pendaftaran::STATUS_DITERIMA)
+            ->whereNotIn('siswa_id', $occupiedInThisEkskul)
             ->with('siswa.kelas')
             ->get()
             ->sortBy(fn ($item) => strtolower($item->siswa?->nama ?? ''))
@@ -535,6 +604,8 @@ class PengurusController extends Controller
         return view('ketua.pengurus', compact(
             'ekskul',
             'pengurusAktif',
+            'wakilKetuas',
+            'subdivisis',
             'usulanMenunggu',
             'riwayatUsulan',
             'anggotaEligible',
@@ -554,6 +625,7 @@ class PengurusController extends Controller
         $validated = $request->validate([
             'siswa_id' => ['required', 'exists:siswas,id'],
             'jabatan' => ['required', 'in:wakil_ketua,sekretaris,bendahara'],
+            'subdivisi_id' => ['nullable', 'exists:ekskuls,id'],
             'catatan' => ['nullable', 'string', 'max:500'],
         ], [
             'siswa_id.required' => 'Pilih salah satu anggota ekskul.',
@@ -564,6 +636,11 @@ class PengurusController extends Controller
 
         $siswa = Siswa::findOrFail($validated['siswa_id']);
         $jabatan = $validated['jabatan'];
+        $subdivisiId = ($jabatan === Pengurus::JABATAN_WAKIL_KETUA) ? ($validated['subdivisi_id'] ?? null) : null;
+        if ($subdivisiId) {
+            $subdivisi = Ekskul::findOrFail($subdivisiId);
+            abort_unless($subdivisi->parent_id === $ekskul->id, 422, 'Sub divisi tidak sesuai dengan ekskul ini.');
+        }
 
         // 1. Pastikan siswa adalah anggota ekskul ini dengan status diterima
         $pendaftaran = Pendaftaran::where('ekskul_id', $ekskul->id)
@@ -575,38 +652,51 @@ class PengurusController extends Controller
             return back()->with('error', "{$siswa->nama} bukan anggota aktif berstatus diterima di ekskul ini.");
         }
 
-        // 2. Pastikan siswa belum memegang jabatan aktif di ekskul ini
-        $jabatanAktif = Pengurus::where('ekskul_id', $ekskul->id)
+        // 2. Pastikan siswa belum memegang jabatan aktif di ekskul ini (1 siswa 1 jabatan per ekskul)
+        $jabatanAktifDiEkskulIni = Pengurus::where('ekskul_id', $ekskul->id)
             ->where('siswa_id', $siswa->id)
             ->where('status', Pengurus::STATUS_AKTIF)
             ->first();
 
-        if ($jabatanAktif) {
-            return back()->with('error', "{$siswa->nama} sudah memegang jabatan " . Pengurus::labelJabatan($jabatanAktif->jabatan) . " di ekskul ini.");
+        if ($jabatanAktifDiEkskulIni) {
+            return back()->with('error', "{$siswa->nama} saat ini sudah memegang jabatan " . Pengurus::labelJabatan($jabatanAktifDiEkskulIni->jabatan) . " di ekskul ini. Satu siswa hanya dapat memegang satu jabatan pada ekskul yang sama.");
+        }
+
+        if ($ekskul->ketua()?->id === $siswa->id) {
+            return back()->with('error', "{$siswa->nama} adalah Ketua di ekskul ini dan tidak dapat diusulkan untuk jabatan lain.");
         }
 
         // 3. Pastikan tidak ada usulan yang sedang menunggu untuk jabatan yang sama
-        $pendingJabatan = Pengurus::where('ekskul_id', $ekskul->id)
+        $queryPending = Pengurus::where('ekskul_id', $ekskul->id)
             ->where('jabatan', $jabatan)
-            ->where('status', Pengurus::STATUS_MENUNGGU)
-            ->first();
+            ->where('status', Pengurus::STATUS_MENUNGGU);
 
-        if ($pendingJabatan) {
-            return back()->with('error', "Sudah ada usulan " . Pengurus::labelJabatan($jabatan) . " atas nama {$pendingJabatan->siswa?->nama} yang sedang menunggu persetujuan Pembina.");
+        if ($jabatan === Pengurus::JABATAN_WAKIL_KETUA && $subdivisiId) {
+            $queryPending->where('subdivisi_id', $subdivisiId);
         }
 
-        // 4. Pastikan siswa tersebut tidak sedang memiliki usulan pending untuk jabatan lain
+        $pendingJabatan = $queryPending->first();
+
+        if ($pendingJabatan) {
+            $label = $jabatan === Pengurus::JABATAN_WAKIL_KETUA && $pendingJabatan->subdivisi
+                ? "Wakil Ketua ({$pendingJabatan->subdivisi->nama_ekskul})"
+                : Pengurus::labelJabatan($jabatan);
+            return back()->with('error', "Sudah ada usulan {$label} atas nama {$pendingJabatan->siswa?->nama} yang sedang menunggu persetujuan Pembina.");
+        }
+
+        // 4. Pastikan siswa tersebut tidak sedang memiliki usulan pending di ekskul ini
         $pendingSiswa = Pengurus::where('ekskul_id', $ekskul->id)
             ->where('siswa_id', $siswa->id)
             ->where('status', Pengurus::STATUS_MENUNGGU)
             ->first();
 
         if ($pendingSiswa) {
-            return back()->with('error', "{$siswa->nama} sudah diusulkan untuk jabatan " . Pengurus::labelJabatan($pendingSiswa->jabatan) . " dan sedang menunggu persetujuan Pembina.");
+            return back()->with('error', "{$siswa->nama} sudah diusulkan untuk jabatan " . Pengurus::labelJabatan($pendingSiswa->jabatan) . " di ekskul ini dan sedang menunggu persetujuan Pembina.");
         }
 
         $usulan = Pengurus::create([
             'ekskul_id' => $ekskul->id,
+            'subdivisi_id' => $subdivisiId,
             'siswa_id' => $siswa->id,
             'jabatan' => $jabatan,
             'status' => Pengurus::STATUS_MENUNGGU,

@@ -258,7 +258,7 @@
 
                 {{-- Ekskul --}}
                 @if (request()->filled('ekskul_id'))
-                    @php $ekskulName = $ekskulList->firstWhere('id', request('ekskul_id'))?->nama_ekskul ?? request('ekskul_id'); @endphp
+                    @php $ekskulName = $ekskulList->firstWhere('id', request('ekskul_id'))?->nama_ekskul ?? \App\Models\Ekskul::find(request('ekskul_id'))?->nama_ekskul ?? request('ekskul_id'); @endphp
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-100">
                         Ekskul: {{ $ekskulName }}
                         <a href="{{ route('kesiswaan.siswa.index', request()->except('ekskul_id', 'page')) }}" class="text-sky-400 hover:text-rose-600 font-extrabold">&times;</a>

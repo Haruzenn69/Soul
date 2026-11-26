@@ -14,6 +14,7 @@
     <style>
         /* Sidebar mobile selalu overlay, jangan dipaksa jadi relative (split layar) */
         #sidebar-mobile { position: fixed; }
+        [x-cloak] { display: none !important; }
     </style>
     @include('partials.responsive-tables')
 </head>

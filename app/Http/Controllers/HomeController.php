@@ -8,7 +8,7 @@ class HomeController extends Controller
 {
     public function landing()
     {
-        $ekskuls = Ekskul::with('pembina')->get();
+        $ekskuls = Ekskul::whereNull('parent_id')->with('pembina')->get();
 
         return view('welcome', compact('ekskuls'));
     }

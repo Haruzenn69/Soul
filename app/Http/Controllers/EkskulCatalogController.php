@@ -15,6 +15,9 @@ class EkskulCatalogController extends Controller
         $ekskul->load([
             'pembina',
             'pelatih',
+            'parent',
+            'subdivisis',
+            'penguruses.siswa',
             'kegiatans' => fn($q) => $q->latest('tanggal_kegiatan')->take(6),
             'prestasis',
             'testimoniss' => fn($q) => $q->where('status', Testimoni::STATUS_APPROVED),

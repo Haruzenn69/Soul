@@ -1,4 +1,4 @@
-﻿@extends('layouts.kesiswaan')
+@extends('layouts.kesiswaan')
 
 @section('title', 'Data Ekskul')
 
@@ -92,6 +92,17 @@
                 <input type="text" name="nama_ekskul" placeholder="Contoh: Paskibra, OSIS, Pramuka..." required
                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
                 <p class="text-[10px] text-slate-400 mt-1">Pembina dapat ditentukan di halaman <a href="{{ route('kesiswaan.pembina.index') }}" class="text-sky-600 font-semibold hover:underline">Data Pembina</a>.</p>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wide">Induk Ekskul (Opsional)</label>
+                <select name="parent_id" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-2 focus:ring-sky-100 transition">
+                    <option value="">Bukan Sub Divisi (Ekskul Utama)</option>
+                    @foreach ($parentEkskuls ?? [] as $pe)
+                        <option value="{{ $pe->id }}">Sub Divisi dari {{ $pe->nama_ekskul }}</option>
+                    @endforeach
+                </select>
+                <p class="text-[10px] text-slate-400 mt-1">Pilih jika ekskul ini merupakan sub divisi dari ekskul induk (contoh: Tari sub divisi dari Seni).</p>
             </div>
 
             <div>

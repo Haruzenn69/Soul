@@ -21,6 +21,7 @@ class Pengurus extends Model
 
     protected $fillable = [
         'ekskul_id',
+        'subdivisi_id',
         'siswa_id',
         'jabatan',
         'status',
@@ -70,6 +71,22 @@ class Pengurus extends Model
     public function ekskul(): BelongsTo
     {
         return $this->belongsTo(Ekskul::class);
+    }
+
+    public function subdivisi(): BelongsTo
+    {
+        return $this->belongsTo(Ekskul::class, 'subdivisi_id');
+    }
+
+    public function labelJabatanDisplay(): string
+    {
+        if ($this->jabatan === self::JABATAN_WAKIL_KETUA && $this->subdivisi) {
+            return 'Wakil Ketua (Ketua Sub Divisi ' . $this->subdivisi->nama_ekskul . ')';
+        }
+        if ($this->catatan && str_contains($this->catatan, 'Sub Divisi')) {
+            return 'Wakil Ketua (' . $this->catatan . ')';
+        }
+        return self::labelJabatan($this->jabatan);
     }
 
     public function siswa(): BelongsTo
