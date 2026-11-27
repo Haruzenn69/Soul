@@ -39,6 +39,71 @@
         </div>
     </div>
 
+    @if(($anggotaPusatLama ?? collect())->isNotEmpty() && ($subdivisis ?? collect())->isNotEmpty())
+        <section class="rounded-3xl border border-amber-200 bg-amber-50/70 p-5 dark:border-amber-900/50 dark:bg-amber-950/20">
+            <div class="mb-4">
+                <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Tempatkan anggota lama ke subdivisi</h2>
+                <p class="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-300">Ini proses satu kali saat ekskul beralih dari tunggal ke subdivisi. Pilih tepat satu subdivisi untuk setiap anggota. Ketua subdivisi yang sudah aktif akan langsung ditempatkan otomatis.</p>
+            </div>
+            <form method="POST" action="{{ route('ketua.anggota.penempatan-subdivisi', ['ekskul' => $ekskul->id]) }}" id="form-penempatan-subdivisi" class="space-y-4">
+                @csrf
+                @foreach($anggotaPusatLama as $member)
+                    @if($ketuaSubdivisiAssignments->has($member->siswa_id))
+                        <input type="hidden" name="penempatan[{{ $member->id }}]" value="{{ $ketuaSubdivisiAssignments->get($member->siswa_id) }}">
+                    @endif
+                @endforeach
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                    @foreach($subdivisis as $subdivisi)
+                        <div class="rounded-2xl border border-slate-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900">
+                            <h3 class="mb-3 text-xs font-extrabold text-sky-700 dark:text-sky-300">{{ $subdivisi->nama_ekskul }}</h3>
+                            <div class="space-y-2">
+                                @foreach($anggotaPusatLama as $member)
+                                    @php $leaderTargetId = $ketuaSubdivisiAssignments->get($member->siswa_id); @endphp
+                                    @if($leaderTargetId)
+                                        @if((int) $leaderTargetId === (int) $subdivisi->id)
+                                            <div class="flex items-start gap-2 rounded-xl bg-sky-50 p-2.5 text-xs dark:bg-sky-950/40">
+                                                <i class="fa-solid fa-crown mt-0.5 text-sky-600"></i>
+                                                <span class="font-semibold text-slate-700 dark:text-slate-200">{{ $member->siswa?->nama }} <span class="font-normal text-sky-700">(ketua subdivisi, otomatis)</span></span>
+                                            </div>
+                                        @endif
+                                    @else
+                                        <label class="flex cursor-pointer items-start gap-2 rounded-xl border border-slate-100 p-2.5 text-xs hover:border-sky-200 hover:bg-sky-50/60 dark:border-neutral-800 dark:hover:border-sky-900 dark:hover:bg-sky-950/20">
+                                            <input type="checkbox" name="penempatan[{{ $member->id }}]" value="{{ $subdivisi->id }}" data-penempatan-member="{{ $member->id }}" class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500">
+                                            <span class="font-semibold text-slate-700 dark:text-slate-200">{{ $member->siswa?->nama }} <span class="block text-[10px] font-normal text-slate-400">{{ $member->siswa?->kelas?->nama ?? 'Tanpa kelas' }}</span></span>
+                                        </label>
+                                    @endif
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <p id="penempatan-error" class="hidden text-xs font-semibold text-rose-600">Pilih satu subdivisi untuk setiap anggota sebelum menyimpan.</p>
+                    <button type="submit" class="rounded-xl bg-sky-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-sky-700">Simpan penempatan satu kali</button>
+                </div>
+            </form>
+            <script>
+                (() => {
+                    const form = document.getElementById('form-penempatan-subdivisi');
+                    const checks = [...form.querySelectorAll('[data-penempatan-member]')];
+                    const error = document.getElementById('penempatan-error');
+                    checks.forEach((check) => check.addEventListener('change', () => {
+                        if (check.checked) checks.filter((other) => other.dataset.penempatanMember === check.dataset.penempatanMember && other !== check).forEach((other) => other.checked = false);
+                        error.classList.add('hidden');
+                    }));
+                    form.addEventListener('submit', (event) => {
+                        const members = [...new Set(checks.map((check) => check.dataset.penempatanMember))];
+                        const complete = members.every((id) => checks.some((check) => check.dataset.penempatanMember === id && check.checked));
+                        if (!complete) {
+                            event.preventDefault();
+                            error.classList.remove('hidden');
+                        }
+                    });
+                })();
+            </script>
+        </section>
+    @endif
+
     @php
         $statusOptions = ['diterima' => 'Aktif', 'peringatan' => 'Peringatan', 'nonaktif' => 'Nonaktif', 'keluar' => 'Keluar'];
         $hasFilter = request()->filled('cari') || request()->filled('status') || request()->filled('kelas_id') || $tampilArsip;

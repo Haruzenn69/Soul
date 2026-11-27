@@ -22,9 +22,9 @@ class LaporanBulananController extends ApiController
 
     public function index(Request $request): JsonResponse
     {
-        $ekskul = $this->ekskul();
+        $ekskul = $this->kegiatanEkskul();
 
-        $query = LaporanBulanan::where('ekskul_id', $ekskul->id);
+        $query = LaporanBulanan::whereIn('ekskul_id', $this->kegiatanEkskulIds($ekskul))->with('ekskul:id,nama_ekskul');
 
         $total = (clone $query)->count();
 
@@ -62,7 +62,8 @@ class LaporanBulananController extends ApiController
 
     public function show(LaporanBulanan $laporan_bulanan): JsonResponse
     {
-        $this->ensureEkskul($laporan_bulanan);
+        $this->ensureKegiatanEkskul($laporan_bulanan);
+        $laporan_bulanan->loadMissing('ekskul:id,nama_ekskul');
 
         return $this->ok([
             'laporan' => (new LaporanBulananResource($laporan_bulanan))->resolve(),
@@ -71,7 +72,7 @@ class LaporanBulananController extends ApiController
 
     public function downloadPdf(LaporanBulanan $laporan_bulanan): Response
     {
-        $this->ensureEkskul($laporan_bulanan);
+        $this->ensureKegiatanEkskul($laporan_bulanan);
 
         $ekskul = $laporan_bulanan->ekskul;
         $kelas = $ekskul->pendaftarans()
@@ -129,7 +130,7 @@ class LaporanBulananController extends ApiController
             'evaluasi_solusi' => 'nullable|string',
         ]);
 
-        $ekskul = $this->ekskul();
+        $ekskul = $this->pastikanBolehKelolaKegiatan();
         $bulan = now()->format('Y-m');
 
         $existing = LaporanBulanan::where('ekskul_id', $ekskul->id)->where('bulan', $bulan)->exists();
@@ -159,7 +160,8 @@ class LaporanBulananController extends ApiController
 
     public function update(Request $request, LaporanBulanan $laporan_bulanan): JsonResponse
     {
-        $this->ensureEkskul($laporan_bulanan);
+        $this->ensureKegiatanEkskul($laporan_bulanan);
+        $this->pastikanBolehKelolaKegiatan();
 
         abort_if(
             in_array($laporan_bulanan->status, [LaporanBulanan::STATUS_MENUNGGU, LaporanBulanan::STATUS_DISETUJUI]),
@@ -196,7 +198,8 @@ class LaporanBulananController extends ApiController
 
     public function submitToPembina(LaporanBulanan $laporan_bulanan): JsonResponse
     {
-        $this->ensureEkskul($laporan_bulanan);
+        $this->ensureKegiatanEkskul($laporan_bulanan);
+        $this->pastikanBolehKelolaKegiatan();
 
         abort_if(
             in_array($laporan_bulanan->status, [LaporanBulanan::STATUS_MENUNGGU, LaporanBulanan::STATUS_DISETUJUI]),

@@ -91,7 +91,10 @@ class ResetDatabase extends Command
                 }
 
                 if (Schema::hasTable('pelatihs')) {
-                    DB::table('ekskuls')->update(['pelatih_id' => null]);
+                    DB::table('ekskuls')->update([
+                        'pelatih_id' => null,
+                        'tipe' => 'komunitas',
+                    ]);
                     DB::table('pelatihs')->delete();
                 }
 

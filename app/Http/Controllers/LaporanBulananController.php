@@ -150,9 +150,10 @@ class LaporanBulananController extends Controller
         $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
 
         if ($isKesiswaan && ! $request->filled('ekskul')) {
-            $ekskuls = \App\Models\Ekskul::orderBy('nama_ekskul')->get();
+            $ekskuls = \App\Models\Ekskul::whereNull('parent_id')->orderBy('nama_ekskul')->get();
             $cards = $ekskuls->map(function (\App\Models\Ekskul $e) {
-                $base = LaporanBulanan::where('ekskul_id', $e->id);
+                $ekskulIds = array_merge([$e->id], $e->subdivisis()->pluck('id')->all());
+                $base = LaporanBulanan::whereIn('ekskul_id', $ekskulIds);
                 $total = (clone $base)->count();
                 $draftCount = (clone $base)->where('status', 'draft')->count();
                 $menungguCount = (clone $base)->where('status', 'menunggu')->count();
@@ -179,7 +180,7 @@ class LaporanBulananController extends Controller
                     'ekskul' => $e,
                     'stats' => $stats,
                     'badge' => $badge,
-                    'actionText' => 'Kelola Laporan',
+                    'actionText' => $e->hasSubdivisi() ? 'Lihat Subdivisi' : 'Kelola Laporan',
                     'actionUrl' => route('ketua.laporan-bulanan.index', ['ekskul' => $e->id]),
                 ];
             });
@@ -191,13 +192,55 @@ class LaporanBulananController extends Controller
             ]);
         }
 
-        $ekskul = $this->ekskul();
-        $base = LaporanBulanan::where('ekskul_id', $ekskul->id);
+        $ekskul = $this->kegiatanEkskul();
+        $isMonitoring = $this->isKetuaUtamaMonitoring($ekskul);
+
+        if (($isKesiswaan && ! $ekskul->isSubdivisi() && $ekskul->hasSubdivisi())
+            || (! $isKesiswaan && $isMonitoring && ! $ekskul->isSubdivisi())) {
+            $cards = $ekskul->subdivisis()->orderBy('nama_ekskul')->get()->map(function (\App\Models\Ekskul $subdivisi) use ($isKesiswaan) {
+                $base = LaporanBulanan::where('ekskul_id', $subdivisi->id);
+                $total = (clone $base)->count();
+                $draftCount = (clone $base)->where('status', 'draft')->count();
+                $disetujuiCount = (clone $base)->where('status', 'disetujui')->count();
+                $terbaru = (clone $base)->latest('bulan')->first();
+
+                $stats = [
+                    ['label' => 'Total Laporan', 'value' => $total.' Laporan', 'class' => 'font-bold text-slate-800 dark:text-slate-200'],
+                    ['label' => 'Draft', 'value' => $draftCount.' Laporan', 'class' => 'font-semibold text-slate-600 dark:text-slate-300'],
+                    ['label' => 'Disetujui', 'value' => $disetujuiCount.' Laporan', 'class' => 'font-bold text-emerald-600 dark:text-emerald-400'],
+                ];
+                if ($terbaru) {
+                    $stats[] = ['label' => 'Terbaru', 'value' => \Carbon\Carbon::createFromFormat('Y-m', $terbaru->bulan)->translatedFormat('M Y'), 'class' => 'font-medium text-slate-500 text-[11px]'];
+                }
+
+                return (object) [
+                    'ekskul' => $subdivisi,
+                    'stats' => $stats,
+                    'badge' => null,
+                    'actionText' => $isKesiswaan ? 'Kelola Laporan' : 'Lihat Laporan',
+                    'actionUrl' => route('ketua.laporan-bulanan.index', ['ekskul' => $subdivisi->id]),
+                ];
+            });
+
+            return view('ketua.laporan-bulanan.index', [
+                'isCatalog' => true,
+                'cards' => $cards,
+                'isKesiswaan' => $isKesiswaan,
+                'catalogTitle' => 'Subdivisi '.$ekskul->nama_ekskul,
+                'catalogSubtitle' => 'Pilih subdivisi untuk melihat laporannya satu per satu.',
+                'backUrl' => $isKesiswaan
+                    ? route('ketua.laporan-bulanan.index')
+                    : route('ketua.dashboard'),
+            ]);
+        }
+
+        $base = LaporanBulanan::whereIn('ekskul_id', $this->kegiatanEkskulIds($ekskul));
         $total = (clone $base)->count();
 
         [$sort, $direction] = TableKit::sort(['bulan', 'status'], 'bulan', 'desc');
 
         $laporans = (clone $base)
+            ->with('ekskul:id,nama_ekskul')
             ->when($request->filled('cari'), function ($query) use ($request) {
                 $cari = $request->input('cari');
                 $query->where(function ($sub) use ($cari) {
@@ -210,11 +253,15 @@ class LaporanBulananController extends Controller
             ->paginate(8)
             ->withQueryString();
 
-        return view('ketua.laporan-bulanan.index', compact('laporans', 'total', 'sort', 'direction', 'ekskul', 'isKesiswaan'));
+        $showUnitColumn = $isMonitoring && ! $ekskul->isSubdivisi();
+
+        return view('ketua.laporan-bulanan.index', compact('laporans', 'total', 'sort', 'direction', 'ekskul', 'isKesiswaan', 'isMonitoring', 'showUnitColumn'));
     }
 
     public function create()
     {
+        $this->pastikanBolehKelolaKegiatan();
+
         return view('ketua.laporan-bulanan.create');
     }
 
@@ -227,7 +274,7 @@ class LaporanBulananController extends Controller
             'evaluasi_solusi' => 'nullable|string',
         ]);
 
-        $ekskul = $this->ekskul();
+        $ekskul = $this->pastikanBolehKelolaKegiatan();
 
         $bulan = now()->format('Y-m');
 
@@ -258,14 +305,18 @@ class LaporanBulananController extends Controller
 
     public function show(LaporanBulanan $laporan_bulanan)
     {
-        $this->ensureEkskul($laporan_bulanan);
+        $this->ensureKegiatanEkskul($laporan_bulanan);
+        $laporan_bulanan->loadMissing('ekskul:id,nama_ekskul');
+        $ekskul = $this->kegiatanEkskul();
+        $isMonitoring = $this->isKetuaUtamaMonitoring($ekskul);
 
-        return view('ketua.laporan-bulanan.show', ['laporan' => $laporan_bulanan]);
+        return view('ketua.laporan-bulanan.show', ['laporan' => $laporan_bulanan, 'ekskul' => $ekskul, 'isMonitoring' => $isMonitoring]);
     }
 
     public function edit(LaporanBulanan $laporan_bulanan)
     {
-        $this->ensureEkskul($laporan_bulanan);
+        $this->ensureKegiatanEkskul($laporan_bulanan);
+        $this->pastikanBolehKelolaKegiatan();
         abort_if(in_array($laporan_bulanan->status, [LaporanBulanan::STATUS_MENUNGGU, LaporanBulanan::STATUS_DISETUJUI]), 403, 'Laporan yang sudah diserahkan atau disetujui tidak dapat diubah.');
 
         return view('ketua.laporan-bulanan.edit', ['laporan' => $laporan_bulanan]);
@@ -273,7 +324,8 @@ class LaporanBulananController extends Controller
 
     public function update(Request $request, LaporanBulanan $laporan_bulanan)
     {
-        $this->ensureEkskul($laporan_bulanan);
+        $this->ensureKegiatanEkskul($laporan_bulanan);
+        $this->pastikanBolehKelolaKegiatan();
         abort_if(in_array($laporan_bulanan->status, [LaporanBulanan::STATUS_MENUNGGU, LaporanBulanan::STATUS_DISETUJUI]), 403, 'Laporan yang sudah diserahkan atau disetujui tidak dapat diubah.');
 
         $validated = $request->validate([
@@ -307,7 +359,8 @@ class LaporanBulananController extends Controller
 
     public function submitToPembina(LaporanBulanan $laporan_bulanan)
     {
-        $this->ensureEkskul($laporan_bulanan);
+        $this->ensureKegiatanEkskul($laporan_bulanan);
+        $this->pastikanBolehKelolaKegiatan();
         abort_if(in_array($laporan_bulanan->status, [LaporanBulanan::STATUS_MENUNGGU, LaporanBulanan::STATUS_DISETUJUI]), 403, 'Laporan ini sudah diserahkan atau disetujui.');
 
         $laporan_bulanan->update(['status' => LaporanBulanan::STATUS_MENUNGGU]);
@@ -320,7 +373,7 @@ class LaporanBulananController extends Controller
 
     public function downloadPdf(LaporanBulanan $laporan_bulanan)
     {
-        $this->ensureEkskul($laporan_bulanan);
+        $this->ensureKegiatanEkskul($laporan_bulanan);
 
         $ekskul = $laporan_bulanan->ekskul;
         $kelas = $this->generateKelas($ekskul);

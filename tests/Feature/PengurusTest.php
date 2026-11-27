@@ -254,4 +254,91 @@ class PengurusTest extends TestCase
             'status' => 'selesai',
         ]);
     }
+
+    public function test_pembina_menyetujui_wakil_ketua_subdivisi_tanpa_mencopot_subdivisi_lain(): void
+    {
+        $ekskul = $this->makeEkskul();
+        $pembina = $ekskul->pembina;
+        $subdivisiA = $this->makeEkskul([
+            'parent_id' => $ekskul->id,
+            'pembina_id' => $ekskul->pembina_id,
+            'pelatih_id' => $ekskul->pelatih_id,
+            'nama_ekskul' => 'Sub Divisi A',
+        ]);
+        $subdivisiB = $this->makeEkskul([
+            'parent_id' => $ekskul->id,
+            'pembina_id' => $ekskul->pembina_id,
+            'pelatih_id' => $ekskul->pelatih_id,
+            'nama_ekskul' => 'Sub Divisi B',
+        ]);
+
+        $petugasA = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('x'));
+        $this->daftarkan($petugasA, $ekskul);
+        $pengurusA = Pengurus::create([
+            'ekskul_id' => $ekskul->id,
+            'subdivisi_id' => $subdivisiA->id,
+            'siswa_id' => $petugasA->id,
+            'jabatan' => Pengurus::JABATAN_WAKIL_KETUA,
+            'status' => Pengurus::STATUS_AKTIF,
+            'diusulkan_oleh' => 'pembina',
+        ]);
+
+        $calonB = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('xi'));
+        $this->daftarkan($calonB, $ekskul);
+        $usulanB = Pengurus::create([
+            'ekskul_id' => $ekskul->id,
+            'subdivisi_id' => $subdivisiB->id,
+            'siswa_id' => $calonB->id,
+            'jabatan' => Pengurus::JABATAN_WAKIL_KETUA,
+            'status' => Pengurus::STATUS_MENUNGGU,
+            'diusulkan_oleh' => 'ketua',
+        ]);
+
+        $this->actingAs($pembina->user)
+            ->post(route('pembina.pengurus.approve', $usulanB->id))
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('pengurus', [
+            'id' => $pengurusA->id,
+            'status' => Pengurus::STATUS_AKTIF,
+        ]);
+        $this->assertDatabaseHas('pengurus', [
+            'id' => $usulanB->id,
+            'status' => Pengurus::STATUS_AKTIF,
+        ]);
+    }
+
+    public function test_ketua_dapat_mengusulkan_wakil_ketua_subdivisi_via_api(): void
+    {
+        $ekskul = $this->makeEkskul();
+        $ketua = $this->makeKetua($ekskul);
+        $subdivisi = $this->makeEkskul([
+            'parent_id' => $ekskul->id,
+            'pembina_id' => $ekskul->pembina_id,
+            'pelatih_id' => $ekskul->pelatih_id,
+            'nama_ekskul' => 'Sub Divisi API',
+        ]);
+        $calon = $this->makeSiswa($this->makeUser('siswa'), $this->makeKelas('xi'));
+        $this->daftarkan($calon, $ekskul);
+
+        $this->actingAs($ketua['user'])
+            ->postJson('/api/siswa/pengajuan-kepengurusan', [
+                'ekskul_id' => $ekskul->id,
+                'siswa_id' => $calon->id,
+                'jabatan' => Pengurus::JABATAN_WAKIL_KETUA,
+                'subdivisi_id' => $subdivisi->id,
+                'alasan' => 'Memiliki pengalaman memimpin kegiatan sub divisi.',
+            ])
+            ->assertCreated()
+            ->assertJsonPath('data.pengurus.subdivisi_id', $subdivisi->id);
+
+        $this->assertDatabaseHas('pengurus', [
+            'ekskul_id' => $ekskul->id,
+            'subdivisi_id' => $subdivisi->id,
+            'siswa_id' => $calon->id,
+            'jabatan' => Pengurus::JABATAN_WAKIL_KETUA,
+            'status' => Pengurus::STATUS_MENUNGGU,
+            'diusulkan_oleh' => 'ketua',
+        ]);
+    }
 }

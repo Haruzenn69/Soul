@@ -84,7 +84,7 @@ class Pembina extends Model
 
     public function ekskuls(): HasMany
     {
-        return $this->hasMany(Ekskul::class);
+        return $this->hasMany(Ekskul::class)->whereNull('parent_id');
     }
 
     public function profileHistories(): HasMany

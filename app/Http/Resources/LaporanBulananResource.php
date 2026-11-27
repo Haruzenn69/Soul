@@ -13,6 +13,10 @@ class LaporanBulananResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'ekskul' => $this->whenLoaded('ekskul', fn () => [
+                'id' => $this->ekskul->id,
+                'nama_ekskul' => $this->ekskul->nama_ekskul,
+            ]),
             'bulan' => $this->bulan,
             'materi_kegiatan' => $this->materi_kegiatan,
             'tujuan' => $this->tujuan,

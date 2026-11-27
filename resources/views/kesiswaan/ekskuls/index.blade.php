@@ -251,7 +251,7 @@
                                 <span class="text-[10px] text-slate-400 italic font-medium px-2 py-1">Tidak bisa dihapus</span>
                             @else
                                 <form method="POST" action="{{ route('kesiswaan.kategori.destroy', $kat) }}"
-                                      onsubmit="return confirm('Hapus kategori \'{{ $kat->nama }}\'? {{ $kat->ekskuls_count > 0 ? $kat->ekskuls_count . ' ekskul pada kategori ini akan otomatis dipindah ke kategori Lainnya.' : 'Tidak ada ekskul yang terdampak.' }}')">
+                                      onsubmit="return confirm('Hapus kategori \'{{ $kat->nama }}\'? {{ $kat->ekskuls_count > 0 ? $kat->ekskuls_count . ' ekskul pada kategori ini akan otomatis dipindah ke kategori ' . \App\Support\AturanEkskul::KATEGORI_FALLBACK . '.' : 'Tidak ada ekskul yang terdampak.' }}')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="px-2.5 py-1 text-[11px] font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition">

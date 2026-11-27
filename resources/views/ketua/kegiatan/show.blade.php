@@ -10,7 +10,7 @@
             <p class="text-xs text-slate-400 dark:text-neutral-400 mt-1">{{ $kegiatan->materi }}</p>
         </div>
         <div class="flex items-center gap-2 flex-wrap self-start sm:self-auto">
-            <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-sm transition inline-flex items-center justify-center gap-1.5">
+            @if(empty($isMonitoring))<a href="{{ route('ketua.presensi.create', ['kegiatan' => $kegiatan, 'ekskul' => $ekskul->id]) }}" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-sm transition inline-flex items-center justify-center gap-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <span>Input Presensi</span>
             </a>
@@ -18,6 +18,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.5-9.5a2.121 2.121 0 013 3L12 16l-4 1 1-4 8.5-8.5z"/></svg>
                 <span>Edit Kegiatan</span>
             </a>
+            @else<span class="text-xs font-semibold text-slate-500">Monitoring sub divisi</span>@endif
             <a href="{{ route('ketua.kegiatan.index') }}" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-600 dark:text-neutral-300 font-bold text-xs rounded-xl transition inline-flex items-center justify-center gap-1.5">Kembali</a>
         </div>
     </div>
@@ -91,7 +92,7 @@
                 <h3 class="text-sm font-bold text-slate-800 dark:text-neutral-100">Rekap presensi</h3>
                 <p class="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">Ringkasan status kehadiran anggota.</p>
             </div>
-            <a href="{{ route('ketua.presensi.create', $kegiatan) }}" class="text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-300 transition">Perbarui presensi</a>
+            <a href="{{ route('ketua.presensi.create', ['kegiatan' => $kegiatan, 'ekskul' => $ekskul->id]) }}" class="text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-300 transition">Perbarui presensi</a>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6">
             <div class="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/25 border border-emerald-100 dark:border-emerald-900/50 text-center transition">
@@ -169,12 +170,13 @@
         </table>
         </div>
         <div class="mt-5 pt-5 border-t border-sky-100 dark:border-neutral-800 flex flex-col sm:flex-row gap-2">
-            <a href="{{ route('ketua.kegiatan.edit', $kegiatan) }}" class="px-5 py-2.5 bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/40 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-400 text-xs font-bold rounded-xl transition text-center border border-transparent dark:border-amber-800/50">Edit kegiatan</a>
+            @if(empty($isMonitoring))<a href="{{ route('ketua.kegiatan.edit', $kegiatan) }}" class="px-5 py-2.5 bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/40 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-400 text-xs font-bold rounded-xl transition text-center border border-transparent dark:border-amber-800/50">Edit kegiatan</a>
             <form action="{{ route('ketua.kegiatan.destroy', $kegiatan) }}" method="POST" onsubmit="return confirm('{{ $kegiatan->presensis->count() > 0 ? "Kegiatan ini sudah diisi presensi (".$kegiatan->presensis->count()." orang). Menghapus kegiatan juga akan menghapus data presensinya! Yakin hapus?" : "Yakin hapus kegiatan ini?" }}');">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="w-full px-5 py-2.5 bg-rose-100 hover:bg-rose-200 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-400 text-xs font-bold rounded-xl transition border border-transparent dark:border-rose-800/50">Hapus kegiatan</button>
             </form>
+            @endif
             <a href="{{ route('ketua.kegiatan.index') }}" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-600 dark:text-neutral-300 text-xs font-bold rounded-xl transition text-center">Kembali</a>
         </div>
     </div>

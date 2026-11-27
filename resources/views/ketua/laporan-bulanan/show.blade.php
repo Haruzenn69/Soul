@@ -103,7 +103,10 @@
         @endif
 
         <div class="mt-4 pt-5 border-t border-sky-100 flex flex-col sm:flex-row gap-2 flex-wrap">
-            @if(in_array($laporan->status, ['draft', 'ditolak']))
+            @if(!empty($isMonitoring))
+                <span class="text-xs font-semibold text-slate-500">Monitoring laporan sub divisi {{ $laporan->ekskul->nama_ekskul }}</span>
+            @endif
+            @if(empty($isMonitoring) && in_array($laporan->status, ['draft', 'ditolak']))
                 <a href="{{ route('ketua.laporan-bulanan.edit', $laporan) }}" class="px-5 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-bold rounded-xl transition text-center">
                     Edit laporan
                 </a>

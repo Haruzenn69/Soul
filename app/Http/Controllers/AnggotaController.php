@@ -25,12 +25,13 @@ class AnggotaController extends Controller
         $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
 
         if ($isKesiswaan && ! $request->filled('ekskul')) {
-            $ekskuls = \App\Models\Ekskul::orderBy('nama_ekskul')->get();
+            $ekskuls = \App\Models\Ekskul::whereNull('parent_id')->orderBy('nama_ekskul')->get();
             $cards = $ekskuls->map(function (\App\Models\Ekskul $e) {
-                $totalAktif = Pendaftaran::where('ekskul_id', $e->id)
+                $ids = array_merge([$e->id], $e->subdivisis()->pluck('id')->all());
+                $totalAktif = Pendaftaran::whereIn('ekskul_id', $ids)
                     ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
                     ->count();
-                $peringatan = Pendaftaran::where('ekskul_id', $e->id)
+                $peringatan = Pendaftaran::whereIn('ekskul_id', $ids)
                     ->where('status', Pendaftaran::STATUS_PERINGATAN)
                     ->count();
                 $ketua = $e->ketua();
@@ -62,7 +63,9 @@ class AnggotaController extends Controller
         }
 
         $ekskul = $this->ekskul();
-        $base = Pendaftaran::where('ekskul_id', $ekskul->id)
+        $anggotaEkskulIds = $this->anggotaEkskulIds($ekskul);
+        $subdivisis = ! $ekskul->isSubdivisi() ? $ekskul->subdivisis()->orderBy('nama_ekskul')->get() : collect();
+        $base = Pendaftaran::whereIn('ekskul_id', $anggotaEkskulIds)
             ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_NONAKTIF, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_KELUAR]);
 
         $totalAnggotas = (clone $base)->count();
@@ -87,7 +90,7 @@ class AnggotaController extends Controller
 
         $daftarKelas = \App\Models\Kelas::query()
             ->whereHas('siswas.pendaftarans', fn ($p) => $p
-                ->where('ekskul_id', $ekskul->id)
+                ->whereIn('ekskul_id', $anggotaEkskulIds)
                 ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_NONAKTIF, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_KELUAR]))
             ->orderBy('nama')
             ->get();
@@ -110,8 +113,20 @@ class AnggotaController extends Controller
             ? $arsipService->arsip($ekskul)
             : ['ketuaSelesai' => collect(), 'anggotaLulus' => collect(), 'total' => $arsipTotal];
         $ketuaId = $ekskul->ketua()?->id;
+        $anggotaPusatLama = ! $ekskul->isSubdivisi() && $subdivisis->isNotEmpty()
+            ? Pendaftaran::query()->where('ekskul_id', $ekskul->id)
+                ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_NONAKTIF])
+                ->with('siswa.kelas')->orderBy('tanggal_daftar')->get()
+            : collect();
+        $ketuaSubdivisiAssignments = ! $ekskul->isSubdivisi() && $subdivisis->isNotEmpty()
+            ? \App\Models\Pengurus::query()->where('ekskul_id', $ekskul->id)
+                ->where('jabatan', \App\Models\Pengurus::JABATAN_WAKIL_KETUA)
+                ->where('status', \App\Models\Pengurus::STATUS_AKTIF)
+                ->whereIn('subdivisi_id', $subdivisis->pluck('id'))
+                ->pluck('subdivisi_id', 'siswa_id')
+            : collect();
 
-        return view('ketua.anggota.index', compact('anggotas', 'ekskul', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'daftarKelas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal', 'isKesiswaan', 'ketuaId'));
+        return view('ketua.anggota.index', compact('anggotas', 'ekskul', 'subdivisis', 'anggotaPusatLama', 'ketuaSubdivisiAssignments', 'peringatanCount', 'nonaktifCount', 'keluarCount', 'totalAnggotas', 'daftarKelas', 'sort', 'direction', 'tampilArsip', 'arsip', 'arsipTotal', 'isKesiswaan', 'ketuaId'));
     }
 
     public function calonSiswa(Request $request): JsonResponse
@@ -122,13 +137,18 @@ class AnggotaController extends Controller
             'page' => ['nullable', 'integer', 'min:1'],
         ]);
         $ekskul = $this->ekskul();
+        $targetEkskul = $this->targetAnggotaEkskul($request);
+        $scopeEkskulIds = $this->anggotaEkskulIds($ekskul);
+        if ($targetEkskul->isSubdivisi()) {
+            $scopeEkskulIds[] = $targetEkskul->parent_id;
+        }
         $statusAktif = [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN];
 
         $siswas = Siswa::query()
             ->with('kelas')
             ->whereDoesntHave('pendaftarans', fn ($query) => $query
-                ->where('ekskul_id', $ekskul->id)
-                ->whereIn('status', [Pendaftaran::STATUS_PENDING, Pendaftaran::STATUS_LULUS]))
+                ->whereIn('ekskul_id', $scopeEkskulIds)
+                ->whereIn('status', [Pendaftaran::STATUS_PENDING, Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_LULUS]))
             ->when($validated['kelas_id'] ?? null, fn ($query, $kelasId) => $query->where('kelas_id', $kelasId))
             ->when($validated['q'] ?? null, function ($query, $cari) {
                 $query->where(function ($search) use ($cari) {
@@ -144,7 +164,7 @@ class AnggotaController extends Controller
                     AND pendaftarans.ekskul_id = ?
                     AND pendaftarans.status IN (?, ?)
                 ) THEN 1 ELSE 0 END',
-                [$ekskul->id, ...$statusAktif]
+                [$targetEkskul->id, ...$statusAktif]
             )
             ->orderBy('nama')
             ->paginate(25)
@@ -152,11 +172,11 @@ class AnggotaController extends Controller
 
         $ids = $siswas->getCollection()->pluck('id');
         $statusSebelumnya = Pendaftaran::query()
-            ->where('ekskul_id', $ekskul->id)
+            ->whereIn('ekskul_id', $scopeEkskulIds)
             ->whereIn('siswa_id', $ids)
             ->pluck('status', 'siswa_id');
         $tanggalSebelumnya = Pendaftaran::query()
-            ->where('ekskul_id', $ekskul->id)
+            ->whereIn('ekskul_id', $scopeEkskulIds)
             ->whereIn('siswa_id', $ids)
             ->pluck('tanggal_daftar', 'siswa_id');
 
@@ -220,6 +240,7 @@ class AnggotaController extends Controller
     public function store(Request $request)
     {
         $ekskul = $this->ekskul();
+        $ekskul = $this->targetAnggotaEkskul($request);
 
         $validated = $request->validate([
             'siswa_ids' => ['required', 'array', 'min:1', 'max:100'],
@@ -342,6 +363,91 @@ class AnggotaController extends Controller
         NotifikasiService::statusAnggotaDiubah($pendaftaran, $targetStatus, $judul, $pesan, $tipe);
 
         return back()->with('success', 'Status '.$namaSiswa.' berhasil diubah menjadi '.$this->labelStatus($targetStatus).'.');
+    }
+
+    public function tempatkanAnggotaKeSubdivisi(Request $request)
+    {
+        $ekskul = $this->ekskul();
+        abort_unless(! $ekskul->isSubdivisi() && $ekskul->hasSubdivisi(), 422, 'Penempatan hanya tersedia untuk ekskul pusat yang memiliki subdivisi.');
+
+        $user = auth()->user();
+        $siswa = $user?->siswa;
+        $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
+        abort_unless($isKesiswaan || $siswa?->ekskulDipimpin()?->id === $ekskul->id, 403, 'Hanya Ketua pusat yang dapat menyelesaikan penempatan anggota ini.');
+
+        $subdivisis = $ekskul->subdivisis()->orderBy('id')->get();
+        $ketuaAssignments = \App\Models\Pengurus::query()
+            ->where('ekskul_id', $ekskul->id)
+            ->where('jabatan', \App\Models\Pengurus::JABATAN_WAKIL_KETUA)
+            ->where('status', \App\Models\Pengurus::STATUS_AKTIF)
+            ->whereIn('subdivisi_id', $subdivisis->pluck('id'))
+            ->pluck('subdivisi_id', 'siswa_id');
+        $eligibleStatuses = [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_NONAKTIF];
+        $members = Pendaftaran::query()->where('ekskul_id', $ekskul->id)->whereIn('status', $eligibleStatuses)->get();
+        abort_if($members->isEmpty(), 422, 'Tidak ada anggota ekskul pusat yang perlu ditempatkan.');
+
+        $validated = $request->validate([
+            'penempatan' => ['required', 'array'],
+            'penempatan.*' => ['required', 'integer'],
+        ], ['penempatan.required' => 'Pilih subdivisi untuk setiap anggota.']);
+
+        $divisionIds = $subdivisis->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $placements = [];
+        foreach ($members as $member) {
+            $leaderDivision = $ketuaAssignments->get($member->siswa_id);
+            $targetId = $leaderDivision ?? ($validated['penempatan'][$member->id] ?? null);
+            abort_unless($targetId && in_array((int) $targetId, $divisionIds, true), 422, 'Setiap anggota harus dipilih tepat satu kali ke subdivisi yang tersedia.');
+            $placements[$member->id] = (int) $targetId;
+        }
+
+        DB::transaction(function () use ($ekskul, $placements) {
+            foreach ($placements as $pendaftaranId => $targetId) {
+                $pendaftaran = Pendaftaran::query()->where('ekskul_id', $ekskul->id)->lockForUpdate()->findOrFail($pendaftaranId);
+                $subdivisi = $ekskul->subdivisis()->findOrFail($targetId);
+                $duplicate = Pendaftaran::query()->where('siswa_id', $pendaftaran->siswa_id)->where('ekskul_id', $subdivisi->id)->lockForUpdate()->first();
+
+                if ($duplicate) {
+                    if (! in_array($duplicate->status, [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN], true)) {
+                        RiwayatPendaftaran::create([
+                            'pendaftaran_id' => $duplicate->id,
+                            'siswa_id' => $duplicate->siswa_id,
+                            'ekskul_id' => $duplicate->ekskul_id,
+                            'tanggal_daftar' => $duplicate->tanggal_daftar,
+                            'status' => $duplicate->status,
+                            'alasan' => 'Diaktifkan saat penempatan anggota ke subdivisi.',
+                            'dicatat_pada' => now(),
+                        ]);
+                        $duplicate->update(['status' => $pendaftaran->status === Pendaftaran::STATUS_NONAKTIF ? Pendaftaran::STATUS_NONAKTIF : Pendaftaran::STATUS_DITERIMA]);
+                    }
+
+                    RiwayatPendaftaran::create([
+                        'pendaftaran_id' => $pendaftaran->id,
+                        'siswa_id' => $pendaftaran->siswa_id,
+                        'ekskul_id' => $pendaftaran->ekskul_id,
+                        'tanggal_daftar' => $pendaftaran->tanggal_daftar,
+                        'status' => $pendaftaran->status,
+                        'alasan' => 'Keanggotaan pusat disatukan dengan riwayat subdivisi '.$subdivisi->nama_ekskul.'.',
+                        'dicatat_pada' => now(),
+                    ]);
+                    $pendaftaran->update(['status' => Pendaftaran::STATUS_KELUAR, 'alasan' => 'Keanggotaan dipusatkan pada subdivisi '.$subdivisi->nama_ekskul.'.']);
+                    continue;
+                }
+
+                RiwayatPendaftaran::create([
+                    'pendaftaran_id' => $pendaftaran->id,
+                    'siswa_id' => $pendaftaran->siswa_id,
+                    'ekskul_id' => $pendaftaran->ekskul_id,
+                    'tanggal_daftar' => $pendaftaran->tanggal_daftar,
+                    'status' => $pendaftaran->status,
+                    'alasan' => 'Penempatan anggota dari ekskul pusat ke subdivisi '.$subdivisi->nama_ekskul.'.',
+                    'dicatat_pada' => now(),
+                ]);
+
+                $pendaftaran->update(['ekskul_id' => $subdivisi->id]);
+            }
+        });
+
+        return redirect()->route('ketua.anggota.index', ['ekskul' => $ekskul->id])->with('success', 'Penempatan '.$members->count().' anggota ke subdivisi berhasil disimpan. Proses penempatan pusat sudah selesai.');
     }
 
     private function labelStatus(string $status): string

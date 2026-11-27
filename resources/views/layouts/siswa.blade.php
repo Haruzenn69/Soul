@@ -88,6 +88,10 @@
                     $__siswaCurrent   = auth()->user()?->siswa;
                     $__activeEkskuls  = $__siswaCurrent ? $__siswaCurrent->activeEkskuls() : collect();
                     $__hasMultiEkskul = $__activeEkskuls->count() >= 2;
+                    $__ledEkskulSiswa = $__siswaCurrent?->ekskulDipimpin();
+                    $__anggotaSubdivisiKetua = $__ledEkskulSiswa?->hasSubdivisi()
+                        ? $__activeEkskuls->first(fn ($item) => (int) $item->parent_id === (int) $__ledEkskulSiswa->id)
+                        : null;
 
                     if ($__hasMultiEkskul) {
                         $__curEks  = $__activeEkskulLayout ?? $__siswaCurrent->resolveActiveEkskul();
@@ -121,6 +125,23 @@
                        class="sm:hidden relative w-9 h-9 rounded-xl bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/40 dark:hover:bg-sky-900/50 border border-sky-200 dark:border-sky-800/70 text-sky-700 dark:text-sky-300 flex items-center justify-center transition-all shadow-sm shrink-0">
                         <i class="fa-solid fa-arrow-right-arrow-left text-xs text-sky-600 dark:text-sky-400"></i>
                         <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-sky-500 border-2 border-white dark:border-neutral-900 animate-pulse"></span>
+                    </a>
+                @endif
+
+                @if($__anggotaSubdivisiKetua)
+                    <a href="{{ route('ketua.dashboard') }}"
+                       id="header-switch-dashboard-ekskul-pusat"
+                       title="Pindah ke dashboard ekskul pusat {{ $__ledEkskulSiswa->nama_ekskul }}"
+                       class="group relative hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800/70 text-indigo-700 dark:text-indigo-300 text-xs font-bold transition-all shadow-sm hover:shadow shrink-0">
+                        <i class="fa-solid fa-arrow-right-arrow-left text-xs text-indigo-600 dark:text-indigo-400"></i>
+                        <span class="whitespace-nowrap">Dashboard Pusat</span>
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded-md bg-indigo-200/60 dark:bg-indigo-900/80 text-[10px] font-semibold truncate max-w-[100px]">{{ $__ledEkskulSiswa->nama_ekskul }}</span>
+                    </a>
+                    <a href="{{ route('ketua.dashboard') }}"
+                       id="header-switch-dashboard-ekskul-pusat-mobile"
+                       title="Pindah ke dashboard ekskul pusat {{ $__ledEkskulSiswa->nama_ekskul }}"
+                       class="sm:hidden relative w-9 h-9 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800/70 text-indigo-700 dark:text-indigo-300 flex items-center justify-center transition-all shadow-sm shrink-0">
+                        <i class="fa-solid fa-arrow-right-arrow-left text-xs text-indigo-600 dark:text-indigo-400"></i>
                     </a>
                 @endif
 

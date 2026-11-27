@@ -19,12 +19,13 @@ class KegiatanController extends Controller
         $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
 
         if ($isKesiswaan && ! $request->filled('ekskul')) {
-            $ekskuls = \App\Models\Ekskul::orderBy('nama_ekskul')->get();
+            $ekskuls = \App\Models\Ekskul::whereNull('parent_id')->orderBy('nama_ekskul')->get();
             $cards = $ekskuls->map(function (\App\Models\Ekskul $e) {
-                $totalKegiatan = Kegiatan::where('ekskul_id', $e->id)->count();
-                $eventCount = Kegiatan::where('ekskul_id', $e->id)->whereNotNull('jenis_kegiatan')->count();
-                $kegiatanTerakhir = Kegiatan::where('ekskul_id', $e->id)->latest('tanggal_kegiatan')->first();
-                $totalAnggota = $e->pendaftarans()->where('status', 'diterima')->count();
+                $unitIds = array_merge([$e->id], $e->subdivisis()->pluck('id')->all());
+                $totalKegiatan = Kegiatan::whereIn('ekskul_id', $unitIds)->count();
+                $eventCount = Kegiatan::whereIn('ekskul_id', $unitIds)->whereNotNull('jenis_kegiatan')->count();
+                $kegiatanTerakhir = Kegiatan::whereIn('ekskul_id', $unitIds)->latest('tanggal_kegiatan')->first();
+                $totalAnggota = \App\Models\Pendaftaran::whereIn('ekskul_id', $unitIds)->where('status', 'diterima')->count();
 
                 $stats = [
                     ['label' => 'Total Kegiatan', 'value' => $totalKegiatan.' Kegiatan', 'class' => 'font-bold text-slate-800 dark:text-slate-200'],
@@ -39,7 +40,7 @@ class KegiatanController extends Controller
                     'ekskul' => $e,
                     'stats' => $stats,
                     'badge' => null,
-                    'actionText' => 'Buka Kegiatan',
+                    'actionText' => $e->subdivisis()->exists() ? 'Lihat Subdivisi' : 'Buka Kegiatan',
                     'actionUrl' => route('ketua.kegiatan.index', ['ekskul' => $e->id]),
                 ];
             });
@@ -51,8 +52,95 @@ class KegiatanController extends Controller
             ]);
         }
 
-        $ekskul = $this->ekskul();
-        $base = Kegiatan::where('ekskul_id', $ekskul->id);
+        if ($isKesiswaan && $request->filled('ekskul')) {
+            $pusat = \App\Models\Ekskul::findOrFail($request->integer('ekskul'));
+            $subdivisis = $pusat->subdivisis()->orderBy('nama_ekskul')->get();
+
+            if (! $pusat->isSubdivisi() && $subdivisis->isNotEmpty()) {
+                $cards = $subdivisis->map(function (\App\Models\Ekskul $subdivisi) {
+                    $totalKegiatan = Kegiatan::where('ekskul_id', $subdivisi->id)->count();
+                    $eventCount = Kegiatan::where('ekskul_id', $subdivisi->id)->whereNotNull('jenis_kegiatan')->count();
+                    $totalAnggota = $subdivisi->pendaftarans()->where('status', 'diterima')->count();
+                    $kegiatanTerakhir = Kegiatan::where('ekskul_id', $subdivisi->id)->latest('tanggal_kegiatan')->first();
+
+                    $stats = [
+                        ['label' => 'Total Kegiatan', 'value' => $totalKegiatan.' Kegiatan', 'class' => 'font-bold text-slate-800 dark:text-slate-200'],
+                        ['label' => 'Event Khusus', 'value' => $eventCount.' Event', 'class' => 'font-bold text-amber-600 dark:text-amber-400'],
+                        ['label' => 'Anggota Aktif', 'value' => $totalAnggota.' Siswa', 'class' => 'font-semibold text-slate-600 dark:text-slate-300'],
+                    ];
+                    if ($kegiatanTerakhir) {
+                        $stats[] = ['label' => 'Terakhir', 'value' => $kegiatanTerakhir->tanggal_kegiatan->translatedFormat('d M Y'), 'class' => 'font-medium text-slate-500 text-[11px]'];
+                    }
+
+                    return (object) [
+                        'ekskul' => $subdivisi,
+                        'stats' => $stats,
+                        'badge' => null,
+                        'actionText' => 'Buka Kegiatan',
+                        'actionUrl' => route('ketua.kegiatan.index', ['ekskul' => $subdivisi->id]),
+                    ];
+                });
+
+                return view('ketua.kegiatan.index', [
+                    'isCatalog' => true,
+                    'cards' => $cards,
+                    'isKesiswaan' => true,
+                    'catalogTitle' => 'Subdivisi '.$pusat->nama_ekskul,
+                    'catalogSubtitle' => 'Pilih subdivisi untuk melihat jadwal dan presensinya.',
+                    'backUrl' => route('ketua.kegiatan.index'),
+                ]);
+            }
+        }
+
+        $ekskul = $this->kegiatanEkskul();
+        $isMonitoring = $this->isKetuaUtamaMonitoring($ekskul);
+
+        if (! $isKesiswaan && $isMonitoring && ! $ekskul->isSubdivisi()) {
+            $subdivisis = $ekskul->subdivisis()->orderBy('nama_ekskul')->get();
+            $cards = $subdivisis->map(function (\App\Models\Ekskul $subdivisi) {
+                $unitIds = [$subdivisi->id];
+                $totalKegiatan = Kegiatan::whereIn('ekskul_id', $unitIds)->count();
+                $eventCount = Kegiatan::whereIn('ekskul_id', $unitIds)->whereNotNull('jenis_kegiatan')->count();
+                $totalAnggota = \App\Models\Pendaftaran::whereIn('ekskul_id', $unitIds)->where('status', 'diterima')->count();
+                $kegiatanTerakhir = Kegiatan::whereIn('ekskul_id', $unitIds)->latest('tanggal_kegiatan')->first();
+                $stats = [
+                    ['label' => 'Total Kegiatan', 'value' => $totalKegiatan.' Kegiatan', 'class' => 'font-bold text-slate-800 dark:text-slate-200'],
+                    ['label' => 'Event Khusus', 'value' => $eventCount.' Event', 'class' => 'font-bold text-amber-600 dark:text-amber-400'],
+                    ['label' => 'Anggota Aktif', 'value' => $totalAnggota.' Siswa', 'class' => 'font-semibold text-slate-600 dark:text-slate-300'],
+                ];
+                if ($kegiatanTerakhir) {
+                    $stats[] = ['label' => 'Terakhir', 'value' => $kegiatanTerakhir->tanggal_kegiatan->translatedFormat('d M Y'), 'class' => 'font-medium text-slate-500 text-[11px]'];
+                }
+
+                return (object) [
+                    'ekskul' => $subdivisi,
+                    'stats' => $stats,
+                    'badge' => null,
+                    'actionText' => 'Lihat Kegiatan',
+                    'actionUrl' => route('ketua.kegiatan.index', ['ekskul' => $subdivisi->id]),
+                ];
+            });
+
+            return view('ketua.kegiatan.index', [
+                'isCatalog' => true,
+                'cards' => $cards,
+                'catalogTitle' => 'Subdivisi '.$ekskul->nama_ekskul,
+                'catalogSubtitle' => 'Pilih subdivisi untuk melihat daftar kegiatannya.',
+                'backUrl' => route('ketua.dashboard'),
+            ]);
+        }
+
+        $subdivisis = $isKesiswaan
+            ? $ekskul->subdivisis()->orderBy('nama_ekskul')->get()
+            : collect();
+        $activityIds = $this->kegiatanEkskulIds($ekskul);
+        $showUnitColumn = $isMonitoring && ! $ekskul->isSubdivisi();
+        if ($isKesiswaan && ! $ekskul->isSubdivisi()) {
+            $subdivisiIds = $ekskul->subdivisis()->pluck('id')->all();
+            $activityIds = array_merge([$ekskul->id], $subdivisiIds);
+            $showUnitColumn = $subdivisiIds !== [];
+        }
+        $base = Kegiatan::whereIn('ekskul_id', $activityIds);
         $total = (clone $base)->count();
 
         [$sort, $direction] = TableKit::sort(['tanggal_kegiatan', 'materi'], 'tanggal_kegiatan', 'desc');
@@ -72,16 +160,19 @@ class KegiatanController extends Controller
                     $query->whereNull('jenis_kegiatan');
                 }
             })
+            ->with('ekskul:id,nama_ekskul')
             ->withCount('presensis')
             ->orderBy($sort, $direction)
             ->paginate(10)
             ->withQueryString();
 
-        return view('ketua.kegiatan.index', compact('kegiatans', 'ekskul', 'total', 'sort', 'direction', 'isKesiswaan'));
+        return view('ketua.kegiatan.index', compact('kegiatans', 'ekskul', 'total', 'sort', 'direction', 'isKesiswaan', 'isMonitoring', 'showUnitColumn', 'subdivisis'));
     }
 
     public function create()
     {
+        $this->pastikanBolehKelolaKegiatan();
+
         return view('ketua.kegiatan.create');
     }
 
@@ -96,7 +187,7 @@ class KegiatanController extends Controller
             'dokumentasi' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $ekskul = $this->ekskul();
+        $ekskul = $this->pastikanBolehKelolaKegiatan();
 
         $dokumentasiPath = null;
         if ($request->hasFile('dokumentasi')) {
@@ -120,25 +211,29 @@ class KegiatanController extends Controller
 
     public function show(Kegiatan $kegiatan)
     {
-        $this->ensureEkskul($kegiatan);
+        $this->ensureKegiatanEkskul($kegiatan);
+        $ekskul = $this->kegiatanEkskul();
 
         $kegiatan->load(['presensis.pendaftaran.siswa.kelas', 'presensiPelatihs', 'ekskul.pelatih']);
 
         $presensiPelatih = $kegiatan->presensiPelatihs->first();
+        $isMonitoring = $this->isKetuaUtamaMonitoring($ekskul);
 
-        return view('ketua.kegiatan.show', compact('kegiatan', 'presensiPelatih'));
+        return view('ketua.kegiatan.show', compact('kegiatan', 'ekskul', 'presensiPelatih', 'isMonitoring'));
     }
 
     public function edit(Kegiatan $kegiatan)
     {
-        $this->ensureEkskul($kegiatan);
+        $this->ensureKegiatanEkskul($kegiatan);
+        $this->pastikanBolehKelolaKegiatan();
 
         return view('ketua.kegiatan.edit', compact('kegiatan'));
     }
 
     public function update(Request $request, Kegiatan $kegiatan)
     {
-        $this->ensureEkskul($kegiatan);
+        $this->ensureKegiatanEkskul($kegiatan);
+        $this->pastikanBolehKelolaKegiatan();
 
         $validated = $request->validate([
             'materi' => 'required|string|max:255',
@@ -172,7 +267,8 @@ class KegiatanController extends Controller
 
     public function destroy(Kegiatan $kegiatan)
     {
-        $this->ensureEkskul($kegiatan);
+        $this->ensureKegiatanEkskul($kegiatan);
+        $this->pastikanBolehKelolaKegiatan();
 
         if ($kegiatan->dokumentasi) {
             Storage::disk('public')->delete($kegiatan->dokumentasi);

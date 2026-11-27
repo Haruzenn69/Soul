@@ -34,8 +34,13 @@
                 </p>
             </div>
             <div class="flex items-center gap-2">
+                @if(!empty($backUrl))
+                    <a href="{{ $backUrl }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3.5 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-50 dark:border-neutral-700 dark:text-slate-300 dark:hover:bg-neutral-800">
+                        <i class="fa-solid fa-arrow-left text-[10px]"></i> Kembali
+                    </a>
+                @endif
                 <span class="px-3.5 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 text-xs font-bold border border-sky-200/60 dark:border-sky-800/50">
-                    Total {{ $cards->count() }} Ekskul
+                    Total {{ $cards->count() }} {{ !empty($backUrl) ? 'Subdivisi' : 'Ekskul' }}
                 </span>
             </div>
         </div>

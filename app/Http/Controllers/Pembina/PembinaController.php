@@ -37,7 +37,7 @@ class PembinaController extends Controller
         $user = auth()->user();
 
         if ($user && in_array($user->role, ['kesiswaan', 'admin'], true)) {
-            return Ekskul::orderBy('nama_ekskul')->get();
+            return Ekskul::whereNull('parent_id')->orderBy('nama_ekskul')->get();
         }
 
         $pembina = $user?->pembina;
@@ -54,12 +54,22 @@ class PembinaController extends Controller
         return $this->getEkskuls()->first();
     }
 
+    private function getEkskulIdsWithSubdivisi(?Ekskul $ekskul = null): Collection
+    {
+        $ekskulIds = $ekskul ? collect([$ekskul->id]) : $this->getEkskuls()->pluck('id');
+
+        return $ekskulIds
+            ->merge(Ekskul::whereIn('parent_id', $ekskulIds)->pluck('id'))
+            ->unique()
+            ->values();
+    }
+
     public function dashboard()
     {
         $pembina = auth()->user()?->pembina;
         $ekskuls = $this->getEkskuls();
         $ekskul = $ekskuls->first();
-        $ekskulIds = $ekskuls->pluck('id');
+        $ekskulIds = $this->getEkskulIdsWithSubdivisi();
 
         $ekskulsByBidang = $ekskuls->groupBy(fn ($e) => $e->bidang);
 
@@ -644,10 +654,11 @@ class PembinaController extends Controller
         // TAMPILKAN KATALOG KARTU EKSKUL JIKA BELUM MEMILIH EKSKUL
         if (! $selectedEkskulId || ! $ekskulIds->contains((int) $selectedEkskulId)) {
             $ekskulCards = $ekskuls->map(function (Ekskul $e) {
-                $totalLaporan = LaporanBulanan::where('ekskul_id', $e->id)->where('status', '!=', 'draft')->count();
-                $menungguCount = LaporanBulanan::where('ekskul_id', $e->id)->where('status', LaporanBulanan::STATUS_MENUNGGU)->count();
-                $disetujuiCount = LaporanBulanan::where('ekskul_id', $e->id)->where('status', LaporanBulanan::STATUS_DISETUJUI)->count();
-                $laporanTerbaru = LaporanBulanan::where('ekskul_id', $e->id)->where('status', '!=', 'draft')->latest('bulan')->first();
+                $managedIds = $this->getEkskulIdsWithSubdivisi($e);
+                $totalLaporan = LaporanBulanan::whereIn('ekskul_id', $managedIds)->where('status', '!=', 'draft')->count();
+                $menungguCount = LaporanBulanan::whereIn('ekskul_id', $managedIds)->where('status', LaporanBulanan::STATUS_MENUNGGU)->count();
+                $disetujuiCount = LaporanBulanan::whereIn('ekskul_id', $managedIds)->where('status', LaporanBulanan::STATUS_DISETUJUI)->count();
+                $laporanTerbaru = LaporanBulanan::whereIn('ekskul_id', $managedIds)->where('status', '!=', 'draft')->latest('bulan')->first();
 
                 return (object) [
                     'ekskul' => $e,
@@ -672,11 +683,12 @@ class PembinaController extends Controller
         $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
 
         $query = LaporanBulanan::where('status', '!=', 'draft')->with('ekskul');
+        $managedIds = $this->getEkskulIdsWithSubdivisi($activeEkskul);
 
         if ($activeEkskul) {
-            $query->where('ekskul_id', $activeEkskul->id);
+            $query->whereIn('ekskul_id', $managedIds);
         } else {
-            $query->whereIn('ekskul_id', $ekskulIds);
+            $query->whereIn('ekskul_id', $this->getEkskulIdsWithSubdivisi());
         }
 
         // Search: bulan atau materi
@@ -697,9 +709,9 @@ class PembinaController extends Controller
 
         $kegiatanQuery = Kegiatan::query();
         if ($activeEkskul) {
-            $kegiatanQuery->where('ekskul_id', $activeEkskul->id);
+            $kegiatanQuery->whereIn('ekskul_id', $managedIds);
         } else {
-            $kegiatanQuery->whereIn('ekskul_id', $ekskulIds);
+            $kegiatanQuery->whereIn('ekskul_id', $this->getEkskulIdsWithSubdivisi());
         }
 
         $kegiatans = $kegiatanQuery
@@ -716,7 +728,7 @@ class PembinaController extends Controller
 
     public function laporanShow(LaporanBulanan $laporanBulanan)
     {
-        abort_unless($this->getEkskuls()->pluck('id')->contains($laporanBulanan->ekskul_id), 403);
+        abort_unless($this->getEkskulIdsWithSubdivisi()->contains($laporanBulanan->ekskul_id), 403);
         abort_if($laporanBulanan->status === 'draft', 404);
 
         $laporanBulanan->load('ekskul');
@@ -726,7 +738,7 @@ class PembinaController extends Controller
 
     public function laporanDownload(LaporanBulanan $laporanBulanan)
     {
-        abort_unless($this->getEkskuls()->pluck('id')->contains($laporanBulanan->ekskul_id), 403);
+        abort_unless($this->getEkskulIdsWithSubdivisi()->contains($laporanBulanan->ekskul_id), 403);
         abort_if($laporanBulanan->status === 'draft', 404);
 
         $ekskul = $laporanBulanan->ekskul;
@@ -758,7 +770,7 @@ class PembinaController extends Controller
 
     public function laporanApprove(LaporanBulanan $laporanBulanan)
     {
-        abort_unless($this->getEkskuls()->pluck('id')->contains($laporanBulanan->ekskul_id), 403);
+        abort_unless($this->getEkskulIdsWithSubdivisi()->contains($laporanBulanan->ekskul_id), 403);
         abort_if($laporanBulanan->status !== LaporanBulanan::STATUS_MENUNGGU, 403, 'Laporan hanya bisa disetujui saat berstatus menunggu.');
 
         $laporanBulanan->update([
@@ -774,7 +786,7 @@ class PembinaController extends Controller
 
     public function laporanReject(Request $request, LaporanBulanan $laporanBulanan)
     {
-        abort_unless($this->getEkskuls()->pluck('id')->contains($laporanBulanan->ekskul_id), 403);
+        abort_unless($this->getEkskulIdsWithSubdivisi()->contains($laporanBulanan->ekskul_id), 403);
         abort_if($laporanBulanan->status !== LaporanBulanan::STATUS_MENUNGGU, 403, 'Laporan hanya bisa ditolak saat berstatus menunggu.');
 
         $validated = $request->validate([

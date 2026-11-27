@@ -47,6 +47,7 @@
 
     @php
         $__isKesiswaan = in_array(auth()->user()?->role, ['kesiswaan', 'admin'], true);
+        $__isKetuaSubdivisiOnly = view()->shared('isKetuaSubdivisiOnly') ?? false;
         if ($__isKesiswaan) {
             $__allEkskulsK = \App\Models\Ekskul::orderBy('nama_ekskul')->get();
             $__currentEkskulId = request('ekskul') ?? request('ekskul_id') ?? session('kesiswaan_active_ekskul_id') ?? $__allEkskulsK->first()?->id;
@@ -59,10 +60,14 @@
     @include('partials.pill-sidebar', [
     'psTitle' => $__isKesiswaan ? 'Menu Kesiswaan' : 'Menu Ketua',
     'psLogoBrand' => 'SOUL',
-    'psDashboardUrl' => $__isKesiswaan ? route('kesiswaan.dashboard') : route('ketua.dashboard'),
+    'psDashboardUrl' => $__isKesiswaan ? route('kesiswaan.dashboard') : ($__isKetuaSubdivisiOnly ? route('ketua.kegiatan.index') : route('ketua.dashboard')),
     'psNotifUrl' => '',
     'psProfileUrl' => $__isKesiswaan ? route('kesiswaan.profile') : route('profile.edit', ['from' => 'ketua']),
-'psItems' => $__isKesiswaan ? \App\Support\MenuKesiswaan::items() : [
+'psItems' => $__isKesiswaan ? \App\Support\MenuKesiswaan::items() : ($__isKetuaSubdivisiOnly ? [
+        ['icon' => 'calendar', 'label' => 'Kegiatan', 'url' => route('ketua.kegiatan.index'), 'is' => 'ketua.kegiatan.*'],
+        ['icon' => 'columns', 'label' => 'Laporan Bulanan', 'url' => route('ketua.laporan-bulanan.index'), 'is' => 'ketua.laporan-bulanan.*'],
+        ['icon' => 'user', 'label' => 'Profile', 'url' => route('profile.edit', ['from' => 'ketua']), 'is' => 'profile.edit'],
+    ] : [
         ['icon' => 'dashboard', 'label' => 'Dashboard', 'url' => route('ketua.dashboard'), 'is' => 'ketua.dashboard'],
         ['icon' => 'users', 'label' => 'Keanggotaan', 'children' => [
             ['icon' => 'users', 'label' => 'Kelola Anggota', 'url' => route('ketua.anggota.index'), 'is' => ['ketua.anggota.index', 'ketua.anggota.update-status']],
@@ -82,7 +87,7 @@
             ['icon' => 'help', 'label' => 'FAQ', 'url' => route('ketua.faq.index'), 'is' => 'ketua.faq.*'],
         ]],
         ['icon' => 'user', 'label' => 'Profile', 'url' => route('profile.edit', ['from' => 'ketua']), 'is' => 'profile.edit'],
-    ],
+    ]),
     'psMore' => [],
 ])
 
@@ -130,16 +135,19 @@
                     $__activeEkskulsK = $__siswaKetua ? $__siswaKetua->activeEkskuls() : collect();
                     $__hasMultiK      = $__activeEkskulsK->count() >= 2;
                     $__ledEkskulK     = $__siswaKetua?->ekskulDipimpin();
-
-                    if ($__hasMultiK) {
-                        $__othEksK = $__ledEkskulK
-                            ? $__activeEkskulsK->firstWhere('id', '!=', $__ledEkskulK->id)
-                            : $__activeEkskulsK->skip(1)->first();
-                    }
+                    $__memberSubdivisiK = $__ledEkskulK?->hasSubdivisi()
+                        ? $__activeEkskulsK->first(fn ($item) => (int) $item->parent_id === (int) $__ledEkskulK->id)
+                        : null;
+                    $__othEksK = $__memberSubdivisiK
+                        ?? ($__hasMultiK
+                            ? ($__ledEkskulK
+                                ? $__activeEkskulsK->firstWhere('id', '!=', $__ledEkskulK->id)
+                                : $__activeEkskulsK->skip(1)->first())
+                            : null);
                 @endphp
 
-                {{-- Switch Dashboard: tepat di sebelah tombol notifikasi jika ketua ikut 2 ekskul (hanya siswa) --}}
-                @if(! $__isKesiswaan && $__hasMultiK && isset($__othEksK) && $__othEksK)
+                {{-- Ketua pusat dapat berpindah ke dashboard anggota subdivisinya. --}}
+                @if(! $__isKesiswaan && isset($__othEksK) && $__othEksK)
                     <!-- Desktop: Tombol Switch Dashboard (Tema Biru) -->
                     <a href="{{ route('siswa.dashboard', ['ekskul' => $__othEksK->id]) }}"
                        id="header-switch-dashboard-ketua"

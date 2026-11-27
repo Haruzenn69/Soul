@@ -27,9 +27,9 @@ class KegiatanController extends ApiController
 
     public function index(Request $request): JsonResponse
     {
-        $ekskul = $this->ekskul();
+        $ekskul = $this->kegiatanEkskul();
 
-        $query = Kegiatan::where('ekskul_id', $ekskul->id);
+        $query = Kegiatan::whereIn('ekskul_id', $this->kegiatanEkskulIds($ekskul));
 
         if ($cari = $request->input('cari')) {
             $query->where(fn ($q) => $q
@@ -53,7 +53,7 @@ class KegiatanController extends ApiController
             $sort = 'tanggal_kegiatan';
         }
 
-        $kegiatans = $query->withCount('presensis')->orderBy($sort, $direction)->paginate(10);
+        $kegiatans = $query->with(['ekskul:id,nama_ekskul'])->withCount('presensis')->orderBy($sort, $direction)->paginate(10);
 
         return $this->ok([
             'total' => $kegiatans->total(),
@@ -68,7 +68,7 @@ class KegiatanController extends ApiController
 
     public function show(Kegiatan $kegiatan): JsonResponse
     {
-        $this->ensureEkskul($kegiatan);
+        $this->ensureKegiatanEkskul($kegiatan);
 
         $kegiatan->load(['presensis.pendaftaran.siswa', 'presensiPelatihs', 'ekskul.pelatih']);
 
@@ -92,7 +92,7 @@ class KegiatanController extends ApiController
 
     public function store(Request $request): JsonResponse
     {
-        $ekskul = $this->ekskul();
+        $ekskul = $this->pastikanBolehKelolaKegiatan();
 
         $validated = $request->validate($this->rules(), $this->messages());
 
@@ -120,7 +120,8 @@ class KegiatanController extends ApiController
 
     public function update(Request $request, Kegiatan $kegiatan): JsonResponse
     {
-        $this->ensureEkskul($kegiatan);
+        $this->ensureKegiatanEkskul($kegiatan);
+        $this->pastikanBolehKelolaKegiatan();
 
         $validated = $request->validate($this->rules(), $this->messages());
 
@@ -149,7 +150,8 @@ class KegiatanController extends ApiController
 
     public function destroy(Kegiatan $kegiatan): JsonResponse
     {
-        $this->ensureEkskul($kegiatan);
+        $this->ensureKegiatanEkskul($kegiatan);
+        $this->pastikanBolehKelolaKegiatan();
 
         if ($kegiatan->dokumentasi) {
             Storage::disk('public')->delete($kegiatan->dokumentasi);
@@ -162,8 +164,8 @@ class KegiatanController extends ApiController
 
     public function presensiForm(Kegiatan $kegiatan): JsonResponse
     {
-        $this->ensureEkskul($kegiatan);
-        $ekskul = $this->ekskul();
+        $this->ensureKegiatanEkskul($kegiatan);
+        $ekskul = $this->pastikanBolehKelolaKegiatan();
 
         $anggotas = Pendaftaran::where('ekskul_id', $ekskul->id)
             ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
@@ -193,8 +195,8 @@ class KegiatanController extends ApiController
 
     public function storePresensi(Request $request, Kegiatan $kegiatan): JsonResponse
     {
-        $this->ensureEkskul($kegiatan);
-        $ekskul = $this->ekskul();
+        $this->ensureKegiatanEkskul($kegiatan);
+        $ekskul = $this->pastikanBolehKelolaKegiatan();
 
         $validated = $request->validate([
             'presensi' => ['nullable', 'array'],
@@ -249,7 +251,9 @@ class KegiatanController extends ApiController
     public function rekap(Request $request): JsonResponse
     {
         $bulan = (new RekapAbsensiService)->normalizeBulan($request->input('bulan'));
-        $data = (new RekapAbsensiService)->rekap($this->ekskul(), $bulan);
+        $ekskul = $this->kegiatanEkskul();
+        abort_if($this->isKetuaUtamaMonitoring($ekskul), 403, 'Rekap presensi dikelola oleh ketua sub divisi.');
+        $data = (new RekapAbsensiService)->rekap($ekskul, $bulan);
 
         $rows = $data['rows']->map(fn ($r) => [
             'pendaftaran_id' => $r->pendaftaran->id,
@@ -287,7 +291,7 @@ class KegiatanController extends ApiController
     public function downloadRekapPdf(Request $request): Response
     {
         $data = (new RekapAbsensiService)->rekap(
-            $this->ekskul(),
+            $this->pastikanBolehKelolaKegiatan(),
             (new RekapAbsensiService)->normalizeBulan($request->input('bulan')),
         );
         $pdf = Pdf::loadView('ketua.presensi.rekap-pdf', $data);

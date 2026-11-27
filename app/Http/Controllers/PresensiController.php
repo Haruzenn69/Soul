@@ -18,9 +18,10 @@ class PresensiController extends Controller
 
     public function create(Kegiatan $kegiatan)
     {
-        $this->ensureEkskul($kegiatan);
+        $this->ensureKegiatanEkskul($kegiatan);
+        $this->pastikanBolehKelolaKegiatan();
 
-        $ekskul = $this->ekskul();
+        $ekskul = $kegiatan->ekskul;
         $anggotas = Pendaftaran::where('ekskul_id', $ekskul->id)
             ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
             ->with('siswa.kelas')
@@ -42,7 +43,8 @@ class PresensiController extends Controller
 
     public function store(Request $request, Kegiatan $kegiatan)
     {
-        $this->ensureEkskul($kegiatan);
+        $this->ensureKegiatanEkskul($kegiatan);
+        $this->pastikanBolehKelolaKegiatan();
 
         $validated = $request->validate([
             'presensi' => 'nullable|array',
@@ -73,7 +75,7 @@ class PresensiController extends Controller
         $pelatih = $request->input('pelatih_presensi.pelatih_id');
         $pelatihStatus = $request->input('pelatih_presensi.status');
         if ($pelatih && $pelatihStatus) {
-            $ekskul = $this->ekskul();
+            $ekskul = $kegiatan->ekskul;
             abort_unless($ekskul->pelatih_id === (int) $pelatih, 422, 'Kehadiran pelatih tidak sesuai dengan ekskul kegiatan ini.');
 
             PresensiPelatih::updateOrCreate(
@@ -121,18 +123,67 @@ class PresensiController extends Controller
 
         $service = app(RekapAbsensiService::class);
         $bulan = $service->normalizeBulan($request->input('bulan'));
-        $ekskul = $this->ekskul();
+        $ekskul = $this->kegiatanEkskul();
+        $isMonitoring = $this->isKetuaUtamaMonitoring($ekskul);
+
+        if ($isMonitoring && ! $ekskul->isSubdivisi()) {
+            $cards = $ekskul->subdivisis()->orderBy('nama_ekskul')->get()->map(function (\App\Models\Ekskul $subdivisi) {
+                $kegiatanRutin = Kegiatan::where('ekskul_id', $subdivisi->id)->whereNull('jenis_kegiatan');
+                $totalPertemuan = (clone $kegiatanRutin)->count();
+                $presensiKeseluruhan = Presensi::query()
+                    ->join('kegiatans', 'kegiatans.id', '=', 'presensis.kegiatan_id')
+                    ->where('kegiatans.ekskul_id', $subdivisi->id)
+                    ->whereNull('kegiatans.jenis_kegiatan')
+                    ->selectRaw('count(presensis.id) as total, sum(case when presensis.status = ? then 1 else 0 end) as hadir', [Presensi::STATUS_HADIR])
+                    ->first();
+                $persentaseKehadiran = (int) $presensiKeseluruhan->total > 0
+                    ? round(((int) $presensiKeseluruhan->hadir / (int) $presensiKeseluruhan->total) * 100, 1)
+                    : 0;
+                $totalAnggota = Pendaftaran::where('ekskul_id', $subdivisi->id)
+                    ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
+                    ->count();
+                $kegiatanTerakhir = Kegiatan::where('ekskul_id', $subdivisi->id)->latest('tanggal_kegiatan')->first();
+                $stats = [
+                    ['label' => 'Pertemuan', 'value' => $totalPertemuan.' Pertemuan', 'class' => 'font-bold text-slate-800 dark:text-slate-200'],
+                    ['label' => 'Kehadiran', 'value' => $persentaseKehadiran.'%', 'class' => 'font-bold text-amber-600 dark:text-amber-400'],
+                    ['label' => 'Anggota Aktif', 'value' => $totalAnggota.' Siswa', 'class' => 'font-semibold text-slate-600 dark:text-slate-300'],
+                ];
+                if ($kegiatanTerakhir) {
+                    $stats[] = ['label' => 'Terakhir', 'value' => $kegiatanTerakhir->tanggal_kegiatan->translatedFormat('d M Y'), 'class' => 'font-medium text-slate-500 text-[11px]'];
+                }
+
+                return (object) [
+                    'ekskul' => $subdivisi,
+                    'stats' => $stats,
+                    'badge' => null,
+                    'actionText' => 'Lihat Rekap Absensi',
+                    'actionUrl' => route('ketua.presensi.rekap', ['ekskul' => $subdivisi->id]),
+                ];
+            });
+
+            return view('ketua.presensi.rekap', [
+                'isCatalog' => true,
+                'cards' => $cards,
+                'isKesiswaan' => false,
+                'ekskul' => null,
+                'bulan' => $bulan,
+                'catalogTitle' => 'Rekap Absensi Subdivisi '.$ekskul->nama_ekskul,
+                'catalogSubtitle' => 'Pilih subdivisi untuk melihat rekap kehadirannya satu per satu.',
+                'backUrl' => route('ketua.dashboard'),
+            ]);
+        }
 
         $data = $service->rekap($ekskul, $bulan);
 
-        return view('ketua.presensi.rekap', array_merge($data, ['isKesiswaan' => $isKesiswaan]));
+        return view('ketua.presensi.rekap', array_merge($data, ['isKesiswaan' => $isKesiswaan, 'isMonitoring' => $isMonitoring]));
     }
 
     public function rekapPdf(Request $request)
     {
         $service = app(RekapAbsensiService::class);
         $bulan = $service->normalizeBulan($request->input('bulan'));
-        $ekskul = $this->ekskul();
+        $ekskul = $this->kegiatanEkskul();
+        abort_if($this->isKetuaUtamaMonitoring($ekskul) && ! $ekskul->isSubdivisi(), 403, 'Pilih subdivisi untuk mencetak rekap absensi.');
 
         $data = $service->rekap($ekskul, $bulan);
 

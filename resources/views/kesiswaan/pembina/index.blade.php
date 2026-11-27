@@ -420,7 +420,7 @@
                         <div>
                             <p class="text-xs font-bold text-slate-800">{{ $ekskul->nama_ekskul }}</p>
                             <span class="inline-block mt-0.5 px-2 py-0.5 bg-sky-100 text-sky-700 font-bold text-[10px] rounded-md">
-                                Kategori: {{ $ekskul->kategori ?: 'Lainnya' }}
+                                Kategori: {{ $ekskul->kategori ?: \App\Support\AturanEkskul::KATEGORI_FALLBACK }}
                             </span>
                         </div>
                         <form action="{{ route('kesiswaan.pembina.remove-ekskul', [$p, $ekskul]) }}" method="POST" onsubmit="return confirm('Lepas penugasan {{ $ekskul->nama_ekskul }} dari {{ $p->nama }}? Kategori akan disimpan sebagai riwayat pembina.')">
@@ -447,7 +447,7 @@
                         <option value="" disabled selected>Pilih ekskul...</option>
                         @foreach ($availableEkskuls as $ekskul)
                             <option value="{{ $ekskul->id }}">
-                                {{ $ekskul->nama_ekskul }} · Kategori: {{ $ekskul->kategori ?: 'Lainnya' }}
+                                {{ $ekskul->nama_ekskul }} · Kategori: {{ $ekskul->kategori ?: \App\Support\AturanEkskul::KATEGORI_FALLBACK }}
                             </option>
                         @endforeach
                     </select>

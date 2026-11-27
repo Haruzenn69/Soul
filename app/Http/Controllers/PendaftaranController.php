@@ -21,9 +21,10 @@ class PendaftaranController extends Controller
         $isKesiswaan = $user && in_array($user->role, ['kesiswaan', 'admin'], true);
 
         if ($isKesiswaan && ! $request->filled('ekskul')) {
-            $ekskuls = \App\Models\Ekskul::orderBy('nama_ekskul')->get();
+            $ekskuls = \App\Models\Ekskul::whereNull('parent_id')->orderBy('nama_ekskul')->get();
             $cards = $ekskuls->map(function (\App\Models\Ekskul $e) {
-                $base = Pendaftaran::where('ekskul_id', $e->id);
+                $ids = array_merge([$e->id], $e->subdivisis()->pluck('id')->all());
+                $base = Pendaftaran::whereIn('ekskul_id', $ids);
                 $total = (clone $base)->count();
                 $pendingCount = (clone $base)->where('status', 'pending')->count();
                 $diterimaCount = (clone $base)->where('status', 'diterima')->count();
@@ -57,7 +58,9 @@ class PendaftaranController extends Controller
         }
 
         $ekskul = $this->ekskul();
-        $base = Pendaftaran::where('ekskul_id', $ekskul->id);
+        $anggotaEkskulIds = $this->anggotaEkskulIds($ekskul);
+        $subdivisis = ! $ekskul->isSubdivisi() ? $ekskul->subdivisis()->orderBy('nama_ekskul')->get() : collect();
+        $base = Pendaftaran::whereIn('ekskul_id', $anggotaEkskulIds);
 
         $total = (clone $base)->count();
         $pendingCount = (clone $base)->where('status', 'pending')->count();
@@ -79,7 +82,7 @@ class PendaftaranController extends Controller
 
         $kelasList = Kelas::whereHas('siswas')->orderBy('nama')->get(['id', 'nama']);
 
-        return view('ketua.pendaftaran.index', compact('pendaftarans', 'pendingCount', 'diterimaCount', 'ditolakCount', 'total', 'sort', 'direction', 'ekskul', 'isKesiswaan', 'kelasList'));
+        return view('ketua.pendaftaran.index', compact('pendaftarans', 'pendingCount', 'diterimaCount', 'ditolakCount', 'total', 'sort', 'direction', 'ekskul', 'subdivisis', 'isKesiswaan', 'kelasList'));
     }
 
     public function show(Pendaftaran $pendaftaran)

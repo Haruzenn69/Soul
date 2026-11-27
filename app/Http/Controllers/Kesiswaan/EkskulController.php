@@ -138,12 +138,8 @@ class EkskulController extends Controller
             $data['kategori'] = $parent->kategori;
             $data['pembina_id'] = $data['pembina_id'] ?? $parent->pembina_id;
         } else {
-            $data['tipe'] = strtolower($data['kategori']) === 'komunitas' 
-                ? Ekskul::TIPE_KOMUNITAS 
-                : Ekskul::TIPE_EKSKUL;
-            if ($data['tipe'] === Ekskul::TIPE_KOMUNITAS) {
-                $data['pelatih_id'] = null;
-            }
+            $data['pelatih_id'] = null;
+            $data['tipe'] = Ekskul::TIPE_KOMUNITAS;
         }
 
         if (! empty($data['pembina_id'])) {

@@ -15,7 +15,8 @@ class KategoriEkskul extends Model
 
     public function ekskuls(): HasMany
     {
-        return $this->hasMany(Ekskul::class, 'kategori', 'nama');
+        return $this->hasMany(Ekskul::class, 'kategori', 'nama')
+            ->whereNull('parent_id');
     }
 
     public function isWajib(): bool
@@ -23,13 +24,13 @@ class KategoriEkskul extends Model
         return AturanEkskul::isWajib($this->nama);
     }
 
-    /** Kategori fallback sistem (Lainnya) — tidak bisa dihapus. */
+    /** Kategori fallback sistem (Komunitas) — tidak bisa dihapus. */
     public function isFallback(): bool
     {
         return AturanEkskul::isFallback($this->nama);
     }
 
-    /** Kategori sistem (Wajib atau Lainnya) — tidak bisa dihapus. */
+    /** Kategori sistem (Wajib atau Komunitas) — tidak bisa dihapus. */
     public function isSistem(): bool
     {
         return AturanEkskul::isSistem($this->nama);

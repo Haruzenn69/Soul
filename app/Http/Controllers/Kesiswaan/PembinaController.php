@@ -57,7 +57,7 @@ class PembinaController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        $ekskulList = Ekskul::orderBy('nama_ekskul')->get();
+        $ekskulList = Ekskul::whereNull('parent_id')->orderBy('nama_ekskul')->get();
 
         return view('kesiswaan.pembina.index', [
             'pembinas' => $pembinas,
@@ -74,6 +74,10 @@ class PembinaController extends Controller
         ]);
 
         $ekskul = Ekskul::findOrFail($data['ekskul_id']);
+
+        if ($ekskul->isSubdivisi()) {
+            return back()->withErrors(['ekskul_id' => 'Sub divisi mengikuti pembina ekskul pusat dan tidak ditugaskan sebagai ekskul binaan tersendiri.']);
+        }
 
         if ($ekskul->pembina_id !== null) {
             return back()->withErrors(['ekskul_id' => "Ekskul {$ekskul->nama_ekskul} sudah memiliki pembina."]);

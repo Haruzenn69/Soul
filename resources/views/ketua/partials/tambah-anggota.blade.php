@@ -2,6 +2,20 @@
     <dialog id="modal-tambah-anggota" aria-labelledby="modal-tambah-anggota-title" class="w-[min(56rem,96vw)] max-w-none max-h-[92dvh] rounded-3xl border border-sky-100 shadow-2xl shadow-slate-900/20 p-0 backdrop:bg-slate-950/50 backdrop:backdrop-blur-sm">
         <form id="form-tambah-anggota" method="POST" action="{{ route('ketua.anggota.store') }}" class="bg-white rounded-3xl overflow-hidden flex flex-col max-h-[92dvh]">
             @csrf
+            @if(($subdivisis ?? collect())->isNotEmpty())
+                <div class="px-5 sm:px-7 pt-4">
+                    <label for="tujuan-subdivisi" class="text-[11px] font-bold text-slate-600 mb-2 block">Tambahkan anggota ke subdivisi</label>
+                    <select id="tujuan-subdivisi" name="subdivisi_id" required class="w-full sm:max-w-sm py-3 px-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-sky-400 focus:ring-4 focus:ring-sky-100 transition">
+                        <option value="">Pilih subdivisi tujuan</option>
+                        @foreach($subdivisis as $subdivisi)
+                            <option value="{{ $subdivisi->id }}">{{ $subdivisi->nama_ekskul }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @elseif(isset($ekskul) && $ekskul->isSubdivisi())
+                <input type="hidden" name="subdivisi_id" value="{{ $ekskul->id }}">
+                <p class="px-5 sm:px-7 pt-4 text-xs font-semibold text-sky-700">Anggota akan ditambahkan ke subdivisi {{ $ekskul->nama_ekskul }}.</p>
+            @endif
             <div class="flex items-start justify-between gap-4 px-5 sm:px-7 py-5 border-b border-slate-100">
                 <div>
                     <p class="text-[10px] font-extrabold uppercase tracking-[.18em] text-sky-600">Kelola Keanggotaan</p>
@@ -81,6 +95,7 @@
     const dialog = document.getElementById('modal-tambah-anggota');
     const search = document.getElementById('calon-siswa-search');
     const classFilter = document.getElementById('calon-siswa-kelas');
+    const subdivisionSelect = document.getElementById('tujuan-subdivisi');
     const list = document.getElementById('calon-siswa-list');
     const meta = document.getElementById('calon-siswa-meta');
     const pageLabel = document.getElementById('calon-siswa-page');
@@ -230,8 +245,17 @@
 
         const url = new URL(@json(route('ketua.anggota.calon-siswa')), window.location.origin);
         url.searchParams.set('page', String(page));
+        if (subdivisionSelect && !subdivisionSelect.value) {
+            list.innerHTML = '<div class="py-12 text-center text-xs text-slate-400">Pilih subdivisi tujuan terlebih dahulu.</div>';
+            meta.textContent = 'Subdivisi tujuan belum dipilih';
+            pageLabel.textContent = '';
+            previousPage.disabled = true;
+            nextPage.disabled = true;
+            return;
+        }
         if (search.value.trim()) url.searchParams.set('q', search.value.trim());
         if (classFilter.value) url.searchParams.set('kelas_id', classFilter.value);
+        if (subdivisionSelect?.value) url.searchParams.set('subdivisi_id', subdivisionSelect.value);
 
         try {
             const response = await fetch(url, {
@@ -284,6 +308,7 @@
         debounceTimer = setTimeout(() => loadPage(1), 250);
     });
     classFilter.addEventListener('change', () => loadPage(1));
+    subdivisionSelect?.addEventListener('change', () => loadPage(1));
     selectPage.addEventListener('click', () => {
         for (const siswa of visibleItems) {
             if (siswa.sudah_aktif) continue;

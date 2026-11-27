@@ -13,6 +13,10 @@ class KegiatanResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'ekskul' => $this->whenLoaded('ekskul', fn () => [
+                'id' => $this->ekskul->id,
+                'nama_ekskul' => $this->ekskul->nama_ekskul,
+            ]),
             'materi' => $this->materi,
             'jenis_kegiatan' => $this->jenis_kegiatan,
             'is_event' => $this->isEvent(),

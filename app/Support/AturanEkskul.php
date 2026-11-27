@@ -75,7 +75,7 @@ final class AturanEkskul
     }
 
     /**
-     * Cek apakah kategori adalah kategori fallback sistem (Lainnya).
+     * Cek apakah kategori adalah kategori fallback sistem (Komunitas).
      * Kategori ini tidak bisa dihapus karena menjadi tempat penampungan
      * ekskul yang kategorinya dihapus.
      */
@@ -85,7 +85,7 @@ final class AturanEkskul
     }
 
     /**
-     * Cek apakah kategori adalah kategori sistem (Wajib atau Lainnya) yang tidak bisa dihapus.
+     * Cek apakah kategori adalah kategori sistem (Wajib atau Komunitas) yang tidak bisa dihapus.
      */
     public static function isSistem(?string $kategori): bool
     {

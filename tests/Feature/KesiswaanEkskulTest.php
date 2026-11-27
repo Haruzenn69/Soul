@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Ekskul;
 use App\Models\Pendaftaran;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\CreatesFixtures;
@@ -55,5 +56,24 @@ class KesiswaanEkskulTest extends TestCase
             ->where('status', Pendaftaran::STATUS_DITERIMA)
             ->whereHas('siswa', fn ($query) => $query->where('jabatan', 'ketua'))
             ->count());
+    }
+
+    public function test_admin_dapat_membuat_ekskul_dengan_kategori_komunitas(): void
+    {
+        $admin = $this->makeUser('admin');
+
+        $this->actingAs($admin)
+            ->post(route('kesiswaan.ekskuls.store'), [
+                'nama_ekskul' => 'Komunitas Baca',
+                'kategori' => 'Komunitas',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('ekskuls', [
+            'nama_ekskul' => 'Komunitas Baca',
+            'kategori' => 'Komunitas',
+            'tipe' => Ekskul::TIPE_KOMUNITAS,
+            'pelatih_id' => null,
+        ]);
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Ekskul;
 use App\Models\Notifikasi;
 use App\Models\Pendaftaran;
 use App\Models\Pengurus;
+use App\Models\RiwayatPendaftaran;
 use App\Models\RiwayatJabatan;
 use App\Models\Siswa;
 use App\Services\ArsipEkskulService;
@@ -27,7 +28,7 @@ class PengurusController extends Controller
         $user = auth()->user();
 
         if ($user && in_array($user->role, ['kesiswaan', 'admin'], true)) {
-            return Ekskul::orderBy('nama_ekskul')->get();
+            return Ekskul::whereNull('parent_id')->orderBy('nama_ekskul')->get();
         }
 
         $pembina = $user?->pembina;
@@ -169,7 +170,7 @@ class PengurusController extends Controller
                 ->when($currentKetuaId, fn ($col) => $col->push($currentKetuaId))
                 ->unique();
 
-            $anggotaEligible = Pendaftaran::where('ekskul_id', $ekskul->id)
+            $anggotaEligible = Pendaftaran::whereIn('ekskul_id', array_merge([$ekskul->id], $ekskul->subdivisis()->pluck('id')->all()))
                 ->where('status', Pendaftaran::STATUS_DITERIMA)
                 ->whereNotIn('siswa_id', $occupiedInThisEkskul)
                 ->with('siswa.kelas')
@@ -232,15 +233,21 @@ class PengurusController extends Controller
 
         // Ketua dapat dipilih dari master siswa oleh Pembina. Keanggotaannya
         // dibuat bersamaan dengan penetapan agar tidak tersimpan setengah.
-        $pendaftaran = Pendaftaran::where('ekskul_id', $ekskul->id)
-            ->where('siswa_id', $siswa->id)
-            ->latest('id')
-            ->first();
+        $pendaftaran = $subdivisiId
+            ? Pendaftaran::where('ekskul_id', $subdivisiId)->where('siswa_id', $siswa->id)->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])->latest('id')->first()
+            : null;
+        $pendaftaran ??= Pendaftaran::where('ekskul_id', $ekskul->id)->where('siswa_id', $siswa->id)->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])->latest('id')->first();
+        $pendaftaran ??= Pendaftaran::whereIn('ekskul_id', $ekskul->subdivisis()->pluck('id'))->where('siswa_id', $siswa->id)->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])->latest('id')->first();
+        $pendaftaran ??= Pendaftaran::whereIn('ekskul_id', array_filter([$subdivisiId, $ekskul->id]))->where('siswa_id', $siswa->id)->latest('id')->first();
 
         $perluTambahAnggota = ! $pendaftaran?->isActive();
         if ($perluTambahAnggota) {
             if ($jabatan !== Pengurus::JABATAN_KETUA) {
                 return back()->with('error', "{$siswa->nama} belum menjadi anggota aktif ekskul {$ekskul->nama_ekskul}.");
+            }
+
+            if ($ekskul->hasSubdivisi()) {
+                return back()->with('error', 'Ketua pusat harus dipilih dari siswa yang sudah menjadi anggota aktif salah satu subdivisi.');
             }
 
             $siswa->loadMissing('user');
@@ -284,7 +291,7 @@ class PengurusController extends Controller
             return back()->with('error', "{$siswa->nama} adalah Ketua di ekskul ini dan tidak dapat merangkap jabatan lain.");
         }
 
-        DB::transaction(function () use ($ekskul, $siswa, $jabatan, $validated, $perluTambahAnggota, &$pendaftaran) {
+        DB::transaction(function () use ($ekskul, $siswa, $jabatan, $subdivisiId, $validated, $perluTambahAnggota, &$pendaftaran) {
             $arsip = app(ArsipEkskulService::class);
 
             if ($perluTambahAnggota) {
@@ -311,7 +318,7 @@ class PengurusController extends Controller
                 ->where('jabatan', $jabatan)
                 ->where('status', Pengurus::STATUS_AKTIF);
 
-            if ($jabatan === Pengurus::JABATAN_WAKIL_KETUA && $subdivisiId) {
+            if ($jabatan === Pengurus::JABATAN_WAKIL_KETUA) {
                 $queryLama->where('subdivisi_id', $subdivisiId);
             }
 
@@ -335,7 +342,7 @@ class PengurusController extends Controller
                 ->where('jabatan', $jabatan)
                 ->where('status', Pengurus::STATUS_MENUNGGU);
 
-            if ($jabatan === Pengurus::JABATAN_WAKIL_KETUA && $subdivisiId) {
+            if ($jabatan === Pengurus::JABATAN_WAKIL_KETUA) {
                 $queryPending->where('subdivisi_id', $subdivisiId);
             }
 
@@ -354,6 +361,10 @@ class PengurusController extends Controller
                 'diusulkan_oleh' => 'pembina',
                 'catatan' => $validated['catatan'] ?: 'Ditetapkan langsung oleh pembina',
             ]);
+
+            if ($jabatan === Pengurus::JABATAN_WAKIL_KETUA && $subdivisiId) {
+                $this->pindahkanKeanggotaanKetuaSubdivisi($ekskul, $ekskul->subdivisis()->findOrFail($subdivisiId), $siswa);
+            }
 
             // Bila jabatan adalah ketua, update kolom jabatan siswa dan arsip riwayat
             if ($jabatan === Pengurus::JABATAN_KETUA) {
@@ -389,10 +400,11 @@ class PengurusController extends Controller
         }
 
         // Pastikan siswa masih berstatus diterima
-        $pendaftaran = Pendaftaran::where('ekskul_id', $ekskul->id)
-            ->where('siswa_id', $pengurus->siswa_id)
-            ->where('status', Pendaftaran::STATUS_DITERIMA)
-            ->first();
+        $pendaftaran = $pengurus->subdivisi_id
+            ? Pendaftaran::where('ekskul_id', $pengurus->subdivisi_id)->where('siswa_id', $pengurus->siswa_id)->where('status', Pendaftaran::STATUS_DITERIMA)->first()
+            : null;
+        $pendaftaran ??= Pendaftaran::where('ekskul_id', $ekskul->id)->where('siswa_id', $pengurus->siswa_id)->where('status', Pendaftaran::STATUS_DITERIMA)->first();
+        $pendaftaran ??= Pendaftaran::whereIn('ekskul_id', $ekskul->subdivisis()->pluck('id'))->where('siswa_id', $pengurus->siswa_id)->where('status', Pendaftaran::STATUS_DITERIMA)->first();
 
         if (! $pendaftaran) {
             $pengurus->update([
@@ -422,10 +434,15 @@ class PengurusController extends Controller
 
         DB::transaction(function () use ($ekskul, $pengurus, $request) {
             // Selesaikan pengurus aktif sebelumnya pada jabatan ini (jika ada)
-            $pengurusLama = Pengurus::where('ekskul_id', $ekskul->id)
+            $queryLama = Pengurus::where('ekskul_id', $ekskul->id)
                 ->where('jabatan', $pengurus->jabatan)
-                ->where('status', Pengurus::STATUS_AKTIF)
-                ->first();
+                ->where('status', Pengurus::STATUS_AKTIF);
+
+            if ($pengurus->jabatan === Pengurus::JABATAN_WAKIL_KETUA) {
+                $queryLama->where('subdivisi_id', $pengurus->subdivisi_id);
+            }
+
+            $pengurusLama = $queryLama->first();
 
             if ($pengurusLama) {
                 $pengurusLama->update([
@@ -439,6 +456,10 @@ class PengurusController extends Controller
                 'status' => Pengurus::STATUS_AKTIF,
                 'catatan' => $request->input('catatan') ?: 'Disetujui oleh pembina pada ' . now()->translatedFormat('d M Y H:i'),
             ]);
+
+            if ($pengurus->jabatan === Pengurus::JABATAN_WAKIL_KETUA && $pengurus->subdivisi_id) {
+                $this->pindahkanKeanggotaanKetuaSubdivisi($ekskul, $ekskul->subdivisis()->findOrFail($pengurus->subdivisi_id), $pengurus->siswa);
+            }
         });
 
         // Notifikasi ke siswa
@@ -590,7 +611,7 @@ class PengurusController extends Controller
             ->when($currentKetuaId, fn ($col) => $col->push($currentKetuaId))
             ->unique();
 
-        $anggotaEligible = Pendaftaran::where('ekskul_id', $ekskul->id)
+        $anggotaEligible = Pendaftaran::whereIn('ekskul_id', array_merge([$ekskul->id], $subdivisis->pluck('id')->all()))
             ->where('status', Pendaftaran::STATUS_DITERIMA)
             ->whereNotIn('siswa_id', $occupiedInThisEkskul)
             ->with('siswa.kelas')
@@ -643,10 +664,11 @@ class PengurusController extends Controller
         }
 
         // 1. Pastikan siswa adalah anggota ekskul ini dengan status diterima
-        $pendaftaran = Pendaftaran::where('ekskul_id', $ekskul->id)
-            ->where('siswa_id', $siswa->id)
-            ->where('status', Pendaftaran::STATUS_DITERIMA)
-            ->first();
+        $pendaftaran = $subdivisiId
+            ? Pendaftaran::where('ekskul_id', $subdivisiId)->where('siswa_id', $siswa->id)->where('status', Pendaftaran::STATUS_DITERIMA)->first()
+            : null;
+        $pendaftaran ??= Pendaftaran::where('ekskul_id', $ekskul->id)->where('siswa_id', $siswa->id)->where('status', Pendaftaran::STATUS_DITERIMA)->first();
+        $pendaftaran ??= Pendaftaran::whereIn('ekskul_id', $ekskul->subdivisis()->pluck('id'))->where('siswa_id', $siswa->id)->where('status', Pendaftaran::STATUS_DITERIMA)->first();
 
         if (! $pendaftaran) {
             return back()->with('error', "{$siswa->nama} bukan anggota aktif berstatus diterima di ekskul ini.");
@@ -671,7 +693,7 @@ class PengurusController extends Controller
             ->where('jabatan', $jabatan)
             ->where('status', Pengurus::STATUS_MENUNGGU);
 
-        if ($jabatan === Pengurus::JABATAN_WAKIL_KETUA && $subdivisiId) {
+        if ($jabatan === Pengurus::JABATAN_WAKIL_KETUA) {
             $queryPending->where('subdivisi_id', $subdivisiId);
         }
 
@@ -715,5 +737,74 @@ class PengurusController extends Controller
         }
 
         return back()->with('success', "Usulan pengurus untuk posisi " . Pengurus::labelJabatan($jabatan) . " atas nama {$siswa->nama} berhasil diajukan dan sedang menunggu persetujuan Pembina.");
+    }
+
+    private function pindahkanKeanggotaanKetuaSubdivisi(Ekskul $ekskulPusat, Ekskul $subdivisi, Siswa $siswa): void
+    {
+        $target = Pendaftaran::query()
+            ->where('siswa_id', $siswa->id)
+            ->where('ekskul_id', $subdivisi->id)
+            ->lockForUpdate()
+            ->first();
+        $source = Pendaftaran::query()
+            ->where('siswa_id', $siswa->id)
+            ->whereIn('ekskul_id', array_merge([$ekskulPusat->id], $ekskulPusat->subdivisis()->pluck('id')->all()))
+            ->where('ekskul_id', '!=', $subdivisi->id)
+            ->whereIn('status', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
+            ->lockForUpdate()
+            ->orderByRaw('CASE WHEN status IN (?, ?) THEN 0 ELSE 1 END', [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN])
+            ->latest('id')
+            ->first();
+
+        if ($target) {
+            if ($source) {
+                RiwayatPendaftaran::create([
+                    'pendaftaran_id' => $source->id,
+                    'siswa_id' => $source->siswa_id,
+                    'ekskul_id' => $source->ekskul_id,
+                    'tanggal_daftar' => $source->tanggal_daftar,
+                    'status' => $source->status,
+                    'alasan' => 'Keanggotaan ketua subdivisi dialihkan ke '.$subdivisi->nama_ekskul.'.',
+                    'dicatat_pada' => now(),
+                ]);
+                $source->update(['status' => Pendaftaran::STATUS_KELUAR, 'alasan' => 'Dipindahkan sebagai ketua subdivisi '.$subdivisi->nama_ekskul.'.']);
+            }
+
+            if (! in_array($target->status, [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN], true)) {
+                RiwayatPendaftaran::create([
+                    'pendaftaran_id' => $target->id,
+                    'siswa_id' => $target->siswa_id,
+                    'ekskul_id' => $target->ekskul_id,
+                    'tanggal_daftar' => $target->tanggal_daftar,
+                    'status' => $target->status,
+                    'alasan' => 'Keanggotaan diaktifkan sebagai ketua subdivisi.',
+                    'dicatat_pada' => now(),
+                ]);
+                $target->update(['status' => Pendaftaran::STATUS_DITERIMA, 'alasan' => 'Aktif sebagai ketua subdivisi.']);
+            }
+
+            return;
+        }
+
+        if (! $source) {
+            return;
+        }
+
+        RiwayatPendaftaran::create([
+            'pendaftaran_id' => $source->id,
+            'siswa_id' => $source->siswa_id,
+            'ekskul_id' => $source->ekskul_id,
+            'tanggal_daftar' => $source->tanggal_daftar,
+            'status' => $source->status,
+            'alasan' => 'Dipindahkan otomatis karena ditetapkan sebagai ketua subdivisi '.$subdivisi->nama_ekskul.'.',
+            'dicatat_pada' => now(),
+        ]);
+        $source->update([
+            'ekskul_id' => $subdivisi->id,
+            'status' => in_array($source->status, [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN], true)
+                ? $source->status
+                : Pendaftaran::STATUS_DITERIMA,
+            'alasan' => 'Dipindahkan otomatis sebagai ketua subdivisi.',
+        ]);
     }
 }

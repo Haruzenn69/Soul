@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Kesiswaan;
 use App\Http\Controllers\Controller;
 use App\Models\Ekskul;
 use App\Models\KategoriEkskul;
+use App\Support\AturanEkskul;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -33,27 +34,25 @@ class KategoriEkskulController extends Controller
 
     public function destroy(KategoriEkskul $kategoriEkskul): RedirectResponse
     {
-        // Hanya kategori Lainnya yang tidak bisa dihapus (sebagai fallback sistem)
+        $fallbackNama = AturanEkskul::KATEGORI_FALLBACK;
+
         if ($kategoriEkskul->isFallback()) {
-            return back()->withErrors(['kategori' => 'Kategori Lainnya adalah kategori fallback sistem. Ekskul yang kategorinya dihapus akan dipindah ke sini, sehingga kategori ini tidak dapat dihapus.']);
+            return back()->withErrors(['kategori' => "Kategori {$fallbackNama} adalah kategori fallback sistem. Ekskul yang kategorinya dihapus akan dipindah ke sini, sehingga kategori ini tidak dapat dihapus."]);
         }
 
-        // Cegah hapus jika hanya ada 1 kategori tersisa (selain Lainnya)
-        $totalKategoriHapusable = KategoriEkskul::where('nama', '!=', \App\Support\AturanEkskul::KATEGORI_FALLBACK)->count();
+        $totalKategoriHapusable = KategoriEkskul::where('nama', '!=', $fallbackNama)->count();
 
         if ($totalKategoriHapusable <= 1) {
-            return back()->withErrors(['kategori' => 'Tidak dapat menghapus kategori terakhir. Minimal harus ada 1 kategori selain Lainnya.']);
+            return back()->withErrors(['kategori' => "Tidak dapat menghapus kategori terakhir. Minimal harus ada 1 kategori selain {$fallbackNama}."]);
         }
 
         $nama = $kategoriEkskul->nama;
 
-        // Pastikan fallback "Lainnya" ada di database (auto-buat jika belum)
         $fallback = KategoriEkskul::firstOrCreate(
-            ['nama' => \App\Support\AturanEkskul::KATEGORI_FALLBACK],
+            ['nama' => $fallbackNama],
             ['deskripsi' => 'Kategori umum untuk ekskul yang tidak termasuk kategori lain.']
         );
 
-        // Pindahkan semua ekskul dari kategori yang dihapus ke "Lainnya"
         $affectedCount = Ekskul::where('kategori', $nama)->count();
         if ($affectedCount > 0) {
             Ekskul::where('kategori', $nama)->update(['kategori' => $fallback->nama]);
@@ -63,7 +62,7 @@ class KategoriEkskulController extends Controller
 
         $pesan = "Kategori '{$nama}' berhasil dihapus.";
         $pesan .= $affectedCount > 0
-            ? " {$affectedCount} ekskul yang sebelumnya berkategori '{$nama}' otomatis dipindah ke kategori 'Lainnya'."
+            ? " {$affectedCount} ekskul yang sebelumnya berkategori '{$nama}' otomatis dipindah ke kategori '{$fallback->nama}'."
             : ' Tidak ada ekskul yang terdampak.';
 
         return back()->with('success', $pesan);

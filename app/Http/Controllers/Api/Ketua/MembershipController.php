@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Ketua;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Concerns\KetuaEkskul;
 use App\Http\Resources\PendaftaranResource;
+use App\Models\Ekskul;
 use App\Models\Notifikasi;
 use App\Models\Pendaftaran;
 use App\Models\PengajuanKeluar;
@@ -33,22 +34,34 @@ class MembershipController extends ApiController
             'ekskul_id' => ['required', 'integer', Rule::in([$ekskul->id])],
             'siswa_id' => ['required', 'integer', 'exists:siswas,id'],
             'jabatan' => ['required', Rule::in(array_keys(Pengurus::daftarJabatanUsulanKetua()))],
+            'subdivisi_id' => ['nullable', 'integer', 'exists:ekskuls,id'],
             'alasan' => ['required', 'string', 'min:10', 'max:500'],
         ], [
             'ekskul_id.in' => 'Ekskul tidak sesuai dengan ekskul yang Anda pimpin.',
             'jabatan.in' => 'Ketua hanya dapat mengusulkan Wakil Ketua, Sekretaris, atau Bendahara.',
+            'subdivisi_id.exists' => 'Sub divisi tidak ditemukan.',
             'alasan.min' => 'Alasan pengajuan minimal 10 karakter.',
             'alasan.max' => 'Alasan pengajuan maksimal 500 karakter.',
         ]);
 
-        return DB::transaction(function () use ($ekskul, $validated): JsonResponse {
+        $subdivisiId = $validated['jabatan'] === Pengurus::JABATAN_WAKIL_KETUA
+            ? ($validated['subdivisi_id'] ?? null)
+            : null;
+
+        if ($subdivisiId) {
+            $subdivisi = Ekskul::findOrFail($subdivisiId);
+            abort_unless($subdivisi->parent_id === $ekskul->id, 422, 'Sub divisi tidak sesuai dengan ekskul ini.');
+        }
+
+        return DB::transaction(function () use ($ekskul, $validated, $subdivisiId): JsonResponse {
             $siswa = Siswa::query()
                 ->whereKey($validated['siswa_id'])
                 ->lockForUpdate()
                 ->firstOrFail();
 
+            $memberEkskulIds = array_merge(array_filter([$subdivisiId, $ekskul->id]), $ekskul->subdivisis()->pluck('id')->all());
             $pendaftaran = Pendaftaran::query()
-                ->where('ekskul_id', $ekskul->id)
+                ->whereIn('ekskul_id', $memberEkskulIds)
                 ->where('siswa_id', $siswa->id)
                 ->where('status', Pendaftaran::STATUS_DITERIMA)
                 ->exists();
@@ -72,12 +85,17 @@ class MembershipController extends ApiController
                 return $this->error($message, 422, ['siswa_id' => [$message]]);
             }
 
-            $pendingJabatan = Pengurus::query()
+            $queryPending = Pengurus::query()
                 ->where('ekskul_id', $ekskul->id)
                 ->where('jabatan', $validated['jabatan'])
                 ->where('status', Pengurus::STATUS_MENUNGGU)
-                ->with('siswa')
-                ->first();
+                ->with('siswa');
+
+            if ($validated['jabatan'] === Pengurus::JABATAN_WAKIL_KETUA) {
+                $queryPending->where('subdivisi_id', $subdivisiId);
+            }
+
+            $pendingJabatan = $queryPending->first();
 
             if ($pendingJabatan) {
                 $message = 'Sudah ada usulan '.Pengurus::labelJabatan($validated['jabatan'])
@@ -102,6 +120,7 @@ class MembershipController extends ApiController
 
             $pengurus = Pengurus::create([
                 'ekskul_id' => $ekskul->id,
+                'subdivisi_id' => $subdivisiId,
                 'siswa_id' => $siswa->id,
                 'jabatan' => $validated['jabatan'],
                 'status' => Pengurus::STATUS_MENUNGGU,
@@ -130,7 +149,7 @@ class MembershipController extends ApiController
     {
         $ekskul = $this->ekskul();
 
-        $query = Pendaftaran::where('ekskul_id', $ekskul->id)
+        $query = Pendaftaran::whereIn('ekskul_id', $this->anggotaEkskulIds($ekskul))
             ->whereIn('status', ['diterima', 'nonaktif', 'peringatan', 'keluar']);
 
         $total = (clone $query)->count();
@@ -186,13 +205,18 @@ class MembershipController extends ApiController
             'page' => ['nullable', 'integer', 'min:1'],
         ]);
         $ekskul = $this->ekskul();
+        $targetEkskul = $this->targetAnggotaEkskul($request);
+        $scopeEkskulIds = $this->anggotaEkskulIds($ekskul);
+        if ($targetEkskul->isSubdivisi()) {
+            $scopeEkskulIds[] = $targetEkskul->parent_id;
+        }
         $statusAktif = [Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN];
 
         $siswas = Siswa::query()
             ->with('kelas')
             ->whereDoesntHave('pendaftarans', fn ($query) => $query
-                ->where('ekskul_id', $ekskul->id)
-                ->whereIn('status', [Pendaftaran::STATUS_PENDING, Pendaftaran::STATUS_LULUS]))
+                ->whereIn('ekskul_id', $scopeEkskulIds)
+                ->whereIn('status', [Pendaftaran::STATUS_PENDING, Pendaftaran::STATUS_DITERIMA, Pendaftaran::STATUS_PERINGATAN, Pendaftaran::STATUS_LULUS]))
             ->when($validated['kelas_id'] ?? null, fn ($query, $kelasId) => $query->where('kelas_id', $kelasId))
             ->when($validated['q'] ?? null, function ($query, $search) {
                 $query->where(function ($studentQuery) use ($search) {
@@ -208,7 +232,7 @@ class MembershipController extends ApiController
                     AND pendaftarans.ekskul_id = ?
                     AND pendaftarans.status IN (?, ?)
                 ) THEN 1 ELSE 0 END',
-                [$ekskul->id, ...$statusAktif]
+                [$targetEkskul->id, ...$statusAktif]
             )
             ->orderBy('nama')
             ->paginate(25)
@@ -216,11 +240,11 @@ class MembershipController extends ApiController
 
         $studentIds = $siswas->getCollection()->pluck('id');
         $previousStatuses = Pendaftaran::query()
-            ->where('ekskul_id', $ekskul->id)
+            ->whereIn('ekskul_id', $scopeEkskulIds)
             ->whereIn('siswa_id', $studentIds)
             ->pluck('status', 'siswa_id');
         $previousDates = Pendaftaran::query()
-            ->where('ekskul_id', $ekskul->id)
+            ->whereIn('ekskul_id', $scopeEkskulIds)
             ->whereIn('siswa_id', $studentIds)
             ->pluck('tanggal_daftar', 'siswa_id');
 
@@ -245,7 +269,7 @@ class MembershipController extends ApiController
 
     public function tambahAnggota(Request $request): JsonResponse
     {
-        $ekskul = $this->ekskul();
+        $ekskul = $this->targetAnggotaEkskul($request);
         $validated = $request->validate([
             'siswa_ids' => ['required', 'array', 'min:1', 'max:100'],
             'siswa_ids.*' => ['required', 'integer', 'distinct', 'exists:siswas,id'],
@@ -379,7 +403,7 @@ class MembershipController extends ApiController
     {
         $ekskul = $this->ekskul();
 
-        $query = Pendaftaran::where('ekskul_id', $ekskul->id);
+        $query = Pendaftaran::whereIn('ekskul_id', $this->anggotaEkskulIds($ekskul));
 
         $total = (clone $query)->count();
         $pendingCount = (clone $query)->where('status', 'pending')->count();

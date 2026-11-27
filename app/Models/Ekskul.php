@@ -33,6 +33,28 @@ class Ekskul extends Model
         'status' => 'boolean',
     ];
 
+    protected static function booted(): void
+    {
+        static::saving(function (self $ekskul): void {
+            if ($ekskul->parent_id) {
+                $ekskul->tipe = self::query()->whereKey($ekskul->parent_id)->value('tipe')
+                    ?? self::TIPE_KOMUNITAS;
+
+                return;
+            }
+
+            $ekskul->tipe = $ekskul->pelatih_id
+                ? self::TIPE_EKSKUL
+                : self::TIPE_KOMUNITAS;
+        });
+
+        static::saved(function (self $ekskul): void {
+            if (! $ekskul->isSubdivisi() && $ekskul->wasChanged(['pelatih_id', 'tipe'])) {
+                $ekskul->subdivisis()->update(['tipe' => $ekskul->tipe]);
+            }
+        });
+    }
+
     public function parent(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id');
